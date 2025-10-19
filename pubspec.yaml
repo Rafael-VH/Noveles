@@ -1,0 +1,50 @@
+name: noveles
+description: "A new Flutter project."
+publish_to: 'none'
+version: 1.1.0
+
+environment:
+  sdk: '>=3.3.4 <4.0.0'
+
+dependencies:
+  accordion: ^2.6.0
+  banner_carousel: ^1.2.1
+  bloc: ^8.1.4
+  carousel_slider: ^4.2.1
+  cupertino_icons: ^1.0.8
+  dropdown_button2: ^2.3.9
+  equatable: ^2.0.5
+  expandable: ^5.0.1
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^8.1.6
+  flutter_native_splash: ^2.4.0
+  font_awesome_flutter: ^10.7.0
+  path_provider: ^2.1.3
+  provider: ^6.1.2
+  shared_preferences: ^2.2.3
+
+dev_dependencies:
+  flutter_lints: ^4.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/
+    - assets/book/
+    - assets/book/ch/
+    - assets/book/cr/
+    - assets/book/cr/sl/
+    - assets/book/eu/
+    - assets/book/eu/rwtss/
+    - assets/book/jp/
+    - assets/book/jp/oskar/
+    - assets/cover/
+    - assets/cover/ch/
+    - assets/cover/cr/
+    - assets/cover/eu/
+    - assets/cover/jp/
+    - assets/svg/
