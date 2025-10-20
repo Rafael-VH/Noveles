@@ -1,14 +1,16 @@
-import 'package:noveles/features/main/data/local/models/model.dart';
+import 'package:noveles/features/data/local/models/model.dart';
 
 //  Método para filtrar las Novelas por Genero
-List<BookLocalModel> filterBooksByGenre({required List<BookLocalModel> books, required String genre}) {
+List<BookLocalModel> filterBooksByGenre(
+    {required List<BookLocalModel> books, required String genre}) {
   return books.where((book) {
     return book.listGenre.any((g) => g.name == genre);
   }).toList();
 }
 
 //  Método para filtrar y mostrar los ultimo 5 Novelas por el "createdAt"
-List<BookLocalModel> getLastFiveBooksByCreatedAt({required List<BookLocalModel> books}) {
+List<BookLocalModel> getLastFiveBooksByCreatedAt(
+    {required List<BookLocalModel> books}) {
   // Ordenar los libros por fecha de creación en orden descendente
   books.sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
@@ -17,7 +19,8 @@ List<BookLocalModel> getLastFiveBooksByCreatedAt({required List<BookLocalModel> 
 }
 
 //  Método para filtrar y mostrar los ultimo 5 Novelas por el "id"
-List<BookLocalModel> getLastFiveBooksById({required List<BookLocalModel> books}) {
+List<BookLocalModel> getLastFiveBooksById(
+    {required List<BookLocalModel> books}) {
   // Ordenar los libros por id en orden descendente
   books.sort((a, b) => b.id.compareTo(a.id));
 

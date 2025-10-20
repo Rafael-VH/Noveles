@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:noveles/features/main/presentation/bloc/bloc.dart';
-import 'package:noveles/features/main/presentation/screens/screens.dart';
+import 'package:noveles/features/presentation/bloc/bloc.dart';
+import 'package:noveles/features/presentation/screens/screens.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
