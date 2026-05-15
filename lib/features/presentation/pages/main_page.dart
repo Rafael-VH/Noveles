@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:noveles/core/utils/entity_to_local.dart';
-import 'package:noveles/features/data/local/models/model.dart';
+import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
 import 'package:noveles/features/presentation/screens/screens.dart';
 import 'package:noveles/features/presentation/widgets/carousel_appbar_sliver.dart';
@@ -25,10 +24,8 @@ class MainPage extends StatelessWidget {
               return Center(child: Text('Error: ${genreState.message}'));
             }
             if (bookState is BookLoaded && genreState is GenreLoaded) {
-              final listBook =
-                  bookState.books.map((b) => b.toLocalModel()).toList();
-              final listGenre =
-                  genreState.genres.map((g) => g.toLocalModel()).toList();
+              final listBook = bookState.books;
+              final listGenre = genreState.genres;
               return _buildContent(context, listBook, listGenre);
             }
             return const Center(child: CircularProgressIndicator());
@@ -40,8 +37,8 @@ class MainPage extends StatelessWidget {
 
   Widget _buildContent(
     BuildContext context,
-    List<BookLocalModel> listBook,
-    List<GenreLocalModel> listGenre,
+    List<BookEntity> listBook,
+    List<GenreEntity> listGenre,
   ) {
     return SafeArea(
       child: CustomScrollView(

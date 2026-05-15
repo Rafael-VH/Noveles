@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:noveles/features/data/local/models/model.dart';
+import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/presentation/pages/pages.dart';
 
 class BookScreen extends StatefulWidget {
@@ -8,7 +8,7 @@ class BookScreen extends StatefulWidget {
     required this.books,
   });
 
-  final BookLocalModel books;
+  final BookEntity books;
 
   @override
   State<BookScreen> createState() => _BookScreenState();

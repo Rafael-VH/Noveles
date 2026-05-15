@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:noveles/features/data/local/models/chapter_local_model.dart';
+import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/presentation/pages/pages.dart';
 
 class ChapterScreen extends StatefulWidget {
-  final List<ChapterLocalModel> chapters;
+  final List<ChapterEntity> chapters;
   final int i;
 
   const ChapterScreen({super.key, required this.chapters, required this.i});
@@ -14,7 +14,7 @@ class ChapterScreen extends StatefulWidget {
 }
 
 class _ChapterScreenState extends State<ChapterScreen> {
-  late List<ChapterLocalModel> _chapters;
+  late List<ChapterEntity> _chapters;
 
   @override
   void initState() {
@@ -26,13 +26,28 @@ class _ChapterScreenState extends State<ChapterScreen> {
   Future<void> _loadContent() async {
     for (int i = 0; i < _chapters.length; i++) {
       try {
-        final String content = await rootBundle.loadString(_chapters[i].content);
+        final String content =
+            await rootBundle.loadString(_chapters[i].content);
         setState(() {
-          _chapters[i] = _chapters[i].copyWith(content: content);
+          _chapters[i] = ChapterEntity(
+            id: _chapters[i].id,
+            createdAt: _chapters[i].createdAt,
+            number: _chapters[i].number,
+            title: _chapters[i].title,
+            content: content,
+            tookId: _chapters[i].tookId,
+          );
         });
       } catch (e) {
         setState(() {
-          _chapters[i] = _chapters[i].copyWith(content: 'Error: $e');
+          _chapters[i] = ChapterEntity(
+            id: _chapters[i].id,
+            createdAt: _chapters[i].createdAt,
+            number: _chapters[i].number,
+            title: _chapters[i].title,
+            content: 'Error: $e',
+            tookId: _chapters[i].tookId,
+          );
         });
       }
     }

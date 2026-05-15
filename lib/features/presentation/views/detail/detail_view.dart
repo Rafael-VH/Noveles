@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:noveles/features/data/local/models/model.dart';
+import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/presentation/views/detail/widgets/card_info_v1_detail.dart';
 import 'package:noveles/features/presentation/widgets/widgets.dart';
 
@@ -9,7 +9,7 @@ class DetailView extends StatefulWidget {
     required this.books,
   });
 
-  final BookLocalModel books;
+  final BookEntity books;
 
   @override
   State<DetailView> createState() => _DetailViewState();
@@ -24,14 +24,12 @@ class _DetailViewState extends State<DetailView> {
           children: [
             const SizedBox(height: 22.0),
 
-            //
             titleWidget(
               text: 'Descripción',
               clContent: Theme.of(context).colorScheme.surface,
               clText: Colors.white,
             ),
 
-            //
             Padding(
               padding: const EdgeInsets.all(10.0),
               child: Text(
@@ -76,14 +74,12 @@ class _DetailViewState extends State<DetailView> {
               ),
             ),
 
-            //
             titleWidget(
               text: 'Generos',
               clContent: Theme.of(context).colorScheme.surface,
               clText: Colors.white,
             ),
 
-            //
             Padding(
               padding: const EdgeInsets.all(10.0),
               child: Wrap(

@@ -1,11 +1,11 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:noveles/features/data/local/models/model.dart';
+import 'package:noveles/features/domain/entities/entities.dart';
 
 SliverAppBar sliverAppBarV1Book({
   required BuildContext context,
-  required BookLocalModel books,
+  required BookEntity books,
   required IconButton infoIcon,
 }) {
   return SliverAppBar(
@@ -22,7 +22,6 @@ SliverAppBar sliverAppBarV1Book({
       width: MediaQuery.of(context).size.width,
       child: Stack(
         children: [
-          //
           Positioned.fill(
             child: Image(
               fit: BoxFit.cover,
@@ -30,7 +29,6 @@ SliverAppBar sliverAppBarV1Book({
             ),
           ),
 
-          //
           Positioned.fill(
             child: ClipRect(
               child: BackdropFilter(
@@ -42,7 +40,6 @@ SliverAppBar sliverAppBarV1Book({
             ),
           ),
 
-          //
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
@@ -59,7 +56,6 @@ SliverAppBar sliverAppBarV1Book({
             ),
           ),
 
-          //
           Positioned(
             top: 65.0,
             left: 16.0,

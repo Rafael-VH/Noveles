@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:noveles/features/data/local/models/model.dart';
+import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/presentation/screens/screens.dart';
 
 class TookPage extends StatefulWidget {
@@ -8,7 +8,7 @@ class TookPage extends StatefulWidget {
     required this.tooks,
   });
 
-  final TookLocalModel tooks;
+  final TookEntity tooks;
 
   @override
   State<TookPage> createState() => _TookPageState();
@@ -20,12 +20,10 @@ class _TookPageState extends State<TookPage> {
     return SafeArea(
       child: CustomScrollView(
         slivers: [
-          //
           SliverAppBar(
             title: Text(widget.tooks.number),
           ),
 
-          //
           SliverList.builder(
             itemCount: widget.tooks.listChapter.length,
             itemBuilder: (context, index) {

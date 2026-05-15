@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:noveles/core/utils/filter_genre.dart';
-import 'package:noveles/features/data/local/models/model.dart';
+import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/presentation/pages/pages.dart';
 
 class GenreScreen extends StatefulWidget {
@@ -11,22 +10,21 @@ class GenreScreen extends StatefulWidget {
   });
 
   final String genre;
-  final List<BookLocalModel> books;
+  final List<BookEntity> books;
 
   @override
   State<GenreScreen> createState() => _GenreScreenState();
 }
 
 class _GenreScreenState extends State<GenreScreen> {
-  // Utiliza la función de filtrado
-  late final List<BookLocalModel> filteredBooks;
+  late final List<BookEntity> filteredBooks;
 
   @override
   void initState() {
     super.initState();
-    // Filtrar los libros en initState
-    filteredBooks =
-        filterBooksByGenre(books: widget.books, genre: widget.genre);
+    filteredBooks = widget.books
+        .where((book) => book.listGenre.any((g) => g.name == widget.genre))
+        .toList();
   }
 
   @override

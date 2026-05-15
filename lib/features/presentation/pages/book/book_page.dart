@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:noveles/features/data/local/models/model.dart';
+import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/presentation/pages/book/widgets/sliver_app_bar_v1_book.dart';
 import 'package:noveles/features/presentation/pages/book/widgets/sliver_persistent_header_v1_book.dart';
 import 'package:noveles/features/presentation/views/views.dart';
@@ -11,7 +11,7 @@ class BookPage extends StatefulWidget {
     required this.books,
   });
 
-  final BookLocalModel books;
+  final BookEntity books;
 
   @override
   State<BookPage> createState() => _BookPageState();
@@ -26,22 +26,16 @@ class _BookPageState extends State<BookPage>
 
   @override
   void initState() {
-    super.initState(); //
+    super.initState();
     _tabController = TabController(length: 2, vsync: this);
 
-    // Agrega un listener al ScrollController para detectar el scroll en el CustomScrollView
     _scrollController.addListener(() {
       setState(() {
-        // Verifica si se está haciendo scroll hacia abajo dentro del CustomScrollView
         if (_scrollController.position.userScrollDirection ==
             ScrollDirection.reverse) {
-          // Oculta el FloatingActionButton
           isVisible = false;
-        }
-        // Verifica si se está haciendo scroll hacia arriba dentro del CustomScrollView
-        else if (_scrollController.position.userScrollDirection ==
+        } else if (_scrollController.position.userScrollDirection ==
             ScrollDirection.forward) {
-          // Muestra el FloatingActionButton
           isVisible = true;
         }
       });
@@ -55,7 +49,6 @@ class _BookPageState extends State<BookPage>
     super.dispose();
   }
 
-  //
   void showInfoDialog() {
     showDialog(
       context: context,
@@ -69,9 +62,7 @@ class _BookPageState extends State<BookPage>
         actions: [
           ElevatedButton(
             onPressed: () {},
-            child: const Text(
-              "Aceptar",
-            ),
+            child: const Text("Aceptar"),
           ),
         ],
         title: const Center(
@@ -90,32 +81,26 @@ class _BookPageState extends State<BookPage>
       child: NestedScrollView(
         headerSliverBuilder: (context, _) {
           return [
-            //
             sliverAppBarV1Book(
               context: context,
               books: widget.books,
               infoIcon: IconButton(
                 onPressed: () => showInfoDialog(),
-                //icon: const FaIcon(FontAwesomeIcons.circleInfo),
                 icon: const Icon(Icons.info_outlined),
               ),
             ),
 
-            //
             sliverPersistentHeaderV1Book(
               tabController: _tabController,
               tabs: nameTab,
               context: context,
             ),
           ];
-        }, //
+        },
         body: TabBarView(
           controller: _tabController,
           children: [
-            //
             DetailView(books: widget.books),
-
-            //
             TookView(books: widget.books),
           ],
         ),

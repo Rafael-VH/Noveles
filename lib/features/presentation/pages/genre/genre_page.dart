@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:noveles/features/data/local/models/model.dart';
+import 'package:noveles/features/domain/entities/entities.dart';
 
 class GenrePage extends StatefulWidget {
   const GenrePage({
@@ -8,7 +8,7 @@ class GenrePage extends StatefulWidget {
     required this.genre,
   });
 
-  final List<BookLocalModel> books;
+  final List<BookEntity> books;
   final String genre;
 
   @override
@@ -47,7 +47,6 @@ class _GenrePageState extends State<GenrePage> {
                             ),
                           ),
 
-                          //
                           Positioned.fill(
                             child: Container(
                               decoration: BoxDecoration(
@@ -71,7 +70,6 @@ class _GenrePageState extends State<GenrePage> {
                             ),
                           ),
 
-                          //
                           Positioned(
                             left: 4.0,
                             right: 4.0,

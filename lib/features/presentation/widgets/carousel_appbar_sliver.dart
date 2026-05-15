@@ -1,12 +1,11 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-//import 'package:carousel_slider/carousel_slider.dart';
-import 'package:noveles/features/data/local/models/model.dart';
+import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/presentation/screens/screens.dart';
 
 SliverAppBar sliverAppBarV1Home({
   required BuildContext context,
-  required List<BookLocalModel> listBook,
+  required List<BookEntity> listBook,
   required List<Widget> actions,
 }) {
   return SliverAppBar(
@@ -35,7 +34,6 @@ SliverAppBar sliverAppBarV1Home({
           ),
           child: Stack(
             children: [
-              //  Imagen de Fondo
               Positioned.fill(
                 child: Image(
                   fit: BoxFit.cover,
@@ -45,7 +43,6 @@ SliverAppBar sliverAppBarV1Home({
                 ),
               ),
 
-              //  Degradado de Imagen
               Positioned.fill(
                 child: Container(
                   decoration: BoxDecoration(
@@ -62,7 +59,6 @@ SliverAppBar sliverAppBarV1Home({
                 ),
               ),
 
-              //  Texto de la Novela
               Positioned(
                 left: 0.0,
                 right: 0.0,

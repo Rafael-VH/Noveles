@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:noveles/features/data/local/models/model.dart';
+import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/presentation/pages/pages.dart';
 
 class TookScreen extends StatefulWidget {
@@ -8,7 +8,7 @@ class TookScreen extends StatefulWidget {
     required this.tooks,
   });
 
-  final TookLocalModel tooks;
+  final TookEntity tooks;
 
   @override
   State<TookScreen> createState() => _TookScreenState();

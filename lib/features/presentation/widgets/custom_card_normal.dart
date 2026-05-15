@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:noveles/features/data/local/models/model.dart';
+import 'package:noveles/features/domain/entities/entities.dart';
 
 class CustomCardNormal extends StatelessWidget {
   const CustomCardNormal({
@@ -7,7 +7,7 @@ class CustomCardNormal extends StatelessWidget {
     required this.novelModel,
   });
 
-  final BookLocalModel novelModel;
+  final BookEntity novelModel;
 
   @override
   Widget build(BuildContext context) {

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:noveles/features/data/local/models/model.dart';
+import 'package:noveles/features/domain/entities/entities.dart';
 
 class ChapterPage extends StatefulWidget {
   final int i;
-  final List<ChapterLocalModel> chapters;
+  final List<ChapterEntity> chapters;
 
   const ChapterPage({
     super.key,
@@ -34,19 +34,13 @@ class _ChapterPageState extends State<ChapterPage> {
   void initState() {
     super.initState();
     textEditingController.text = textSize.toString();
-    // Agrega un listener al ScrollController para detectar el scroll en el CustomScrollView
     scrollController.addListener(() {
       setState(() {
-        // Verifica si se está haciendo scroll hacia abajo dentro del CustomScrollView
         if (scrollController.position.userScrollDirection ==
             ScrollDirection.reverse) {
-          // Oculta el FloatingActionButton
           isVisible = false;
-        }
-        // Verifica si se está haciendo scroll hacia arriba dentro del CustomScrollView
-        else if (scrollController.position.userScrollDirection ==
+        } else if (scrollController.position.userScrollDirection ==
             ScrollDirection.forward) {
-          // Muestra el FloatingActionButton
           isVisible = true;
         }
       });
@@ -60,18 +54,14 @@ class _ChapterPageState extends State<ChapterPage> {
     super.dispose();
   }
 
-  //
   int countCaracteres(String? texto) {
     if (texto == null || texto.isEmpty) {
       return 0;
     }
-
-    // Remover símbolos de puntuación, espacios y contar los caracteres restantes
     final textoLimpio = texto.replaceAll(RegExp(r'([.,!?; ])'), '');
     return textoLimpio.length;
   }
 
-  //
   int countPalabras(String? texto) {
     if (texto == null || texto.isEmpty) {
       return 0;
@@ -80,7 +70,6 @@ class _ChapterPageState extends State<ChapterPage> {
     return palabras.length;
   }
 
-  //
   int countFrases(String? texto) {
     if (texto == null || texto.isEmpty) {
       return 0;
@@ -89,7 +78,6 @@ class _ChapterPageState extends State<ChapterPage> {
     return frases.length;
   }
 
-  //
   int countParrafos(String? texto) {
     if (texto == null || texto.isEmpty) {
       return 0;
@@ -119,7 +107,6 @@ class _ChapterPageState extends State<ChapterPage> {
             controller: scrollController,
             physics: const BouncingScrollPhysics(),
             slivers: [
-              //
               SliverAppBar(
                 floating: false,
                 centerTitle: true,
@@ -132,7 +119,6 @@ class _ChapterPageState extends State<ChapterPage> {
                 ),
               ),
 
-              //
               SliverToBoxAdapter(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -147,7 +133,6 @@ class _ChapterPageState extends State<ChapterPage> {
                           ch.title,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
-                            //color: ColorTheme.primaryColor,
                             fontSize: 20.0,
                           ),
                         ),

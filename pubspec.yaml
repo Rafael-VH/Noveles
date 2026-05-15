@@ -12,10 +12,7 @@ dependencies:
 
   # UI / COMPONENTES VISUALES
   cupertino_icons: ^1.0.8
-  font_awesome_flutter: ^10.7.0
   carousel_slider: ^4.2.1
-  expandable: ^5.0.1
-  dropdown_button2: ^2.3.9
 
   # ARQUITECTURA / STATE MANAGEMENT
   bloc: ^8.1.4
@@ -23,13 +20,10 @@ dependencies:
   equatable: ^2.0.5
 
   # ALMACENAMIENTO / PERSISTENCIA
-  shared_preferences: ^2.3.1
-  path_provider: ^2.1.4
+
 
   # Dependency Injection
   get_it: ^7.6.0
-  injectable: ^2.3.2
-  dartz: ^0.10.1
 
   # SUPABASE
   supabase_flutter: ^2.10.0
@@ -60,4 +54,3 @@ flutter:
     - assets/cover/cr/
     - assets/cover/eu/
     - assets/cover/jp/
-    - assets/svg/
