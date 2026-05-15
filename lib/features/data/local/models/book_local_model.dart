@@ -8,13 +8,14 @@ class BookLocalModel {
   final String short;
   final String alternative;
   final String description;
+  final int authorId;
   final String author;
   final String country;
   final String state;
   final String type;
   final String release;
-  final String took;
-  final String chapter;
+  final String tookCount;
+  final String chapterCount;
   final String source;
   final String link;
   late bool isFavorite;
@@ -29,13 +30,14 @@ class BookLocalModel {
     required this.short,
     required this.alternative,
     required this.description,
+    required this.authorId,
     required this.author,
     required this.country,
     required this.state,
     required this.type,
     required this.release,
-    required this.took,
-    required this.chapter,
+    required this.tookCount,
+    required this.chapterCount,
     required this.source,
     required this.link,
     this.isFavorite = false,
@@ -43,7 +45,6 @@ class BookLocalModel {
     required this.listTook,
   });
 
-  //  Se utiliza para actualizar los datos de la 'Novela' sin modificar la instancia original.
   BookLocalModel copyWith({
     int? id,
     DateTime? createdAt,
@@ -52,13 +53,14 @@ class BookLocalModel {
     String? short,
     String? alternative,
     String? description,
+    int? authorId,
     String? author,
     String? country,
     String? state,
     String? type,
     String? release,
-    String? took,
-    String? chapter,
+    String? tookCount,
+    String? chapterCount,
     String? source,
     String? link,
     bool? isFavorite,
@@ -73,13 +75,14 @@ class BookLocalModel {
       short: short ?? this.short,
       alternative: alternative ?? this.alternative,
       description: description ?? this.description,
+      authorId: authorId ?? this.authorId,
       author: author ?? this.author,
       country: country ?? this.country,
       state: state ?? this.state,
       type: type ?? this.type,
       release: release ?? this.release,
-      took: took ?? this.took,
-      chapter: chapter ?? this.chapter,
+      tookCount: tookCount ?? this.tookCount,
+      chapterCount: chapterCount ?? this.chapterCount,
       source: source ?? this.source,
       link: link ?? this.link,
       isFavorite: isFavorite ?? this.isFavorite,
@@ -88,7 +91,6 @@ class BookLocalModel {
     );
   }
 
-  //  Devuelve un mapa de las propiedades de la 'Novela'.
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -98,13 +100,14 @@ class BookLocalModel {
       'short': short,
       'alternative': alternative,
       'description': description,
+      'authorId': authorId,
       'author': author,
       'country': country,
       'state': state,
       'type': type,
       'release': release,
-      'took': took,
-      'chapter': chapter,
+      'tookCount': tookCount,
+      'chapterCount': chapterCount,
       'source': source,
       'link': link,
       'isFavorite': isFavorite,
@@ -113,7 +116,6 @@ class BookLocalModel {
     };
   }
 
-  //  Devuelve un mapa de las propiedades de la 'Novela' en formato JSON.
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -123,13 +125,14 @@ class BookLocalModel {
       'short': short,
       'alternative': alternative,
       'description': description,
+      'authorId': authorId,
       'author': author,
       'country': country,
       'state': state,
       'type': type,
       'release': release,
-      'took': took,
-      'chapter': chapter,
+      'tookCount': tookCount,
+      'chapterCount': chapterCount,
       'source': source,
       'link': link,
       'isFavorite': isFavorite,
@@ -138,7 +141,6 @@ class BookLocalModel {
     };
   }
 
-  //  Convierte un mapa JSON en una instancia de NovelModel.
   factory BookLocalModel.fromJson(Map<String, dynamic> json) {
     return BookLocalModel(
       id: json['id'],
@@ -148,13 +150,14 @@ class BookLocalModel {
       short: json['short'],
       alternative: json['alternative'],
       description: json['description'],
+      authorId: json['authorId'] ?? 0,
       author: json['author'],
       country: json['country'],
       state: json['state'],
       type: json['type'],
       release: json['release'],
-      took: json['took'],
-      chapter: json['chapter'],
+      tookCount: json['tookCount'],
+      chapterCount: json['chapterCount'],
       source: json['source'],
       link: json['link'],
       isFavorite: json['isFavorite'],

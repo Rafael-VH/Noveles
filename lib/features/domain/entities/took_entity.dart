@@ -7,6 +7,7 @@ class TookEntity {
   final String number;
   final String title;
   final String content;
+  final int bookId;
   final List<ChapterEntity> listChapter;
 
   TookEntity({
@@ -16,6 +17,7 @@ class TookEntity {
     required this.number,
     required this.title,
     required this.content,
+    required this.bookId,
     required this.listChapter,
   });
 
@@ -26,6 +28,7 @@ class TookEntity {
     String? number,
     String? title,
     String? content,
+    int? bookId,
     List<ChapterEntity>? listChapter,
   }) {
     return TookEntity(
@@ -35,6 +38,7 @@ class TookEntity {
       number: number ?? this.number,
       title: title ?? this.title,
       content: content ?? this.content,
+      bookId: bookId ?? this.bookId,
       listChapter: listChapter ?? this.listChapter,
     );
   }
@@ -42,11 +46,12 @@ class TookEntity {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'createdAt': createdAt.toIso8601String(),
+      'created_at': createdAt.toIso8601String(),
       'cover': cover,
       'number': number,
       'title': title,
       'content': content,
+      'book_id': bookId,
       'listChapter': listChapter.map((chapter) => chapter.toMap()).toList(),
     };
   }
@@ -54,11 +59,12 @@ class TookEntity {
   factory TookEntity.fromMap(Map<String, dynamic> map) {
     return TookEntity(
       id: map['id'],
-      createdAt: DateTime.parse(map['createdAt']),
-      cover: map['cover'],
-      number: map['number'],
-      title: map['title'],
-      content: map['content'],
+      createdAt: DateTime.parse(map['created_at']),
+      cover: map['cover'] ?? '',
+      number: map['number'] ?? '',
+      title: map['title'] ?? '',
+      content: map['content'] ?? '',
+      bookId: map['book_id'] ?? 0,
       listChapter: List<ChapterEntity>.from(
         map['listChapter'].map((item) => ChapterEntity.fromMap(item)),
       ),

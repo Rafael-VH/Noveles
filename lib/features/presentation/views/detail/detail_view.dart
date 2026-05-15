@@ -70,9 +70,9 @@ class _DetailViewState extends State<DetailView> {
               child: cardInfoV1Detail(
                 context: context,
                 title1: "Tomos",
-                text1: widget.books.took,
+                text1: widget.books.tookCount,
                 title2: "Capítulos",
-                text2: widget.books.chapter,
+                text2: widget.books.chapterCount,
               ),
             ),
 

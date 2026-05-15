@@ -7,6 +7,7 @@ class TookLocalModel {
   final String number;
   final String title;
   final String content;
+  final int bookId;
   final List<ChapterLocalModel> listChapter;
 
   TookLocalModel({
@@ -16,10 +17,10 @@ class TookLocalModel {
     required this.number,
     required this.title,
     required this.content,
+    required this.bookId,
     required this.listChapter,
   });
 
-  //  Se utiliza para actualizar los datos del 'Tomo' sin modificar la instancia original.
   TookLocalModel copyWith({
     int? id,
     DateTime? createdAt,
@@ -27,6 +28,7 @@ class TookLocalModel {
     String? number,
     String? title,
     String? content,
+    int? bookId,
     List<ChapterLocalModel>? listChapter,
   }) {
     return TookLocalModel(
@@ -36,11 +38,11 @@ class TookLocalModel {
       number: number ?? this.number,
       title: title ?? this.title,
       content: content ?? this.content,
+      bookId: bookId ?? this.bookId,
       listChapter: listChapter ?? this.listChapter,
     );
   }
 
-  //  Devuelve un mapa de las propiedades del 'Tomo'.
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -49,11 +51,11 @@ class TookLocalModel {
       'number': number,
       'title': title,
       'content': content,
+      'bookId': bookId,
       'listChapter': listChapter.toList(),
     };
   }
 
-  //  Devuelve un mapa de las propiedades del 'Tomo' en formato JSON.
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -62,11 +64,11 @@ class TookLocalModel {
       'number': number,
       'title': title,
       'content': content,
+      'bookId': bookId,
       'listChapter': listChapter.toList(),
     };
   }
 
-  //  Convierte un mapa JSON en una instancia de TookModel.
   factory TookLocalModel.fromJson(Map<String, dynamic> json) {
     return TookLocalModel(
       id: json['id'],
@@ -75,6 +77,7 @@ class TookLocalModel {
       number: json['number'],
       title: json['title'],
       content: json['content'],
+      bookId: json['bookId'] ?? 0,
       listChapter: json['listChapter'],
     );
   }

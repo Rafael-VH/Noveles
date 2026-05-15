@@ -8,13 +8,14 @@ class BookEntity {
   final String short;
   final String alternative;
   final String description;
+  final int authorId;
   final String author;
   final String country;
   final String state;
   final String type;
   final String release;
-  final String took;
-  final String chapter;
+  final String tookCount;
+  final String chapterCount;
   final String source;
   final String link;
   late bool isFavorite;
@@ -29,13 +30,14 @@ class BookEntity {
     required this.short,
     required this.alternative,
     required this.description,
+    required this.authorId,
     required this.author,
     required this.country,
     required this.state,
     required this.type,
     required this.release,
-    required this.took,
-    required this.chapter,
+    required this.tookCount,
+    required this.chapterCount,
     required this.source,
     required this.link,
     this.isFavorite = false,
@@ -51,13 +53,14 @@ class BookEntity {
     String? short,
     String? alternative,
     String? description,
+    int? authorId,
     String? author,
     String? country,
     String? state,
     String? type,
     String? release,
-    String? took,
-    String? chapter,
+    String? tookCount,
+    String? chapterCount,
     String? source,
     String? link,
     bool? isFavorite,
@@ -72,13 +75,14 @@ class BookEntity {
       short: short ?? this.short,
       alternative: alternative ?? this.alternative,
       description: description ?? this.description,
+      authorId: authorId ?? this.authorId,
       author: author ?? this.author,
       country: country ?? this.country,
       state: state ?? this.state,
       type: type ?? this.type,
       release: release ?? this.release,
-      took: took ?? this.took,
-      chapter: chapter ?? this.chapter,
+      tookCount: tookCount ?? this.tookCount,
+      chapterCount: chapterCount ?? this.chapterCount,
       source: source ?? this.source,
       link: link ?? this.link,
       isFavorite: isFavorite ?? this.isFavorite,
@@ -90,22 +94,22 @@ class BookEntity {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'createdAt': createdAt.toIso8601String(),
+      'created_at': createdAt.toIso8601String(),
       'cover': cover,
       'name': name,
       'short': short,
       'alternative': alternative,
       'description': description,
-      'author': author,
+      'author_id': authorId,
       'country': country,
       'state': state,
       'type': type,
       'release': release,
-      'took': took,
-      'chapter': chapter,
+      'took_count': tookCount,
+      'chapter_count': chapterCount,
       'source': source,
       'link': link,
-      'isFavorite': isFavorite,
+      'is_favorite': isFavorite,
       'listGenre': listGenre.map((genre) => genre.toMap()).toList(),
       'listTook': listTook.map((took) => took.toMap()).toList(),
     };
@@ -114,22 +118,23 @@ class BookEntity {
   factory BookEntity.fromMap(Map<String, dynamic> map) {
     return BookEntity(
       id: map['id'],
-      createdAt: DateTime.parse(map['createdAt']),
-      cover: map['cover'],
-      name: map['name'],
-      short: map['short'],
-      alternative: map['alternative'],
-      description: map['description'],
-      author: map['author'],
-      country: map['country'],
-      state: map['state'],
-      type: map['type'],
-      release: map['release'],
-      took: map['took'],
-      chapter: map['chapter'],
-      source: map['source'],
-      link: map['link'],
-      isFavorite: map['isFavorite'],
+      createdAt: DateTime.parse(map['created_at']),
+      cover: map['cover'] ?? '',
+      name: map['name'] ?? '',
+      short: map['short'] ?? '',
+      alternative: map['alternative'] ?? '',
+      description: map['description'] ?? '',
+      authorId: map['author_id'] ?? 0,
+      author: map['author'] ?? '',
+      country: map['country'] ?? '',
+      state: map['state'] ?? '',
+      type: map['type'] ?? '',
+      release: map['release'] ?? '',
+      tookCount: map['took_count'] ?? '',
+      chapterCount: map['chapter_count'] ?? '',
+      source: map['source'] ?? '',
+      link: map['link'] ?? '',
+      isFavorite: map['is_favorite'] ?? false,
       listGenre: List<GenreEntity>.from(
         map['listGenre'].map((item) => GenreEntity.fromMap(item)),
       ),

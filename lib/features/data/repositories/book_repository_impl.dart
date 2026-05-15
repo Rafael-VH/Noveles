@@ -7,7 +7,7 @@ class BookRepositoryImpl implements BookRepository {
   Future<List<BookEntity>> getBooks() async {
     final response = await supabase
         .from('books')
-        .select('*, books_genres!inner(genre_id, genres(*)), tooks(*, chapters(*))')
+        .select('*, authors!inner(*), books_genres!inner(genre_id, genres(*)), tooks(*, chapters(*))')
         .order('id');
 
     return response.map((json) => _mapToBookEntity(json)).toList();
@@ -17,7 +17,7 @@ class BookRepositoryImpl implements BookRepository {
   Future<BookEntity?> getBookById(int id) async {
     final response = await supabase
         .from('books')
-        .select('*, books_genres!inner(genre_id, genres(*)), tooks(*, chapters(*))')
+        .select('*, authors!inner(*), books_genres!inner(genre_id, genres(*)), tooks(*, chapters(*))')
         .eq('id', id)
         .maybeSingle();
 
@@ -26,6 +26,8 @@ class BookRepositoryImpl implements BookRepository {
   }
 
   BookEntity _mapToBookEntity(Map<String, dynamic> json) {
+    final authorData = Map<String, dynamic>.from(json['authors']);
+
     final listGenre = (json['books_genres'] as List<dynamic>)
         .map((bg) => GenreEntity.fromMap(Map<String, dynamic>.from(bg['genres'])))
         .toList();
@@ -49,13 +51,14 @@ class BookRepositoryImpl implements BookRepository {
       short: json['short'] ?? '',
       alternative: json['alternative'] ?? '',
       description: json['description'] ?? '',
-      author: json['author'] ?? '',
+      authorId: json['author_id'] ?? 0,
+      author: authorData['name'] ?? '',
       country: json['country'] ?? '',
       state: json['state'] ?? '',
       type: json['type'] ?? '',
       release: json['release'] ?? '',
-      took: json['took'] ?? '',
-      chapter: json['chapter'] ?? '',
+      tookCount: json['took_count'] ?? '',
+      chapterCount: json['chapter_count'] ?? '',
       source: json['source'] ?? '',
       link: json['link'] ?? '',
       isFavorite: json['is_favorite'] ?? false,

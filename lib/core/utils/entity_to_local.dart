@@ -10,13 +10,14 @@ extension BookEntityToLocal on BookEntity {
         short: short,
         alternative: alternative,
         description: description,
+        authorId: authorId,
         author: author,
         country: country,
         state: state,
         type: type,
         release: release,
-        took: took,
-        chapter: chapter,
+        tookCount: tookCount,
+        chapterCount: chapterCount,
         source: source,
         link: link,
         isFavorite: isFavorite,
@@ -42,6 +43,7 @@ extension TookEntityToLocal on TookEntity {
         number: number,
         title: title,
         content: content,
+        bookId: bookId,
         listChapter: listChapter.map((c) => c.toLocalModel()).toList(),
       );
 }
@@ -53,5 +55,6 @@ extension ChapterEntityToLocal on ChapterEntity {
         number: number,
         title: title,
         content: content,
+        tookId: tookId,
       );
 }

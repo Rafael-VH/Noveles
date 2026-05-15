@@ -4,6 +4,7 @@ class ChapterLocalModel {
   final String number;
   final String title;
   final String content;
+  final int tookId;
 
   ChapterLocalModel({
     required this.id,
@@ -11,15 +12,16 @@ class ChapterLocalModel {
     required this.number,
     required this.title,
     required this.content,
+    required this.tookId,
   });
 
-  //  Se utiliza para actualizar los datos del 'Capitulo' sin modificar la instancia original.
   ChapterLocalModel copyWith({
     int? id,
     DateTime? createdAt,
     String? number,
     String? title,
     String? content,
+    int? tookId,
   }) {
     return ChapterLocalModel(
       id: id ?? this.id,
@@ -27,10 +29,10 @@ class ChapterLocalModel {
       number: number ?? this.number,
       title: title ?? this.title,
       content: content ?? this.content,
+      tookId: tookId ?? this.tookId,
     );
   }
 
-  //  Devuelve un mapa de las propiedades del 'Capitulo'.
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -38,10 +40,10 @@ class ChapterLocalModel {
       'number': number,
       'title': title,
       'content': content,
+      'tookId': tookId,
     };
   }
 
-  //  Devuelve un mapa de las propiedades del 'Capitulo' en formato JSON.
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -49,10 +51,10 @@ class ChapterLocalModel {
       'number': number,
       'title': title,
       'content': content,
+      'tookId': tookId,
     };
   }
 
-  //  Convierte un mapa JSON en una instancia de ChapterModel.
   factory ChapterLocalModel.fromJson(Map<String, dynamic> json) {
     return ChapterLocalModel(
       id: json['id'],
@@ -60,6 +62,7 @@ class ChapterLocalModel {
       number: json['number'],
       title: json['title'],
       content: json['content'],
+      tookId: json['tookId'] ?? 0,
     );
   }
 }

@@ -4,6 +4,7 @@ class ChapterEntity {
   final String number;
   final String title;
   final String content;
+  final int tookId;
 
   ChapterEntity({
     required this.id,
@@ -11,6 +12,7 @@ class ChapterEntity {
     required this.number,
     required this.title,
     required this.content,
+    required this.tookId,
   });
 
   ChapterEntity copyWith({
@@ -19,6 +21,7 @@ class ChapterEntity {
     String? number,
     String? title,
     String? content,
+    int? tookId,
   }) {
     return ChapterEntity(
       id: id ?? this.id,
@@ -26,26 +29,29 @@ class ChapterEntity {
       number: number ?? this.number,
       title: title ?? this.title,
       content: content ?? this.content,
+      tookId: tookId ?? this.tookId,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'createdAt': createdAt,
+      'created_at': createdAt.toIso8601String(),
       'number': number,
       'title': title,
       'content': content,
+      'took_id': tookId,
     };
   }
 
   factory ChapterEntity.fromMap(Map<String, dynamic> map) {
     return ChapterEntity(
       id: map['id'],
-      createdAt: DateTime.parse(map['createdAt']),
-      number: map['number'],
-      title: map['title'],
-      content: map['content'],
+      createdAt: DateTime.parse(map['created_at']),
+      number: map['number'] ?? '',
+      title: map['title'] ?? '',
+      content: map['content'] ?? '',
+      tookId: map['took_id'] ?? 0,
     );
   }
 }
