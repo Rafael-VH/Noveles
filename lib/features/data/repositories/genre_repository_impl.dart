@@ -6,24 +6,42 @@ class GenreRepositoryImpl implements GenreRepository {
   @override
   Future<List<GenreEntity>> getGenres() async {
     final response = await supabase.from('genres').select('*').order('id');
-    return response.map((json) => GenreEntity.fromMap(Map<String, dynamic>.from(json))).toList();
+    return response.map((json) => _mapToGenreEntity(json)).toList();
   }
 
   @override
   Future<GenreEntity?> getGenreById(int id) async {
-    final response = await supabase.from('genres').select('*').eq('id', id).maybeSingle();
+    final response =
+        await supabase.from('genres').select('*').eq('id', id).maybeSingle();
     if (response == null) return null;
-    return GenreEntity.fromMap(Map<String, dynamic>.from(response));
+    return _mapToGenreEntity(response);
+  }
+
+  GenreEntity _mapToGenreEntity(Map<String, dynamic> json) {
+    return GenreEntity(
+      id: json['id'],
+      createdAt: DateTime.parse(json['created_at']),
+      name: json['name'] ?? '',
+      description: json['description'] ?? '',
+    );
   }
 
   @override
   Future<void> createGenre(GenreEntity genre) async {
-    await supabase.from('genres').insert(genre.toMap());
+    await supabase.from('genres').insert({
+      'id': genre.id,
+      'created_at': genre.createdAt.toIso8601String(),
+      'name': genre.name,
+      'description': genre.description,
+    });
   }
 
   @override
   Future<void> updateGenre(GenreEntity genre) async {
-    await supabase.from('genres').update(genre.toMap()).eq('id', genre.id);
+    await supabase.from('genres').update({
+      'name': genre.name,
+      'description': genre.description,
+    }).eq('id', genre.id);
   }
 
   @override

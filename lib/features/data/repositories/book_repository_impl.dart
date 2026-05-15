@@ -7,7 +7,8 @@ class BookRepositoryImpl implements BookRepository {
   Future<List<BookEntity>> getBooks() async {
     final response = await supabase
         .from('books')
-        .select('*, authors!inner(*), books_genres!inner(genre_id, genres(*)), tooks(*, chapters(*))')
+        .select(
+            '*, authors!inner(*), books_genres!inner(genre_id, genres(*)), tooks(*, chapters(*))')
         .order('id');
 
     return response.map((json) => _mapToBookEntity(json)).toList();
@@ -17,7 +18,8 @@ class BookRepositoryImpl implements BookRepository {
   Future<BookEntity?> getBookById(int id) async {
     final response = await supabase
         .from('books')
-        .select('*, authors!inner(*), books_genres!inner(genre_id, genres(*)), tooks(*, chapters(*))')
+        .select(
+            '*, authors!inner(*), books_genres!inner(genre_id, genres(*)), tooks(*, chapters(*))')
         .eq('id', id)
         .maybeSingle();
 
@@ -29,17 +31,42 @@ class BookRepositoryImpl implements BookRepository {
     final authorData = Map<String, dynamic>.from(json['authors']);
 
     final listGenre = (json['books_genres'] as List<dynamic>)
-        .map((bg) => GenreEntity.fromMap(Map<String, dynamic>.from(bg['genres'])))
+        .map((bg) {
+          final g = Map<String, dynamic>.from(bg['genres']);
+          return GenreEntity(
+            id: g['id'],
+            createdAt: DateTime.parse(g['created_at']),
+            name: g['name'] ?? '',
+            description: g['description'] ?? '',
+          );
+        })
         .toList();
 
     final listTook = (json['tooks'] as List<dynamic>)
         .map((t) {
           final took = Map<String, dynamic>.from(t);
           final chapters = (took['chapters'] as List<dynamic>)
-              .map((ch) => ChapterEntity.fromMap(Map<String, dynamic>.from(ch)))
+              .map((ch) {
+                return ChapterEntity(
+                  id: ch['id'],
+                  createdAt: DateTime.parse(ch['created_at']),
+                  number: ch['number'] ?? '',
+                  title: ch['title'] ?? '',
+                  content: ch['content'] ?? '',
+                  tookId: ch['took_id'] ?? 0,
+                );
+              })
               .toList();
-          took['listChapter'] = chapters;
-          return TookEntity.fromMap(took);
+          return TookEntity(
+            id: took['id'],
+            createdAt: DateTime.parse(took['created_at']),
+            cover: took['cover'] ?? '',
+            number: took['number'] ?? '',
+            title: took['title'] ?? '',
+            content: took['content'] ?? '',
+            bookId: took['book_id'] ?? 0,
+            listChapter: chapters,
+          );
         })
         .toList();
 
@@ -69,12 +96,46 @@ class BookRepositoryImpl implements BookRepository {
 
   @override
   Future<void> createBook(BookEntity book) async {
-    await supabase.from('books').insert(book.toMap());
+    await supabase.from('books').insert({
+      'id': book.id,
+      'created_at': book.createdAt.toIso8601String(),
+      'cover': book.cover,
+      'name': book.name,
+      'short': book.short,
+      'alternative': book.alternative,
+      'description': book.description,
+      'author_id': book.authorId,
+      'country': book.country,
+      'state': book.state,
+      'type': book.type,
+      'release': book.release,
+      'took_count': book.tookCount,
+      'chapter_count': book.chapterCount,
+      'source': book.source,
+      'link': book.link,
+      'is_favorite': book.isFavorite,
+    });
   }
 
   @override
   Future<void> updateBook(BookEntity book) async {
-    await supabase.from('books').update(book.toMap()).eq('id', book.id);
+    await supabase.from('books').update({
+      'cover': book.cover,
+      'name': book.name,
+      'short': book.short,
+      'alternative': book.alternative,
+      'description': book.description,
+      'author_id': book.authorId,
+      'country': book.country,
+      'state': book.state,
+      'type': book.type,
+      'release': book.release,
+      'took_count': book.tookCount,
+      'chapter_count': book.chapterCount,
+      'source': book.source,
+      'link': book.link,
+      'is_favorite': book.isFavorite,
+    }).eq('id', book.id);
   }
 
   @override
