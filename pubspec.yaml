@@ -31,6 +31,9 @@ dependencies:
   injectable: ^2.3.2
   dartz: ^0.10.1
 
+  # SUPABASE
+  supabase_flutter: ^2.10.0
+
   # OTROS
   flutter_native_splash: ^2.4.1
 
