@@ -268,3 +268,7 @@ INSERT INTO chapters (id, created_at, took_id, number, title, content) VALUES
 (146, '2024-04-21', 3, 'Capítulo 15',     'Epílogo',                      'assets/book/jp/oskar/oskarTook1Ch15.txt'),
 (147, '2024-04-21', 3, 'Historia adicional', 'El plan harem de Liam',     'assets/book/jp/oskar/oskarTook1Ch16.txt'),
 (148, '2024-04-21', 3, 'Palabras del Autor', 'Palabras del Autor',       'assets/book/jp/oskar/oskarTook1Ch17.txt');
+
+-- ADMIN profile (usuario creado manualmente en auth.users)
+UPDATE profiles SET role = 'admin'
+WHERE id = (SELECT id FROM auth.users WHERE email = 'admin@noveles.com');
