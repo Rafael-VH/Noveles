@@ -6,3 +6,4 @@ export 'package:noveles/features/presentation/screens/main_screen.dart';
 export 'package:noveles/features/presentation/screens/took/took_screen.dart';
 export 'package:noveles/features/presentation/screens/auth/login_screen.dart';
 export 'package:noveles/features/presentation/screens/auth/register_screen.dart';
+export 'package:noveles/features/presentation/screens/profile/profile_screen.dart';

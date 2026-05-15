@@ -28,6 +28,9 @@ dependencies:
   # SUPABASE
   supabase_flutter: ^2.10.0
 
+  # IMAGE PICKER
+  image_picker: ^1.1.2
+
   # OTROS
   flutter_native_splash: ^2.4.1
 

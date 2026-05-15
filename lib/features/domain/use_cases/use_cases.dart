@@ -28,3 +28,8 @@ export 'package:noveles/features/domain/use_cases/login.dart';
 export 'package:noveles/features/domain/use_cases/register.dart';
 export 'package:noveles/features/domain/use_cases/logout.dart';
 export 'package:noveles/features/domain/use_cases/get_current_user.dart';
+//  PROFILE
+export 'package:noveles/features/domain/use_cases/get_profile.dart';
+export 'package:noveles/features/domain/use_cases/update_profile.dart';
+export 'package:noveles/features/domain/use_cases/upload_avatar.dart';
+export 'package:noveles/features/domain/use_cases/change_password.dart';

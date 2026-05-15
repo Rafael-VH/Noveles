@@ -47,6 +47,17 @@ class MainPage extends StatelessWidget {
             context: context,
             listBook: listBook,
             actions: [
+              IconButton(
+                icon: const Icon(Icons.person),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ProfileScreen(),
+                    ),
+                  );
+                },
+              ),
               Switch(
                 value: context.read<ThemeBloc>().state.themeData.brightness ==
                     Brightness.dark,
