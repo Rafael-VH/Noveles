@@ -50,7 +50,7 @@ SliverAppBar sliverAppBarV1Home({
                       end: AlignmentDirectional.bottomCenter,
                       colors: [
                         Colors.transparent,
-                        Theme.of(context).colorScheme.surface.withOpacity(0.9),
+                        Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
                         Theme.of(context).colorScheme.surface,
                       ],
                     ),

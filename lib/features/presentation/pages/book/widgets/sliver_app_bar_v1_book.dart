@@ -45,8 +45,8 @@ SliverAppBar sliverAppBarV1Book({
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
-                    Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                    Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+                    Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                     Theme.of(context).colorScheme.onSurface,
                   ],
                 ),

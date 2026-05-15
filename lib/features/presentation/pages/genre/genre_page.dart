@@ -57,11 +57,11 @@ class _GenrePageState extends State<GenrePage> {
                                     Theme.of(context)
                                         .colorScheme
                                         .onSurface
-                                        .withOpacity(0.5),
+                                        .withValues(alpha: 0.5),
                                     Theme.of(context)
                                         .colorScheme
                                         .onSurface
-                                        .withOpacity(0.7),
+                                        .withValues(alpha: 0.7),
                                     Theme.of(context).colorScheme.surface,
                                   ],
                                 ),
