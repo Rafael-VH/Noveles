@@ -30,45 +30,39 @@ class BookRepositoryImpl implements BookRepository {
   BookEntity _mapToBookEntity(Map<String, dynamic> json) {
     final authorData = Map<String, dynamic>.from(json['authors']);
 
-    final listGenre = (json['books_genres'] as List<dynamic>)
-        .map((bg) {
-          final g = Map<String, dynamic>.from(bg['genres']);
-          return GenreEntity(
-            id: g['id'],
-            createdAt: DateTime.parse(g['created_at']),
-            name: g['name'] ?? '',
-            description: g['description'] ?? '',
-          );
-        })
-        .toList();
+    final listGenre = (json['books_genres'] as List<dynamic>).map((bg) {
+      final g = Map<String, dynamic>.from(bg['genres']);
+      return GenreEntity(
+        id: g['id'],
+        createdAt: DateTime.parse(g['created_at']),
+        name: g['name'] ?? '',
+        description: g['description'] ?? '',
+      );
+    }).toList();
 
-    final listTook = (json['tooks'] as List<dynamic>)
-        .map((t) {
-          final took = Map<String, dynamic>.from(t);
-          final chapters = (took['chapters'] as List<dynamic>)
-              .map((ch) {
-                return ChapterEntity(
-                  id: ch['id'],
-                  createdAt: DateTime.parse(ch['created_at']),
-                  number: ch['number'] ?? '',
-                  title: ch['title'] ?? '',
-                  content: ch['content'] ?? '',
-                  tookId: ch['took_id'] ?? 0,
-                );
-              })
-              .toList();
-          return TookEntity(
-            id: took['id'],
-            createdAt: DateTime.parse(took['created_at']),
-            cover: took['cover'] ?? '',
-            number: took['number'] ?? '',
-            title: took['title'] ?? '',
-            content: took['content'] ?? '',
-            bookId: took['book_id'] ?? 0,
-            listChapter: chapters,
-          );
-        })
-        .toList();
+    final listTook = (json['tooks'] as List<dynamic>).map((t) {
+      final took = Map<String, dynamic>.from(t);
+      final chapters = (took['chapters'] as List<dynamic>).map((ch) {
+        return ChapterEntity(
+          id: ch['id'],
+          createdAt: DateTime.parse(ch['created_at']),
+          number: ch['number'] ?? '',
+          title: ch['title'] ?? '',
+          content: ch['content'] ?? '',
+          tookId: ch['took_id'] ?? 0,
+        );
+      }).toList();
+      return TookEntity(
+        id: took['id'],
+        createdAt: DateTime.parse(took['created_at']),
+        cover: took['cover'] ?? '',
+        number: took['number'] ?? '',
+        title: took['title'] ?? '',
+        content: took['content'] ?? '',
+        bookId: took['book_id'] ?? 0,
+        listChapter: chapters,
+      );
+    }).toList();
 
     return BookEntity(
       id: json['id'],

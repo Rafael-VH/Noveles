@@ -28,7 +28,6 @@ SliverAppBar sliverAppBarV1Book({
               image: AssetImage(books.cover),
             ),
           ),
-
           Positioned.fill(
             child: ClipRect(
               child: BackdropFilter(
@@ -39,7 +38,6 @@ SliverAppBar sliverAppBarV1Book({
               ),
             ),
           ),
-
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
@@ -55,7 +53,6 @@ SliverAppBar sliverAppBarV1Book({
               ),
             ),
           ),
-
           Positioned(
             top: 65.0,
             left: 16.0,

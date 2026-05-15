@@ -46,7 +46,6 @@ class _GenrePageState extends State<GenrePage> {
                               image: AssetImage(book.cover),
                             ),
                           ),
-
                           Positioned.fill(
                             child: Container(
                               decoration: BoxDecoration(
@@ -69,7 +68,6 @@ class _GenrePageState extends State<GenrePage> {
                               ),
                             ),
                           ),
-
                           Positioned(
                             left: 4.0,
                             right: 4.0,

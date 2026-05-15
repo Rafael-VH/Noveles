@@ -56,9 +56,7 @@ class MainPage extends StatelessWidget {
               ),
             ],
           ),
-
           const SliverToBoxAdapter(child: SizedBox(height: 32.0)),
-
           SliverToBoxAdapter(
             child: SizedBox(
               height: 60.0,

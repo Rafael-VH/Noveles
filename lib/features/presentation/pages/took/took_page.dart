@@ -23,7 +23,6 @@ class _TookPageState extends State<TookPage> {
           SliverAppBar(
             title: Text(widget.tooks.number),
           ),
-
           SliverList.builder(
             itemCount: widget.tooks.listChapter.length,
             itemBuilder: (context, index) {

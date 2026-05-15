@@ -89,7 +89,6 @@ class _BookPageState extends State<BookPage>
                 icon: const Icon(Icons.info_outlined),
               ),
             ),
-
             sliverPersistentHeaderV1Book(
               tabController: _tabController,
               tabs: nameTab,

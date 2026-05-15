@@ -118,7 +118,6 @@ class _ChapterPageState extends State<ChapterPage> {
                   ),
                 ),
               ),
-
               SliverToBoxAdapter(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
