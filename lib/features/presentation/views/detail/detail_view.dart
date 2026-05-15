@@ -23,13 +23,11 @@ class _DetailViewState extends State<DetailView> {
         child: Column(
           children: [
             const SizedBox(height: 22.0),
-
             titleWidget(
               text: 'Descripción',
               clContent: Theme.of(context).colorScheme.surface,
               clText: Colors.white,
             ),
-
             Padding(
               padding: const EdgeInsets.all(10.0),
               child: Text(
@@ -40,7 +38,6 @@ class _DetailViewState extends State<DetailView> {
                 ),
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.all(6.0),
               child: cardInfoV1Detail(
@@ -51,7 +48,6 @@ class _DetailViewState extends State<DetailView> {
                 text2: widget.books.type,
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.all(6.0),
               child: cardInfoV1Detail(
@@ -62,7 +58,6 @@ class _DetailViewState extends State<DetailView> {
                 text2: widget.books.state,
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.all(6.0),
               child: cardInfoV1Detail(
@@ -73,13 +68,11 @@ class _DetailViewState extends State<DetailView> {
                 text2: widget.books.chapterCount,
               ),
             ),
-
             titleWidget(
               text: 'Generos',
               clContent: Theme.of(context).colorScheme.surface,
               clText: Colors.white,
             ),
-
             Padding(
               padding: const EdgeInsets.all(10.0),
               child: Wrap(

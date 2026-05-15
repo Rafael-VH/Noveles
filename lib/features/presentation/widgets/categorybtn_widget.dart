@@ -25,7 +25,8 @@ class CategoryBTNWidget extends StatelessWidget {
         width: MediaQuery.of(context).size.width * 0.355,
         padding: const EdgeInsets.all(8.0),
         decoration: BoxDecoration(
-          border: Border.all(width: 1, color: buttonClr, style: BorderStyle.solid),
+          border:
+              Border.all(width: 1, color: buttonClr, style: BorderStyle.solid),
           borderRadius: const BorderRadius.all(Radius.circular(8.0)),
         ),
         child: Center(

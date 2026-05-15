@@ -42,7 +42,6 @@ SliverAppBar sliverAppBarV1Home({
                   ),
                 ),
               ),
-
               Positioned.fill(
                 child: Container(
                   decoration: BoxDecoration(
@@ -58,7 +57,6 @@ SliverAppBar sliverAppBarV1Home({
                   ),
                 ),
               ),
-
               Positioned(
                 left: 0.0,
                 right: 0.0,
