@@ -11,9 +11,12 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => ThemeBloc()),
-        BlocProvider(create: (context) => getIt<BookBloc>()..add(LoadBooks())),
-        BlocProvider(create: (context) => getIt<GenreBloc>()..add(LoadGenres())),
+        BlocProvider(create: (_) => ThemeBloc()),
+        BlocProvider(
+          create: (_) => getIt<AuthBloc>()..add(CheckAuthSession()),
+        ),
+        BlocProvider(create: (_) => getIt<BookBloc>()..add(LoadBooks())),
+        BlocProvider(create: (_) => getIt<GenreBloc>()..add(LoadGenres())),
       ],
       child: BlocBuilder<ThemeBloc, ThemeState>(
         builder: (context, state) {
@@ -21,7 +24,19 @@ class App extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             title: 'NovelEs',
             theme: state.themeData,
-            home: const MainScreen(),
+            home: BlocBuilder<AuthBloc, AuthState>(
+              builder: (context, authState) {
+                if (authState is AuthLoading) {
+                  return const Scaffold(
+                    body: Center(child: CircularProgressIndicator()),
+                  );
+                }
+                if (authState is AuthAuthenticated) {
+                  return const MainScreen();
+                }
+                return const LoginScreen();
+              },
+            ),
           );
         },
       ),

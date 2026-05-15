@@ -23,3 +23,8 @@ export 'package:noveles/features/domain/use_cases/update_book.dart';
 export 'package:noveles/features/domain/use_cases/update_chapter.dart';
 export 'package:noveles/features/domain/use_cases/update_genre.dart';
 export 'package:noveles/features/domain/use_cases/update_took.dart';
+//  AUTH
+export 'package:noveles/features/domain/use_cases/login.dart';
+export 'package:noveles/features/domain/use_cases/register.dart';
+export 'package:noveles/features/domain/use_cases/logout.dart';
+export 'package:noveles/features/domain/use_cases/get_current_user.dart';

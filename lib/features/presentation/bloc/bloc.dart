@@ -10,3 +10,6 @@ export 'package:noveles/features/presentation/bloc/genre_state.dart';
 export 'package:noveles/features/presentation/bloc/theme_bloc.dart';
 export 'package:noveles/features/presentation/bloc/theme_event.dart';
 export 'package:noveles/features/presentation/bloc/theme_state.dart';
+export 'package:noveles/features/presentation/bloc/auth_bloc.dart';
+export 'package:noveles/features/presentation/bloc/auth_event.dart';
+export 'package:noveles/features/presentation/bloc/auth_state.dart';
