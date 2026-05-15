@@ -2,6 +2,26 @@
 -- NovelEs — Seed Data
 -- ============================================================
 
+-- AUTHORS
+INSERT INTO authors (id, created_at, name, description) VALUES
+(1, '2024-04-21', 'Chugong', '')
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO authors (id, created_at, name, description) VALUES
+(2, '2024-04-21', 'Elyon', '')
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO authors (id, created_at, name, description) VALUES
+(3, '2024-04-21', 'I Eat Tomatoes', '')
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO authors (id, created_at, name, description) VALUES
+(4, '2024-04-21', 'Mishima Yomu', '')
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO authors (id, created_at, name, description) VALUES
+(5, '2024-04-21', 'Tang Jia San Shao', '')
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO authors (id, created_at, name, description) VALUES
+(6, '2024-04-21', 'Toy car', '')
+ON CONFLICT (id) DO NOTHING;
+
 -- GENRES
 INSERT INTO genres (id, created_at, name, description) VALUES
 (0,  '2024-04-21', 'Acción', 'Descripción temporal'),
@@ -27,14 +47,14 @@ INSERT INTO genres (id, created_at, name, description) VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- BOOKS
-INSERT INTO books (id, created_at, cover, name, short, alternative, description, author, country, state, type, release, took, chapter, source, link, is_favorite) VALUES
-(0,  '2024-04-21', 'assets/cover/ch/swallowedStar.png', 'Estrella Tragada', 'SS', E'Swallowed Star\nThe legend of spacewalker\nTun Shi Xing Kong', E'Año 2056, en una ciudad del área de Yuan Jiang Su Jin. Encima de un apartamento residencial de seis pisos en ruinas y destrozado se encuentra un adolescente que viste un chaleco de combate, pantalones militares y botas de combate de aleación.\n\nEn su espalda hay un escudo hexagonal y está equipado un cuchillo de batalla de sombra-sangre. Se sienta allí en silencio en el borde del techo.\n\nEn este momento, el cielo resplandeciente brillaba y había un aliento refrescante en el aire que soplaba hacia él. Sin embargo, solo había silencio dentro de la ciudad desierta y en ruinas, con un aullido ocasional que hace que tu corazón se acelere.', 'I Eat Tomatoes', 'China', 'Finalizado', 'Web', '2010', '32', '1477', 'Qidian', 'https://book.qidian.com/info/1639199/', false),
-(1,  '2024-04-21', 'assets/cover/cr/soloLeveling.png', 'Solo Leveling', 'SL', E'I Level Up Alone\nOnly I Level Up\n나 혼자만 레벨업', E'Hace 10 años, después de que se abriera "la Puerta" que conectaba el mundo real con el mundo de los monstruos, algunas personas comunes y corrientes recibieron el poder de cazar monstruos dentro de la Puerta.Se les conoce como "Cazadores".\n\nSin embargo, no todos los cazadores son poderosos.Mi nombre es Sung Jin-Woo, un cazador de rango E.Soy alguien que tiene que arriesgar su vida en la más baja de las catacumbas, la "más débil del mundo".\n\nAl no tener ninguna habilidad para mostrar, apenas gané el dinero requerido luchando en catacumbas de bajo nivel... ¡al menos hasta que encontré una catacumba oculta con la dificultad más difícil dentro de las catacumbas de rango D!\n\nAl final, mientras aceptaba la muerte, de repente recibí un poder extraño, un registro de misiones que solo yo podía ver, ¡un secreto para subir de nivel que solo yo conocía!Si entrenaba de acuerdo con mis misiones y cazaba monstruos, mi nivel aumentaría.\n\n¡Cambiar del cazador más débil al cazador de rango S más fuerte!', 'Chugong', 'Corea', 'Finalizado', 'Web', '2016', '5', '270', '-', '-', false),
-(3,  '2024-04-21', 'assets/cover/eu/reincarnatedWithTheStrongestSystem.jpg', 'Reencarnado con el sistema más fuerte', 'RWTSS', 'Reincarnated With The Strongest System', 'Descripción pendiente', 'Elyon', 'Otros', 'Finalizado', 'Web', '2021', '9', '1.474', 'WebNovel', 'https://www.webnovel.com/book/reincarnated-with-the-strongest-system_19720038005035905', false),
-(4,  '2024-04-21', 'assets/cover/cr/everyoneElseIsAReturnee.png', 'Todos los Demás están de Regreso', 'EER', E'Everyone Else is a Returnee\n나 빼고 다 귀환자', 'Descripción pendiente', 'Toy car', 'Corea', 'Finalizado', 'Web', '2016', '15', '348', '-', '-', false),
-(5,  '2024-04-21', 'assets/cover/jp/oreWaSeikanKokkaNoAkutokuRyoshuVol1.png', 'Soy un Lord Malvado de un Imperio Intergalactico!', 'OSKAR', 'Ore wa Seikan Kokka no Akutoku Ryōshu!', 'Descripción pendiente', 'Mishima Yomu', 'Japon', 'Emisión', 'Ligera', '2018', '8', '47', '-', '-', false),
-(8,  '2024-04-21', 'assets/cover/ch/douluoDalu1.png', 'Douluo Dalu', 'DD', E'Combat Continent\nSoul Land\nLands of Battle', 'Descripción pendiente', 'Tang Jia San Shao', 'China', 'Finalizado', 'Web', '2008', '47', '336', 'Qidian', 'https://book.qidian.com/info/1115277/', false),
-(11, '2024-04-21', 'assets/cover/ch/douluoDalu2.png', 'Secta Tang sin Igual', 'DD2', E'Combat Continent 2\nSoul Land II\nDouluo Dalu 2\nInigualable Tang Sect', 'Descripción pendiente', 'Tang Jia San Shao', 'China', 'Finalizado', 'Web', '2012', '72', '622', 'Qidian', 'https://book.qidian.com/info/2517792/', false)
+INSERT INTO books (id, created_at, cover, name, short, alternative, description, author_id, country, state, type, release, took_count, chapter_count, source, link, is_favorite) VALUES
+(0,  '2024-04-21', 'assets/cover/ch/swallowedStar.png', 'Estrella Tragada', 'SS', E'Swallowed Star\nThe legend of spacewalker\nTun Shi Xing Kong', E'Año 2056, en una ciudad del área de Yuan Jiang Su Jin. Encima de un apartamento residencial de seis pisos en ruinas y destrozado se encuentra un adolescente que viste un chaleco de combate, pantalones militares y botas de combate de aleación.\n\nEn su espalda hay un escudo hexagonal y está equipado un cuchillo de batalla de sombra-sangre. Se sienta allí en silencio en el borde del techo.\n\nEn este momento, el cielo resplandeciente brillaba y había un aliento refrescante en el aire que soplaba hacia él. Sin embargo, solo había silencio dentro de la ciudad desierta y en ruinas, con un aullido ocasional que hace que tu corazón se acelere.', 3, 'China', 'Finalizado', 'Web', '2010', '32', '1477', 'Qidian', 'https://book.qidian.com/info/1639199/', false),
+(1,  '2024-04-21', 'assets/cover/cr/soloLeveling.png', 'Solo Leveling', 'SL', E'I Level Up Alone\nOnly I Level Up\n나 혼자만 레벨업', E'Hace 10 años, después de que se abriera "la Puerta" que conectaba el mundo real con el mundo de los monstruos, algunas personas comunes y corrientes recibieron el poder de cazar monstruos dentro de la Puerta.Se les conoce como "Cazadores".\n\nSin embargo, no todos los cazadores son poderosos.Mi nombre es Sung Jin-Woo, un cazador de rango E.Soy alguien que tiene que arriesgar su vida en la más baja de las catacumbas, la "más débil del mundo".\n\nAl no tener ninguna habilidad para mostrar, apenas gané el dinero requerido luchando en catacumbas de bajo nivel... ¡al menos hasta que encontré una catacumba oculta con la dificultad más difícil dentro de las catacumbas de rango D!\n\nAl final, mientras aceptaba la muerte, de repente recibí un poder extraño, un registro de misiones que solo yo podía ver, ¡un secreto para subir de nivel que solo yo conocía!Si entrenaba de acuerdo con mis misiones y cazaba monstruos, mi nivel aumentaría.\n\n¡Cambiar del cazador más débil al cazador de rango S más fuerte!', 1, 'Corea', 'Finalizado', 'Web', '2016', '5', '270', '-', '-', false),
+(3,  '2024-04-21', 'assets/cover/eu/reincarnatedWithTheStrongestSystem.jpg', 'Reencarnado con el sistema más fuerte', 'RWTSS', 'Reincarnated With The Strongest System', 'Descripción pendiente', 2, 'Otros', 'Finalizado', 'Web', '2021', '9', '1.474', 'WebNovel', 'https://www.webnovel.com/book/reincarnated-with-the-strongest-system_19720038005035905', false),
+(4,  '2024-04-21', 'assets/cover/cr/everyoneElseIsAReturnee.png', 'Todos los Demás están de Regreso', 'EER', E'Everyone Else is a Returnee\n나 빼고 다 귀환자', 'Descripción pendiente', 6, 'Corea', 'Finalizado', 'Web', '2016', '15', '348', '-', '-', false),
+(5,  '2024-04-21', 'assets/cover/jp/oreWaSeikanKokkaNoAkutokuRyoshuVol1.png', 'Soy un Lord Malvado de un Imperio Intergalactico!', 'OSKAR', 'Ore wa Seikan Kokka no Akutoku Ryōshu!', 'Descripción pendiente', 4, 'Japon', 'Emisión', 'Ligera', '2018', '8', '47', '-', '-', false),
+(8,  '2024-04-21', 'assets/cover/ch/douluoDalu1.png', 'Douluo Dalu', 'DD', E'Combat Continent\nSoul Land\nLands of Battle', 'Descripción pendiente', 5, 'China', 'Finalizado', 'Web', '2008', '47', '336', 'Qidian', 'https://book.qidian.com/info/1115277/', false),
+(11, '2024-04-21', 'assets/cover/ch/douluoDalu2.png', 'Secta Tang sin Igual', 'DD2', E'Combat Continent 2\nSoul Land II\nDouluo Dalu 2\nInigualable Tang Sect', 'Descripción pendiente', 5, 'China', 'Finalizado', 'Web', '2012', '72', '622', 'Qidian', 'https://book.qidian.com/info/2517792/', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- BOOKS_GENRES
