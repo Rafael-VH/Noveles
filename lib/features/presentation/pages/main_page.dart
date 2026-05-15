@@ -1,28 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:noveles/features/data/local/data_sources/data_source.dart';
+import 'package:noveles/core/utils/entity_to_local.dart';
 import 'package:noveles/features/data/local/models/model.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
 import 'package:noveles/features/presentation/screens/screens.dart';
 import 'package:noveles/features/presentation/widgets/carousel_appbar_sliver.dart';
 
-class MainPage extends StatefulWidget {
+class MainPage extends StatelessWidget {
   const MainPage({super.key});
 
   @override
-  State<MainPage> createState() => _MainPageState();
-}
-
-class _MainPageState extends State<MainPage> {
-  late List<GenreLocalModel> listGenre = GenreLocalDataSource.allGenre;
-  late List<BookLocalModel> listBook = BookLocalDataSource.allBook;
-
-  @override
   Widget build(BuildContext context) {
+    return BlocBuilder<BookBloc, BookState>(
+      builder: (context, bookState) {
+        return BlocBuilder<GenreBloc, GenreState>(
+          builder: (context, genreState) {
+            if (bookState is BookLoading || genreState is GenreLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (bookState is BookError) {
+              return Center(child: Text('Error: ${bookState.message}'));
+            }
+            if (genreState is GenreError) {
+              return Center(child: Text('Error: ${genreState.message}'));
+            }
+            if (bookState is BookLoaded && genreState is GenreLoaded) {
+              final listBook =
+                  bookState.books.map((b) => b.toLocalModel()).toList();
+              final listGenre =
+                  genreState.genres.map((g) => g.toLocalModel()).toList();
+              return _buildContent(context, listBook, listGenre);
+            }
+            return const Center(child: CircularProgressIndicator());
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildContent(
+    BuildContext context,
+    List<BookLocalModel> listBook,
+    List<GenreLocalModel> listGenre,
+  ) {
     return SafeArea(
       child: CustomScrollView(
         slivers: [
-          //
           sliverAppBarV1Home(
             context: context,
             listBook: listBook,
@@ -41,7 +64,7 @@ class _MainPageState extends State<MainPage> {
 
           SliverToBoxAdapter(
             child: SizedBox(
-              height: 60.0, // Ajusta la altura según sea necesario
+              height: 60.0,
               child: ListView(
                 scrollDirection: Axis.horizontal,
                 children: listGenre
@@ -50,7 +73,6 @@ class _MainPageState extends State<MainPage> {
                         padding: const EdgeInsets.symmetric(horizontal: 4.0),
                         child: InkWell(
                           onTap: () {
-                            // Navegar a la pantalla de género
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -62,9 +84,7 @@ class _MainPageState extends State<MainPage> {
                             );
                           },
                           child: Chip(
-                            label: Text(
-                              item.name,
-                            ),
+                            label: Text(item.name),
                           ),
                         ),
                       ),

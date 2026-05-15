@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
 import 'package:noveles/features/presentation/screens/screens.dart';
 
@@ -8,8 +9,12 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => ThemeBloc(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => ThemeBloc()),
+        BlocProvider(create: (context) => getIt<BookBloc>()..add(LoadBooks())),
+        BlocProvider(create: (context) => getIt<GenreBloc>()..add(LoadGenres())),
+      ],
       child: BlocBuilder<ThemeBloc, ThemeState>(
         builder: (context, state) {
           return MaterialApp(
