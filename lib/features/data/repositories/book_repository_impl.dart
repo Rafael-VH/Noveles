@@ -118,7 +118,7 @@ class BookRepositoryImpl implements BookRepository {
           authorId = result['id'];
         }
       }
-      await supabase.from('books').insert({
+      final result = await supabase.from('books').insert({
         'created_at': book.createdAt.toIso8601String(),
         'cover': book.cover,
         'name': book.name,
@@ -135,7 +135,14 @@ class BookRepositoryImpl implements BookRepository {
         'source': book.source,
         'link': book.link,
         'is_favorite': book.isFavorite,
-      });
+      }).select('id').single();
+      final newBookId = result['id'];
+      for (final genre in book.listGenre) {
+        await supabase.from('books_genres').insert({
+          'book_id': newBookId,
+          'genre_id': genre.id,
+        });
+      }
     } catch (e) {
       throw Exception('Error al crear libro: $e');
     }
@@ -161,6 +168,13 @@ class BookRepositoryImpl implements BookRepository {
         'link': book.link,
         'is_favorite': book.isFavorite,
       }).eq('id', book.id);
+      await supabase.from('books_genres').delete().eq('book_id', book.id);
+      for (final genre in book.listGenre) {
+        await supabase.from('books_genres').insert({
+          'book_id': book.id,
+          'genre_id': genre.id,
+        });
+      }
     } catch (e) {
       throw Exception('Error al actualizar libro: $e');
     }

@@ -17,6 +17,7 @@ class MockDeleteTook extends Mock implements DeleteTook {}
 class MockCreateChapter extends Mock implements CreateChapter {}
 class MockUpdateChapter extends Mock implements UpdateChapter {}
 class MockDeleteChapter extends Mock implements DeleteChapter {}
+class MockGetGenre extends Mock implements GetGenre {}
 
 void main() {
   late MockGetBooks mockGetBooks;
@@ -29,6 +30,7 @@ void main() {
   late MockCreateChapter mockCreateChapter;
   late MockUpdateChapter mockUpdateChapter;
   late MockDeleteChapter mockDeleteChapter;
+  late MockGetGenre mockGetGenre;
   late AdminBloc adminBloc;
 
   final testBooks = [
@@ -58,6 +60,9 @@ void main() {
       id: 0, createdAt: DateTime(2024), number: '',
       title: '', content: '', tookId: 1,
     ));
+    registerFallbackValue(GenreEntity(
+      id: 0, createdAt: DateTime(2024), name: '', description: '',
+    ));
   });
 
   setUp(() {
@@ -71,6 +76,7 @@ void main() {
     mockCreateChapter = MockCreateChapter();
     mockUpdateChapter = MockUpdateChapter();
     mockDeleteChapter = MockDeleteChapter();
+    mockGetGenre = MockGetGenre();
     adminBloc = AdminBloc(
       getBooks: mockGetBooks,
       createBook: mockCreateBook,
@@ -82,6 +88,7 @@ void main() {
       createChapter: mockCreateChapter,
       updateChapter: mockUpdateChapter,
       deleteChapter: mockDeleteChapter,
+      getGenres: mockGetGenre,
     );
   });
 
@@ -117,6 +124,24 @@ void main() {
       expect: () => [
         isA<AdminLoading>(),
         isA<AdminError>().having((s) => s.message, 'message', contains('Error de red')),
+      ],
+    );
+
+    blocTest<AdminBloc, AdminState>(
+      'emits AdminGenresLoaded when LoadAdminGenres succeeds',
+      build: () {
+        final genres = [
+          GenreEntity(id: 1, createdAt: DateTime(2024), name: 'Acción', description: ''),
+          GenreEntity(id: 2, createdAt: DateTime(2024), name: 'Romance', description: ''),
+        ];
+        when(() => mockGetGenre()).thenAnswer((_) async => genres);
+        return adminBloc;
+      },
+      act: (bloc) => bloc.add(LoadAdminGenres()),
+      expect: () => [
+        isA<AdminGenresLoaded>()
+            .having((s) => s.genres.length, 'genre count', 2)
+            .having((s) => s.genres.first.name, 'first genre name', 'Acción'),
       ],
     );
 

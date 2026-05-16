@@ -8,6 +8,8 @@ abstract class AdminEvent extends Equatable {
 
 class LoadAdminBooks extends AdminEvent {}
 
+class LoadAdminGenres extends AdminEvent {}
+
 class SaveAdminBook extends AdminEvent {
   final BookEntity book;
   final bool isUpdate;

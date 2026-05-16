@@ -20,6 +20,15 @@ class AdminLoaded extends AdminState {
   List<Object> get props => [books, message ?? ''];
 }
 
+class AdminGenresLoaded extends AdminState {
+  final List<GenreEntity> genres;
+
+  AdminGenresLoaded(this.genres);
+
+  @override
+  List<Object> get props => [genres];
+}
+
 class AdminError extends AdminState {
   final String message;
 

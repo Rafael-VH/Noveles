@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
@@ -27,7 +28,10 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
   late TextEditingController _releaseCtrl;
   late TextEditingController _sourceCtrl;
   late TextEditingController _linkCtrl;
+  List<GenreEntity> _allGenres = [];
+  Set<int> _selectedGenreIds = {};
   bool _isSaving = false;
+  StreamSubscription? _stateSub;
 
   bool get _isEditing => widget.book != null;
 
@@ -47,6 +51,13 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
     _releaseCtrl = TextEditingController(text: b?.release ?? '');
     _sourceCtrl = TextEditingController(text: b?.source ?? '');
     _linkCtrl = TextEditingController(text: b?.link ?? '');
+    _selectedGenreIds = b?.listGenre.map((g) => g.id).toSet() ?? {};
+    _stateSub = context.read<AdminBloc>().stream.listen((state) {
+      if (state is AdminGenresLoaded && mounted) {
+        setState(() => _allGenres = state.genres);
+      }
+    });
+    context.read<AdminBloc>().add(LoadAdminGenres());
   }
 
   @override
@@ -63,6 +74,7 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
     _releaseCtrl.dispose();
     _sourceCtrl.dispose();
     _linkCtrl.dispose();
+    _stateSub?.cancel();
     super.dispose();
   }
 
@@ -88,7 +100,7 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
       source: _sourceCtrl.text.trim(),
       link: _linkCtrl.text.trim(),
       isFavorite: widget.book?.isFavorite ?? false,
-      listGenre: widget.book?.listGenre ?? [],
+      listGenre: _allGenres.where((g) => _selectedGenreIds.contains(g.id)).toList(),
       listTook: widget.book?.listTook ?? [],
     );
     setState(() => _isSaving = true);
@@ -165,6 +177,31 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
               TextFormField(
                   controller: _linkCtrl,
                   decoration: const InputDecoration(labelText: 'Link')),
+              const SizedBox(height: 16),
+              const Text('Géneros',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              if (_allGenres.isEmpty)
+                const Text('Cargando géneros...',
+                    style: TextStyle(color: Colors.grey))
+              else
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
+                  children: _allGenres.map((genre) => FilterChip(
+                    label: Text(genre.name),
+                    selected: _selectedGenreIds.contains(genre.id),
+                    onSelected: (selected) {
+                      setState(() {
+                        if (selected) {
+                          _selectedGenreIds.add(genre.id);
+                        } else {
+                          _selectedGenreIds.remove(genre.id);
+                        }
+                      });
+                    },
+                  )).toList(),
+                ),
               if (_isEditing) ...[
                 const SizedBox(height: 24),
                 const Divider(),

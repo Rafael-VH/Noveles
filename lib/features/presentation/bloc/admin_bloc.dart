@@ -14,6 +14,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
   final CreateChapter createChapter;
   final UpdateChapter updateChapter;
   final DeleteChapter deleteChapter;
+  final GetGenre getGenres;
 
   AdminBloc({
     required this.getBooks,
@@ -26,14 +27,28 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     required this.createChapter,
     required this.updateChapter,
     required this.deleteChapter,
+    required this.getGenres,
   }) : super(AdminInitial()) {
     on<LoadAdminBooks>(_onLoadBooks);
+    on<LoadAdminGenres>(_onLoadGenres);
     on<SaveAdminBook>(_onSaveBook);
     on<DeleteAdminBook>(_onDeleteBook);
     on<SaveAdminTook>(_onSaveTook);
     on<DeleteAdminTook>(_onDeleteTook);
     on<SaveAdminChapter>(_onSaveChapter);
     on<DeleteAdminChapter>(_onDeleteChapter);
+  }
+
+  Future<void> _onLoadGenres(
+    LoadAdminGenres event,
+    Emitter<AdminState> emit,
+  ) async {
+    try {
+      final genres = await getGenres();
+      emit(AdminGenresLoaded(genres));
+    } catch (e) {
+      emit(AdminError(e.toString()));
+    }
   }
 
   Future<void> _onLoadBooks(

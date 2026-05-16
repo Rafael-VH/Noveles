@@ -127,6 +127,7 @@ void setupDependencies() {
       createChapter: getIt(),
       updateChapter: getIt(),
       deleteChapter: getIt(),
+      getGenres: getIt(),
     ),
   );
 }
