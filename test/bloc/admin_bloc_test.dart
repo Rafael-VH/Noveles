@@ -23,6 +23,12 @@ void main() {
   late MockCreateBook mockCreateBook;
   late MockUpdateBook mockUpdateBook;
   late MockDeleteBook mockDeleteBook;
+  late MockCreateTook mockCreateTook;
+  late MockUpdateTook mockUpdateTook;
+  late MockDeleteTook mockDeleteTook;
+  late MockCreateChapter mockCreateChapter;
+  late MockUpdateChapter mockUpdateChapter;
+  late MockDeleteChapter mockDeleteChapter;
   late AdminBloc adminBloc;
 
   final testBooks = [
@@ -43,6 +49,15 @@ void main() {
       type: '', release: '', tookCount: '', chapterCount: '',
       source: '', link: '', isFavorite: false, listGenre: [], listTook: [],
     ));
+    registerFallbackValue(TookEntity(
+      id: 0, createdAt: DateTime(2024), cover: '',
+      number: '', title: '', chapterCount: '',
+      bookId: 1, listChapter: [],
+    ));
+    registerFallbackValue(ChapterEntity(
+      id: 0, createdAt: DateTime(2024), number: '',
+      title: '', content: '', tookId: 1,
+    ));
   });
 
   setUp(() {
@@ -50,17 +65,23 @@ void main() {
     mockCreateBook = MockCreateBook();
     mockUpdateBook = MockUpdateBook();
     mockDeleteBook = MockDeleteBook();
+    mockCreateTook = MockCreateTook();
+    mockUpdateTook = MockUpdateTook();
+    mockDeleteTook = MockDeleteTook();
+    mockCreateChapter = MockCreateChapter();
+    mockUpdateChapter = MockUpdateChapter();
+    mockDeleteChapter = MockDeleteChapter();
     adminBloc = AdminBloc(
       getBooks: mockGetBooks,
       createBook: mockCreateBook,
       updateBook: mockUpdateBook,
       deleteBook: mockDeleteBook,
-      createTook: MockCreateTook(),
-      updateTook: MockUpdateTook(),
-      deleteTook: MockDeleteTook(),
-      createChapter: MockCreateChapter(),
-      updateChapter: MockUpdateChapter(),
-      deleteChapter: MockDeleteChapter(),
+      createTook: mockCreateTook,
+      updateTook: mockUpdateTook,
+      deleteTook: mockDeleteTook,
+      createChapter: mockCreateChapter,
+      updateChapter: mockUpdateChapter,
+      deleteChapter: mockDeleteChapter,
     );
   });
 
@@ -121,6 +142,208 @@ void main() {
         return adminBloc;
       },
       act: (bloc) => bloc.add(DeleteAdminBook(999)),
+      expect: () => [
+        isA<AdminLoading>(),
+        isA<AdminError>(),
+      ],
+    );
+
+    blocTest<AdminBloc, AdminState>(
+      'emits [AdminLoading, AdminLoaded] when DeleteAdminBook succeeds',
+      build: () {
+        when(() => mockDeleteBook(any())).thenAnswer((_) async {});
+        when(() => mockGetBooks()).thenAnswer((_) async => testBooks);
+        return adminBloc;
+      },
+      act: (bloc) => bloc.add(DeleteAdminBook(1)),
+      expect: () => [
+        isA<AdminLoading>(),
+        isA<AdminLoaded>().having((s) => s.message, 'message', 'Libro eliminado'),
+      ],
+    );
+
+    blocTest<AdminBloc, AdminState>(
+      'emits [AdminLoading, AdminLoaded] when SaveAdminBook creates new book',
+      build: () {
+        when(() => mockCreateBook(any())).thenAnswer((_) async {});
+        when(() => mockGetBooks()).thenAnswer((_) async => testBooks);
+        return adminBloc;
+      },
+      act: (bloc) => bloc.add(SaveAdminBook(testBooks.first, isUpdate: false)),
+      expect: () => [
+        isA<AdminLoading>(),
+        isA<AdminLoaded>().having((s) => s.message, 'message', 'Libro creado'),
+      ],
+    );
+
+    blocTest<AdminBloc, AdminState>(
+      'emits [AdminLoading, AdminError] when SaveAdminBook fails',
+      build: () {
+        when(() => mockCreateBook(any())).thenThrow(Exception('Error al crear'));
+        when(() => mockGetBooks()).thenAnswer((_) async => testBooks);
+        return adminBloc;
+      },
+      act: (bloc) => bloc.add(SaveAdminBook(testBooks.first, isUpdate: false)),
+      expect: () => [
+        isA<AdminLoading>(),
+        isA<AdminError>().having((s) => s.message, 'message', contains('Error al crear')),
+      ],
+    );
+
+    blocTest<AdminBloc, AdminState>(
+      'emits [AdminLoading, AdminLoaded] when SaveAdminTook updates',
+      build: () {
+        when(() => mockUpdateTook(any())).thenAnswer((_) async {});
+        when(() => mockGetBooks()).thenAnswer((_) async => testBooks);
+        return adminBloc;
+      },
+      act: (bloc) => bloc.add(SaveAdminTook(
+        TookEntity(id: 1, createdAt: DateTime(2024), cover: '',
+            number: '1', title: '', chapterCount: '', bookId: 1, listChapter: []),
+        isUpdate: true,
+      )),
+      expect: () => [
+        isA<AdminLoading>(),
+        isA<AdminLoaded>().having((s) => s.message, 'message', 'Tomo guardado'),
+      ],
+    );
+
+    blocTest<AdminBloc, AdminState>(
+      'emits [AdminLoading, AdminLoaded] when SaveAdminTook creates',
+      build: () {
+        when(() => mockCreateTook(any())).thenAnswer((_) async {});
+        when(() => mockGetBooks()).thenAnswer((_) async => testBooks);
+        return adminBloc;
+      },
+      act: (bloc) => bloc.add(SaveAdminTook(
+        TookEntity(id: 0, createdAt: DateTime(2024), cover: '',
+            number: '1', title: '', chapterCount: '', bookId: 1, listChapter: []),
+        isUpdate: false,
+      )),
+      expect: () => [
+        isA<AdminLoading>(),
+        isA<AdminLoaded>().having((s) => s.message, 'message', 'Tomo creado'),
+      ],
+    );
+
+    blocTest<AdminBloc, AdminState>(
+      'emits [AdminLoading, AdminError] when SaveAdminTook fails',
+      build: () {
+        when(() => mockCreateTook(any())).thenThrow(Exception('Error'));
+        return adminBloc;
+      },
+      act: (bloc) => bloc.add(SaveAdminTook(
+        TookEntity(id: 0, createdAt: DateTime(2024), cover: '',
+            number: '1', title: '', chapterCount: '', bookId: 1, listChapter: []),
+        isUpdate: false,
+      )),
+      expect: () => [
+        isA<AdminLoading>(),
+        isA<AdminError>(),
+      ],
+    );
+
+    blocTest<AdminBloc, AdminState>(
+      'emits [AdminLoading, AdminLoaded] when DeleteAdminTook succeeds',
+      build: () {
+        when(() => mockDeleteTook(any())).thenAnswer((_) async {});
+        when(() => mockGetBooks()).thenAnswer((_) async => testBooks);
+        return adminBloc;
+      },
+      act: (bloc) => bloc.add(DeleteAdminTook(1)),
+      expect: () => [
+        isA<AdminLoading>(),
+        isA<AdminLoaded>().having((s) => s.message, 'message', 'Tomo eliminado'),
+      ],
+    );
+
+    blocTest<AdminBloc, AdminState>(
+      'emits [AdminLoading, AdminError] when DeleteAdminTook fails',
+      build: () {
+        when(() => mockDeleteTook(any())).thenThrow(Exception('Error'));
+        return adminBloc;
+      },
+      act: (bloc) => bloc.add(DeleteAdminTook(999)),
+      expect: () => [
+        isA<AdminLoading>(),
+        isA<AdminError>(),
+      ],
+    );
+
+    blocTest<AdminBloc, AdminState>(
+      'emits [AdminLoading, AdminLoaded] when SaveAdminChapter updates',
+      build: () {
+        when(() => mockUpdateChapter(any())).thenAnswer((_) async {});
+        when(() => mockGetBooks()).thenAnswer((_) async => testBooks);
+        return adminBloc;
+      },
+      act: (bloc) => bloc.add(SaveAdminChapter(
+        ChapterEntity(id: 1, createdAt: DateTime(2024), number: '1',
+            title: '', content: 'texto', tookId: 1),
+        isUpdate: true,
+      )),
+      expect: () => [
+        isA<AdminLoading>(),
+        isA<AdminLoaded>().having((s) => s.message, 'message', 'Capítulo guardado'),
+      ],
+    );
+
+    blocTest<AdminBloc, AdminState>(
+      'emits [AdminLoading, AdminLoaded] when SaveAdminChapter creates',
+      build: () {
+        when(() => mockCreateChapter(any())).thenAnswer((_) async {});
+        when(() => mockGetBooks()).thenAnswer((_) async => testBooks);
+        return adminBloc;
+      },
+      act: (bloc) => bloc.add(SaveAdminChapter(
+        ChapterEntity(id: 0, createdAt: DateTime(2024), number: '1',
+            title: '', content: 'nuevo', tookId: 1),
+        isUpdate: false,
+      )),
+      expect: () => [
+        isA<AdminLoading>(),
+        isA<AdminLoaded>().having((s) => s.message, 'message', 'Capítulo creado'),
+      ],
+    );
+
+    blocTest<AdminBloc, AdminState>(
+      'emits [AdminLoading, AdminError] when SaveAdminChapter fails',
+      build: () {
+        when(() => mockCreateChapter(any())).thenThrow(Exception('Error'));
+        return adminBloc;
+      },
+      act: (bloc) => bloc.add(SaveAdminChapter(
+        ChapterEntity(id: 0, createdAt: DateTime(2024), number: '1',
+            title: '', content: 'nuevo', tookId: 1),
+        isUpdate: false,
+      )),
+      expect: () => [
+        isA<AdminLoading>(),
+        isA<AdminError>(),
+      ],
+    );
+
+    blocTest<AdminBloc, AdminState>(
+      'emits [AdminLoading, AdminLoaded] when DeleteAdminChapter succeeds',
+      build: () {
+        when(() => mockDeleteChapter(any())).thenAnswer((_) async {});
+        when(() => mockGetBooks()).thenAnswer((_) async => testBooks);
+        return adminBloc;
+      },
+      act: (bloc) => bloc.add(DeleteAdminChapter(1)),
+      expect: () => [
+        isA<AdminLoading>(),
+        isA<AdminLoaded>().having((s) => s.message, 'message', 'Capítulo eliminado'),
+      ],
+    );
+
+    blocTest<AdminBloc, AdminState>(
+      'emits [AdminLoading, AdminError] when DeleteAdminChapter fails',
+      build: () {
+        when(() => mockDeleteChapter(any())).thenThrow(Exception('Error'));
+        return adminBloc;
+      },
+      act: (bloc) => bloc.add(DeleteAdminChapter(999)),
       expect: () => [
         isA<AdminLoading>(),
         isA<AdminError>(),
