@@ -20,6 +20,15 @@ class AdminLoaded extends AdminState {
   List<Object> get props => [books, message ?? ''];
 }
 
+class AdminCoverUploaded extends AdminState {
+  final String filename;
+
+  AdminCoverUploaded(this.filename);
+
+  @override
+  List<Object> get props => [filename];
+}
+
 class AdminGenresLoaded extends AdminState {
   final List<GenreEntity> genres;
 

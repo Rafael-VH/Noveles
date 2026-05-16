@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:noveles/core/supabase/storage_helper.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
 import 'package:noveles/features/presentation/screens/admin/admin_took_edit_screen.dart';
@@ -55,6 +57,8 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
     _stateSub = context.read<AdminBloc>().stream.listen((state) {
       if (state is AdminGenresLoaded && mounted) {
         setState(() => _allGenres = state.genres);
+      } else if (state is AdminCoverUploaded && mounted) {
+        setState(() => _coverCtrl.text = state.filename);
       }
     });
     context.read<AdminBloc>().add(LoadAdminGenres());
@@ -76,6 +80,14 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
     _linkCtrl.dispose();
     _stateSub?.cancel();
     super.dispose();
+  }
+
+  Future<void> _pickCover() async {
+    final picker = ImagePicker();
+    final xFile = await picker.pickImage(source: ImageSource.gallery);
+    if (xFile != null && mounted) {
+      context.read<AdminBloc>().add(UploadAdminCover(xFile.path));
+    }
   }
 
   Future<void> _save() async {
@@ -141,10 +153,41 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
                   decoration: const InputDecoration(labelText: 'Nombre'),
                   validator: (v) =>
                       v?.trim().isEmpty == true ? 'Requerido' : null),
-              TextFormField(
-                  controller: _coverCtrl,
-                  decoration: const InputDecoration(
-                      labelText: 'Cover (filename en Storage)')),
+              const SizedBox(height: 8),
+              const Text('Cover',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              if (_coverCtrl.text.isNotEmpty)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    coverUrl(_coverCtrl.text),
+                    height: 150,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => const Icon(Icons.broken_image, size: 100),
+                  ),
+                ),
+              Row(
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: _pickCover,
+                    icon: const Icon(Icons.image),
+                    label: const Text('Seleccionar imagen'),
+                  ),
+                  if (_coverCtrl.text.isNotEmpty)
+                    TextButton(
+                      onPressed: () => setState(() => _coverCtrl.clear()),
+                      child: const Text('Quitar'),
+                    ),
+                ],
+              ),
+              if (_coverCtrl.text.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Text(_coverCtrl.text,
+                      style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                ),
               TextFormField(
                   controller: _shortCtrl,
                   decoration: const InputDecoration(labelText: 'Nombre corto')),

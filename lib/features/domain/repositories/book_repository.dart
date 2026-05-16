@@ -6,4 +6,5 @@ abstract class BookRepository {
   Future<void> createBook(BookEntity book);
   Future<void> updateBook(BookEntity book);
   Future<void> deleteBook(int id);
+  Future<String> uploadCover(String filePath);
 }

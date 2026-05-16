@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/domain/repositories/repositories.dart';
@@ -186,6 +187,19 @@ class BookRepositoryImpl implements BookRepository {
       await supabase.from('books').delete().eq('id', id);
     } catch (e) {
       throw Exception('Error al eliminar libro: $e');
+    }
+  }
+
+  @override
+  Future<String> uploadCover(String filePath) async {
+    try {
+      final file = File(filePath);
+      final ext = filePath.split('.').last;
+      final filename = '${DateTime.now().millisecondsSinceEpoch}.$ext';
+      await supabase.storage.from('covers').upload(filename, file);
+      return filename;
+    } catch (e) {
+      throw Exception('Error al subir cover: $e');
     }
   }
 }

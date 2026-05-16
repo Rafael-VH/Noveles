@@ -42,6 +42,7 @@ import 'package:noveles/features/domain/use_cases/update_genre.dart';
 import 'package:noveles/features/domain/use_cases/update_profile.dart';
 import 'package:noveles/features/domain/use_cases/update_took.dart';
 import 'package:noveles/features/domain/use_cases/upload_avatar.dart';
+import 'package:noveles/features/domain/use_cases/upload_cover.dart';
 //
 import 'package:noveles/features/presentation/bloc/admin_bloc.dart';
 import 'package:noveles/features/presentation/bloc/auth_bloc.dart';
@@ -88,6 +89,7 @@ void setupDependencies() {
   getIt.registerLazySingleton(() => GetProfile(getIt()));
   getIt.registerLazySingleton(() => UpdateProfile(getIt()));
   getIt.registerLazySingleton(() => UploadAvatar(getIt()));
+  getIt.registerLazySingleton(() => UploadCover(getIt()));
   getIt.registerLazySingleton(() => ChangePassword(getIt()));
 
   // Blocs
@@ -128,6 +130,7 @@ void setupDependencies() {
       updateChapter: getIt(),
       deleteChapter: getIt(),
       getGenres: getIt(),
+      uploadCover: getIt(),
     ),
   );
 }

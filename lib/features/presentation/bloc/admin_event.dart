@@ -10,6 +10,15 @@ class LoadAdminBooks extends AdminEvent {}
 
 class LoadAdminGenres extends AdminEvent {}
 
+class UploadAdminCover extends AdminEvent {
+  final String filePath;
+
+  UploadAdminCover(this.filePath);
+
+  @override
+  List<Object> get props => [filePath];
+}
+
 class SaveAdminBook extends AdminEvent {
   final BookEntity book;
   final bool isUpdate;

@@ -15,6 +15,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
   final UpdateChapter updateChapter;
   final DeleteChapter deleteChapter;
   final GetGenre getGenres;
+  final UploadCover uploadCover;
 
   AdminBloc({
     required this.getBooks,
@@ -28,15 +29,29 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     required this.updateChapter,
     required this.deleteChapter,
     required this.getGenres,
+    required this.uploadCover,
   }) : super(AdminInitial()) {
     on<LoadAdminBooks>(_onLoadBooks);
     on<LoadAdminGenres>(_onLoadGenres);
+    on<UploadAdminCover>(_onUploadCover);
     on<SaveAdminBook>(_onSaveBook);
     on<DeleteAdminBook>(_onDeleteBook);
     on<SaveAdminTook>(_onSaveTook);
     on<DeleteAdminTook>(_onDeleteTook);
     on<SaveAdminChapter>(_onSaveChapter);
     on<DeleteAdminChapter>(_onDeleteChapter);
+  }
+
+  Future<void> _onUploadCover(
+    UploadAdminCover event,
+    Emitter<AdminState> emit,
+  ) async {
+    try {
+      final filename = await uploadCover(event.filePath);
+      emit(AdminCoverUploaded(filename));
+    } catch (e) {
+      emit(AdminError(e.toString()));
+    }
   }
 
   Future<void> _onLoadGenres(

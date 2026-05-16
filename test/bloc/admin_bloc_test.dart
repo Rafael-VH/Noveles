@@ -18,6 +18,7 @@ class MockCreateChapter extends Mock implements CreateChapter {}
 class MockUpdateChapter extends Mock implements UpdateChapter {}
 class MockDeleteChapter extends Mock implements DeleteChapter {}
 class MockGetGenre extends Mock implements GetGenre {}
+class MockUploadCover extends Mock implements UploadCover {}
 
 void main() {
   late MockGetBooks mockGetBooks;
@@ -31,6 +32,7 @@ void main() {
   late MockUpdateChapter mockUpdateChapter;
   late MockDeleteChapter mockDeleteChapter;
   late MockGetGenre mockGetGenre;
+  late MockUploadCover mockUploadCover;
   late AdminBloc adminBloc;
 
   final testBooks = [
@@ -77,6 +79,7 @@ void main() {
     mockUpdateChapter = MockUpdateChapter();
     mockDeleteChapter = MockDeleteChapter();
     mockGetGenre = MockGetGenre();
+    mockUploadCover = MockUploadCover();
     adminBloc = AdminBloc(
       getBooks: mockGetBooks,
       createBook: mockCreateBook,
@@ -89,6 +92,7 @@ void main() {
       updateChapter: mockUpdateChapter,
       deleteChapter: mockDeleteChapter,
       getGenres: mockGetGenre,
+      uploadCover: mockUploadCover,
     );
   });
 
