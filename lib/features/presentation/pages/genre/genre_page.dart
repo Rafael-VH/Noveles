@@ -47,7 +47,8 @@ class _GenrePageState extends State<GenrePage> {
                             child: CachedNetworkImage(
                               fit: BoxFit.cover,
                               imageUrl: coverUrl(book.cover),
-                              errorWidget: (_, __, ___) => const Icon(Icons.book, size: 48),
+                              errorWidget: (_, __, ___) =>
+                                  const Icon(Icons.book, size: 48),
                             ),
                           ),
                           Positioned.fill(

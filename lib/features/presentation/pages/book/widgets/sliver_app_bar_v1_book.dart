@@ -83,7 +83,8 @@ class SliverAppBarV1Book extends StatelessWidget {
                       child: CachedNetworkImage(
                         fit: BoxFit.cover,
                         imageUrl: coverUrl(books.cover),
-                        errorWidget: (_, __, ___) => const Icon(Icons.book, size: 48),
+                        errorWidget: (_, __, ___) =>
+                            const Icon(Icons.book, size: 48),
                       ),
                     ),
                     Expanded(
