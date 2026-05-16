@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 
 class SliverAppBarV1Book extends StatelessWidget {
@@ -32,7 +33,9 @@ class SliverAppBarV1Book extends StatelessWidget {
             Positioned.fill(
               child: Image(
                 fit: BoxFit.cover,
-                image: AssetImage(books.cover),
+                image: NetworkImage(
+                  supabase.storage.from('covers').getPublicUrl(books.cover),
+                ),
               ),
             ),
             Positioned.fill(
@@ -40,7 +43,8 @@ class SliverAppBarV1Book extends StatelessWidget {
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                   child: Container(
-                    color: Theme.of(context).colorScheme.onSurface.withAlpha(10),
+                    color:
+                        Theme.of(context).colorScheme.onSurface.withAlpha(10),
                   ),
                 ),
               ),
@@ -52,8 +56,14 @@ class SliverAppBarV1Book extends StatelessWidget {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
-                      Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                      Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.5),
+                      Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
                       Theme.of(context).colorScheme.onSurface,
                     ],
                   ),
@@ -72,7 +82,11 @@ class SliverAppBarV1Book extends StatelessWidget {
                       flex: 10,
                       child: Image(
                         fit: BoxFit.cover,
-                        image: AssetImage(books.cover),
+                        image: NetworkImage(
+                          supabase.storage
+                              .from('covers')
+                              .getPublicUrl(books.cover),
+                        ),
                       ),
                     ),
                     Expanded(

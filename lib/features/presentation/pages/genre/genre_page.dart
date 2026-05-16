@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 
 class GenrePage extends StatefulWidget {
@@ -24,7 +25,8 @@ class _GenrePageState extends State<GenrePage> {
           title: Text('Genero: ${widget.genre}'),
         ),
         widget.books.isEmpty
-            ? const SliverToBoxAdapter(child: Center(child: Text('No books available for this genre')))
+            ? const SliverToBoxAdapter(
+                child: Center(child: Text('No books available for this genre')))
             : SliverGrid(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
@@ -43,7 +45,11 @@ class _GenrePageState extends State<GenrePage> {
                           Positioned.fill(
                             child: Image(
                               fit: BoxFit.cover,
-                              image: AssetImage(book.cover),
+                              image: NetworkImage(
+                                supabase.storage
+                                    .from('covers')
+                                    .getPublicUrl(book.cover),
+                              ),
                             ),
                           ),
                           Positioned.fill(

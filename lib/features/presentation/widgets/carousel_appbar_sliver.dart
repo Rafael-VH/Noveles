@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/presentation/screens/screens.dart';
 
@@ -44,8 +45,8 @@ class SliverAppBarV1Home extends StatelessWidget {
                 Positioned.fill(
                   child: Image(
                     fit: BoxFit.cover,
-                    image: AssetImage(
-                      item.cover,
+                    image: NetworkImage(
+                      supabase.storage.from('covers').getPublicUrl(item.cover),
                     ),
                   ),
                 ),

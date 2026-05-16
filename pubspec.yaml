@@ -48,18 +48,4 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-  assets:
-    - assets/
-    - assets/book/
-    - assets/book/ch/
-    - assets/book/cr/
-    - assets/book/cr/sl/
-    - assets/book/eu/
-    - assets/book/eu/rwtss/
-    - assets/book/jp/
-    - assets/book/jp/oskar/
-    - assets/cover/
-    - assets/cover/ch/
-    - assets/cover/cr/
-    - assets/cover/eu/
-    - assets/cover/jp/
+

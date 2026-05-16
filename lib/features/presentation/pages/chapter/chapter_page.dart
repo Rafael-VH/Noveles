@@ -127,12 +127,12 @@ class _ChapterPageState extends State<ChapterPage> {
                       padding: const EdgeInsets.all(16.0),
                       width: MediaQuery.of(context).size.width,
                       child: Text(
-                          ch.title,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 20.0,
-                          ),
+                        ch.title,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 20.0,
                         ),
+                      ),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(

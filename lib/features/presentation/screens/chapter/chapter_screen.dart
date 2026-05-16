@@ -1,5 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/presentation/pages/pages.dart';
 
@@ -26,8 +28,14 @@ class _ChapterScreenState extends State<ChapterScreen> {
   Future<void> _loadContent() async {
     for (int i = 0; i < _chapters.length; i++) {
       try {
-        final String content =
-            await rootBundle.loadString(_chapters[i].content);
+        final raw = _chapters[i].content;
+        String content;
+        try {
+          final bytes = await supabase.storage.from('chapters').download(raw);
+          content = utf8.decode(bytes);
+        } catch (_) {
+          content = raw;
+        }
         setState(() {
           _chapters[i] = ChapterEntity(
             id: _chapters[i].id,
@@ -38,18 +46,7 @@ class _ChapterScreenState extends State<ChapterScreen> {
             tookId: _chapters[i].tookId,
           );
         });
-      } catch (e) {
-        setState(() {
-          _chapters[i] = ChapterEntity(
-            id: _chapters[i].id,
-            createdAt: _chapters[i].createdAt,
-            number: _chapters[i].number,
-            title: _chapters[i].title,
-            content: 'Error: $e',
-            tookId: _chapters[i].tookId,
-          );
-        });
-      }
+      } catch (_) {}
     }
   }
 
