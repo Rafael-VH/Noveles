@@ -58,7 +58,10 @@ class SliverAppBarV1Home extends StatelessWidget {
                         end: AlignmentDirectional.bottomCenter,
                         colors: [
                           Colors.transparent,
-                          Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
+                          Theme.of(context)
+                              .colorScheme
+                              .surface
+                              .withValues(alpha: 0.9),
                           Theme.of(context).colorScheme.surface,
                         ],
                       ),
