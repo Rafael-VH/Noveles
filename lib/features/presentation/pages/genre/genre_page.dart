@@ -24,7 +24,7 @@ class _GenrePageState extends State<GenrePage> {
           title: Text('Genero: ${widget.genre}'),
         ),
         widget.books.isEmpty
-            ? const Center(child: Text('No books available for this genre'))
+            ? const SliverToBoxAdapter(child: Center(child: Text('No books available for this genre')))
             : SliverGrid(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,

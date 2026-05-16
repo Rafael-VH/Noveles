@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
+import 'package:noveles/features/domain/entities/chapter_entity.dart';
 
 class TookEntity extends Equatable {
   final int id;

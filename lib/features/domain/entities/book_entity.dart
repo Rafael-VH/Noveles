@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
+import 'package:noveles/features/domain/entities/genre_entity.dart';
+import 'package:noveles/features/domain/entities/took_entity.dart';
 
 class BookEntity extends Equatable {
   final int id;

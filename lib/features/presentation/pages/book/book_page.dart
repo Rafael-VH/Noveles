@@ -21,7 +21,7 @@ class _BookPageState extends State<BookPage>
     with SingleTickerProviderStateMixin {
   final ScrollController _scrollController = ScrollController();
   late TabController _tabController;
-  late bool isVisible = true;
+  bool isVisible = true;
   List<Widget> nameTab = [const Tab(text: 'Info'), const Tab(text: 'Took')];
 
   @override

@@ -7,7 +7,10 @@ class BookBloc extends Bloc<BookEvent, BookState> {
   final GetBooks getBooks;
   final GetBookById getBookById;
 
-  BookBloc(this.getBooks, this.getBookById) : super(BookInitial()) {
+  BookBloc({
+    required this.getBooks,
+    required this.getBookById,
+  }) : super(BookInitial()) {
     on<LoadBooks>(_onLoadBooks);
     on<LoadBookById>(_onLoadBookById);
   }

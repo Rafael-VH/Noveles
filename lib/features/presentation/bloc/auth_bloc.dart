@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/domain/use_cases/use_cases.dart';
@@ -10,6 +11,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final Register register;
   final Logout logout;
   final GetCurrentUser getCurrentUser;
+  StreamSubscription? _authSubscription;
 
   AuthBloc({
     required this.login,
@@ -25,11 +27,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   void _listenAuthChanges() {
-    supabase.auth.onAuthStateChange.listen((data) {
+    _authSubscription = supabase.auth.onAuthStateChange.listen((data) {
       if (data.event == AuthChangeEvent.signedOut) {
         add(LogoutRequested());
       }
     });
+  }
+
+  @override
+  Future<void> close() {
+    _authSubscription?.cancel();
+    return super.close();
   }
 
   Future<void> _onCheckSession(

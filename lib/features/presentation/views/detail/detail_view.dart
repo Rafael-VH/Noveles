@@ -23,7 +23,7 @@ class _DetailViewState extends State<DetailView> {
         child: Column(
           children: [
             const SizedBox(height: 22.0),
-            titleWidget(
+            TitleWidget(
               text: 'Descripción',
               clContent: Theme.of(context).colorScheme.surface,
               clText: Colors.white,
@@ -68,7 +68,7 @@ class _DetailViewState extends State<DetailView> {
                 text2: widget.books.chapterCount,
               ),
             ),
-            titleWidget(
+            TitleWidget(
               text: 'Generos',
               clContent: Theme.of(context).colorScheme.surface,
               clText: Colors.white,

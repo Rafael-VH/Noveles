@@ -98,7 +98,12 @@ void setupDependencies() {
       getCurrentUser: getIt(),
     ),
   );
-  getIt.registerFactory(() => BookBloc(getIt(), getIt()));
+  getIt.registerFactory(
+    () => BookBloc(
+      getBooks: getIt(),
+      getBookById: getIt(),
+    ),
+  );
   getIt.registerFactory(() => GenreBloc(getIt()));
   getIt.registerFactory(
     () => ProfileBloc(
