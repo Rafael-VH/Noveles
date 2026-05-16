@@ -117,8 +117,7 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (_) => AdminChapterEditScreen(
-                                        chapter: ch,
-                                        tookId: widget.took!.id),
+                                        chapter: ch, tookId: widget.took!.id),
                                   )),
                             ),
                             IconButton(
@@ -131,15 +130,21 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
                             ),
                           ],
                         ),
-                    onTap: () => Navigator.push(context, MaterialPageRoute(
-                      builder: (_) => AdminChapterEditScreen(chapter: ch, tookId: widget.took!.id),
-                    )),
+                        onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => AdminChapterEditScreen(
+                                  chapter: ch, tookId: widget.took!.id),
+                            )),
                       ),
                     )),
                 ElevatedButton.icon(
-                  onPressed: () => Navigator.push(context, MaterialPageRoute(
-                    builder: (_) => AdminChapterEditScreen(tookId: widget.took!.id),
-                  )),
+                  onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            AdminChapterEditScreen(tookId: widget.took!.id),
+                      )),
                   icon: const Icon(Icons.add),
                   label: const Text('Añadir Capítulo'),
                 ),

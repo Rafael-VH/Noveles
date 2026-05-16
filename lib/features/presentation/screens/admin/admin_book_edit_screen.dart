@@ -178,7 +178,7 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
                             ? took.title
                             : 'Tomo ${took.number}'),
                         subtitle: Text('${took.listChapter.length} capítulos'),
-                          trailing: Row(
+                        trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
@@ -201,11 +201,11 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
                           ],
                         ),
                         onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => AdminTookEditScreen(
-                                    took: took, bookId: widget.book!.id),
-                              )),
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => AdminTookEditScreen(
+                                  took: took, bookId: widget.book!.id),
+                            )),
                       ),
                     )),
                 ElevatedButton.icon(

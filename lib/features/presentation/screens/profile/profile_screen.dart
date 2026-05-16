@@ -50,19 +50,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _onSave() {
     if (_formKey.currentState?.validate() ?? false) {
       context.read<ProfileBloc>().add(
-        UpdateProfile(
-          displayName: _displayNameController.text.trim(),
-          bio: _bioController.text.trim(),
-        ),
-      );
+            UpdateProfile(
+              displayName: _displayNameController.text.trim(),
+              bio: _bioController.text.trim(),
+            ),
+          );
     }
   }
 
   void _onChangePassword() {
     if (_passwordFormKey.currentState?.validate() ?? false) {
       context.read<ProfileBloc>().add(
-        ChangePassword(_newPasswordController.text),
-      );
+            ChangePassword(_newPasswordController.text),
+          );
       _newPasswordController.clear();
       _confirmPasswordController.clear();
     }
@@ -291,8 +291,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ? Icons.visibility_off
                             : Icons.visibility,
                       ),
-                      onPressed: () => setState(
-                          () => _obscureConfirm = !_obscureConfirm),
+                      onPressed: () =>
+                          setState(() => _obscureConfirm = !_obscureConfirm),
                     ),
                   ),
                   validator: (value) {
