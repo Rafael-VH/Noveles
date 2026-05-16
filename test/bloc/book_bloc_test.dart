@@ -50,8 +50,8 @@ void main() {
         source: 'source',
         link: '',
         isFavorite: false,
-        listGenre: [],
-        listTook: [],
+        listGenre: const [],
+        listTook: const [],
       ),
     ];
 

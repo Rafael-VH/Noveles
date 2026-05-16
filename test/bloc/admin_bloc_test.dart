@@ -37,7 +37,7 @@ void main() {
       name: 'Test Book', short: '', alternative: '', description: '',
       authorId: 1, author: 'Author', country: 'JP', state: 'ongoing',
       type: 'novel', release: '2024', tookCount: '1', chapterCount: '10',
-      source: '', link: '', isFavorite: false, listGenre: [], listTook: [],
+      source: '', link: '', isFavorite: false, listGenre: const [], listTook: const [],
     ),
   ];
 
@@ -47,12 +47,12 @@ void main() {
       name: '', short: '', alternative: '', description: '',
       authorId: 0, author: '', country: '', state: '',
       type: '', release: '', tookCount: '', chapterCount: '',
-      source: '', link: '', isFavorite: false, listGenre: [], listTook: [],
+      source: '', link: '', isFavorite: false, listGenre: const [], listTook: const [],
     ));
     registerFallbackValue(TookEntity(
       id: 0, createdAt: DateTime(2024), cover: '',
       number: '', title: '', chapterCount: '',
-      bookId: 1, listChapter: [],
+      bookId: 1, listChapter: const [],
     ));
     registerFallbackValue(ChapterEntity(
       id: 0, createdAt: DateTime(2024), number: '',
@@ -199,7 +199,7 @@ void main() {
       },
       act: (bloc) => bloc.add(SaveAdminTook(
         TookEntity(id: 1, createdAt: DateTime(2024), cover: '',
-            number: '1', title: '', chapterCount: '', bookId: 1, listChapter: []),
+            number: '1', title: '', chapterCount: '', bookId: 1, listChapter: const []),
         isUpdate: true,
       )),
       expect: () => [
@@ -217,7 +217,7 @@ void main() {
       },
       act: (bloc) => bloc.add(SaveAdminTook(
         TookEntity(id: 0, createdAt: DateTime(2024), cover: '',
-            number: '1', title: '', chapterCount: '', bookId: 1, listChapter: []),
+            number: '1', title: '', chapterCount: '', bookId: 1, listChapter: const []),
         isUpdate: false,
       )),
       expect: () => [
@@ -234,7 +234,7 @@ void main() {
       },
       act: (bloc) => bloc.add(SaveAdminTook(
         TookEntity(id: 0, createdAt: DateTime(2024), cover: '',
-            number: '1', title: '', chapterCount: '', bookId: 1, listChapter: []),
+            number: '1', title: '', chapterCount: '', bookId: 1, listChapter: const []),
         isUpdate: false,
       )),
       expect: () => [
