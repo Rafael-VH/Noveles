@@ -39,22 +39,24 @@ class ProfileBloc extends Bloc<events.ProfileEvent, ProfileState> {
     Emitter<ProfileState> emit,
   ) async {
     final currentState = state;
-    if (currentState is ProfileLoaded) {
-      emit(ProfileSaving(currentState.user));
-      try {
-        String? avatarUrl = currentState.user.avatarUrl;
-        if (currentState.pendingAvatar != null) {
-          avatarUrl = await uploadAvatar(currentState.pendingAvatar!);
-        }
-        final user = await updateProfile(
-          displayName: event.displayName,
-          bio: event.bio,
-          avatarUrl: avatarUrl,
-        );
-        emit(ProfileLoaded(user, message: 'Perfil actualizado exitosamente'));
-      } catch (e) {
-        emit(ProfileError(e.toString(), user: currentState.user));
+    if (currentState is! ProfileLoaded) {
+      emit(ProfileError('No se puede actualizar: perfil no cargado'));
+      return;
+    }
+    emit(ProfileSaving(currentState.user));
+    try {
+      String? avatarUrl = currentState.user.avatarUrl;
+      if (currentState.pendingAvatar != null) {
+        avatarUrl = await uploadAvatar(currentState.pendingAvatar!.path);
       }
+      final user = await updateProfile(
+        displayName: event.displayName,
+        bio: event.bio,
+        avatarUrl: avatarUrl,
+      );
+      emit(ProfileLoaded(user, message: 'Perfil actualizado exitosamente'));
+    } catch (e) {
+      emit(ProfileError(e.toString(), user: currentState.user));
     }
   }
 
@@ -63,28 +65,25 @@ class ProfileBloc extends Bloc<events.ProfileEvent, ProfileState> {
     Emitter<ProfileState> emit,
   ) async {
     final currentState = state;
-    if (currentState is ProfileLoaded) {
-      emit(ProfileLoaded(currentState.user, pendingAvatar: event.file));
-    }
+    if (currentState is! ProfileLoaded) return;
+    emit(ProfileLoaded(currentState.user, pendingAvatar: event.file));
   }
 
   Future<void> _onChangePassword(
     events.ChangePassword event,
     Emitter<ProfileState> emit,
   ) async {
+    final currentState = state;
+    if (currentState is! ProfileLoaded) {
+      emit(ProfileError('No se puede cambiar la contraseña: perfil no cargado'));
+      return;
+    }
+    emit(ProfileSaving(currentState.user));
     try {
       await changePassword(event.newPassword);
-      final currentState = state;
-      if (currentState is ProfileLoaded) {
-        emit(ProfileLoaded(currentState.user, message: 'Contraseña actualizada exitosamente'));
-      }
+      emit(ProfileLoaded(currentState.user, message: 'Contraseña actualizada exitosamente'));
     } catch (e) {
-      final currentState = state;
-      if (currentState is ProfileLoaded) {
-        emit(ProfileError(e.toString(), user: currentState.user));
-      } else {
-        emit(ProfileError(e.toString()));
-      }
+      emit(ProfileError(e.toString(), user: currentState.user));
     }
   }
 }

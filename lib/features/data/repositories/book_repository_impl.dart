@@ -5,26 +5,35 @@ import 'package:noveles/features/domain/repositories/repositories.dart';
 class BookRepositoryImpl implements BookRepository {
   @override
   Future<List<BookEntity>> getBooks() async {
-    final response = await supabase
-        .from('books')
-        .select(
-            '*, authors!inner(*), books_genres!inner(genre_id, genres(*)), tooks(*, chapters(*))')
-        .order('id');
+    try {
+      final response = await supabase
+          .from('books')
+          .select(
+              '*, authors!inner(*), books_genres!inner(genre_id, genres(*)), tooks(*, chapters(*))')
+          .order('id')
+          .limit(100);
 
-    return response.map((json) => _mapToBookEntity(json)).toList();
+      return response.map((json) => _mapToBookEntity(json)).toList();
+    } catch (e) {
+      throw Exception('Error al obtener libros: $e');
+    }
   }
 
   @override
   Future<BookEntity?> getBookById(int id) async {
-    final response = await supabase
-        .from('books')
-        .select(
-            '*, authors!inner(*), books_genres!inner(genre_id, genres(*)), tooks(*, chapters(*))')
-        .eq('id', id)
-        .maybeSingle();
+    try {
+      final response = await supabase
+          .from('books')
+          .select(
+              '*, authors!inner(*), books_genres!inner(genre_id, genres(*)), tooks(*, chapters(*))')
+          .eq('id', id)
+          .maybeSingle();
 
-    if (response == null) return null;
-    return _mapToBookEntity(response);
+      if (response == null) return null;
+      return _mapToBookEntity(response);
+    } catch (e) {
+      throw Exception('Error al obtener libro: $e');
+    }
   }
 
   BookEntity _mapToBookEntity(Map<String, dynamic> json) {
@@ -90,50 +99,62 @@ class BookRepositoryImpl implements BookRepository {
 
   @override
   Future<void> createBook(BookEntity book) async {
-    await supabase.from('books').insert({
-      'id': book.id,
-      'created_at': book.createdAt.toIso8601String(),
-      'cover': book.cover,
-      'name': book.name,
-      'short': book.short,
-      'alternative': book.alternative,
-      'description': book.description,
-      'author_id': book.authorId,
-      'country': book.country,
-      'state': book.state,
-      'type': book.type,
-      'release': book.release,
-      'took_count': book.tookCount,
-      'chapter_count': book.chapterCount,
-      'source': book.source,
-      'link': book.link,
-      'is_favorite': book.isFavorite,
-    });
+    try {
+      await supabase.from('books').insert({
+        'id': book.id,
+        'created_at': book.createdAt.toIso8601String(),
+        'cover': book.cover,
+        'name': book.name,
+        'short': book.short,
+        'alternative': book.alternative,
+        'description': book.description,
+        'author_id': book.authorId,
+        'country': book.country,
+        'state': book.state,
+        'type': book.type,
+        'release': book.release,
+        'took_count': book.tookCount,
+        'chapter_count': book.chapterCount,
+        'source': book.source,
+        'link': book.link,
+        'is_favorite': book.isFavorite,
+      });
+    } catch (e) {
+      throw Exception('Error al crear libro: $e');
+    }
   }
 
   @override
   Future<void> updateBook(BookEntity book) async {
-    await supabase.from('books').update({
-      'cover': book.cover,
-      'name': book.name,
-      'short': book.short,
-      'alternative': book.alternative,
-      'description': book.description,
-      'author_id': book.authorId,
-      'country': book.country,
-      'state': book.state,
-      'type': book.type,
-      'release': book.release,
-      'took_count': book.tookCount,
-      'chapter_count': book.chapterCount,
-      'source': book.source,
-      'link': book.link,
-      'is_favorite': book.isFavorite,
-    }).eq('id', book.id);
+    try {
+      await supabase.from('books').update({
+        'cover': book.cover,
+        'name': book.name,
+        'short': book.short,
+        'alternative': book.alternative,
+        'description': book.description,
+        'author_id': book.authorId,
+        'country': book.country,
+        'state': book.state,
+        'type': book.type,
+        'release': book.release,
+        'took_count': book.tookCount,
+        'chapter_count': book.chapterCount,
+        'source': book.source,
+        'link': book.link,
+        'is_favorite': book.isFavorite,
+      }).eq('id', book.id);
+    } catch (e) {
+      throw Exception('Error al actualizar libro: $e');
+    }
   }
 
   @override
   Future<void> deleteBook(int id) async {
-    await supabase.from('books').delete().eq('id', id);
+    try {
+      await supabase.from('books').delete().eq('id', id);
+    } catch (e) {
+      throw Exception('Error al eliminar libro: $e');
+    }
   }
 }

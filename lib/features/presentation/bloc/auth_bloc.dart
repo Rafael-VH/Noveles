@@ -1,7 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/domain/use_cases/use_cases.dart';
 import 'package:noveles/features/presentation/bloc/auth_event.dart';
 import 'package:noveles/features/presentation/bloc/auth_state.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide AuthState;
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final Login login;
@@ -19,6 +21,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<LoginRequested>(_onLogin);
     on<RegisterRequested>(_onRegister);
     on<LogoutRequested>(_onLogout);
+    _listenAuthChanges();
+  }
+
+  void _listenAuthChanges() {
+    supabase.auth.onAuthStateChange.listen((data) {
+      if (data.event == AuthChangeEvent.signedOut) {
+        add(LogoutRequested());
+      }
+    });
   }
 
   Future<void> _onCheckSession(

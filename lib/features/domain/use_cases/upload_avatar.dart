@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:noveles/features/domain/repositories/repositories.dart';
 
 class UploadAvatar {
@@ -6,7 +5,7 @@ class UploadAvatar {
 
   UploadAvatar(this.repository);
 
-  Future<String> call(File file) async {
-    return await repository.uploadAvatar(file);
+  Future<String> call(String filePath) async {
+    return await repository.uploadAvatar(filePath);
   }
 }

@@ -11,7 +11,7 @@ class TookEntity extends Equatable {
   final int bookId;
   final List<ChapterEntity> listChapter;
 
-  TookEntity({
+  const TookEntity({
     required this.id,
     required this.createdAt,
     required this.cover,

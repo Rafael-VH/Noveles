@@ -5,16 +5,24 @@ import 'package:noveles/features/domain/repositories/repositories.dart';
 class ChapterRepositoryImpl implements ChapterRepository {
   @override
   Future<List<ChapterEntity>> getChapters() async {
-    final response = await supabase.from('chapters').select('*').order('id');
-    return response.map((json) => _mapToChapterEntity(json)).toList();
+    try {
+      final response = await supabase.from('chapters').select('*').order('id').limit(100);
+      return response.map((json) => _mapToChapterEntity(json)).toList();
+    } catch (e) {
+      throw Exception('Error al obtener capítulos: $e');
+    }
   }
 
   @override
   Future<ChapterEntity?> getChapterById(int id) async {
-    final response =
-        await supabase.from('chapters').select('*').eq('id', id).maybeSingle();
-    if (response == null) return null;
-    return _mapToChapterEntity(response);
+    try {
+      final response =
+          await supabase.from('chapters').select('*').eq('id', id).maybeSingle();
+      if (response == null) return null;
+      return _mapToChapterEntity(response);
+    } catch (e) {
+      throw Exception('Error al obtener capítulo: $e');
+    }
   }
 
   ChapterEntity _mapToChapterEntity(Map<String, dynamic> json) {
@@ -30,28 +38,40 @@ class ChapterRepositoryImpl implements ChapterRepository {
 
   @override
   Future<void> createChapter(ChapterEntity chapter) async {
-    await supabase.from('chapters').insert({
-      'id': chapter.id,
-      'created_at': chapter.createdAt.toIso8601String(),
-      'number': chapter.number,
-      'title': chapter.title,
-      'content': chapter.content,
-      'took_id': chapter.tookId,
-    });
+    try {
+      await supabase.from('chapters').insert({
+        'id': chapter.id,
+        'created_at': chapter.createdAt.toIso8601String(),
+        'number': chapter.number,
+        'title': chapter.title,
+        'content': chapter.content,
+        'took_id': chapter.tookId,
+      });
+    } catch (e) {
+      throw Exception('Error al crear capítulo: $e');
+    }
   }
 
   @override
   Future<void> updateChapter(ChapterEntity chapter) async {
-    await supabase.from('chapters').update({
-      'number': chapter.number,
-      'title': chapter.title,
-      'content': chapter.content,
-      'took_id': chapter.tookId,
-    }).eq('id', chapter.id);
+    try {
+      await supabase.from('chapters').update({
+        'number': chapter.number,
+        'title': chapter.title,
+        'content': chapter.content,
+        'took_id': chapter.tookId,
+      }).eq('id', chapter.id);
+    } catch (e) {
+      throw Exception('Error al actualizar capítulo: $e');
+    }
   }
 
   @override
   Future<void> deleteChapter(int id) async {
-    await supabase.from('chapters').delete().eq('id', id);
+    try {
+      await supabase.from('chapters').delete().eq('id', id);
+    } catch (e) {
+      throw Exception('Error al eliminar capítulo: $e');
+    }
   }
 }

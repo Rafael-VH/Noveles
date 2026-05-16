@@ -5,24 +5,32 @@ import 'package:noveles/features/domain/repositories/repositories.dart';
 class TookRepositoryImpl implements TookRepository {
   @override
   Future<List<TookEntity>> getTooks() async {
-    final response =
-        await supabase.from('tooks').select('*, chapters(*)').order('id');
+    try {
+      final response =
+          await supabase.from('tooks').select('*, chapters(*)').order('id').limit(100);
 
-    return response
-        .map((json) => _mapToTookEntity(Map<String, dynamic>.from(json)))
-        .toList();
+      return response
+          .map((json) => _mapToTookEntity(Map<String, dynamic>.from(json)))
+          .toList();
+    } catch (e) {
+      throw Exception('Error al obtener tomos: $e');
+    }
   }
 
   @override
   Future<TookEntity?> getTookById(int id) async {
-    final response = await supabase
-        .from('tooks')
-        .select('*, chapters(*)')
-        .eq('id', id)
-        .maybeSingle();
+    try {
+      final response = await supabase
+          .from('tooks')
+          .select('*, chapters(*)')
+          .eq('id', id)
+          .maybeSingle();
 
-    if (response == null) return null;
-    return _mapToTookEntity(Map<String, dynamic>.from(response));
+      if (response == null) return null;
+      return _mapToTookEntity(Map<String, dynamic>.from(response));
+    } catch (e) {
+      throw Exception('Error al obtener tomo: $e');
+    }
   }
 
   TookEntity _mapToTookEntity(Map<String, dynamic> json) {
@@ -51,30 +59,42 @@ class TookRepositoryImpl implements TookRepository {
 
   @override
   Future<void> createTook(TookEntity took) async {
-    await supabase.from('tooks').insert({
-      'id': took.id,
-      'created_at': took.createdAt.toIso8601String(),
-      'cover': took.cover,
-      'number': took.number,
-      'title': took.title,
-      'content': took.content,
-      'book_id': took.bookId,
-    });
+    try {
+      await supabase.from('tooks').insert({
+        'id': took.id,
+        'created_at': took.createdAt.toIso8601String(),
+        'cover': took.cover,
+        'number': took.number,
+        'title': took.title,
+        'content': took.content,
+        'book_id': took.bookId,
+      });
+    } catch (e) {
+      throw Exception('Error al crear tomo: $e');
+    }
   }
 
   @override
   Future<void> updateTook(TookEntity took) async {
-    await supabase.from('tooks').update({
-      'cover': took.cover,
-      'number': took.number,
-      'title': took.title,
-      'content': took.content,
-      'book_id': took.bookId,
-    }).eq('id', took.id);
+    try {
+      await supabase.from('tooks').update({
+        'cover': took.cover,
+        'number': took.number,
+        'title': took.title,
+        'content': took.content,
+        'book_id': took.bookId,
+      }).eq('id', took.id);
+    } catch (e) {
+      throw Exception('Error al actualizar tomo: $e');
+    }
   }
 
   @override
   Future<void> deleteTook(int id) async {
-    await supabase.from('tooks').delete().eq('id', id);
+    try {
+      await supabase.from('tooks').delete().eq('id', id);
+    } catch (e) {
+      throw Exception('Error al eliminar tomo: $e');
+    }
   }
 }

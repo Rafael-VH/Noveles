@@ -6,7 +6,7 @@ class GenreEntity extends Equatable {
   final String name;
   final String description;
 
-  GenreEntity({
+  const GenreEntity({
     required this.id,
     required this.createdAt,
     required this.name,

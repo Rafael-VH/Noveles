@@ -1,24 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:noveles/core/app/app.dart';
 import 'package:noveles/core/di/injection.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized(); //  Inicializando Widgets
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: '.env');
 
   await Supabase.initialize(
-    url: 'https://xozqqjcuuesxcqwhillr.supabase.co',
-    anonKey: 'sb_publishable_4KI-2PHTvKTReCqx2xbU2A_8TgtzItJ',
+    url: dotenv.env['SUPABASE_URL']!,
+    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
 
-  SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.immersive); //  Abarcando toda la pantalla
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
   setupDependencies();
 
-  //  Lanzando la aplicación
-  runApp(
-    const App(),
-  );
+  runApp(const App());
 }

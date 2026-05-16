@@ -6,7 +6,7 @@ class AuthorEntity extends Equatable {
   final String name;
   final String description;
 
-  AuthorEntity({
+  const AuthorEntity({
     required this.id,
     required this.createdAt,
     required this.name,

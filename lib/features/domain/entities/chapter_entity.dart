@@ -8,7 +8,7 @@ class ChapterEntity extends Equatable {
   final String content;
   final int tookId;
 
-  ChapterEntity({
+  const ChapterEntity({
     required this.id,
     required this.createdAt,
     required this.number,

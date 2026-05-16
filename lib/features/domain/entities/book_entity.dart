@@ -23,7 +23,7 @@ class BookEntity extends Equatable {
   final List<GenreEntity> listGenre;
   final List<TookEntity> listTook;
 
-  BookEntity({
+  const BookEntity({
     required this.id,
     required this.createdAt,
     required this.cover,
