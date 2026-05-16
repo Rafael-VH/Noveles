@@ -6,7 +6,8 @@ class GenreRepositoryImpl implements GenreRepository {
   @override
   Future<List<GenreEntity>> getGenres() async {
     try {
-      final response = await supabase.from('genres').select('*').order('id').limit(100);
+      final response =
+          await supabase.from('genres').select('*').order('id').limit(100);
       return response.map((json) => _mapToGenreEntity(json)).toList();
     } catch (e) {
       throw Exception('Error al obtener géneros: $e');

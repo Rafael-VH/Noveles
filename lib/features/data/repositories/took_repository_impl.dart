@@ -6,8 +6,11 @@ class TookRepositoryImpl implements TookRepository {
   @override
   Future<List<TookEntity>> getTooks() async {
     try {
-      final response =
-          await supabase.from('tooks').select('*, chapters(*)').order('id').limit(100);
+      final response = await supabase
+          .from('tooks')
+          .select('*, chapters(*)')
+          .order('id')
+          .limit(100);
 
       return response
           .map((json) => _mapToTookEntity(Map<String, dynamic>.from(json)))

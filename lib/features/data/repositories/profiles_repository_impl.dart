@@ -22,7 +22,8 @@ class ProfilesRepositoryImpl implements ProfilesRepository {
   }
 
   @override
-  Future<UserEntity> updateProfile({String? displayName, String? bio, String? avatarUrl}) async {
+  Future<UserEntity> updateProfile(
+      {String? displayName, String? bio, String? avatarUrl}) async {
     try {
       final user = supabase.auth.currentUser;
       if (user == null) throw Exception('No hay sesión activa');
@@ -49,7 +50,9 @@ class ProfilesRepositoryImpl implements ProfilesRepository {
       final ext = filePath.split('.').last;
       final path = '${user.id}/avatar.$ext';
       final file = File(filePath);
-      await supabase.storage.from('avatars').upload(path, file, fileOptions: const FileOptions(upsert: true));
+      await supabase.storage
+          .from('avatars')
+          .upload(path, file, fileOptions: const FileOptions(upsert: true));
       final url = supabase.storage.from('avatars').getPublicUrl(path);
       return '$url?v=${DateTime.now().millisecondsSinceEpoch}';
     } catch (e) {

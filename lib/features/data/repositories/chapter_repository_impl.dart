@@ -6,7 +6,8 @@ class ChapterRepositoryImpl implements ChapterRepository {
   @override
   Future<List<ChapterEntity>> getChapters() async {
     try {
-      final response = await supabase.from('chapters').select('*').order('id').limit(100);
+      final response =
+          await supabase.from('chapters').select('*').order('id').limit(100);
       return response.map((json) => _mapToChapterEntity(json)).toList();
     } catch (e) {
       throw Exception('Error al obtener capítulos: $e');
@@ -16,8 +17,11 @@ class ChapterRepositoryImpl implements ChapterRepository {
   @override
   Future<ChapterEntity?> getChapterById(int id) async {
     try {
-      final response =
-          await supabase.from('chapters').select('*').eq('id', id).maybeSingle();
+      final response = await supabase
+          .from('chapters')
+          .select('*')
+          .eq('id', id)
+          .maybeSingle();
       if (response == null) return null;
       return _mapToChapterEntity(response);
     } catch (e) {
