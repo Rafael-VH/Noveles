@@ -1,4 +1,5 @@
 //
+export 'package:noveles/features/presentation/widgets/carousel_appbar_sliver.dart';
 export 'package:noveles/features/presentation/widgets/categorybtn_widget.dart';
 export 'package:noveles/features/presentation/widgets/custom_card_normal.dart';
 export 'package:noveles/features/presentation/widgets/custom_card_thumbnail.dart';

@@ -1,4 +1,4 @@
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/features/domain/use_cases/use_cases.dart';
 import 'package:noveles/features/presentation/bloc/auth_event.dart';
 import 'package:noveles/features/presentation/bloc/auth_state.dart';

@@ -55,14 +55,14 @@ class _TookViewState extends State<TookView> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Capitulos',
+                        'Capítulos',
                         style: Theme.of(context)
                             .textTheme
                             .labelSmall
                             ?.copyWith(color: Colors.grey),
                       ),
                       Text(
-                        item.content,
+                        '${item.listChapter.length}',
                         style: Theme.of(context)
                             .textTheme
                             .labelMedium

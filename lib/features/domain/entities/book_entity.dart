@@ -1,6 +1,7 @@
+import 'package:equatable/equatable.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 
-class BookEntity {
+class BookEntity extends Equatable {
   final int id;
   final DateTime createdAt;
   final String cover;
@@ -18,7 +19,7 @@ class BookEntity {
   final String chapterCount;
   final String source;
   final String link;
-  late bool isFavorite;
+  final bool isFavorite;
   final List<GenreEntity> listGenre;
   final List<TookEntity> listTook;
 
@@ -40,8 +41,32 @@ class BookEntity {
     required this.chapterCount,
     required this.source,
     required this.link,
-    this.isFavorite = false,
+    required this.isFavorite,
     required this.listGenre,
     required this.listTook,
   });
+
+  @override
+  List<Object> get props => [
+        id,
+        createdAt,
+        cover,
+        name,
+        short,
+        alternative,
+        description,
+        authorId,
+        author,
+        country,
+        state,
+        type,
+        release,
+        tookCount,
+        chapterCount,
+        source,
+        link,
+        isFavorite,
+        listGenre,
+        listTook,
+      ];
 }

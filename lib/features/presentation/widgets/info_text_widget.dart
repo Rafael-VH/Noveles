@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:noveles/features/presentation/widgets/widgets.dart';
+import 'package:noveles/features/presentation/widgets/title_widget.dart';
+import 'package:noveles/features/presentation/widgets/subtitle_widget.dart';
 
 Widget infoTextWidget({
   required Size size,

@@ -1,4 +1,6 @@
-class AuthorEntity {
+import 'package:equatable/equatable.dart';
+
+class AuthorEntity extends Equatable {
   final int id;
   final DateTime createdAt;
   final String name;
@@ -10,4 +12,7 @@ class AuthorEntity {
     required this.name,
     required this.description,
   });
+
+  @override
+  List<Object> get props => [id, createdAt, name, description];
 }

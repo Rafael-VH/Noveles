@@ -24,7 +24,7 @@ class PickAvatar extends ProfileEvent {
   PickAvatar(this.file);
 
   @override
-  List<Object> get props => [file];
+  List<Object> get props => [file.path];
 }
 
 class ChangePassword extends ProfileEvent {

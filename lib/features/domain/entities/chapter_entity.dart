@@ -1,4 +1,6 @@
-class ChapterEntity {
+import 'package:equatable/equatable.dart';
+
+class ChapterEntity extends Equatable {
   final int id;
   final DateTime createdAt;
   final String number;
@@ -14,4 +16,7 @@ class ChapterEntity {
     required this.content,
     required this.tookId,
   });
+
+  @override
+  List<Object> get props => [id, createdAt, number, title, content, tookId];
 }

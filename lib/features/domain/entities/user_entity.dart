@@ -1,4 +1,6 @@
-class UserEntity {
+import 'package:equatable/equatable.dart';
+
+class UserEntity extends Equatable {
   final String id;
   final String email;
   final String role;
@@ -6,7 +8,7 @@ class UserEntity {
   final String? bio;
   final String? avatarUrl;
 
-  UserEntity({
+  const UserEntity({
     required this.id,
     required this.email,
     required this.role,
@@ -16,6 +18,9 @@ class UserEntity {
   });
 
   bool get isAdmin => role == 'admin';
+
+  @override
+  List<Object> get props => [id, email, role, displayName ?? '', bio ?? '', avatarUrl ?? ''];
 
   UserEntity copyWith({
     String? id,

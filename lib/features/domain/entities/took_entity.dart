@@ -1,6 +1,7 @@
+import 'package:equatable/equatable.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 
-class TookEntity {
+class TookEntity extends Equatable {
   final int id;
   final DateTime createdAt;
   final String cover;
@@ -20,4 +21,16 @@ class TookEntity {
     required this.bookId,
     required this.listChapter,
   });
+
+  @override
+  List<Object> get props => [
+        id,
+        createdAt,
+        cover,
+        number,
+        title,
+        content,
+        bookId,
+        listChapter,
+      ];
 }

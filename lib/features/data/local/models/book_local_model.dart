@@ -1,4 +1,5 @@
-import 'package:noveles/features/data/local/models/model.dart';
+import 'package:noveles/features/data/local/models/genre_local_model.dart';
+import 'package:noveles/features/data/local/models/took_local_model.dart';
 
 class BookLocalModel {
   final int id;
@@ -160,9 +161,15 @@ class BookLocalModel {
       chapterCount: json['chapterCount'],
       source: json['source'],
       link: json['link'],
-      isFavorite: json['isFavorite'],
-      listGenre: json['listGenre'],
-      listTook: json['listTook'],
+      isFavorite: json['isFavorite'] ?? false,
+      listGenre: (json['listGenre'] as List<dynamic>?)
+              ?.map((e) => GenreLocalModel.fromJson(Map<String, dynamic>.from(e)))
+              .toList() ??
+          [],
+      listTook: (json['listTook'] as List<dynamic>?)
+              ?.map((e) => TookLocalModel.fromJson(Map<String, dynamic>.from(e)))
+              .toList() ??
+          [],
     );
   }
 }
