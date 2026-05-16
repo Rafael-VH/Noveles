@@ -43,8 +43,7 @@ class MainPage extends StatelessWidget {
     return SafeArea(
       child: CustomScrollView(
         slivers: [
-          sliverAppBarV1Home(
-            context: context,
+          SliverAppBarV1Home(
             listBook: listBook,
             actions: [
               IconButton(

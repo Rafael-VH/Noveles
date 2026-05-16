@@ -40,8 +40,7 @@ class _DetailViewState extends State<DetailView> {
             ),
             Padding(
               padding: const EdgeInsets.all(6.0),
-              child: cardInfoV1Detail(
-                context: context,
+              child: CardInfoV1Detail(
                 title1: "Publicado",
                 text1: widget.books.release,
                 title2: "Tipo de Novela",
@@ -50,8 +49,7 @@ class _DetailViewState extends State<DetailView> {
             ),
             Padding(
               padding: const EdgeInsets.all(6.0),
-              child: cardInfoV1Detail(
-                context: context,
+              child: CardInfoV1Detail(
                 title1: "País",
                 text1: widget.books.country,
                 title2: "Estado",
@@ -60,8 +58,7 @@ class _DetailViewState extends State<DetailView> {
             ),
             Padding(
               padding: const EdgeInsets.all(6.0),
-              child: cardInfoV1Detail(
-                context: context,
+              child: CardInfoV1Detail(
                 title1: "Tomos",
                 text1: widget.books.tookCount,
                 title2: "Capítulos",

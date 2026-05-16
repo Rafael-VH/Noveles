@@ -81,18 +81,16 @@ class _BookPageState extends State<BookPage>
       child: NestedScrollView(
         headerSliverBuilder: (context, _) {
           return [
-            sliverAppBarV1Book(
-              context: context,
+            SliverAppBarV1Book(
               books: widget.books,
               infoIcon: IconButton(
                 onPressed: () => showInfoDialog(),
                 icon: const Icon(Icons.info_outlined),
               ),
             ),
-            sliverPersistentHeaderV1Book(
+            SliverPersistentHeaderV1Book(
               tabController: _tabController,
               tabs: nameTab,
-              context: context,
             ),
           ];
         },

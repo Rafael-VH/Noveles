@@ -1,6 +1,5 @@
-//  GET
-export 'package:noveles/features/domain/use_cases/create_book.dart';
 //  CREATE
+export 'package:noveles/features/domain/use_cases/create_book.dart';
 export 'package:noveles/features/domain/use_cases/create_chapter.dart';
 export 'package:noveles/features/domain/use_cases/create_genre.dart';
 export 'package:noveles/features/domain/use_cases/create_took.dart';

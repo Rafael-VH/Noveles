@@ -51,7 +51,7 @@ class TookRepositoryImpl implements TookRepository {
       cover: json['cover'] ?? '',
       number: json['number'] ?? '',
       title: json['title'] ?? '',
-      content: json['content'] ?? '',
+      chapterCount: json['content'] ?? '',
       bookId: json['book_id'] ?? 0,
       listChapter: chapters,
     );
@@ -66,7 +66,7 @@ class TookRepositoryImpl implements TookRepository {
         'cover': took.cover,
         'number': took.number,
         'title': took.title,
-        'content': took.content,
+        'content': took.chapterCount,
         'book_id': took.bookId,
       });
     } catch (e) {
@@ -81,7 +81,7 @@ class TookRepositoryImpl implements TookRepository {
         'cover': took.cover,
         'number': took.number,
         'title': took.title,
-        'content': took.content,
+        'content': took.chapterCount,
         'book_id': took.bookId,
       }).eq('id', took.id);
     } catch (e) {

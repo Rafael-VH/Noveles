@@ -7,7 +7,7 @@ class TookEntity extends Equatable {
   final String cover;
   final String number;
   final String title;
-  final String content;
+  final String chapterCount;
   final int bookId;
   final List<ChapterEntity> listChapter;
 
@@ -17,7 +17,7 @@ class TookEntity extends Equatable {
     required this.cover,
     required this.number,
     required this.title,
-    required this.content,
+    required this.chapterCount,
     required this.bookId,
     required this.listChapter,
   });
@@ -29,7 +29,7 @@ class TookEntity extends Equatable {
         cover,
         number,
         title,
-        content,
+        chapterCount,
         bookId,
         listChapter,
       ];

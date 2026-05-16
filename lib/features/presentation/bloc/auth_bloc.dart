@@ -89,7 +89,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(AuthLoading());
     try {
-      await logout();
+      if (supabase.auth.currentUser != null) {
+        await logout();
+      }
       emit(AuthUnauthenticated());
     } catch (e) {
       emit(AuthError(e.toString()));

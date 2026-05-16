@@ -67,7 +67,7 @@ class BookRepositoryImpl implements BookRepository {
         cover: took['cover'] ?? '',
         number: took['number'] ?? '',
         title: took['title'] ?? '',
-        content: took['content'] ?? '',
+        chapterCount: took['content'] ?? '',
         bookId: took['book_id'] ?? 0,
         listChapter: chapters,
       );
