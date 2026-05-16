@@ -6,7 +6,9 @@ class UpdateProfile {
 
   UpdateProfile(this.repository);
 
-  Future<UserEntity> call({String? displayName, String? bio, String? avatarUrl}) async {
-    return await repository.updateProfile(displayName: displayName, bio: bio, avatarUrl: avatarUrl);
+  Future<UserEntity> call(
+      {String? displayName, String? bio, String? avatarUrl}) async {
+    return await repository.updateProfile(
+        displayName: displayName, bio: bio, avatarUrl: avatarUrl);
   }
 }
