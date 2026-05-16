@@ -43,6 +43,7 @@ import 'package:noveles/features/domain/use_cases/update_profile.dart';
 import 'package:noveles/features/domain/use_cases/update_took.dart';
 import 'package:noveles/features/domain/use_cases/upload_avatar.dart';
 //
+import 'package:noveles/features/presentation/bloc/admin_bloc.dart';
 import 'package:noveles/features/presentation/bloc/auth_bloc.dart';
 import 'package:noveles/features/presentation/bloc/book_bloc.dart';
 import 'package:noveles/features/presentation/bloc/genre_bloc.dart';
@@ -111,6 +112,21 @@ void setupDependencies() {
       updateProfile: getIt(),
       uploadAvatar: getIt(),
       changePassword: getIt(),
+    ),
+  );
+
+  getIt.registerFactory(
+    () => AdminBloc(
+      getBooks: getIt(),
+      createBook: getIt(),
+      updateBook: getIt(),
+      deleteBook: getIt(),
+      createTook: getIt(),
+      updateTook: getIt(),
+      deleteTook: getIt(),
+      createChapter: getIt(),
+      updateChapter: getIt(),
+      deleteChapter: getIt(),
     ),
   );
 }

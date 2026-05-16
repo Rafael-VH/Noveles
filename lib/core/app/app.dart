@@ -17,6 +17,7 @@ class App extends StatelessWidget {
         ),
         BlocProvider(create: (_) => getIt<BookBloc>()..add(LoadBooks())),
         BlocProvider(create: (_) => getIt<GenreBloc>()..add(LoadGenres())),
+        BlocProvider(create: (_) => getIt<AdminBloc>()),
       ],
       child: BlocBuilder<ThemeBloc, ThemeState>(
         builder: (context, state) {
@@ -32,6 +33,9 @@ class App extends StatelessWidget {
                   );
                 }
                 if (authState is AuthAuthenticated) {
+                  if (authState.user.isAdmin) {
+                    return const AdminMainScreen();
+                  }
                   return const MainScreen();
                 }
                 return const LoginScreen();

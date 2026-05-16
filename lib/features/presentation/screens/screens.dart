@@ -7,3 +7,7 @@ export 'package:noveles/features/presentation/screens/took/took_screen.dart';
 export 'package:noveles/features/presentation/screens/auth/login_screen.dart';
 export 'package:noveles/features/presentation/screens/auth/register_screen.dart';
 export 'package:noveles/features/presentation/screens/profile/profile_screen.dart';
+export 'package:noveles/features/presentation/screens/admin/admin_main_screen.dart';
+export 'package:noveles/features/presentation/screens/admin/admin_book_edit_screen.dart';
+export 'package:noveles/features/presentation/screens/admin/admin_took_edit_screen.dart';
+export 'package:noveles/features/presentation/screens/admin/admin_chapter_edit_screen.dart';
