@@ -18,6 +18,7 @@ class _AdminChapterEditScreenState extends State<AdminChapterEditScreen> {
   late TextEditingController _numberCtrl;
   late TextEditingController _titleCtrl;
   late TextEditingController _contentCtrl;
+  bool _isSaving = false;
 
   bool get _isEditing => widget.chapter != null;
 
@@ -38,7 +39,8 @@ class _AdminChapterEditScreenState extends State<AdminChapterEditScreen> {
     super.dispose();
   }
 
-  void _save() {
+  Future<void> _save() async {
+    if (_isSaving) return;
     if (!(_formKey.currentState?.validate() ?? false)) return;
     final chapter = ChapterEntity(
       id: widget.chapter?.id ?? DateTime.now().millisecondsSinceEpoch,
@@ -48,10 +50,22 @@ class _AdminChapterEditScreenState extends State<AdminChapterEditScreen> {
       content: _contentCtrl.text,
       tookId: widget.tookId,
     );
-    context
-        .read<AdminBloc>()
-        .add(SaveAdminChapter(chapter, isUpdate: _isEditing));
-    Navigator.pop(context);
+    setState(() => _isSaving = true);
+    try {
+      final bloc = context.read<AdminBloc>();
+      final future = bloc.stream.firstWhere((s) => s is! AdminLoading);
+      bloc.add(SaveAdminChapter(chapter, isUpdate: _isEditing));
+      final result = await future;
+      if (result is AdminLoaded && mounted) {
+        Navigator.pop(context);
+      } else if (result is AdminError && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result.message), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
   }
 
   @override

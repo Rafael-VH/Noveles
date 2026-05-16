@@ -1,5 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:noveles/core/supabase/supabase_client.dart';
+import 'package:noveles/core/supabase/storage_helper.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 
 class GenrePage extends StatefulWidget {
@@ -43,13 +44,10 @@ class _GenrePageState extends State<GenrePage> {
                       child: Stack(
                         children: [
                           Positioned.fill(
-                            child: Image(
+                            child: CachedNetworkImage(
                               fit: BoxFit.cover,
-                              image: NetworkImage(
-                                supabase.storage
-                                    .from('covers')
-                                    .getPublicUrl(book.cover),
-                              ),
+                              imageUrl: coverUrl(book.cover),
+                              errorWidget: (_, __, ___) => const Icon(Icons.book, size: 48),
                             ),
                           ),
                           Positioned.fill(

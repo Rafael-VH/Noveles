@@ -100,15 +100,32 @@ class BookRepositoryImpl implements BookRepository {
   @override
   Future<void> createBook(BookEntity book) async {
     try {
+      int authorId = book.authorId;
+      if (authorId == 0 && book.author.isNotEmpty) {
+        final existing = await supabase
+            .from('authors')
+            .select('id')
+            .eq('name', book.author)
+            .maybeSingle();
+        if (existing != null) {
+          authorId = existing['id'];
+        } else {
+          final result = await supabase
+              .from('authors')
+              .insert({'name': book.author})
+              .select('id')
+              .single();
+          authorId = result['id'];
+        }
+      }
       await supabase.from('books').insert({
-        'id': book.id,
         'created_at': book.createdAt.toIso8601String(),
         'cover': book.cover,
         'name': book.name,
         'short': book.short,
         'alternative': book.alternative,
         'description': book.description,
-        'author_id': book.authorId,
+        'author_id': authorId,
         'country': book.country,
         'state': book.state,
         'type': book.type,

@@ -19,6 +19,7 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
   late TextEditingController _numberCtrl;
   late TextEditingController _titleCtrl;
   late TextEditingController _coverCtrl;
+  bool _isSaving = false;
 
   bool get _isEditing => widget.took != null;
 
@@ -39,7 +40,8 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
     super.dispose();
   }
 
-  void _save() {
+  Future<void> _save() async {
+    if (_isSaving) return;
     if (!(_formKey.currentState?.validate() ?? false)) return;
     final took = TookEntity(
       id: widget.took?.id ?? DateTime.now().millisecondsSinceEpoch,
@@ -51,8 +53,22 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
       bookId: widget.bookId,
       listChapter: widget.took?.listChapter ?? [],
     );
-    context.read<AdminBloc>().add(SaveAdminTook(took, isUpdate: _isEditing));
-    Navigator.pop(context);
+    setState(() => _isSaving = true);
+    try {
+      final bloc = context.read<AdminBloc>();
+      final future = bloc.stream.firstWhere((s) => s is! AdminLoading);
+      bloc.add(SaveAdminTook(took, isUpdate: _isEditing));
+      final result = await future;
+      if (result is AdminLoaded && mounted) {
+        Navigator.pop(context);
+      } else if (result is AdminError && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result.message), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
   }
 
   @override
@@ -97,42 +113,33 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
                           children: [
                             IconButton(
                               icon: const Icon(Icons.edit, color: Colors.blue),
-                              onPressed: () async {
-                                final bloc = context.read<AdminBloc>();
-                                await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => AdminChapterEditScreen(
-                                          chapter: ch, tookId: widget.took!.id),
-                                    ));
-                                if (mounted) bloc.add(LoadAdminBooks());
+                              onPressed: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => AdminChapterEditScreen(
+                                        chapter: ch,
+                                        tookId: widget.took!.id),
+                                  )),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () {
+                                context
+                                    .read<AdminBloc>()
+                                    .add(DeleteAdminChapter(ch.id));
                               },
                             ),
                           ],
                         ),
-                        onTap: () async {
-                          final bloc = context.read<AdminBloc>();
-                          await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => AdminChapterEditScreen(
-                                    chapter: ch, tookId: widget.took!.id),
-                              ));
-                          if (mounted) bloc.add(LoadAdminBooks());
-                        },
+                    onTap: () => Navigator.push(context, MaterialPageRoute(
+                      builder: (_) => AdminChapterEditScreen(chapter: ch, tookId: widget.took!.id),
+                    )),
                       ),
                     )),
                 ElevatedButton.icon(
-                  onPressed: () async {
-                    final bloc = context.read<AdminBloc>();
-                    await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              AdminChapterEditScreen(tookId: widget.took!.id),
-                        ));
-                    if (mounted) bloc.add(LoadAdminBooks());
-                  },
+                  onPressed: () => Navigator.push(context, MaterialPageRoute(
+                    builder: (_) => AdminChapterEditScreen(tookId: widget.took!.id),
+                  )),
                   icon: const Icon(Icons.add),
                   label: const Text('Añadir Capítulo'),
                 ),

@@ -1,7 +1,8 @@
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:noveles/core/supabase/supabase_client.dart';
+import 'package:noveles/core/supabase/storage_helper.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 
 class SliverAppBarV1Book extends StatelessWidget {
@@ -31,11 +32,10 @@ class SliverAppBarV1Book extends StatelessWidget {
         child: Stack(
           children: [
             Positioned.fill(
-              child: Image(
+              child: CachedNetworkImage(
                 fit: BoxFit.cover,
-                image: NetworkImage(
-                  supabase.storage.from('covers').getPublicUrl(books.cover),
-                ),
+                imageUrl: coverUrl(books.cover),
+                errorWidget: (_, __, ___) => const SizedBox.shrink(),
               ),
             ),
             Positioned.fill(
@@ -80,13 +80,10 @@ class SliverAppBarV1Book extends StatelessWidget {
                   children: [
                     Expanded(
                       flex: 10,
-                      child: Image(
+                      child: CachedNetworkImage(
                         fit: BoxFit.cover,
-                        image: NetworkImage(
-                          supabase.storage
-                              .from('covers')
-                              .getPublicUrl(books.cover),
-                        ),
+                        imageUrl: coverUrl(books.cover),
+                        errorWidget: (_, __, ___) => const Icon(Icons.book, size: 48),
                       ),
                     ),
                     Expanded(

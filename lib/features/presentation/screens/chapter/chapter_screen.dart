@@ -5,6 +5,9 @@ import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/presentation/pages/pages.dart';
 
+bool _isStoragePath(String s) =>
+    s.contains('/') || s.endsWith('.txt') || s.endsWith('.json');
+
 class ChapterScreen extends StatefulWidget {
   final List<ChapterEntity> chapters;
   final int i;
@@ -26,7 +29,7 @@ class _ChapterScreenState extends State<ChapterScreen> {
   }
 
   Future<void> _loadContent() async {
-    for (int i = 0; i < _chapters.length; i++) {
+    await Future.wait(List.generate(_chapters.length, (i) async {
       try {
         final raw = _chapters[i].content;
         String content;
@@ -34,8 +37,11 @@ class _ChapterScreenState extends State<ChapterScreen> {
           final bytes = await supabase.storage.from('chapters').download(raw);
           content = utf8.decode(bytes);
         } catch (_) {
-          content = raw;
+          content = _isStoragePath(raw)
+              ? 'Error: no se pudo cargar el capítulo desde Storage'
+              : raw;
         }
+        if (!mounted) return;
         setState(() {
           _chapters[i] = ChapterEntity(
             id: _chapters[i].id,
@@ -46,8 +52,10 @@ class _ChapterScreenState extends State<ChapterScreen> {
             tookId: _chapters[i].tookId,
           );
         });
-      } catch (_) {}
-    }
+      } catch (_) {
+        debugPrint('Error loading chapter $_chapters[i]');
+      }
+    }));
   }
 
   @override

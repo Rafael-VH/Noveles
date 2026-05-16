@@ -1,6 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:noveles/core/supabase/supabase_client.dart';
+import 'package:noveles/core/supabase/storage_helper.dart';
+import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
 import 'package:noveles/features/presentation/screens/main_screen.dart';
 import 'package:noveles/features/presentation/screens/profile/profile_screen.dart';
@@ -93,14 +95,10 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
                       leading: SizedBox(
                         width: 48,
                         height: 64,
-                        child: Image(
+                        child: CachedNetworkImage(
                           fit: BoxFit.cover,
-                          image: NetworkImage(
-                            supabase.storage
-                                .from('covers')
-                                .getPublicUrl(book.cover),
-                          ),
-                          errorBuilder: (_, __, ___) =>
+                          imageUrl: coverUrl(book.cover),
+                          errorWidget: (_, __, ___) =>
                               const Icon(Icons.book, size: 48),
                         ),
                       ),
@@ -139,24 +137,22 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
     );
   }
 
-  void _editBook(BuildContext context, dynamic book) async {
-    await Navigator.push(
+  void _editBook(BuildContext context, BookEntity book) {
+    Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => AdminBookEditScreen(book: book),
       ),
     );
-    if (context.mounted) context.read<AdminBloc>().add(LoadAdminBooks());
   }
 
-  void _createBook(BuildContext context) async {
-    await Navigator.push(
+  void _createBook(BuildContext context) {
+    Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => const AdminBookEditScreen(),
       ),
     );
-    if (context.mounted) context.read<AdminBloc>().add(LoadAdminBooks());
   }
 
   void _deleteBook(BuildContext context, int bookId, String bookName) {
