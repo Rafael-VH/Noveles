@@ -60,7 +60,7 @@ class _AdminChapterEditScreenState extends State<AdminChapterEditScreen> {
         Navigator.pop(context);
       } else if (result is AdminError && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(result.message), backgroundColor: Colors.red),
+          SnackBar(content: Text(result.message), backgroundColor: Theme.of(context).colorScheme.error),
         );
       }
     } finally {

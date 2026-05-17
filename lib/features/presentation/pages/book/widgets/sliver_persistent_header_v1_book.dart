@@ -19,12 +19,12 @@ class SliverPersistentHeaderV1Book extends StatelessWidget {
           controller: tabController,
           tabs: tabs,
           physics: const BouncingScrollPhysics(),
-          indicatorColor: Theme.of(context).colorScheme.onSurface,
+          indicatorColor: Theme.of(context).colorScheme.primary,
           labelStyle: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color: Theme.of(context).colorScheme.primary,
                 fontWeight: FontWeight.bold,
               ),
-          unselectedLabelColor: Colors.white,
+          unselectedLabelColor: Theme.of(context).colorScheme.onSurfaceVariant,
           unselectedLabelStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),

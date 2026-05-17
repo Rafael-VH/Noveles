@@ -25,15 +25,15 @@ class _DetailViewState extends State<DetailView> {
             const SizedBox(height: 22.0),
             TitleWidget(
               text: 'Descripción',
-              clContent: Theme.of(context).colorScheme.surface,
-              clText: Colors.white,
+              clContent: Theme.of(context).colorScheme.primary,
+              clText: Theme.of(context).colorScheme.onSurface,
             ),
             Padding(
               padding: const EdgeInsets.all(10.0),
               child: Text(
                 widget.books.description,
-                style: const TextStyle(
-                  color: Colors.grey,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                   fontSize: 14.0,
                 ),
               ),
@@ -67,8 +67,8 @@ class _DetailViewState extends State<DetailView> {
             ),
             TitleWidget(
               text: 'Generos',
-              clContent: Theme.of(context).colorScheme.surface,
-              clText: Colors.white,
+              clContent: Theme.of(context).colorScheme.primary,
+              clText: Theme.of(context).colorScheme.onSurface,
             ),
             Padding(
               padding: const EdgeInsets.all(10.0),
@@ -80,7 +80,7 @@ class _DetailViewState extends State<DetailView> {
                     onTap: () {},
                     child: Chip(
                       elevation: 8.0,
-                      backgroundColor: Theme.of(context).colorScheme.onSurface,
+                      backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
                       label: Text(
                         item.name,
                         style: Theme.of(context).textTheme.bodySmall,

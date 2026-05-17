@@ -127,7 +127,7 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
             : result.books.lastWhere((b) => b.name == book.name);
       } else if (result is AdminError && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(result.message), backgroundColor: Colors.red),
+          SnackBar(content: Text(result.message), backgroundColor: Theme.of(context).colorScheme.error),
         );
       }
     } finally {
@@ -206,7 +206,7 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
                 Padding(
                   padding: const EdgeInsets.only(top: 4),
                   child: Text(_coverCtrl.text,
-                      style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 12)),
                 ),
               TextFormField(
                   controller: _shortCtrl,
@@ -245,8 +245,8 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
               if (_allGenres.isEmpty)
-                const Text('Cargando géneros...',
-                    style: TextStyle(color: Colors.grey))
+                Text('Cargando géneros...',
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant))
               else
                 Wrap(
                   spacing: 8,
@@ -281,7 +281,7 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              icon: const Icon(Icons.edit, color: Colors.blue),
+                              icon: Icon(Icons.edit, color: Theme.of(context).colorScheme.primary),
                               onPressed: () => Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -290,7 +290,7 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
                                   )),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
+                              icon: Icon(Icons.delete, color: Theme.of(context).colorScheme.error),
                               onPressed: () {
                                 context
                                     .read<AdminBloc>()

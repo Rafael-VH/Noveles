@@ -112,8 +112,8 @@ class _ChapterPageState extends State<ChapterPage> {
                 centerTitle: true,
                 title: Text(
                   ch.number,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -147,7 +147,7 @@ class _ChapterPageState extends State<ChapterPage> {
                           fontSize: textSize,
                           fontWeight: selectedWeight,
                           fontStyle: selectedStyle,
-                          color: Colors.grey,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ),

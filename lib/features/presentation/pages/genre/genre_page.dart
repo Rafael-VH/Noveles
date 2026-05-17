@@ -54,22 +54,22 @@ class _GenrePageState extends State<GenrePage> {
                           Positioned.fill(
                             child: Container(
                               decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    Colors.transparent,
-                                    Theme.of(context)
-                                        .colorScheme
-                                        .onSurface
-                                        .withValues(alpha: 0.5),
-                                    Theme.of(context)
-                                        .colorScheme
-                                        .onSurface
-                                        .withValues(alpha: 0.7),
-                                    Theme.of(context).colorScheme.surface,
-                                  ],
-                                ),
+                                  gradient: LinearGradient(
+                                    begin: Alignment.topCenter,
+                                    end: Alignment.bottomCenter,
+                                    colors: [
+                                      Colors.transparent,
+                                      Theme.of(context)
+                                          .colorScheme
+                                          .surface
+                                          .withValues(alpha: 0.5),
+                                      Theme.of(context)
+                                          .colorScheme
+                                          .surface
+                                          .withValues(alpha: 0.7),
+                                      Theme.of(context).colorScheme.surface,
+                                    ],
+                                  ),
                               ),
                             ),
                           ),

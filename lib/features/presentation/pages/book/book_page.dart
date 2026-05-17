@@ -59,7 +59,7 @@ class _BookPageState extends State<BookPage>
           Theme.of(context).colorScheme.surface.withValues(alpha: 0.85),
       builder: (context) => AlertDialog(
         scrollable: true,
-        backgroundColor: Theme.of(context).colorScheme.onSurface,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         actions: [
           ElevatedButton(
             onPressed: () {},

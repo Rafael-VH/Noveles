@@ -44,7 +44,7 @@ class SliverAppBarV1Book extends StatelessWidget {
                   filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                   child: Container(
                     color:
-                        Theme.of(context).colorScheme.onSurface.withAlpha(10),
+                        Theme.of(context).colorScheme.surface.withAlpha(10),
                   ),
                 ),
               ),
@@ -58,13 +58,13 @@ class SliverAppBarV1Book extends StatelessWidget {
                     colors: [
                       Theme.of(context)
                           .colorScheme
-                          .onSurface
+                          .surface
                           .withValues(alpha: 0.5),
                       Theme.of(context)
                           .colorScheme
-                          .onSurface
+                          .surface
                           .withValues(alpha: 0.7),
-                      Theme.of(context).colorScheme.onSurface,
+                      Theme.of(context).colorScheme.surface,
                     ],
                   ),
                 ),
@@ -94,8 +94,8 @@ class SliverAppBarV1Book extends StatelessWidget {
                         child: Text(
                           books.name,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 18.0,
                             fontWeight: FontWeight.bold,
                           ),
@@ -107,8 +107,8 @@ class SliverAppBarV1Book extends StatelessWidget {
                       child: Text(
                         books.author,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Colors.grey,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontSize: 14.0,
                           fontWeight: FontWeight.bold,
                         ),

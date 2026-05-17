@@ -28,13 +28,13 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
       listener: (context, state) {
         if (state is AdminError) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+            SnackBar(content: Text(state.message), backgroundColor: Theme.of(context).colorScheme.error),
           );
         }
         if (state is AdminLoaded && state.message != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-                content: Text(state.message!), backgroundColor: Colors.green),
+                content: Text(state.message!), backgroundColor: Theme.of(context).colorScheme.tertiary),
           );
         }
       },
@@ -110,11 +110,11 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
-                            icon: const Icon(Icons.edit, color: Colors.blue),
+                            icon: Icon(Icons.edit, color: Theme.of(context).colorScheme.primary),
                             onPressed: () => _editBook(context, book),
                           ),
                           IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
+                            icon: Icon(Icons.delete, color: Theme.of(context).colorScheme.error),
                             onPressed: () =>
                                 _deleteBook(context, book.id, book.name),
                           ),
@@ -170,7 +170,7 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
               Navigator.pop(ctx);
               context.read<AdminBloc>().add(DeleteAdminBook(bookId));
             },
-            child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
+            child: Text('Eliminar', style: TextStyle(color: Theme.of(context).colorScheme.error)),
           ),
         ],
       ),

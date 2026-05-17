@@ -87,7 +87,7 @@ class SliverAppBarV1Home extends StatelessWidget {
                           style: Theme.of(context)
                               .textTheme
                               .labelSmall
-                              ?.copyWith(color: Colors.grey),
+                              ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
                         ),
                       ],
                     ),

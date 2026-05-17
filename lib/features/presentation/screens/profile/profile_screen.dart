@@ -84,9 +84,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Navigator.pop(ctx);
               context.read<AuthBloc>().add(LogoutRequested());
             },
-            child: const Text(
+            child: Text(
               'Cerrar Sesión',
-              style: TextStyle(color: Colors.red),
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
             ),
           ),
         ],
@@ -112,7 +112,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(state.message!),
-                    backgroundColor: Colors.green,
+                    backgroundColor: Theme.of(context).colorScheme.tertiary,
                   ),
                 );
               }
@@ -121,7 +121,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(state.message),
-                  backgroundColor: Colors.red,
+                  backgroundColor: Theme.of(context).colorScheme.error,
                 ),
               );
             }
@@ -189,7 +189,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             style: Theme.of(context)
                 .textTheme
                 .bodyLarge
-                ?.copyWith(color: Colors.grey),
+                ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
           ),
           const SizedBox(height: 24),
           Form(
@@ -330,9 +330,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 16),
           TextButton(
             onPressed: isSaving ? null : _onLogout,
-            child: const Text(
+            child: Text(
               'Cerrar Sesión',
-              style: TextStyle(color: Colors.red, fontSize: 16),
+              style: TextStyle(color: Theme.of(context).colorScheme.error, fontSize: 16),
             ),
           ),
           const SizedBox(height: 32),

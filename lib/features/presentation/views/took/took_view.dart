@@ -41,32 +41,32 @@ class _TookViewState extends State<TookView> {
                     style: Theme.of(context)
                         .textTheme
                         .labelSmall
-                        ?.copyWith(color: Colors.white),
+                        ?.copyWith(color: Theme.of(context).colorScheme.onSurface),
                   ),
                   title: Text(
                     item.number,
                     style: Theme.of(context)
                         .textTheme
                         .labelMedium
-                        ?.copyWith(color: Colors.grey),
+                        ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
                   ),
                   trailing: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        'Capítulos',
-                        style: Theme.of(context)
-                            .textTheme
-                            .labelSmall
-                            ?.copyWith(color: Colors.grey),
+                        Text(
+                          'Capítulos',
+                          style: Theme.of(context)
+                              .textTheme
+                              .labelSmall
+                              ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
                       ),
                       Text(
                         '${item.listChapter.length}',
                         style: Theme.of(context)
                             .textTheme
                             .labelMedium
-                            ?.copyWith(color: Colors.white),
+                            ?.copyWith(color: Theme.of(context).colorScheme.onSurface),
                       ),
                     ],
                   ),

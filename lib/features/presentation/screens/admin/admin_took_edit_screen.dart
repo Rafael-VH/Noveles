@@ -63,7 +63,7 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
         Navigator.pop(context);
       } else if (result is AdminError && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(result.message), backgroundColor: Colors.red),
+          SnackBar(content: Text(result.message), backgroundColor: Theme.of(context).colorScheme.error),
         );
       }
     } finally {
@@ -112,7 +112,7 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              icon: const Icon(Icons.edit, color: Colors.blue),
+                              icon: Icon(Icons.edit, color: Theme.of(context).colorScheme.primary),
                               onPressed: () => Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -121,7 +121,7 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
                                   )),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
+                              icon: Icon(Icons.delete, color: Theme.of(context).colorScheme.error),
                               onPressed: () {
                                 context
                                     .read<AdminBloc>()
