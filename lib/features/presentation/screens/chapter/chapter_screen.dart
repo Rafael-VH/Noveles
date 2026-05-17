@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:noveles/core/supabase/chapter_cache.dart';
 import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/presentation/pages/pages.dart';
@@ -30,30 +32,45 @@ class _ChapterScreenState extends State<ChapterScreen> {
 
   Future<void> _loadContent() async {
     await Future.wait(List.generate(_chapters.length, (i) async {
+      final raw = _chapters[i].content;
+      if (!_isStoragePath(raw)) {
+        if (mounted) {
+          setState(() => _chapters[i] = ChapterEntity(
+            id: _chapters[i].id, createdAt: _chapters[i].createdAt,
+            number: _chapters[i].number, title: _chapters[i].title,
+            content: raw, tookId: _chapters[i].tookId,
+          ));
+        }
+        return;
+      }
       try {
-        final raw = _chapters[i].content;
         String content;
-        try {
+        final cached = await ChapterCache.read(raw);
+        if (cached != null) {
+          content = cached;
+        } else {
           final bytes = await supabase.storage.from('chapters').download(raw);
           content = utf8.decode(bytes);
-        } catch (_) {
-          content = _isStoragePath(raw)
-              ? 'Error: no se pudo cargar el capítulo desde Storage'
-              : raw;
+          unawaited(ChapterCache.save(raw, bytes));
         }
         if (!mounted) return;
         setState(() {
           _chapters[i] = ChapterEntity(
-            id: _chapters[i].id,
-            createdAt: _chapters[i].createdAt,
-            number: _chapters[i].number,
-            title: _chapters[i].title,
-            content: content,
-            tookId: _chapters[i].tookId,
+            id: _chapters[i].id, createdAt: _chapters[i].createdAt,
+            number: _chapters[i].number, title: _chapters[i].title,
+            content: content, tookId: _chapters[i].tookId,
           );
         });
       } catch (_) {
-        debugPrint('Error loading chapter $_chapters[i]');
+        if (!mounted) return;
+        setState(() {
+          _chapters[i] = ChapterEntity(
+            id: _chapters[i].id, createdAt: _chapters[i].createdAt,
+            number: _chapters[i].number, title: _chapters[i].title,
+            content: 'Error: no se pudo cargar el capítulo',
+            tookId: _chapters[i].tookId,
+          );
+        });
       }
     }));
   }
