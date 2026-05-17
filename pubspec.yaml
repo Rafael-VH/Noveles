@@ -12,7 +12,7 @@ dependencies:
 
   # UI / COMPONENTES VISUALES
   cupertino_icons: ^1.0.8
-  carousel_slider: ^4.2.1
+  carousel_slider: ^5.1.2
 
   # ARQUITECTURA / STATE MANAGEMENT
   bloc: ^8.1.4
