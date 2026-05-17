@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
+import 'package:noveles/features/domain/helpers/text_stats.dart';
 
 class ChapterPage extends StatefulWidget {
   final int i;
@@ -54,38 +55,6 @@ class _ChapterPageState extends State<ChapterPage> {
     super.dispose();
   }
 
-  int countCaracteres(String? texto) {
-    if (texto == null || texto.isEmpty) {
-      return 0;
-    }
-    final textoLimpio = texto.replaceAll(RegExp(r'([.,!?; ])'), '');
-    return textoLimpio.length;
-  }
-
-  int countPalabras(String? texto) {
-    if (texto == null || texto.isEmpty) {
-      return 0;
-    }
-    List<String> palabras = texto.split(RegExp(r'\s+'));
-    return palabras.length;
-  }
-
-  int countFrases(String? texto) {
-    if (texto == null || texto.isEmpty) {
-      return 0;
-    }
-    List<String> frases = texto.split(RegExp(r'[.!?]'));
-    return frases.length;
-  }
-
-  int countParrafos(String? texto) {
-    if (texto == null || texto.isEmpty) {
-      return 0;
-    }
-    List<String> parrafos = texto.split(RegExp(r'\n\s*\n'));
-    return parrafos.length;
-  }
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -98,10 +67,10 @@ class _ChapterPageState extends State<ChapterPage> {
         }),
         itemBuilder: (context, index) {
           final ch = widget.chapters[index];
-          caracteres = countCaracteres(ch.content);
-          palabras = countPalabras(ch.content);
-          frases = countFrases(ch.content);
-          parrafos = countParrafos(ch.content);
+          caracteres = TextStats.characters(ch.content);
+          palabras = TextStats.words(ch.content);
+          frases = TextStats.sentences(ch.content);
+          parrafos = TextStats.paragraphs(ch.content);
 
           return CustomScrollView(
             controller: scrollController,

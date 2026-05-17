@@ -16,6 +16,8 @@ import 'package:noveles/features/domain/repositories/took_repository.dart';
 //
 import 'package:noveles/features/domain/use_cases/change_password.dart';
 import 'package:noveles/features/domain/use_cases/create_book.dart';
+import 'package:noveles/features/domain/use_cases/get_chapter_content.dart';
+import 'package:noveles/features/domain/use_cases/get_books_by_genre.dart';
 import 'package:noveles/features/domain/use_cases/create_chapter.dart';
 import 'package:noveles/features/domain/use_cases/create_genre.dart';
 import 'package:noveles/features/domain/use_cases/create_took.dart';
@@ -49,6 +51,7 @@ import 'package:noveles/features/presentation/bloc/auth_bloc.dart';
 import 'package:noveles/features/presentation/bloc/book_bloc.dart';
 import 'package:noveles/features/presentation/bloc/genre_bloc.dart';
 import 'package:noveles/features/presentation/bloc/profile_bloc.dart';
+import 'package:noveles/features/presentation/bloc/chapter_bloc.dart';
 
 final getIt = GetIt.instance;
 
@@ -91,6 +94,8 @@ void setupDependencies() {
   getIt.registerLazySingleton(() => UploadAvatar(getIt()));
   getIt.registerLazySingleton(() => UploadCover(getIt()));
   getIt.registerLazySingleton(() => ChangePassword(getIt()));
+  getIt.registerLazySingleton(() => GetChapterContent(getIt()));
+  getIt.registerLazySingleton(() => GetBooksByGenre());
 
   // Blocs
   getIt.registerFactory(
@@ -115,6 +120,9 @@ void setupDependencies() {
       uploadAvatar: getIt(),
       changePassword: getIt(),
     ),
+  );
+  getIt.registerFactory(
+    () => ChapterBloc(getChapterContent: getIt()),
   );
 
   getIt.registerFactory(

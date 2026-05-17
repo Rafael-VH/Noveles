@@ -1,14 +1,8 @@
-import 'dart:async';
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:noveles/core/supabase/chapter_cache.dart';
-import 'package:noveles/core/supabase/supabase_client.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
+import 'package:noveles/features/presentation/bloc/bloc.dart';
 import 'package:noveles/features/presentation/pages/pages.dart';
-
-bool _isStoragePath(String s) =>
-    s.contains('/') || s.endsWith('.txt') || s.endsWith('.json');
 
 class ChapterScreen extends StatefulWidget {
   final List<ChapterEntity> chapters;
@@ -21,66 +15,36 @@ class ChapterScreen extends StatefulWidget {
 }
 
 class _ChapterScreenState extends State<ChapterScreen> {
-  late List<ChapterEntity> _chapters;
-
   @override
   void initState() {
     super.initState();
-    _chapters = List.from(widget.chapters);
-    _loadContent();
-  }
-
-  Future<void> _loadContent() async {
-    await Future.wait(List.generate(_chapters.length, (i) async {
-      final raw = _chapters[i].content;
-      if (!_isStoragePath(raw)) {
-        if (mounted) {
-          setState(() => _chapters[i] = ChapterEntity(
-            id: _chapters[i].id, createdAt: _chapters[i].createdAt,
-            number: _chapters[i].number, title: _chapters[i].title,
-            content: raw, tookId: _chapters[i].tookId,
-          ));
-        }
-        return;
-      }
-      try {
-        String content;
-        final cached = await ChapterCache.read(raw);
-        if (cached != null) {
-          content = cached;
-        } else {
-          final bytes = await supabase.storage.from('chapters').download(raw);
-          content = utf8.decode(bytes);
-          unawaited(ChapterCache.save(raw, bytes));
-        }
-        if (!mounted) return;
-        setState(() {
-          _chapters[i] = ChapterEntity(
-            id: _chapters[i].id, createdAt: _chapters[i].createdAt,
-            number: _chapters[i].number, title: _chapters[i].title,
-            content: content, tookId: _chapters[i].tookId,
-          );
-        });
-      } catch (_) {
-        if (!mounted) return;
-        setState(() {
-          _chapters[i] = ChapterEntity(
-            id: _chapters[i].id, createdAt: _chapters[i].createdAt,
-            number: _chapters[i].number, title: _chapters[i].title,
-            content: 'Error: no se pudo cargar el capítulo',
-            tookId: _chapters[i].tookId,
-          );
-        });
-      }
-    }));
+    context.read<ChapterBloc>().add(
+          LoadChapterContent(
+            initialIndex: widget.i,
+            chapters: widget.chapters,
+          ),
+        );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ChapterPage(
-        i: widget.i,
-        chapters: _chapters,
+      body: BlocBuilder<ChapterBloc, ChapterState>(
+        builder: (context, state) {
+          if (state is ChapterLoading || state is ChapterInitial) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (state is ChapterError) {
+            return Center(child: Text(state.message));
+          }
+          if (state is ChapterLoaded) {
+            return ChapterPage(
+              i: state.initialIndex,
+              chapters: state.chapters,
+            );
+          }
+          return const SizedBox.shrink();
+        },
       ),
     );
   }

@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:noveles/core/supabase/chapter_cache.dart';
 import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/domain/repositories/repositories.dart';
@@ -76,6 +79,20 @@ class ChapterRepositoryImpl implements ChapterRepository {
       await supabase.from('chapters').delete().eq('id', id);
     } catch (e) {
       throw Exception('Error al eliminar capítulo: $e');
+    }
+  }
+
+  @override
+  Future<String> downloadContent(String path) async {
+    try {
+      final cached = await ChapterCache.read(path);
+      if (cached != null) return cached;
+      final bytes = await supabase.storage.from('chapters').download(path);
+      final content = utf8.decode(bytes);
+      await ChapterCache.save(path, bytes);
+      return content;
+    } catch (e) {
+      throw Exception('Error al descargar contenido: $e');
     }
   }
 }

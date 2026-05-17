@@ -3,17 +3,18 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:noveles/core/supabase/storage_helper.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
-import 'package:noveles/features/presentation/screens/screens.dart';
 
 class SliverAppBarV1Home extends StatelessWidget {
+  final List<BookEntity> listBook;
+  final List<Widget> actions;
+  final void Function(BookEntity book) onBookTap;
+
   const SliverAppBarV1Home({
     super.key,
     required this.listBook,
     required this.actions,
+    required this.onBookTap,
   });
-
-  final List<BookEntity> listBook;
-  final List<Widget> actions;
 
   @override
   Widget build(BuildContext context) {
@@ -34,13 +35,7 @@ class SliverAppBarV1Home extends StatelessWidget {
           var item = listBook[index];
 
           return InkWell(
-            onTap: () => Navigator.push(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (_, __, ___) => BookScreen(books: item),
-                transitionDuration: const Duration(seconds: 1),
-              ),
-            ),
+            onTap: () => onBookTap(item),
             child: Stack(
               children: [
                 Positioned.fill(

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
+import 'package:noveles/features/domain/use_cases/use_cases.dart';
 import 'package:noveles/features/presentation/pages/pages.dart';
 
 class GenreScreen extends StatefulWidget {
@@ -22,9 +24,7 @@ class _GenreScreenState extends State<GenreScreen> {
   @override
   void initState() {
     super.initState();
-    filteredBooks = widget.books
-        .where((book) => book.listGenre.any((g) => g.name == widget.genre))
-        .toList();
+    filteredBooks = getIt<GetBooksByGenre>()(widget.books, widget.genre);
   }
 
   @override

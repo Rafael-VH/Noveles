@@ -19,3 +19,6 @@ export 'package:noveles/features/presentation/bloc/auth_state.dart';
 export 'package:noveles/features/presentation/bloc/profile_bloc.dart';
 export 'package:noveles/features/presentation/bloc/profile_event.dart';
 export 'package:noveles/features/presentation/bloc/profile_state.dart';
+export 'package:noveles/features/presentation/bloc/chapter_bloc.dart';
+export 'package:noveles/features/presentation/bloc/chapter_event.dart';
+export 'package:noveles/features/presentation/bloc/chapter_state.dart';
