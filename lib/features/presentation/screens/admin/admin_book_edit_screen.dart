@@ -90,9 +90,9 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
     }
   }
 
-  Future<void> _save() async {
-    if (_isSaving) return;
-    if (!(_formKey.currentState?.validate() ?? false)) return;
+  Future<BookEntity?> _saveBook() async {
+    if (_isSaving) return null;
+    if (!(_formKey.currentState?.validate() ?? false)) return null;
     final book = BookEntity(
       id: widget.book?.id ?? DateTime.now().millisecondsSinceEpoch,
       createdAt: widget.book?.createdAt ?? DateTime.now(),
@@ -122,7 +122,9 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
       bloc.add(SaveAdminBook(book, isUpdate: _isEditing));
       final result = await future;
       if (result is AdminLoaded && mounted) {
-        Navigator.pop(context);
+        return _isEditing
+            ? widget.book
+            : result.books.lastWhere((b) => b.name == book.name);
       } else if (result is AdminError && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(result.message), backgroundColor: Colors.red),
@@ -131,6 +133,24 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
+    return null;
+  }
+
+  Future<void> _saveAndAddTomo() async {
+    final saved = await _saveBook();
+    if (saved != null && mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => AdminTookEditScreen(bookId: saved.id),
+        ),
+      );
+    }
+  }
+
+  Future<void> _save() async {
+    final saved = await _saveBook();
+    if (saved != null && mounted) Navigator.pop(context);
   }
 
   @override
@@ -245,13 +265,12 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
                     },
                   )).toList(),
                 ),
-              if (_isEditing) ...[
-                const SizedBox(height: 24),
-                const Divider(),
-                const Text('Tomos',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
+              const SizedBox(height: 24),
+              const Divider(),
+              const Text('Tomos',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              if (_isEditing)
                 ...?widget.book?.listTook.map((took) => Card(
                       child: ListTile(
                         title: Text(took.title.isNotEmpty
@@ -288,17 +307,18 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
                             )),
                       ),
                     )),
-                ElevatedButton.icon(
-                  onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            AdminTookEditScreen(bookId: widget.book!.id),
-                      )),
-                  icon: const Icon(Icons.add),
-                  label: const Text('Añadir Tomo'),
-                ),
-              ],
+              ElevatedButton.icon(
+                onPressed: _isEditing
+                    ? () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              AdminTookEditScreen(bookId: widget.book!.id),
+                        ))
+                    : _saveAndAddTomo,
+                icon: const Icon(Icons.add),
+                label: const Text('Añadir Tomo'),
+              ),
             ],
           ),
         ),
