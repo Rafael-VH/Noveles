@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/domain/use_cases/use_cases.dart';
 import 'package:noveles/features/presentation/bloc/admin_event.dart';
 import 'package:noveles/features/presentation/bloc/admin_state.dart';
@@ -60,7 +61,10 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
   ) async {
     try {
       final genres = await getGenres();
-      emit(AdminGenresLoaded(genres));
+      final currentState = state;
+      final books =
+          currentState is AdminLoaded ? currentState.books : <BookEntity>[];
+      emit(AdminGenresLoaded(books, genres));
     } catch (e) {
       emit(AdminError(e.toString()));
     }
@@ -91,7 +95,8 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
         await createBook(event.book);
       }
       final books = await getBooks();
-      emit(AdminLoaded(books, message: event.isUpdate ? 'Libro guardado' : 'Libro creado'));
+      emit(AdminLoaded(books,
+          message: event.isUpdate ? 'Libro guardado' : 'Libro creado'));
     } catch (e) {
       emit(AdminError(e.toString()));
     }
@@ -122,7 +127,8 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
       } else {
         await createTook(event.took);
       }
-      emit(AdminLoaded(await getBooks(), message: event.isUpdate ? 'Tomo guardado' : 'Tomo creado'));
+      emit(AdminLoaded(await getBooks(),
+          message: event.isUpdate ? 'Tomo guardado' : 'Tomo creado'));
     } catch (e) {
       emit(AdminError(e.toString()));
     }
@@ -152,7 +158,8 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
       } else {
         await createChapter(event.chapter);
       }
-      emit(AdminLoaded(await getBooks(), message: event.isUpdate ? 'Capítulo guardado' : 'Capítulo creado'));
+      emit(AdminLoaded(await getBooks(),
+          message: event.isUpdate ? 'Capítulo guardado' : 'Capítulo creado'));
     } catch (e) {
       emit(AdminError(e.toString()));
     }

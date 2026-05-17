@@ -1,16 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:noveles/core/utils/theme/theme.dart';
+import 'package:noveles/core/utils/theme/dark_theme.dart';
 import 'package:noveles/features/presentation/bloc/theme_event.dart';
 import 'package:noveles/features/presentation/bloc/theme_state.dart';
 
 class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
-  ThemeBloc() : super(ThemeState(LightTheme.lightTheme)) {
+  ThemeBloc() : super(ThemeState(DarkTheme.darkTheme)) {
     on<ThemeChanged>((event, emit) {
-      if (event.isDarkMode) {
-        emit(ThemeState(DarkTheme.darkTheme));
-      } else {
-        emit(ThemeState(LightTheme.lightTheme));
-      }
+      emit(ThemeState(DarkTheme.darkTheme));
     });
   }
 }

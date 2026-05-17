@@ -30,12 +30,13 @@ class AdminCoverUploaded extends AdminState {
 }
 
 class AdminGenresLoaded extends AdminState {
+  final List<BookEntity> books;
   final List<GenreEntity> genres;
 
-  AdminGenresLoaded(this.genres);
+  AdminGenresLoaded(this.books, this.genres);
 
   @override
-  List<Object> get props => [genres];
+  List<Object> get props => [books, genres];
 }
 
 class AdminError extends AdminState {

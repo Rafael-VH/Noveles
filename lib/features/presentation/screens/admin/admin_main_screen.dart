@@ -79,54 +79,54 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
                 ),
               );
             }
-            if (state is AdminLoaded) {
-              final books = state.books;
-              if (books.isEmpty) {
-                return const Center(child: Text('No hay libros'));
-              }
-              return ListView.builder(
-                itemCount: books.length,
-                itemBuilder: (context, index) {
-                  final book = books[index];
-                  return Card(
-                    margin:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                    child: ListTile(
-                      leading: SizedBox(
-                        width: 48,
-                        height: 64,
-                        child: CachedNetworkImage(
-                          fit: BoxFit.cover,
-                          imageUrl: coverUrl(book.cover),
-                          errorWidget: (_, __, ___) =>
-                              const Icon(Icons.book, size: 48),
-                        ),
+            final books = switch (state) {
+              AdminLoaded(:final books) => books,
+              AdminGenresLoaded(:final books) => books,
+              _ => null,
+            };
+            if (books == null) return const SizedBox.shrink();
+            if (books.isEmpty) return const Center(child: Text('No hay libros'));
+            return ListView.builder(
+              itemCount: books.length,
+              itemBuilder: (context, index) {
+                final book = books[index];
+                return Card(
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  child: ListTile(
+                    leading: SizedBox(
+                      width: 48,
+                      height: 64,
+                      child: CachedNetworkImage(
+                        fit: BoxFit.cover,
+                        imageUrl: coverUrl(book.cover),
+                        errorWidget: (_, __, ___) =>
+                            const Icon(Icons.book, size: 48),
                       ),
-                      title: Text(book.name,
-                          maxLines: 1, overflow: TextOverflow.ellipsis),
-                      subtitle:
-                          Text('ID: ${book.id} - ${book.tookCount} tomos'),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.edit, color: Theme.of(context).colorScheme.primary),
-                            onPressed: () => _editBook(context, book),
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.delete, color: Theme.of(context).colorScheme.error),
-                            onPressed: () =>
-                                _deleteBook(context, book.id, book.name),
-                          ),
-                        ],
-                      ),
-                      onTap: () => _editBook(context, book),
                     ),
-                  );
-                },
-              );
-            }
-            return const SizedBox.shrink();
+                    title: Text(book.name,
+                        maxLines: 1, overflow: TextOverflow.ellipsis),
+                    subtitle:
+                        Text('ID: ${book.id} - ${book.tookCount} tomos'),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.edit, color: Theme.of(context).colorScheme.primary),
+                          onPressed: () => _editBook(context, book),
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.delete, color: Theme.of(context).colorScheme.error),
+                          onPressed: () =>
+                              _deleteBook(context, book.id, book.name),
+                        ),
+                      ],
+                    ),
+                    onTap: () => _editBook(context, book),
+                  ),
+                );
+              },
+            );
           },
         ),
         floatingActionButton: FloatingActionButton(

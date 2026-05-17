@@ -71,13 +71,6 @@ class _MainScreenState extends State<MainScreen> {
                   );
                 },
               ),
-              Switch(
-                value: context.read<ThemeBloc>().state.themeData.brightness ==
-                    Brightness.dark,
-                onChanged: (value) {
-                  context.read<ThemeBloc>().add(ThemeChanged(value));
-                },
-              ),
             ],
           ),
           const SliverToBoxAdapter(child: SizedBox(height: 32.0)),
