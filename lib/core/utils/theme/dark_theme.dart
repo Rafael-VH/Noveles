@@ -44,8 +44,8 @@ class DarkTheme {
       onSecondary: DarkColor.onSecondaryColor,
       error: Colors.red,
       onError: Colors.redAccent,
-      surface: DarkColor.primaryColor,
-      onSurface: DarkColor.onSurfaceColor,
+      surface: DarkColor.surfaceColor,
+      onSurface: Colors.white,
       shadow: DarkColor.primaryColor,
     ),
   );
@@ -66,7 +66,7 @@ class DarkTheme {
     ),
   );
 
-  //  
+  //
   static const TextTheme textDarkTheme = TextTheme(
     bodyLarge: TextStyle(
       fontSize: 16.0,

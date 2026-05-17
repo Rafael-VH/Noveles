@@ -12,6 +12,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final Logout logout;
   final GetCurrentUser getCurrentUser;
   StreamSubscription? _authSubscription;
+  bool _manualLogoutInProgress = false;
 
   AuthBloc({
     required this.login,
@@ -28,7 +29,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   void _listenAuthChanges() {
     _authSubscription = supabase.auth.onAuthStateChange.listen((data) {
-      if (data.event == AuthChangeEvent.signedOut) {
+      if (data.event == AuthChangeEvent.signedOut && !_manualLogoutInProgress) {
         add(LogoutRequested());
       }
     });
@@ -87,6 +88,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     LogoutRequested event,
     Emitter<AuthState> emit,
   ) async {
+    _manualLogoutInProgress = true;
     emit(AuthLoading());
     try {
       if (supabase.auth.currentUser != null) {
@@ -95,6 +97,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       emit(AuthUnauthenticated());
     } catch (e) {
       emit(AuthError(e.toString()));
+    } finally {
+      _manualLogoutInProgress = false;
     }
   }
 }
