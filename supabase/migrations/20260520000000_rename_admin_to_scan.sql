@@ -4,7 +4,7 @@ ALTER TABLE profiles DROP CONSTRAINT IF EXISTS profiles_role_check;
 ALTER TABLE profiles ADD CONSTRAINT profiles_role_check CHECK (role IN ('user', 'scan'));
 
 -- Step 2: Create is_scan() helper (replaces is_admin())
-DROP FUNCTION IF EXISTS public.is_admin();
+DROP FUNCTION IF EXISTS public.is_admin() CASCADE;
 CREATE OR REPLACE FUNCTION public.is_scan()
 RETURNS BOOLEAN
 LANGUAGE sql
