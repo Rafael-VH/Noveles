@@ -36,17 +36,15 @@ class _TookViewState extends State<TookView> {
                 child: ListTile(
                   subtitle: Text(
                     item.title,
-                    style: Theme.of(context)
-                        .textTheme
-                        .labelSmall
-                        ?.copyWith(color: Theme.of(context).colorScheme.onSurface),
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
                   ),
                   title: Text(
                     item.number,
-                    style: Theme.of(context)
-                        .textTheme
-                        .labelMedium
-                        ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
                   ),
                   trailing: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -54,17 +52,20 @@ class _TookViewState extends State<TookView> {
                     children: [
                       Text(
                         'Capítulos',
-                        style: Theme.of(context)
-                            .textTheme
-                            .labelSmall
-                            ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
+                            ),
                       ),
                       Text(
                         '${item.listChapter.length}',
                         style: Theme.of(context)
                             .textTheme
                             .labelMedium
-                            ?.copyWith(color: Theme.of(context).colorScheme.onSurface),
+                            ?.copyWith(
+                              color: Theme.of(context).colorScheme.onSurface,
+                            ),
                       ),
                     ],
                   ),
