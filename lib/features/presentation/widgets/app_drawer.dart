@@ -49,6 +49,11 @@ class AppDrawer extends StatelessWidget {
             ),
           ),
           ListTile(
+            leading: Icon(isAdmin ? Icons.admin_panel_settings : Icons.home),
+            title: Text(isAdmin ? 'Admin Panel' : 'Inicio'),
+            onTap: () => Navigator.pop(context),
+          ),
+          ListTile(
             leading: const Icon(Icons.person),
             title: const Text('Editar Perfil'),
             onTap: () {
