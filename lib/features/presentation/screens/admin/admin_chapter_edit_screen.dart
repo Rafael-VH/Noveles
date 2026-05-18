@@ -39,9 +39,15 @@ class _AdminChapterEditScreenState extends State<AdminChapterEditScreen> {
     super.dispose();
   }
 
+  // Save chapter
   Future<void> _save() async {
+    // Prevent multiple saves
     if (_isSaving) return;
+
+    // Validate form
     if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    // Create chapter entity
     final chapter = ChapterEntity(
       id: widget.chapter?.id ?? DateTime.now().millisecondsSinceEpoch,
       createdAt: widget.chapter?.createdAt ?? DateTime.now(),
@@ -50,7 +56,11 @@ class _AdminChapterEditScreenState extends State<AdminChapterEditScreen> {
       content: _contentCtrl.text,
       tookId: widget.tookId,
     );
+
+    // Save chapter
     setState(() => _isSaving = true);
+
+    // Listen for result
     try {
       final bloc = context.read<AdminBloc>();
       final future = bloc.stream.firstWhere((s) => s is! AdminLoading);
@@ -61,8 +71,9 @@ class _AdminChapterEditScreenState extends State<AdminChapterEditScreen> {
       } else if (result is AdminError && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(result.message),
-              backgroundColor: Theme.of(context).colorScheme.error),
+            content: Text(result.message),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
         );
       }
     } finally {
@@ -85,16 +96,23 @@ class _AdminChapterEditScreenState extends State<AdminChapterEditScreen> {
           key: _formKey,
           child: Column(
             children: [
+              // Number
               TextFormField(
                 controller: _numberCtrl,
                 decoration: const InputDecoration(labelText: 'Número'),
               ),
+
               const SizedBox(height: 8),
+
+              // Title
               TextFormField(
                 controller: _titleCtrl,
                 decoration: const InputDecoration(labelText: 'Título'),
               ),
+
               const SizedBox(height: 16),
+
+              // Content
               TextFormField(
                 controller: _contentCtrl,
                 decoration: const InputDecoration(
@@ -103,7 +121,8 @@ class _AdminChapterEditScreenState extends State<AdminChapterEditScreen> {
                   alignLabelWithHint: true,
                 ),
                 maxLines: 20,
-                validator: (v) => v?.isEmpty == true ? 'El contenido es requerido' : null,
+                validator: (v) =>
+                    v?.isEmpty == true ? 'El contenido es requerido' : null,
               ),
             ],
           ),

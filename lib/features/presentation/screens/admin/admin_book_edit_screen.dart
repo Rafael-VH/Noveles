@@ -84,6 +84,7 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
     super.dispose();
   }
 
+  // Pick cover image
   Future<void> _pickCover() async {
     final picker = ImagePicker();
     final xFile = await picker.pickImage(source: ImageSource.gallery);
@@ -92,9 +93,15 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
     }
   }
 
+  // Save book
   Future<BookEntity?> _saveBook() async {
+    // Prevent multiple saves
     if (_isSaving) return null;
+
+    // Validate form
     if (!(_formKey.currentState?.validate() ?? false)) return null;
+
+    // Create book entity
     final book = BookEntity(
       id: widget.book?.id ?? DateTime.now().millisecondsSinceEpoch,
       createdAt: widget.book?.createdAt ?? DateTime.now(),
@@ -118,7 +125,11 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
           _allGenres.where((g) => _selectedGenreIds.contains(g.id)).toList(),
       listTook: widget.book?.listTook ?? [],
     );
+
+    // Save book
     setState(() => _isSaving = true);
+
+    // Listen for result
     try {
       final bloc = context.read<AdminBloc>();
       final future = bloc.stream.firstWhere((s) => s is! AdminLoading);
@@ -141,8 +152,12 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
     return null;
   }
 
+  // Save and add tomo
   Future<void> _saveAndAddTomo() async {
+    // Save book first
     final saved = await _saveBook();
+
+    // If save was successful, navigate to tomo edit screen
     if (saved != null && mounted) {
       Navigator.push(
         context,
@@ -153,6 +168,7 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
     }
   }
 
+  // Delete tomo
   Future<void> _save() async {
     final saved = await _saveBook();
     if (saved != null && mounted) Navigator.pop(context);
@@ -173,69 +189,108 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
           key: _formKey,
           child: Column(
             children: [
+              // Name
               TextFormField(
                 controller: _nameCtrl,
                 decoration: const InputDecoration(labelText: 'Nombre'),
-                validator: (v) => v?.trim().isEmpty == true ? 'Requerido' : null,
+                validator: (v) =>
+                    v?.trim().isEmpty == true ? 'Requerido' : null,
               ),
-              const SizedBox(height: 8),
+
+              const SizedBox(height: 12),
+
+              // Cover
               CoverPicker(
                 controller: _coverCtrl,
                 onPick: _pickCover,
                 onClear: () => setState(() => _coverCtrl.clear()),
               ),
-              const SizedBox(height: 8),
+
+              const SizedBox(height: 12),
+
+              // Short Name
               TextFormField(
                 controller: _shortCtrl,
                 decoration: const InputDecoration(labelText: 'Nombre corto'),
               ),
-              const SizedBox(height: 8),
+
+              const SizedBox(height: 12),
+
+              // Alternative Name
               TextFormField(
                 controller: _alternativeCtrl,
-                decoration: const InputDecoration(labelText: 'Nombre alternativo'),
+                decoration:
+                    const InputDecoration(labelText: 'Nombre alternativo'),
               ),
-              const SizedBox(height: 8),
+
+              const SizedBox(height: 12),
+
+              // Description
               TextFormField(
                 maxLines: 3,
                 controller: _descriptionCtrl,
                 decoration: const InputDecoration(labelText: 'Descripción'),
               ),
-              const SizedBox(height: 8),
+
+              const SizedBox(height: 12),
+
+              // Author
               TextFormField(
                 controller: _authorCtrl,
                 decoration: const InputDecoration(labelText: 'Autor'),
               ),
-              const SizedBox(height: 8),
+
+              const SizedBox(height: 12),
+
+              // Country
               TextFormField(
                 controller: _countryCtrl,
                 decoration: const InputDecoration(labelText: 'País'),
               ),
-              const SizedBox(height: 8),
+
+              const SizedBox(height: 12),
+
+              // State
               TextFormField(
                 controller: _stateCtrl,
                 decoration: const InputDecoration(labelText: 'Estado'),
               ),
-              const SizedBox(height: 8),
+
+              const SizedBox(height: 12),
+
+              // Type
               TextFormField(
                 controller: _typeCtrl,
                 decoration: const InputDecoration(labelText: 'Tipo'),
               ),
-              const SizedBox(height: 8),
+
+              const SizedBox(height: 12),
+
+              // Release
               TextFormField(
                 controller: _releaseCtrl,
                 decoration: const InputDecoration(labelText: 'Lanzamiento'),
               ),
-              const SizedBox(height: 8),
+
+              const SizedBox(height: 12),
+
+              // Source
               TextFormField(
                 controller: _sourceCtrl,
                 decoration: const InputDecoration(labelText: 'Fuente'),
               ),
-              const SizedBox(height: 8),
+
+              const SizedBox(height: 12),
+
+              // Link
               TextFormField(
                 controller: _linkCtrl,
                 decoration: const InputDecoration(labelText: 'Link'),
               ),
+
               const SizedBox(height: 16),
+
+              // Genres
               GenreSelector(
                 genres: _allGenres,
                 selectedIds: _selectedGenreIds,
@@ -249,7 +304,10 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
                   });
                 },
               ),
-              const SizedBox(height: 8),
+
+              const SizedBox(height: 12),
+
+              // Took List
               TookListSection(
                 isEditing: _isEditing,
                 tooks: widget.book?.listTook ?? [],
@@ -258,14 +316,16 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
                     ? () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => AdminTookEditScreen(bookId: widget.book!.id),
+                            builder: (_) =>
+                                AdminTookEditScreen(bookId: widget.book!.id),
                           ),
                         )
                     : _saveAndAddTomo,
                 onEditTook: (took, bookId) => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => AdminTookEditScreen(took: took, bookId: bookId),
+                    builder: (_) =>
+                        AdminTookEditScreen(took: took, bookId: bookId),
                   ),
                 ),
                 onDeleteTook: (tookId) {

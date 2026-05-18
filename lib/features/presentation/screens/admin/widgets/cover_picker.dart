@@ -18,6 +18,7 @@ class CoverPicker extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Label
         const Text(
           'Cover',
           style: TextStyle(
@@ -25,7 +26,10 @@ class CoverPicker extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 8),
+
+        const SizedBox(height: 12),
+
+        // Image preview
         if (controller.text.isNotEmpty)
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
@@ -40,13 +44,18 @@ class CoverPicker extends StatelessWidget {
               ),
             ),
           ),
+
+        // Buttons
         Row(
           children: [
+            // Pick image
             ElevatedButton.icon(
               onPressed: onPick,
               icon: const Icon(Icons.image),
               label: const Text('Seleccionar imagen'),
             ),
+
+            // Clear button
             if (controller.text.isNotEmpty)
               TextButton(
                 onPressed: onClear,
@@ -54,6 +63,8 @@ class CoverPicker extends StatelessWidget {
               ),
           ],
         ),
+
+        // URL Text
         if (controller.text.isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(top: 4),

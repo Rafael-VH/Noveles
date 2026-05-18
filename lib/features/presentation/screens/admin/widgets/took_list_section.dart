@@ -24,8 +24,11 @@ class TookListSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 24),
+        const SizedBox(height: 12),
+
         const Divider(),
+
+        // Section title
         const Text(
           'Tomos',
           style: TextStyle(
@@ -33,7 +36,10 @@ class TookListSection extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
+
         const SizedBox(height: 8),
+
+        // Show message if no tooks
         if (isEditing)
           ...tooks.map(
             (took) => Card(
@@ -45,6 +51,7 @@ class TookListSection extends StatelessWidget {
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    // Edit Button
                     IconButton(
                       icon: Icon(
                         Icons.edit,
@@ -52,6 +59,8 @@ class TookListSection extends StatelessWidget {
                       ),
                       onPressed: () => onEditTook(took, bookId!),
                     ),
+
+                    // Delete Button
                     IconButton(
                       icon: Icon(
                         Icons.delete,
@@ -65,6 +74,8 @@ class TookListSection extends StatelessWidget {
               ),
             ),
           ),
+
+        // Add Took Button
         ElevatedButton.icon(
           onPressed: onAddTook,
           icon: const Icon(Icons.add),

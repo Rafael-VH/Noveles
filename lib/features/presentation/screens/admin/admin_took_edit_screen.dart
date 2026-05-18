@@ -40,6 +40,7 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
     super.dispose();
   }
 
+  // Save tomo
   Future<void> _save() async {
     if (_isSaving) return;
     if (!(_formKey.currentState?.validate() ?? false)) return;
@@ -74,6 +75,7 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
     }
   }
 
+  // Delete chapter
   Future<void> _deleteChapter(int chapterId) async {
     if (_isSaving) return;
     setState(() => _isSaving = true);
@@ -120,40 +122,57 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
           key: _formKey,
           child: Column(
             children: [
+              // Number
               TextFormField(
                 controller: _numberCtrl,
                 decoration: const InputDecoration(labelText: 'Número'),
                 validator: (v) =>
                     v?.trim().isEmpty == true ? 'Requerido' : null,
               ),
-              const SizedBox(height: 8),
+
+              const SizedBox(height: 12),
+
+              // Title
               TextFormField(
                 controller: _titleCtrl,
                 decoration: const InputDecoration(labelText: 'Título'),
               ),
-              const SizedBox(height: 8),
+
+              const SizedBox(height: 12),
+
+              // Cover URL
               TextFormField(
                 controller: _coverCtrl,
                 decoration: const InputDecoration(labelText: 'Cover URL'),
               ),
-              const SizedBox(height: 8),
+
+              const SizedBox(height: 12),
+
+              // Show Chapters if editing
               if (_isEditing) ...[
                 const SizedBox(height: 24),
+
                 const Divider(),
+
                 const Text(
                   'Capítulos',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 8),
+
+                const SizedBox(height: 12),
+
+                // List of Chapters
                 ...?widget.took?.listChapter.map(
                   (ch) => Card(
                     child: ListTile(
                       title: Text(
-                          ch.title.isNotEmpty ? ch.title : 'Cap. ${ch.number}'),
+                        ch.title.isNotEmpty ? ch.title : 'Cap. ${ch.number}',
+                      ),
                       subtitle: Text('ID: ${ch.id}'),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          // Edit Button
                           IconButton(
                             icon: Icon(
                               Icons.edit,
@@ -169,6 +188,8 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
                               ),
                             ),
                           ),
+
+                          // Delete Button
                           IconButton(
                             icon: Icon(
                               Icons.delete,
@@ -190,6 +211,8 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
                     ),
                   ),
                 ),
+
+                // Add Chapter Button
                 ElevatedButton.icon(
                   onPressed: () => Navigator.push(
                     context,

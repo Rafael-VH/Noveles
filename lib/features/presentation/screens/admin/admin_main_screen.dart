@@ -25,6 +25,7 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
   Widget build(BuildContext context) {
     return BlocListener<AdminBloc, AdminState>(
       listener: (context, state) {
+        // Show error message on error state
         if (state is AdminError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -33,6 +34,8 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
             ),
           );
         }
+
+        // Show success message on load or save
         if (state is AdminLoaded && state.message != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -59,11 +62,14 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
         ),
         body: BlocBuilder<AdminBloc, AdminState>(
           builder: (context, state) {
+            // Loading State
             if (state is AdminLoading || state is AdminInitial) {
               return const Center(
                 child: CircularProgressIndicator(),
               );
             }
+
+            // Error State
             if (state is AdminError) {
               return Center(
                 child: Column(
@@ -81,17 +87,25 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
                 ),
               );
             }
+
+            // Loaded State
             final books = switch (state) {
               AdminLoaded(:final books) => books,
               AdminGenresLoaded(:final books) => books,
               _ => null,
             };
+
+            // No Books State
             if (books == null) return const SizedBox.shrink();
+
+            // Empty Books State
             if (books.isEmpty) {
               return const Center(
                 child: Text('No hay libros'),
               );
             }
+
+            // Books List
             return RefreshIndicator(
               onRefresh: () async {
                 context.read<AdminBloc>().add(LoadAdminBooks());
@@ -132,6 +146,7 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          // Edit Button
                           IconButton(
                             icon: Icon(
                               Icons.edit,
@@ -139,6 +154,8 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
                             ),
                             onPressed: () => _editBook(context, book),
                           ),
+
+                          // Delete Button
                           IconButton(
                             icon: Icon(
                               Icons.delete,
@@ -157,6 +174,8 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
             );
           },
         ),
+
+        // Add Book Button
         floatingActionButton: FloatingActionButton(
           onPressed: () => _createBook(context),
           child: const Icon(Icons.add),
@@ -165,6 +184,7 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
     );
   }
 
+  // Edit Book
   void _editBook(BuildContext context, BookEntity book) {
     Navigator.push(
       context,
@@ -174,6 +194,7 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
     );
   }
 
+  // Create Book
   void _createBook(BuildContext context) {
     Navigator.push(
       context,
@@ -183,6 +204,7 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
     );
   }
 
+  // Delete Book
   void _deleteBook(BuildContext context, int bookId, String bookName) {
     showDialog(
       context: context,
@@ -190,10 +212,13 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
         title: const Text('Eliminar libro'),
         content: Text('¿Eliminar "$bookName"?'),
         actions: [
+          // Cancel Button
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: const Text('Cancelar'),
           ),
+
+          // Confirm Delete Button
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);

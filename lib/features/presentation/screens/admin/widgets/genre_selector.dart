@@ -18,6 +18,7 @@ class GenreSelector extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Label
         const Text(
           'Géneros',
           style: TextStyle(
@@ -25,7 +26,10 @@ class GenreSelector extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
+
         const SizedBox(height: 8),
+
+        // Loading state
         if (genres.isEmpty)
           Text(
             'Cargando géneros...',
@@ -33,6 +37,8 @@ class GenreSelector extends StatelessWidget {
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           )
+
+        // Genre chips
         else
           Wrap(
             spacing: 8,
