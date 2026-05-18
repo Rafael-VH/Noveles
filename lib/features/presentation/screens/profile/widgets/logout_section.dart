@@ -43,7 +43,9 @@ class LogoutSection extends StatelessWidget {
         child: Text(
           'Cerrar Sesión',
           style: TextStyle(
-              color: Theme.of(context).colorScheme.error, fontSize: 16),
+            color: Theme.of(context).colorScheme.error,
+            fontSize: 16,
+          ),
         ),
       ),
     );
