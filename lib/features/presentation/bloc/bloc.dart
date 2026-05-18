@@ -1,7 +1,7 @@
-// Admin Bloc
-export 'package:noveles/features/presentation/bloc/admin/admin_bloc.dart';
-export 'package:noveles/features/presentation/bloc/admin/admin_event.dart';
-export 'package:noveles/features/presentation/bloc/admin/admin_state.dart';
+// Scan Bloc
+export 'package:noveles/features/presentation/bloc/scan/scan_bloc.dart';
+export 'package:noveles/features/presentation/bloc/scan/scan_event.dart';
+export 'package:noveles/features/presentation/bloc/scan/scan_state.dart';
 
 // Auth Bloc
 export 'package:noveles/features/presentation/bloc/auth/auth_bloc.dart';

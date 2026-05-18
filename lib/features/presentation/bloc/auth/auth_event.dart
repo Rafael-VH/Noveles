@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-// Define los eventos que el AuthBloc puede manejar, como cargar libros, géneros, subir portadas, guardar o eliminar libros, tomos y capítulos. Cada evento tiene su propia clase que extiende AdminEvent y puede contener datos relevantes para ese evento específico.
+// Define los eventos que el AuthBloc puede manejar, como cargar libros, géneros, subir portadas, guardar o eliminar libros, tomos y capítulos. Cada evento tiene su propia clase que extiende AuthEvent y puede contener datos relevantes para ese evento específico.
 abstract class AuthEvent extends Equatable {
   @override
   List<Object> get props => [];

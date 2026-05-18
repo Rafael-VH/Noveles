@@ -3,17 +3,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
 
-class AdminChapterEditScreen extends StatefulWidget {
+class ScanChapterEditScreen extends StatefulWidget {
   final ChapterEntity? chapter;
   final int tookId;
 
-  const AdminChapterEditScreen({super.key, this.chapter, required this.tookId});
+  const ScanChapterEditScreen({super.key, this.chapter, required this.tookId});
 
   @override
-  State<AdminChapterEditScreen> createState() => _AdminChapterEditScreenState();
+  State<ScanChapterEditScreen> createState() => _ScanChapterEditScreenState();
 }
 
-class _AdminChapterEditScreenState extends State<AdminChapterEditScreen> {
+class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _numberCtrl;
   late TextEditingController _titleCtrl;
@@ -62,13 +62,13 @@ class _AdminChapterEditScreenState extends State<AdminChapterEditScreen> {
 
     // Listen for result
     try {
-      final bloc = context.read<AdminBloc>();
-      final future = bloc.stream.firstWhere((s) => s is! AdminLoading);
-      bloc.add(SaveAdminChapter(chapter, isUpdate: _isEditing));
+      final bloc = context.read<ScanBloc>();
+      final future = bloc.stream.firstWhere((s) => s is! ScanLoading);
+      bloc.add(SaveScanChapter(chapter, isUpdate: _isEditing));
       final result = await future;
-      if (result is AdminLoaded && mounted) {
+      if (result is ScanLoaded && mounted) {
         Navigator.pop(context);
-      } else if (result is AdminError && mounted) {
+      } else if (result is ScanError && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(result.message),

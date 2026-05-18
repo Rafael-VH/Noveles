@@ -17,7 +17,7 @@ class UserEntity extends Equatable {
     this.avatarUrl,
   });
 
-  bool get isAdmin => role == 'admin';
+  bool get isScan => role == 'scan';
 
   @override
   List<Object> get props =>

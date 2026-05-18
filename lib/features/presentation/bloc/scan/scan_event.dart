@@ -1,86 +1,86 @@
 import 'package:equatable/equatable.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 
-// Define los eventos que el AdminBloc puede manejar, como cargar libros, géneros, subir portadas, guardar o eliminar libros, tomos y capítulos. Cada evento tiene su propia clase que extiende AdminEvent y puede contener datos relevantes para ese evento específico.
-abstract class AdminEvent extends Equatable {
+// Define los eventos que el ScanBloc puede manejar, como cargar libros, géneros, subir portadas, guardar o eliminar libros, tomos y capítulos. Cada evento tiene su propia clase que extiende ScanEvent y puede contener datos relevantes para ese evento específico.
+abstract class ScanEvent extends Equatable {
   @override
   List<Object> get props => [];
 }
 
 // Carga los libros y mantiene los géneros cargados si ya se han cargado
-class LoadAdminBooks extends AdminEvent {}
+class LoadScanBooks extends ScanEvent {}
 
 // Carga los géneros y mantiene los libros cargados si ya se han cargado
-class LoadAdminGenres extends AdminEvent {}
+class LoadScanGenres extends ScanEvent {}
 
 // Sube una portada y emite el estado con el nombre del archivo subido o un error si falla
-class UploadAdminCover extends AdminEvent {
+class UploadScanCover extends ScanEvent {
   final String filePath;
 
-  UploadAdminCover(this.filePath);
+  UploadScanCover(this.filePath);
 
   @override
   List<Object> get props => [filePath];
 }
 
 // Guarda o actualiza un libro, luego recarga la lista de libros para reflejar los cambios
-class SaveAdminBook extends AdminEvent {
+class SaveScanBook extends ScanEvent {
   final BookEntity book;
   final bool isUpdate;
 
-  SaveAdminBook(this.book, {required this.isUpdate});
+  SaveScanBook(this.book, {required this.isUpdate});
 
   @override
   List<Object> get props => [book, isUpdate];
 }
 
 // Elimina un libro, luego recarga la lista de libros para reflejar los cambios
-class DeleteAdminBook extends AdminEvent {
+class DeleteScanBook extends ScanEvent {
   final int bookId;
 
-  DeleteAdminBook(this.bookId);
+  DeleteScanBook(this.bookId);
 
   @override
   List<Object> get props => [bookId];
 }
 
 // Guarda o actualiza un tomo, luego recarga la lista de libros para reflejar los cambios
-class SaveAdminTook extends AdminEvent {
+class SaveScanTook extends ScanEvent {
   final TookEntity took;
   final bool isUpdate;
 
-  SaveAdminTook(this.took, {required this.isUpdate});
+  SaveScanTook(this.took, {required this.isUpdate});
 
   @override
   List<Object> get props => [took, isUpdate];
 }
 
 // Elimina un tomo, luego recarga la lista de libros para reflejar los cambios
-class DeleteAdminTook extends AdminEvent {
+class DeleteScanTook extends ScanEvent {
   final int tookId;
 
-  DeleteAdminTook(this.tookId);
+  DeleteScanTook(this.tookId);
 
   @override
   List<Object> get props => [tookId];
 }
 
 // Guarda o actualiza un capítulo, luego recarga la lista de libros para reflejar los cambios
-class SaveAdminChapter extends AdminEvent {
+class SaveScanChapter extends ScanEvent {
   final ChapterEntity chapter;
   final bool isUpdate;
 
-  SaveAdminChapter(this.chapter, {required this.isUpdate});
+  SaveScanChapter(this.chapter, {required this.isUpdate});
 
   @override
   List<Object> get props => [chapter, isUpdate];
 }
 
 // Elimina un capítulo, luego recarga la lista de libros para reflejar los cambios
-class DeleteAdminChapter extends AdminEvent {
+class DeleteScanChapter extends ScanEvent {
   final int chapterId;
 
-  DeleteAdminChapter(this.chapterId);
+  DeleteScanChapter(this.chapterId);
 
   @override
   List<Object> get props => [chapterId];

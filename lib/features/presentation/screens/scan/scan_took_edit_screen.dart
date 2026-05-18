@@ -3,19 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
-import 'package:noveles/features/presentation/screens/admin/admin_chapter_edit_screen.dart';
+import 'package:noveles/features/presentation/screens/scan/scan_chapter_edit_screen.dart';
 
-class AdminTookEditScreen extends StatefulWidget {
+class ScanTookEditScreen extends StatefulWidget {
   final TookEntity? took;
   final int bookId;
 
-  const AdminTookEditScreen({super.key, this.took, required this.bookId});
+  const ScanTookEditScreen({super.key, this.took, required this.bookId});
 
   @override
-  State<AdminTookEditScreen> createState() => _AdminTookEditScreenState();
+  State<ScanTookEditScreen> createState() => _ScanTookEditScreenState();
 }
 
-class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
+class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _numberCtrl;
   late TextEditingController _titleCtrl;
@@ -34,8 +34,8 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
     _numberCtrl = TextEditingController(text: t?.number ?? '');
     _titleCtrl = TextEditingController(text: t?.title ?? '');
     _coverCtrl = TextEditingController(text: t?.cover ?? '');
-    _stateSub = context.read<AdminBloc>().stream.listen((state) {
-      if (state is AdminLoaded && mounted) {
+    _stateSub = context.read<ScanBloc>().stream.listen((state) {
+      if (state is ScanLoaded && mounted) {
         final target = _currentTook;
         if (target != null) {
           for (final b in state.books) {
@@ -76,11 +76,11 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
     );
     setState(() => _isSaving = true);
     try {
-      final bloc = context.read<AdminBloc>();
-      final future = bloc.stream.firstWhere((s) => s is! AdminLoading);
-      bloc.add(SaveAdminTook(took, isUpdate: _isEditing));
+      final bloc = context.read<ScanBloc>();
+      final future = bloc.stream.firstWhere((s) => s is! ScanLoading);
+      bloc.add(SaveScanTook(took, isUpdate: _isEditing));
       final result = await future;
-      if (result is AdminLoaded && mounted) {
+      if (result is ScanLoaded && mounted) {
         if (_isEditing) {
           Navigator.pop(context);
         } else {
@@ -96,7 +96,7 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
             ),
           );
         }
-      } else if (result is AdminError && mounted) {
+      } else if (result is ScanError && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(result.message),
@@ -114,18 +114,18 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
     if (_isSaving) return;
     setState(() => _isSaving = true);
     try {
-      final bloc = context.read<AdminBloc>();
-      final future = bloc.stream.firstWhere((s) => s is! AdminLoading);
-      bloc.add(DeleteAdminChapter(chapterId));
+      final bloc = context.read<ScanBloc>();
+      final future = bloc.stream.firstWhere((s) => s is! ScanLoading);
+      bloc.add(DeleteScanChapter(chapterId));
       final result = await future;
-      if (result is AdminLoaded && mounted) {
+      if (result is ScanLoaded && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Capítulo eliminado'),
             backgroundColor: Theme.of(context).colorScheme.tertiary,
           ),
         );
-      } else if (result is AdminError && mounted) {
+      } else if (result is ScanError && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(result.message),
@@ -213,7 +213,7 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
                             onPressed: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => AdminChapterEditScreen(
+                                builder: (_) => ScanChapterEditScreen(
                                   chapter: ch,
                                   tookId: _currentTook!.id,
                                 ),
@@ -234,7 +234,7 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => AdminChapterEditScreen(
+                          builder: (_) => ScanChapterEditScreen(
                             chapter: ch,
                             tookId: _currentTook!.id,
                           ),
@@ -249,7 +249,7 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
                   onPressed: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => AdminChapterEditScreen(
+                      builder: (_) => ScanChapterEditScreen(
                         tookId: _currentTook!.id,
                       ),
                     ),

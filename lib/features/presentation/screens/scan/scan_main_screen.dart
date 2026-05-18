@@ -5,28 +5,28 @@ import 'package:noveles/core/supabase/storage_helper.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
 import 'package:noveles/features/presentation/widgets/app_drawer.dart';
-import 'package:noveles/features/presentation/screens/admin/admin_book_edit_screen.dart';
+import 'package:noveles/features/presentation/screens/scan/scan_book_edit_screen.dart';
 
-class AdminMainScreen extends StatefulWidget {
-  const AdminMainScreen({super.key});
+class ScanMainScreen extends StatefulWidget {
+  const ScanMainScreen({super.key});
 
   @override
-  State<AdminMainScreen> createState() => _AdminMainScreenState();
+  State<ScanMainScreen> createState() => _ScanMainScreenState();
 }
 
-class _AdminMainScreenState extends State<AdminMainScreen> {
+class _ScanMainScreenState extends State<ScanMainScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<AdminBloc>().add(LoadAdminBooks());
+    context.read<ScanBloc>().add(LoadScanBooks());
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AdminBloc, AdminState>(
+    return BlocListener<ScanBloc, ScanState>(
       listener: (context, state) {
         // Show error message on error state
-        if (state is AdminError) {
+        if (state is ScanError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message),
@@ -36,7 +36,7 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
         }
 
         // Show success message on load or save
-        if (state is AdminLoaded && state.message != null) {
+        if (state is ScanLoaded && state.message != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(state.message!),
@@ -46,21 +46,21 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
         }
       },
       child: Scaffold(
-        drawer: const AppDrawer(isAdmin: true),
+        drawer: const AppDrawer(isScan: true),
         appBar: AppBar(
-          title: const Text('Admin Panel'),
+          title: const Text('Panel Scan'),
         ),
-        body: BlocBuilder<AdminBloc, AdminState>(
+        body: BlocBuilder<ScanBloc, ScanState>(
           builder: (context, state) {
             // Loading State
-            if (state is AdminLoading || state is AdminInitial) {
+            if (state is ScanLoading || state is ScanInitial) {
               return const Center(
                 child: CircularProgressIndicator(),
               );
             }
 
             // Error State
-            if (state is AdminError) {
+            if (state is ScanError) {
               return Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -68,8 +68,8 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
                     Text(state.message),
                     const SizedBox(height: 16),
                     ElevatedButton(
-                      onPressed: () => context.read<AdminBloc>().add(
-                            LoadAdminBooks(),
+                      onPressed: () => context.read<ScanBloc>().add(
+                            LoadScanBooks(),
                           ),
                       child: const Text('Reintentar'),
                     ),
@@ -80,8 +80,8 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
 
             // Loaded State
             final books = switch (state) {
-              AdminLoaded(:final books) => books,
-              AdminGenresLoaded(:final books) => books,
+              ScanLoaded(:final books) => books,
+              ScanGenresLoaded(:final books) => books,
               _ => null,
             };
 
@@ -98,9 +98,9 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
             // Books List
             return RefreshIndicator(
               onRefresh: () async {
-                context.read<AdminBloc>().add(LoadAdminBooks());
-                await context.read<AdminBloc>().stream.firstWhere(
-                      (s) => s is AdminLoaded || s is AdminError,
+                context.read<ScanBloc>().add(LoadScanBooks());
+                await context.read<ScanBloc>().stream.firstWhere(
+                      (s) => s is ScanLoaded || s is ScanError,
                     );
               },
               child: ListView.builder(
@@ -179,7 +179,7 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => AdminBookEditScreen(book: book),
+        builder: (_) => ScanBookEditScreen(book: book),
       ),
     );
   }
@@ -189,7 +189,7 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => const AdminBookEditScreen(),
+        builder: (_) => const ScanBookEditScreen(),
       ),
     );
   }
@@ -212,7 +212,7 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
-              context.read<AdminBloc>().add(DeleteAdminBook(bookId));
+              context.read<ScanBloc>().add(DeleteScanBook(bookId));
             },
             child: Text(
               'Eliminar',

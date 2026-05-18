@@ -46,7 +46,7 @@ import 'package:noveles/features/domain/use_cases/update_took.dart';
 import 'package:noveles/features/domain/use_cases/upload_avatar.dart';
 import 'package:noveles/features/domain/use_cases/upload_cover.dart';
 //
-import 'package:noveles/features/presentation/bloc/admin/admin_bloc.dart';
+import 'package:noveles/features/presentation/bloc/scan/scan_bloc.dart';
 import 'package:noveles/features/presentation/bloc/auth/auth_bloc.dart';
 import 'package:noveles/features/presentation/bloc/book/book_bloc.dart';
 import 'package:noveles/features/presentation/bloc/genre/genre_bloc.dart';
@@ -62,7 +62,8 @@ void setupDependencies() {
   getIt.registerLazySingleton<GenreRepository>(() => GenreRepositoryImpl());
   getIt.registerLazySingleton<TookRepository>(() => TookRepositoryImpl());
   getIt.registerLazySingleton<ChapterRepository>(() => ChapterRepositoryImpl());
-  getIt.registerLazySingleton<ProfilesRepository>(() => ProfilesRepositoryImpl());
+  getIt.registerLazySingleton<ProfilesRepository>(
+      () => ProfilesRepositoryImpl());
 
   // Use Cases
   getIt.registerLazySingleton(() => Login(getIt()));
@@ -126,7 +127,7 @@ void setupDependencies() {
   );
 
   getIt.registerFactory(
-    () => AdminBloc(
+    () => ScanBloc(
       getBooks: getIt(),
       createBook: getIt(),
       updateBook: getIt(),

@@ -4,21 +4,21 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
-import 'package:noveles/features/presentation/screens/admin/admin_took_edit_screen.dart';
-import 'package:noveles/features/presentation/screens/admin/widgets/cover_picker.dart';
-import 'package:noveles/features/presentation/screens/admin/widgets/genre_selector.dart';
-import 'package:noveles/features/presentation/screens/admin/widgets/took_list_section.dart';
+import 'package:noveles/features/presentation/screens/scan/scan_took_edit_screen.dart';
+import 'package:noveles/features/presentation/screens/scan/widgets/cover_picker.dart';
+import 'package:noveles/features/presentation/screens/scan/widgets/genre_selector.dart';
+import 'package:noveles/features/presentation/screens/scan/widgets/took_list_section.dart';
 
-class AdminBookEditScreen extends StatefulWidget {
+class ScanBookEditScreen extends StatefulWidget {
   final BookEntity? book;
 
-  const AdminBookEditScreen({super.key, this.book});
+  const ScanBookEditScreen({super.key, this.book});
 
   @override
-  State<AdminBookEditScreen> createState() => _AdminBookEditScreenState();
+  State<ScanBookEditScreen> createState() => _ScanBookEditScreenState();
 }
 
-class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
+class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameCtrl;
   late TextEditingController _coverCtrl;
@@ -58,12 +58,12 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
     _linkCtrl = TextEditingController(text: b?.link ?? '');
     _selectedGenreIds = b?.listGenre.map((g) => g.id).toSet() ?? {};
     _tooks = b?.listTook ?? [];
-    _stateSub = context.read<AdminBloc>().stream.listen((state) {
-      if (state is AdminGenresLoaded && mounted) {
+    _stateSub = context.read<ScanBloc>().stream.listen((state) {
+      if (state is ScanGenresLoaded && mounted) {
         setState(() => _allGenres = state.genres);
-      } else if (state is AdminCoverUploaded && mounted) {
+      } else if (state is ScanCoverUploaded && mounted) {
         setState(() => _coverCtrl.text = state.filename);
-      } else if (state is AdminLoaded && mounted) {
+      } else if (state is ScanLoaded && mounted) {
         final match = state.books.firstWhere(
           (b) =>
               b.id == widget.book?.id ||
@@ -74,7 +74,7 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
         _tooks = match.listTook;
       }
     });
-    context.read<AdminBloc>().add(LoadAdminGenres());
+    context.read<ScanBloc>().add(LoadScanGenres());
   }
 
   @override
@@ -100,7 +100,7 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
     final picker = ImagePicker();
     final xFile = await picker.pickImage(source: ImageSource.gallery);
     if (xFile != null && mounted) {
-      context.read<AdminBloc>().add(UploadAdminCover(xFile.path));
+      context.read<ScanBloc>().add(UploadScanCover(xFile.path));
     }
   }
 
@@ -142,18 +142,18 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
 
     // Listen for result
     try {
-      final bloc = context.read<AdminBloc>();
-      final future = bloc.stream.firstWhere((s) => s is! AdminLoading);
-      bloc.add(SaveAdminBook(book, isUpdate: _isEditing));
+      final bloc = context.read<ScanBloc>();
+      final future = bloc.stream.firstWhere((s) => s is! ScanLoading);
+      bloc.add(SaveScanBook(book, isUpdate: _isEditing));
       final result = await future;
-      if (result is AdminLoaded && mounted) {
+      if (result is ScanLoaded && mounted) {
         return _isEditing
             ? widget.book
             : result.books.firstWhere(
                 (b) => b.name == book.name && b.author == book.author,
                 orElse: () => result.books.last,
               );
-      } else if (result is AdminError && mounted) {
+      } else if (result is ScanError && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text(result.message),
@@ -176,7 +176,7 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => AdminTookEditScreen(bookId: saved.id),
+          builder: (_) => ScanTookEditScreen(bookId: saved.id),
         ),
       );
     }
@@ -331,7 +331,7 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (_) =>
-                                AdminTookEditScreen(bookId: widget.book!.id),
+                                ScanTookEditScreen(bookId: widget.book!.id),
                           ),
                         )
                     : _saveAndAddTomo,
@@ -339,11 +339,11 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
                   context,
                   MaterialPageRoute(
                     builder: (_) =>
-                        AdminTookEditScreen(took: took, bookId: bookId),
+                        ScanTookEditScreen(took: took, bookId: bookId),
                   ),
                 ),
                 onDeleteTook: (tookId) {
-                  context.read<AdminBloc>().add(DeleteAdminTook(tookId));
+                  context.read<ScanBloc>().add(DeleteScanTook(tookId));
                 },
               ),
             ],

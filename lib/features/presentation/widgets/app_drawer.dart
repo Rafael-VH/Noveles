@@ -5,9 +5,9 @@ import 'package:noveles/features/presentation/bloc/bloc.dart';
 import 'package:noveles/features/presentation/screens/profile/profile_screen.dart';
 
 class AppDrawer extends StatelessWidget {
-  final bool isAdmin;
+  final bool isScan;
 
-  const AppDrawer({super.key, this.isAdmin = false});
+  const AppDrawer({super.key, this.isScan = false});
 
   @override
   Widget build(BuildContext context) {
@@ -49,8 +49,8 @@ class AppDrawer extends StatelessWidget {
             ),
           ),
           ListTile(
-            leading: Icon(isAdmin ? Icons.admin_panel_settings : Icons.home),
-            title: Text(isAdmin ? 'Admin Panel' : 'Inicio'),
+            leading: Icon(isScan ? Icons.admin_panel_settings : Icons.home),
+            title: Text(isScan ? 'Panel Scan' : 'Inicio'),
             onTap: () => Navigator.pop(context),
           ),
           ListTile(
