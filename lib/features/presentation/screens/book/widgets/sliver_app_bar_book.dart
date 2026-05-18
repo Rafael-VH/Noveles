@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:noveles/core/supabase/storage_helper.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 
-class SliverAppBarV1Book extends StatelessWidget {
-  const SliverAppBarV1Book({
+class SliverAppBarBook extends StatelessWidget {
+  const SliverAppBarBook({
     super.key,
     required this.books,
     required this.infoIcon,
@@ -43,8 +43,7 @@ class SliverAppBarV1Book extends StatelessWidget {
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                   child: Container(
-                    color:
-                        Theme.of(context).colorScheme.surface.withAlpha(10),
+                    color: Theme.of(context).colorScheme.surface.withAlpha(10),
                   ),
                 ),
               ),

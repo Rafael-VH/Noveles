@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:noveles/core/supabase/storage_helper.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 
-class SliverAppBarV1Home extends StatelessWidget {
+class SliverAppBarHome extends StatelessWidget {
   final List<BookEntity> listBook;
   final List<Widget> actions;
   final void Function(BookEntity book) onBookTap;
 
-  const SliverAppBarV1Home({
+  const SliverAppBarHome({
     super.key,
     required this.listBook,
     required this.actions,

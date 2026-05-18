@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:noveles/features/presentation/delegates/delegate.dart';
 
-class SliverPersistentHeaderV1Book extends StatelessWidget {
-  const SliverPersistentHeaderV1Book({
+class SliverPersistentHeaderBook extends StatelessWidget {
+  const SliverPersistentHeaderBook({
     super.key,
     required this.tabController,
     required this.tabs,

@@ -50,7 +50,7 @@ class _MainScreenState extends State<MainScreen> {
     return SafeArea(
       child: CustomScrollView(
         slivers: [
-          SliverAppBarV1Home(
+          SliverAppBarHome(
             listBook: listBook,
             onBookTap: (book) => Navigator.push(
               context,

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
-import 'package:noveles/features/presentation/screens/book/widgets/sliver_app_bar_v1_book.dart';
-import 'package:noveles/features/presentation/screens/book/widgets/sliver_persistent_header_v1_book.dart';
+import 'package:noveles/features/presentation/screens/book/widgets/sliver_app_bar_book.dart';
+import 'package:noveles/features/presentation/screens/book/widgets/sliver_persistent_header_book.dart';
 import 'package:noveles/features/presentation/screens/screens.dart';
 import 'package:noveles/features/presentation/views/views.dart';
 
@@ -81,14 +81,14 @@ class _BookScreenState extends State<BookScreen>
         child: NestedScrollView(
           headerSliverBuilder: (context, _) {
             return [
-              SliverAppBarV1Book(
+              SliverAppBarBook(
                 books: widget.books,
                 infoIcon: IconButton(
                   onPressed: () => showInfoDialog(),
                   icon: const Icon(Icons.info_outlined),
                 ),
               ),
-              SliverPersistentHeaderV1Book(
+              SliverPersistentHeaderBook(
                 tabController: _tabController,
                 tabs: nameTab,
               ),
