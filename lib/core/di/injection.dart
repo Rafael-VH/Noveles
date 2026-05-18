@@ -46,12 +46,12 @@ import 'package:noveles/features/domain/use_cases/update_took.dart';
 import 'package:noveles/features/domain/use_cases/upload_avatar.dart';
 import 'package:noveles/features/domain/use_cases/upload_cover.dart';
 //
-import 'package:noveles/features/presentation/bloc/admin_bloc.dart';
-import 'package:noveles/features/presentation/bloc/auth_bloc.dart';
-import 'package:noveles/features/presentation/bloc/book_bloc.dart';
-import 'package:noveles/features/presentation/bloc/genre_bloc.dart';
-import 'package:noveles/features/presentation/bloc/profile_bloc.dart';
-import 'package:noveles/features/presentation/bloc/chapter_bloc.dart';
+import 'package:noveles/features/presentation/bloc/admin/admin_bloc.dart';
+import 'package:noveles/features/presentation/bloc/auth/auth_bloc.dart';
+import 'package:noveles/features/presentation/bloc/book/book_bloc.dart';
+import 'package:noveles/features/presentation/bloc/genre/genre_bloc.dart';
+import 'package:noveles/features/presentation/bloc/profile/profile_bloc.dart';
+import 'package:noveles/features/presentation/bloc/chapter/chapter_bloc.dart';
 
 final getIt = GetIt.instance;
 

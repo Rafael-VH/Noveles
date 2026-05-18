@@ -3,9 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/domain/use_cases/use_cases.dart';
-import 'package:noveles/features/presentation/bloc/book_bloc.dart';
-import 'package:noveles/features/presentation/bloc/book_event.dart';
-import 'package:noveles/features/presentation/bloc/book_state.dart';
+import 'package:noveles/features/presentation/bloc/book/book_bloc.dart';
+import 'package:noveles/features/presentation/bloc/book/book_event.dart';
+import 'package:noveles/features/presentation/bloc/book/book_state.dart';
 
 class MockGetBooks extends Mock implements GetBooks {}
 

@@ -3,9 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/domain/use_cases/use_cases.dart';
-import 'package:noveles/features/presentation/bloc/genre_bloc.dart';
-import 'package:noveles/features/presentation/bloc/genre_event.dart';
-import 'package:noveles/features/presentation/bloc/genre_state.dart';
+import 'package:noveles/features/presentation/bloc/genre/genre_bloc.dart';
+import 'package:noveles/features/presentation/bloc/genre/genre_event.dart';
+import 'package:noveles/features/presentation/bloc/genre/genre_state.dart';
 
 class MockGetGenre extends Mock implements GetGenre {}
 
