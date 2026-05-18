@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/supabase/storage_helper.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
-import 'package:noveles/features/presentation/screens/profile/profile_screen.dart';
+import 'package:noveles/features/presentation/widgets/app_drawer.dart';
 import 'package:noveles/features/presentation/screens/admin/admin_book_edit_screen.dart';
 
 class AdminMainScreen extends StatefulWidget {
@@ -46,19 +46,9 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
         }
       },
       child: Scaffold(
+        drawer: const AppDrawer(isAdmin: true),
         appBar: AppBar(
           title: const Text('Admin Panel'),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.person),
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const ProfileScreen(),
-                ),
-              ),
-            ),
-          ],
         ),
         body: BlocBuilder<AdminBloc, AdminState>(
           builder: (context, state) {

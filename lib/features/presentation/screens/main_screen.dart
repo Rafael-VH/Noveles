@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
 import 'package:noveles/features/presentation/screens/screens.dart';
+import 'package:noveles/features/presentation/widgets/app_drawer.dart';
 import 'package:noveles/features/presentation/widgets/carousel_appbar_sliver.dart';
 
 class MainScreen extends StatefulWidget {
@@ -16,6 +17,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const AppDrawer(),
       body: BlocBuilder<BookBloc, BookState>(
         builder: (context, bookState) {
           return BlocBuilder<GenreBloc, GenreState>(
@@ -60,16 +62,11 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ),
             actions: [
-              IconButton(
-                icon: const Icon(Icons.person),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const ProfileScreen(),
-                    ),
-                  );
-                },
+              Builder(
+                builder: (ctx) => IconButton(
+                  icon: const Icon(Icons.menu),
+                  onPressed: () => Scaffold.of(ctx).openDrawer(),
+                ),
               ),
             ],
           ),
