@@ -62,8 +62,11 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     try {
       final genres = await getGenres();
       final currentState = state;
-      final books =
-          currentState is AdminLoaded ? currentState.books : <BookEntity>[];
+      final books = switch (currentState) {
+        AdminLoaded(:final books) => books,
+        AdminGenresLoaded(:final books) => books,
+        _ => <BookEntity>[],
+      };
       emit(AdminGenresLoaded(books, genres));
     } catch (e) {
       emit(AdminError(e.toString()));
