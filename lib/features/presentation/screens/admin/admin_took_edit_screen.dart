@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
@@ -20,6 +21,8 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
   late TextEditingController _titleCtrl;
   late TextEditingController _coverCtrl;
   bool _isSaving = false;
+  TookEntity? _currentTook;
+  StreamSubscription? _stateSub;
 
   bool get _isEditing => widget.took != null;
 
@@ -27,9 +30,25 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
   void initState() {
     super.initState();
     final t = widget.took;
+    _currentTook = t;
     _numberCtrl = TextEditingController(text: t?.number ?? '');
     _titleCtrl = TextEditingController(text: t?.title ?? '');
     _coverCtrl = TextEditingController(text: t?.cover ?? '');
+    _stateSub = context.read<AdminBloc>().stream.listen((state) {
+      if (state is AdminLoaded && mounted) {
+        final target = _currentTook;
+        if (target != null) {
+          for (final b in state.books) {
+            for (final t2 in b.listTook) {
+              if (t2.id == target.id) {
+                setState(() => _currentTook = t2);
+                return;
+              }
+            }
+          }
+        }
+      }
+    });
   }
 
   @override
@@ -37,6 +56,7 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
     _numberCtrl.dispose();
     _titleCtrl.dispose();
     _coverCtrl.dispose();
+    _stateSub?.cancel();
     super.dispose();
   }
 
@@ -61,7 +81,21 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
       bloc.add(SaveAdminTook(took, isUpdate: _isEditing));
       final result = await future;
       if (result is AdminLoaded && mounted) {
-        Navigator.pop(context);
+        if (_isEditing) {
+          Navigator.pop(context);
+        } else {
+          final match = result.books.expand((b) => b.listTook).firstWhere(
+                (t) => t.number == took.number,
+                orElse: () => result.books.expand((b) => b.listTook).last,
+              );
+          setState(() => _currentTook = match);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Tomo creado'),
+              backgroundColor: Theme.of(context).colorScheme.tertiary,
+            ),
+          );
+        }
       } else if (result is AdminError && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -146,10 +180,8 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
                 decoration: const InputDecoration(labelText: 'Cover URL'),
               ),
 
-              const SizedBox(height: 12),
-
-              // Show Chapters if editing
-              if (_isEditing) ...[
+              // Show Chapters (always visible after first save)
+              if (_currentTook != null) ...[
                 const SizedBox(height: 24),
 
                 const Divider(),
@@ -162,7 +194,7 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
                 const SizedBox(height: 12),
 
                 // List of Chapters
-                ...?widget.took?.listChapter.map(
+                ...?_currentTook!.listChapter.map(
                   (ch) => Card(
                     child: ListTile(
                       title: Text(
@@ -183,7 +215,7 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
                               MaterialPageRoute(
                                 builder: (_) => AdminChapterEditScreen(
                                   chapter: ch,
-                                  tookId: widget.took!.id,
+                                  tookId: _currentTook!.id,
                                 ),
                               ),
                             ),
@@ -204,7 +236,7 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
                         MaterialPageRoute(
                           builder: (_) => AdminChapterEditScreen(
                             chapter: ch,
-                            tookId: widget.took!.id,
+                            tookId: _currentTook!.id,
                           ),
                         ),
                       ),
@@ -218,7 +250,7 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
                     context,
                     MaterialPageRoute(
                       builder: (_) => AdminChapterEditScreen(
-                        tookId: widget.took!.id,
+                        tookId: _currentTook!.id,
                       ),
                     ),
                   ),

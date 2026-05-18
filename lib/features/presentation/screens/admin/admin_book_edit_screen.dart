@@ -34,6 +34,7 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
   late TextEditingController _linkCtrl;
   List<GenreEntity> _allGenres = [];
   Set<int> _selectedGenreIds = {};
+  List<TookEntity> _tooks = [];
   bool _isSaving = false;
   StreamSubscription? _stateSub;
 
@@ -56,11 +57,21 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
     _sourceCtrl = TextEditingController(text: b?.source ?? '');
     _linkCtrl = TextEditingController(text: b?.link ?? '');
     _selectedGenreIds = b?.listGenre.map((g) => g.id).toSet() ?? {};
+    _tooks = b?.listTook ?? [];
     _stateSub = context.read<AdminBloc>().stream.listen((state) {
       if (state is AdminGenresLoaded && mounted) {
         setState(() => _allGenres = state.genres);
       } else if (state is AdminCoverUploaded && mounted) {
         setState(() => _coverCtrl.text = state.filename);
+      } else if (state is AdminLoaded && mounted) {
+        final match = state.books.firstWhere(
+          (b) =>
+              b.id == widget.book?.id ||
+              (b.name == _nameCtrl.text.trim() &&
+                  b.author == _authorCtrl.text.trim()),
+          orElse: () => _isEditing ? widget.book! : state.books.last,
+        );
+        _tooks = match.listTook;
       }
     });
     context.read<AdminBloc>().add(LoadAdminGenres());
@@ -138,7 +149,10 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
       if (result is AdminLoaded && mounted) {
         return _isEditing
             ? widget.book
-            : result.books.lastWhere((b) => b.name == book.name);
+            : result.books.firstWhere(
+                (b) => b.name == book.name && b.author == book.author,
+                orElse: () => result.books.last,
+              );
       } else if (result is AdminError && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -310,7 +324,7 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
               // Took List
               TookListSection(
                 isEditing: _isEditing,
-                tooks: widget.book?.listTook ?? [],
+                tooks: _tooks,
                 bookId: widget.book?.id,
                 onAddTook: _isEditing
                     ? () => Navigator.push(

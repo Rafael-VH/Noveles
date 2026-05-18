@@ -119,24 +119,28 @@ class BookRepositoryImpl implements BookRepository {
           authorId = result['id'];
         }
       }
-      final result = await supabase.from('books').insert({
-        'created_at': book.createdAt.toIso8601String(),
-        'cover': book.cover,
-        'name': book.name,
-        'short': book.short,
-        'alternative': book.alternative,
-        'description': book.description,
-        'author_id': authorId,
-        'country': book.country,
-        'state': book.state,
-        'type': book.type,
-        'release': book.release,
-        'took_count': book.tookCount,
-        'chapter_count': book.chapterCount,
-        'source': book.source,
-        'link': book.link,
-        'is_favorite': book.isFavorite,
-      }).select('id').single();
+      final result = await supabase
+          .from('books')
+          .insert({
+            'created_at': book.createdAt.toIso8601String(),
+            'cover': book.cover,
+            'name': book.name,
+            'short': book.short,
+            'alternative': book.alternative,
+            'description': book.description,
+            'author_id': authorId,
+            'country': book.country,
+            'state': book.state,
+            'type': book.type,
+            'release': book.release,
+            'took_count': book.tookCount,
+            'chapter_count': book.chapterCount,
+            'source': book.source,
+            'link': book.link,
+            'is_favorite': book.isFavorite,
+          })
+          .select('id')
+          .single();
       final newBookId = result['id'];
       for (final genre in book.listGenre) {
         await supabase.from('books_genres').insert({
@@ -184,6 +188,13 @@ class BookRepositoryImpl implements BookRepository {
   @override
   Future<void> deleteBook(int id) async {
     try {
+      await supabase.from('books_genres').delete().eq('book_id', id);
+      final tookIds =
+          await supabase.from('tooks').select('id').eq('book_id', id);
+      for (final row in tookIds) {
+        await supabase.from('chapters').delete().eq('took_id', row['id']);
+      }
+      await supabase.from('tooks').delete().eq('book_id', id);
       await supabase.from('books').delete().eq('id', id);
     } catch (e) {
       throw Exception('Error al eliminar libro: $e');

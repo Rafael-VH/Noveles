@@ -95,6 +95,7 @@ class TookRepositoryImpl implements TookRepository {
   @override
   Future<void> deleteTook(int id) async {
     try {
+      await supabase.from('chapters').delete().eq('took_id', id);
       await supabase.from('tooks').delete().eq('id', id);
     } catch (e) {
       throw Exception('Error al eliminar tomo: $e');
