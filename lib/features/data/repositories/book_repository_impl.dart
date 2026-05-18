@@ -50,9 +50,9 @@ class BookRepositoryImpl implements BookRepository {
       );
     }).toList();
 
-    final listTook = (json['tooks'] as List<dynamic>).map((t) {
+    final listTook = ((json['tooks'] as List<dynamic>?) ?? []).map((t) {
       final took = Map<String, dynamic>.from(t);
-      final chapters = (took['chapters'] as List<dynamic>).map((ch) {
+      final chapters = ((took['chapters'] as List<dynamic>?) ?? []).map((ch) {
         return ChapterEntity(
           id: ch['id'],
           createdAt: DateTime.parse(ch['created_at']),

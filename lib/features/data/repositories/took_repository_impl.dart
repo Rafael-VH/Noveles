@@ -37,7 +37,7 @@ class TookRepositoryImpl implements TookRepository {
   }
 
   TookEntity _mapToTookEntity(Map<String, dynamic> json) {
-    final chapters = (json['chapters'] as List<dynamic>).map((ch) {
+    final chapters = ((json['chapters'] as List<dynamic>?) ?? []).map((ch) {
       return ChapterEntity(
         id: ch['id'],
         createdAt: DateTime.parse(ch['created_at']),

@@ -71,6 +71,28 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
     }
   }
 
+  Future<void> _deleteChapter(int chapterId) async {
+    if (_isSaving) return;
+    setState(() => _isSaving = true);
+    try {
+      final bloc = context.read<AdminBloc>();
+      final future = bloc.stream.firstWhere((s) => s is! AdminLoading);
+      bloc.add(DeleteAdminChapter(chapterId));
+      final result = await future;
+      if (result is AdminLoaded && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: const Text('Capítulo eliminado'), backgroundColor: Theme.of(context).colorScheme.tertiary),
+        );
+      } else if (result is AdminError && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result.message), backgroundColor: Theme.of(context).colorScheme.error),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,7 +110,8 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
             children: [
               TextFormField(
                   controller: _numberCtrl,
-                  decoration: const InputDecoration(labelText: 'Número')),
+                  decoration: const InputDecoration(labelText: 'Número'),
+                  validator: (v) => v?.trim().isEmpty == true ? 'Requerido' : null),
               TextFormField(
                   controller: _titleCtrl,
                   decoration: const InputDecoration(labelText: 'Título')),
@@ -99,8 +122,7 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
                 const SizedBox(height: 24),
                 const Divider(),
                 const Text('Capítulos',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 ...?widget.took?.listChapter.map((ch) => Card(
                       child: ListTile(
@@ -122,11 +144,7 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
                             ),
                             IconButton(
                               icon: Icon(Icons.delete, color: Theme.of(context).colorScheme.error),
-                              onPressed: () {
-                                context
-                                    .read<AdminBloc>()
-                                    .add(DeleteAdminChapter(ch.id));
-                              },
+                              onPressed: () => _deleteChapter(ch.id),
                             ),
                           ],
                         ),
