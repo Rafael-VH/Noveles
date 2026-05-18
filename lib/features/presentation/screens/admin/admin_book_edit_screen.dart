@@ -2,10 +2,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:noveles/core/supabase/storage_helper.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
 import 'package:noveles/features/presentation/screens/admin/admin_took_edit_screen.dart';
+import 'package:noveles/features/presentation/screens/admin/widgets/cover_picker.dart';
+import 'package:noveles/features/presentation/screens/admin/widgets/genre_selector.dart';
+import 'package:noveles/features/presentation/screens/admin/widgets/took_list_section.dart';
 
 class AdminBookEditScreen extends StatefulWidget {
   final BookEntity? book;
@@ -174,40 +176,11 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
                   validator: (v) =>
                       v?.trim().isEmpty == true ? 'Requerido' : null),
               const SizedBox(height: 8),
-              const Text('Cover',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              if (_coverCtrl.text.isNotEmpty)
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    coverUrl(_coverCtrl.text),
-                    height: 150,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => const Icon(Icons.broken_image, size: 100),
-                  ),
-                ),
-              Row(
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: _pickCover,
-                    icon: const Icon(Icons.image),
-                    label: const Text('Seleccionar imagen'),
-                  ),
-                  if (_coverCtrl.text.isNotEmpty)
-                    TextButton(
-                      onPressed: () => setState(() => _coverCtrl.clear()),
-                      child: const Text('Quitar'),
-                    ),
-                ],
+              CoverPicker(
+                controller: _coverCtrl,
+                onPick: _pickCover,
+                onClear: () => setState(() => _coverCtrl.clear()),
               ),
-              if (_coverCtrl.text.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(top: 4),
-                  child: Text(_coverCtrl.text,
-                      style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 12)),
-                ),
               TextFormField(
                   controller: _shortCtrl,
                   decoration: const InputDecoration(labelText: 'Nombre corto')),
@@ -241,74 +214,24 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
                   controller: _linkCtrl,
                   decoration: const InputDecoration(labelText: 'Link')),
               const SizedBox(height: 16),
-              const Text('Géneros',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              if (_allGenres.isEmpty)
-                Text('Cargando géneros...',
-                    style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant))
-              else
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 4,
-                  children: _allGenres.map((genre) => FilterChip(
-                    label: Text(genre.name),
-                    selected: _selectedGenreIds.contains(genre.id),
-                    onSelected: (selected) {
-                      setState(() {
-                        if (selected) {
-                          _selectedGenreIds.add(genre.id);
-                        } else {
-                          _selectedGenreIds.remove(genre.id);
-                        }
-                      });
-                    },
-                  )).toList(),
-                ),
-              const SizedBox(height: 24),
-              const Divider(),
-              const Text('Tomos',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              if (_isEditing)
-                ...?widget.book?.listTook.map((took) => Card(
-                      child: ListTile(
-                        title: Text(took.title.isNotEmpty
-                            ? took.title
-                            : 'Tomo ${took.number}'),
-                        subtitle: Text('${took.listChapter.length} capítulos'),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: Icon(Icons.edit, color: Theme.of(context).colorScheme.primary),
-                              onPressed: () => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => AdminTookEditScreen(
-                                        took: took, bookId: widget.book!.id),
-                                  )),
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.delete, color: Theme.of(context).colorScheme.error),
-                              onPressed: () {
-                                context
-                                    .read<AdminBloc>()
-                                    .add(DeleteAdminTook(took.id));
-                              },
-                            ),
-                          ],
-                        ),
-                        onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => AdminTookEditScreen(
-                                  took: took, bookId: widget.book!.id),
-                            )),
-                      ),
-                    )),
-              ElevatedButton.icon(
-                onPressed: _isEditing
+              GenreSelector(
+                genres: _allGenres,
+                selectedIds: _selectedGenreIds,
+                onToggle: (id, selected) {
+                  setState(() {
+                    if (selected) {
+                      _selectedGenreIds.add(id);
+                    } else {
+                      _selectedGenreIds.remove(id);
+                    }
+                  });
+                },
+              ),
+              TookListSection(
+                isEditing: _isEditing,
+                tooks: widget.book?.listTook ?? [],
+                bookId: widget.book?.id,
+                onAddTook: _isEditing
                     ? () => Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -316,8 +239,15 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
                               AdminTookEditScreen(bookId: widget.book!.id),
                         ))
                     : _saveAndAddTomo,
-                icon: const Icon(Icons.add),
-                label: const Text('Añadir Tomo'),
+                onEditTook: (took, bookId) => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => AdminTookEditScreen(took: took, bookId: bookId),
+                  ),
+                ),
+                onDeleteTook: (tookId) {
+                  context.read<AdminBloc>().add(DeleteAdminTook(tookId));
+                },
               ),
             ],
           ),
