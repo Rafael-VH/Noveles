@@ -114,7 +114,8 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
       source: _sourceCtrl.text.trim(),
       link: _linkCtrl.text.trim(),
       isFavorite: widget.book?.isFavorite ?? false,
-      listGenre: _allGenres.where((g) => _selectedGenreIds.contains(g.id)).toList(),
+      listGenre:
+          _allGenres.where((g) => _selectedGenreIds.contains(g.id)).toList(),
       listTook: widget.book?.listTook ?? [],
     );
     setState(() => _isSaving = true);
@@ -129,7 +130,9 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
             : result.books.lastWhere((b) => b.name == book.name);
       } else if (result is AdminError && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(result.message), backgroundColor: Theme.of(context).colorScheme.error),
+          SnackBar(
+              content: Text(result.message),
+              backgroundColor: Theme.of(context).colorScheme.error),
         );
       }
     } finally {
@@ -171,48 +174,67 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
           child: Column(
             children: [
               TextFormField(
-                  controller: _nameCtrl,
-                  decoration: const InputDecoration(labelText: 'Nombre'),
-                  validator: (v) =>
-                      v?.trim().isEmpty == true ? 'Requerido' : null),
+                controller: _nameCtrl,
+                decoration: const InputDecoration(labelText: 'Nombre'),
+                validator: (v) => v?.trim().isEmpty == true ? 'Requerido' : null,
+              ),
               const SizedBox(height: 8),
               CoverPicker(
                 controller: _coverCtrl,
                 onPick: _pickCover,
                 onClear: () => setState(() => _coverCtrl.clear()),
               ),
+              const SizedBox(height: 8),
               TextFormField(
-                  controller: _shortCtrl,
-                  decoration: const InputDecoration(labelText: 'Nombre corto')),
+                controller: _shortCtrl,
+                decoration: const InputDecoration(labelText: 'Nombre corto'),
+              ),
+              const SizedBox(height: 8),
               TextFormField(
-                  controller: _alternativeCtrl,
-                  decoration:
-                      const InputDecoration(labelText: 'Nombre alternativo')),
+                controller: _alternativeCtrl,
+                decoration: const InputDecoration(labelText: 'Nombre alternativo'),
+              ),
+              const SizedBox(height: 8),
               TextFormField(
-                  controller: _descriptionCtrl,
-                  decoration: const InputDecoration(labelText: 'Descripción'),
-                  maxLines: 3),
+                maxLines: 3,
+                controller: _descriptionCtrl,
+                decoration: const InputDecoration(labelText: 'Descripción'),
+              ),
+              const SizedBox(height: 8),
               TextFormField(
-                  controller: _authorCtrl,
-                  decoration: const InputDecoration(labelText: 'Autor')),
+                controller: _authorCtrl,
+                decoration: const InputDecoration(labelText: 'Autor'),
+              ),
+              const SizedBox(height: 8),
               TextFormField(
-                  controller: _countryCtrl,
-                  decoration: const InputDecoration(labelText: 'País')),
+                controller: _countryCtrl,
+                decoration: const InputDecoration(labelText: 'País'),
+              ),
+              const SizedBox(height: 8),
               TextFormField(
-                  controller: _stateCtrl,
-                  decoration: const InputDecoration(labelText: 'Estado')),
+                controller: _stateCtrl,
+                decoration: const InputDecoration(labelText: 'Estado'),
+              ),
+              const SizedBox(height: 8),
               TextFormField(
-                  controller: _typeCtrl,
-                  decoration: const InputDecoration(labelText: 'Tipo')),
+                controller: _typeCtrl,
+                decoration: const InputDecoration(labelText: 'Tipo'),
+              ),
+              const SizedBox(height: 8),
               TextFormField(
-                  controller: _releaseCtrl,
-                  decoration: const InputDecoration(labelText: 'Lanzamiento')),
+                controller: _releaseCtrl,
+                decoration: const InputDecoration(labelText: 'Lanzamiento'),
+              ),
+              const SizedBox(height: 8),
               TextFormField(
-                  controller: _sourceCtrl,
-                  decoration: const InputDecoration(labelText: 'Fuente')),
+                controller: _sourceCtrl,
+                decoration: const InputDecoration(labelText: 'Fuente'),
+              ),
+              const SizedBox(height: 8),
               TextFormField(
-                  controller: _linkCtrl,
-                  decoration: const InputDecoration(labelText: 'Link')),
+                controller: _linkCtrl,
+                decoration: const InputDecoration(labelText: 'Link'),
+              ),
               const SizedBox(height: 16),
               GenreSelector(
                 genres: _allGenres,
@@ -227,17 +249,18 @@ class _AdminBookEditScreenState extends State<AdminBookEditScreen> {
                   });
                 },
               ),
+              const SizedBox(height: 8),
               TookListSection(
                 isEditing: _isEditing,
                 tooks: widget.book?.listTook ?? [],
                 bookId: widget.book?.id,
                 onAddTook: _isEditing
                     ? () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              AdminTookEditScreen(bookId: widget.book!.id),
-                        ))
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => AdminTookEditScreen(bookId: widget.book!.id),
+                          ),
+                        )
                     : _saveAndAddTomo,
                 onEditTook: (took, bookId) => Navigator.push(
                   context,

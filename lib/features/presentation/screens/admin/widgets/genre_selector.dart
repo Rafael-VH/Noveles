@@ -18,22 +18,34 @@ class GenreSelector extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Géneros',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        const Text(
+          'Géneros',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         const SizedBox(height: 8),
         if (genres.isEmpty)
-          Text('Cargando géneros...',
-              style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant))
+          Text(
+            'Cargando géneros...',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          )
         else
           Wrap(
             spacing: 8,
             runSpacing: 4,
-            children: genres.map((genre) => FilterChip(
-              label: Text(genre.name),
-              selected: selectedIds.contains(genre.id),
-              onSelected: (selected) => onToggle(genre.id, selected),
-            )).toList(),
+            children: genres
+                .map(
+                  (genre) => FilterChip(
+                    label: Text(genre.name),
+                    selected: selectedIds.contains(genre.id),
+                    onSelected: (selected) => onToggle(genre.id, selected),
+                  ),
+                )
+                .toList(),
           ),
       ],
     );

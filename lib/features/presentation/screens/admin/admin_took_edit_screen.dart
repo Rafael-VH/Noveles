@@ -63,7 +63,10 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
         Navigator.pop(context);
       } else if (result is AdminError && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(result.message), backgroundColor: Theme.of(context).colorScheme.error),
+          SnackBar(
+            content: Text(result.message),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
         );
       }
     } finally {
@@ -81,11 +84,17 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
       final result = await future;
       if (result is AdminLoaded && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: const Text('Capítulo eliminado'), backgroundColor: Theme.of(context).colorScheme.tertiary),
+          SnackBar(
+            content: const Text('Capítulo eliminado'),
+            backgroundColor: Theme.of(context).colorScheme.tertiary,
+          ),
         );
       } else if (result is AdminError && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(result.message), backgroundColor: Theme.of(context).colorScheme.error),
+          SnackBar(
+            content: Text(result.message),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
         );
       }
     } finally {
@@ -99,7 +108,10 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
       appBar: AppBar(
         title: Text(_isEditing ? 'Editar Tomo' : 'Nuevo Tomo'),
         actions: [
-          TextButton(onPressed: _save, child: const Text('Guardar')),
+          TextButton(
+            onPressed: _save,
+            child: const Text('Guardar'),
+          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -109,60 +121,84 @@ class _AdminTookEditScreenState extends State<AdminTookEditScreen> {
           child: Column(
             children: [
               TextFormField(
-                  controller: _numberCtrl,
-                  decoration: const InputDecoration(labelText: 'Número'),
-                  validator: (v) => v?.trim().isEmpty == true ? 'Requerido' : null),
+                controller: _numberCtrl,
+                decoration: const InputDecoration(labelText: 'Número'),
+                validator: (v) =>
+                    v?.trim().isEmpty == true ? 'Requerido' : null,
+              ),
+              const SizedBox(height: 8),
               TextFormField(
-                  controller: _titleCtrl,
-                  decoration: const InputDecoration(labelText: 'Título')),
+                controller: _titleCtrl,
+                decoration: const InputDecoration(labelText: 'Título'),
+              ),
+              const SizedBox(height: 8),
               TextFormField(
-                  controller: _coverCtrl,
-                  decoration: const InputDecoration(labelText: 'Cover URL')),
+                controller: _coverCtrl,
+                decoration: const InputDecoration(labelText: 'Cover URL'),
+              ),
+              const SizedBox(height: 8),
               if (_isEditing) ...[
                 const SizedBox(height: 24),
                 const Divider(),
-                const Text('Capítulos',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const Text(
+                  'Capítulos',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
                 const SizedBox(height: 8),
-                ...?widget.took?.listChapter.map((ch) => Card(
-                      child: ListTile(
-                        title: Text(ch.title.isNotEmpty
-                            ? ch.title
-                            : 'Cap. ${ch.number}'),
-                        subtitle: Text('ID: ${ch.id}'),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: Icon(Icons.edit, color: Theme.of(context).colorScheme.primary),
-                              onPressed: () => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => AdminChapterEditScreen(
-                                        chapter: ch, tookId: widget.took!.id),
-                                  )),
+                ...?widget.took?.listChapter.map(
+                  (ch) => Card(
+                    child: ListTile(
+                      title: Text(
+                          ch.title.isNotEmpty ? ch.title : 'Cap. ${ch.number}'),
+                      subtitle: Text('ID: ${ch.id}'),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: Icon(
+                              Icons.edit,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
-                            IconButton(
-                              icon: Icon(Icons.delete, color: Theme.of(context).colorScheme.error),
-                              onPressed: () => _deleteChapter(ch.id),
+                            onPressed: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => AdminChapterEditScreen(
+                                  chapter: ch,
+                                  tookId: widget.took!.id,
+                                ),
+                              ),
                             ),
-                          ],
-                        ),
-                        onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => AdminChapterEditScreen(
-                                  chapter: ch, tookId: widget.took!.id),
-                            )),
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              Icons.delete,
+                              color: Theme.of(context).colorScheme.error,
+                            ),
+                            onPressed: () => _deleteChapter(ch.id),
+                          ),
+                        ],
                       ),
-                    )),
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => AdminChapterEditScreen(
+                            chapter: ch,
+                            tookId: widget.took!.id,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
                 ElevatedButton.icon(
                   onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            AdminChapterEditScreen(tookId: widget.took!.id),
-                      )),
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => AdminChapterEditScreen(
+                        tookId: widget.took!.id,
+                      ),
+                    ),
+                  ),
                   icon: const Icon(Icons.add),
                   label: const Text('Añadir Capítulo'),
                 ),

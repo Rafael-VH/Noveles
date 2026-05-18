@@ -60,7 +60,9 @@ class _AdminChapterEditScreenState extends State<AdminChapterEditScreen> {
         Navigator.pop(context);
       } else if (result is AdminError && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(result.message), backgroundColor: Theme.of(context).colorScheme.error),
+          SnackBar(
+              content: Text(result.message),
+              backgroundColor: Theme.of(context).colorScheme.error),
         );
       }
     } finally {
@@ -84,11 +86,14 @@ class _AdminChapterEditScreenState extends State<AdminChapterEditScreen> {
           child: Column(
             children: [
               TextFormField(
-                  controller: _numberCtrl,
-                  decoration: const InputDecoration(labelText: 'Número')),
+                controller: _numberCtrl,
+                decoration: const InputDecoration(labelText: 'Número'),
+              ),
+              const SizedBox(height: 8),
               TextFormField(
-                  controller: _titleCtrl,
-                  decoration: const InputDecoration(labelText: 'Título')),
+                controller: _titleCtrl,
+                decoration: const InputDecoration(labelText: 'Título'),
+              ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _contentCtrl,
@@ -98,8 +103,7 @@ class _AdminChapterEditScreenState extends State<AdminChapterEditScreen> {
                   alignLabelWithHint: true,
                 ),
                 maxLines: 20,
-                validator: (v) =>
-                    v?.isEmpty == true ? 'El contenido es requerido' : null,
+                validator: (v) => v?.isEmpty == true ? 'El contenido es requerido' : null,
               ),
             ],
           ),

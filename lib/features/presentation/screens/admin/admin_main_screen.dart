@@ -28,13 +28,18 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
       listener: (context, state) {
         if (state is AdminError) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message), backgroundColor: Theme.of(context).colorScheme.error),
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
           );
         }
         if (state is AdminLoaded && state.message != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-                content: Text(state.message!), backgroundColor: Theme.of(context).colorScheme.tertiary),
+              content: Text(state.message!),
+              backgroundColor: Theme.of(context).colorScheme.tertiary,
+            ),
           );
         }
       },
@@ -46,14 +51,9 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
               icon: const Icon(Icons.person),
               onPressed: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const ProfileScreen()),
-              ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.home),
-              onPressed: () => Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const MainScreen()),
+                MaterialPageRoute(
+                  builder: (_) => const ProfileScreen(),
+                ),
               ),
             ),
           ],
@@ -61,7 +61,9 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
         body: BlocBuilder<AdminBloc, AdminState>(
           builder: (context, state) {
             if (state is AdminLoading || state is AdminInitial) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
             }
             if (state is AdminError) {
               return Center(
@@ -71,8 +73,9 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
                     Text(state.message),
                     const SizedBox(height: 16),
                     ElevatedButton(
-                      onPressed: () =>
-                          context.read<AdminBloc>().add(LoadAdminBooks()),
+                      onPressed: () => context.read<AdminBloc>().add(
+                            LoadAdminBooks(),
+                          ),
                       child: const Text('Reintentar'),
                     ),
                   ],
@@ -85,7 +88,11 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
               _ => null,
             };
             if (books == null) return const SizedBox.shrink();
-            if (books.isEmpty) return const Center(child: Text('No hay libros'));
+            if (books.isEmpty) {
+              return const Center(
+                child: Text('No hay libros'),
+              );
+            }
             return RefreshIndicator(
               onRefresh: () async {
                 context.read<AdminBloc>().add(LoadAdminBooks());
@@ -98,8 +105,10 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
                 itemBuilder: (context, index) {
                   final book = books[index];
                   return Card(
-                    margin:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 4,
+                    ),
                     child: ListTile(
                       leading: SizedBox(
                         width: 48,
@@ -107,23 +116,35 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
                         child: CachedNetworkImage(
                           fit: BoxFit.cover,
                           imageUrl: coverUrl(book.cover),
-                          errorWidget: (_, __, ___) =>
-                              const Icon(Icons.book, size: 48),
+                          errorWidget: (_, __, ___) => const Icon(
+                            Icons.book,
+                            size: 48,
+                          ),
                         ),
                       ),
-                      title: Text(book.name,
-                          maxLines: 1, overflow: TextOverflow.ellipsis),
-                      subtitle:
-                          Text('ID: ${book.id} - ${book.tookCount} tomos'),
+                      title: Text(
+                        book.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      subtitle: Text(
+                        'ID: ${book.id} - ${book.tookCount} tomos',
+                      ),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
-                            icon: Icon(Icons.edit, color: Theme.of(context).colorScheme.primary),
+                            icon: Icon(
+                              Icons.edit,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
                             onPressed: () => _editBook(context, book),
                           ),
                           IconButton(
-                            icon: Icon(Icons.delete, color: Theme.of(context).colorScheme.error),
+                            icon: Icon(
+                              Icons.delete,
+                              color: Theme.of(context).colorScheme.error,
+                            ),
                             onPressed: () =>
                                 _deleteBook(context, book.id, book.name),
                           ),
@@ -171,14 +192,18 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
         content: Text('¿Eliminar "$bookName"?'),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancelar')),
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancelar'),
+          ),
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
               context.read<AdminBloc>().add(DeleteAdminBook(bookId));
             },
-            child: Text('Eliminar', style: TextStyle(color: Theme.of(context).colorScheme.error)),
+            child: Text(
+              'Eliminar',
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
           ),
         ],
       ),

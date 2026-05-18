@@ -18,8 +18,13 @@ class CoverPicker extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Cover',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        const Text(
+          'Cover',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         const SizedBox(height: 8),
         if (controller.text.isNotEmpty)
           ClipRRect(
@@ -29,8 +34,10 @@ class CoverPicker extends StatelessWidget {
               height: 150,
               width: double.infinity,
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) =>
-                  const Icon(Icons.broken_image, size: 100),
+              errorBuilder: (_, __, ___) => const Icon(
+                Icons.broken_image,
+                size: 100,
+              ),
             ),
           ),
         Row(
@@ -50,10 +57,13 @@ class CoverPicker extends StatelessWidget {
         if (controller.text.isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(top: 4),
-            child: Text(controller.text,
-                style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    fontSize: 12)),
+            child: Text(
+              controller.text,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                fontSize: 12,
+              ),
+            ),
           ),
       ],
     );
