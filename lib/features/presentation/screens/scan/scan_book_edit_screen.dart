@@ -132,6 +132,7 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
       source: _sourceCtrl.text.trim(),
       link: _linkCtrl.text.trim(),
       isFavorite: widget.book?.isFavorite ?? false,
+      isVisible: widget.book?.isVisible ?? true,
       listGenre:
           _allGenres.where((g) => _selectedGenreIds.contains(g.id)).toList(),
       listTook: widget.book?.listTook ?? [],

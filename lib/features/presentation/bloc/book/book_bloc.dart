@@ -7,10 +7,12 @@ import 'package:noveles/features/presentation/bloc/book/book_state.dart';
 class BookBloc extends Bloc<BookEvent, BookState> {
   final GetBooks getBooks;
   final GetBookById getBookById;
+  final bool onlyVisible;
 
   BookBloc({
     required this.getBooks,
     required this.getBookById,
+    this.onlyVisible = false,
   }) : super(BookInitial()) {
     on<LoadBooks>(_onLoadBooks);
     on<LoadBookById>(_onLoadBookById);
@@ -23,7 +25,7 @@ class BookBloc extends Bloc<BookEvent, BookState> {
   ) async {
     emit(BookLoading());
     try {
-      final books = await getBooks();
+      final books = await getBooks(onlyVisible: onlyVisible);
       emit(BookLoaded(books));
     } catch (e) {
       emit(BookError(e.toString()));

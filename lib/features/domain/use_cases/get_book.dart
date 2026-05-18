@@ -6,7 +6,7 @@ class GetBooks {
 
   GetBooks(this.repository);
 
-  Future<List<BookEntity>> call() async {
-    return await repository.getBooks();
+  Future<List<BookEntity>> call({bool onlyVisible = false}) async {
+    return await repository.getBooks(onlyVisible: onlyVisible);
   }
 }

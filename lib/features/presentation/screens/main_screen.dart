@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
 import 'package:noveles/features/presentation/screens/screens.dart';
@@ -16,9 +17,15 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      drawer: const AppDrawer(),
-      body: BlocBuilder<BookBloc, BookState>(
+    return BlocProvider(
+      create: (_) => BookBloc(
+        getBooks: getIt(),
+        getBookById: getIt(),
+        onlyVisible: true,
+      )..add(LoadBooks()),
+      child: Scaffold(
+        drawer: const AppDrawer(),
+        body: BlocBuilder<BookBloc, BookState>(
         builder: (context, bookState) {
           return BlocBuilder<GenreBloc, GenreState>(
             builder: (context, genreState) {
@@ -41,7 +48,8 @@ class _MainScreenState extends State<MainScreen> {
           );
         },
       ),
-    );
+    ),
+  );
   }
 
   Widget _buildContent(

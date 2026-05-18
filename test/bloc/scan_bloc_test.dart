@@ -41,7 +41,7 @@ void main() {
       name: 'Test Book', short: '', alternative: '', description: '',
       authorId: 1, author: 'Author', country: 'JP', state: 'ongoing',
       type: 'novel', release: '2024', tookCount: '1', chapterCount: '10',
-      source: '', link: '', isFavorite: false, listGenre: const [], listTook: const [],
+      source: '', link: '', isFavorite: false, isVisible: true, listGenre: const [], listTook: const [],
     ),
   ];
 
@@ -51,7 +51,7 @@ void main() {
       name: '', short: '', alternative: '', description: '',
       authorId: 0, author: '', country: '', state: '',
       type: '', release: '', tookCount: '', chapterCount: '',
-      source: '', link: '', isFavorite: false, listGenre: const [], listTook: const [],
+      source: '', link: '', isFavorite: false, isVisible: true, listGenre: const [], listTook: const [],
     ));
     registerFallbackValue(TookEntity(
       id: 0, createdAt: DateTime(2024), cover: '',

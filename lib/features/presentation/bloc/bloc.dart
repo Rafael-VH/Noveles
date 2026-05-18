@@ -32,3 +32,8 @@ export 'package:noveles/features/presentation/bloc/profile/profile_state.dart';
 export 'package:noveles/features/presentation/bloc/theme/theme_bloc.dart';
 export 'package:noveles/features/presentation/bloc/theme/theme_event.dart';
 export 'package:noveles/features/presentation/bloc/theme/theme_state.dart';
+
+// Admin Bloc
+export 'package:noveles/features/presentation/bloc/admin/admin_bloc.dart';
+export 'package:noveles/features/presentation/bloc/admin/admin_event.dart';
+export 'package:noveles/features/presentation/bloc/admin/admin_state.dart';

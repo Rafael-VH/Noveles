@@ -5,15 +5,18 @@ import 'package:noveles/features/domain/repositories/repositories.dart';
 
 class BookRepositoryImpl implements BookRepository {
   @override
-  Future<List<BookEntity>> getBooks() async {
+  Future<List<BookEntity>> getBooks({bool onlyVisible = false}) async {
     try {
-      final response = await supabase
+      var query = supabase
           .from('books')
           .select(
-              '*, authors!inner(*), books_genres!inner(genre_id, genres(*)), tooks(*, chapters(*))')
-          .order('id')
-          .limit(100);
+              '*, authors!inner(*), books_genres!inner(genre_id, genres(*)), tooks(*, chapters(*))');
 
+      if (onlyVisible) {
+        query = query.eq('is_visible', true);
+      }
+
+      final response = await query.order('id').limit(100);
       return response.map((json) => _mapToBookEntity(json)).toList();
     } catch (e) {
       throw Exception('Error al obtener libros: $e');
@@ -93,6 +96,7 @@ class BookRepositoryImpl implements BookRepository {
       source: json['source'] ?? '',
       link: json['link'] ?? '',
       isFavorite: json['is_favorite'] ?? false,
+      isVisible: json['is_visible'] ?? true,
       listGenre: listGenre,
       listTook: listTook,
     );
@@ -198,6 +202,18 @@ class BookRepositoryImpl implements BookRepository {
       await supabase.from('books').delete().eq('id', id);
     } catch (e) {
       throw Exception('Error al eliminar libro: $e');
+    }
+  }
+
+  @override
+  Future<void> toggleBookVisibility(int bookId, bool isVisible) async {
+    try {
+      await supabase
+          .from('books')
+          .update({'is_visible': isVisible})
+          .eq('id', bookId);
+    } catch (e) {
+      throw Exception('Error al cambiar visibilidad: $e');
     }
   }
 

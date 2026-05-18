@@ -50,6 +50,7 @@ void main() {
         source: 'source',
         link: '',
         isFavorite: false,
+        isVisible: true,
         listGenre: const [],
         listTook: const [],
       ),

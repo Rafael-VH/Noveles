@@ -21,6 +21,7 @@ class BookEntity extends Equatable {
   final String source;
   final String link;
   final bool isFavorite;
+  final bool isVisible;
   final List<GenreEntity> listGenre;
   final List<TookEntity> listTook;
 
@@ -43,6 +44,7 @@ class BookEntity extends Equatable {
     required this.source,
     required this.link,
     required this.isFavorite,
+    required this.isVisible,
     required this.listGenre,
     required this.listTook,
   });
@@ -67,6 +69,7 @@ class BookEntity extends Equatable {
         source,
         link,
         isFavorite,
+        isVisible,
         listGenre,
         listTook,
       ];

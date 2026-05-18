@@ -6,8 +6,9 @@ import 'package:noveles/features/presentation/screens/profile/profile_screen.dar
 
 class AppDrawer extends StatelessWidget {
   final bool isScan;
+  final bool isAdmin;
 
-  const AppDrawer({super.key, this.isScan = false});
+  const AppDrawer({super.key, this.isScan = false, this.isAdmin = false});
 
   @override
   Widget build(BuildContext context) {
@@ -48,11 +49,18 @@ class AppDrawer extends StatelessWidget {
               ],
             ),
           ),
-          ListTile(
-            leading: Icon(isScan ? Icons.admin_panel_settings : Icons.home),
-            title: Text(isScan ? 'Panel Scan' : 'Inicio'),
-            onTap: () => Navigator.pop(context),
-          ),
+          if (isAdmin)
+            ListTile(
+              leading: const Icon(Icons.admin_panel_settings),
+              title: const Text('Panel Admin'),
+              onTap: () => Navigator.pop(context),
+            ),
+          if (!isAdmin)
+            ListTile(
+              leading: Icon(isScan ? Icons.admin_panel_settings : Icons.home),
+              title: Text(isScan ? 'Panel Scan' : 'Inicio'),
+              onTap: () => Navigator.pop(context),
+            ),
           ListTile(
             leading: const Icon(Icons.person),
             title: const Text('Editar Perfil'),
