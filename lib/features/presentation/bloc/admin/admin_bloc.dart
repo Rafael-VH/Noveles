@@ -1,9 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/domain/use_cases/use_cases.dart';
-import 'package:noveles/features/presentation/bloc/admin_event.dart';
-import 'package:noveles/features/presentation/bloc/admin_state.dart';
+import 'package:noveles/features/presentation/bloc/admin/admin_event.dart';
+import 'package:noveles/features/presentation/bloc/admin/admin_state.dart';
 
+// AdminBloc es un Bloc que maneja los eventos y estados relacionados con la administración de libros, tomos, capítulos y géneros en la aplicación. Utiliza casos de uso para interactuar con el dominio y actualizar el estado en consecuencia. El AdminBloc escucha eventos como cargar libros, cargar géneros, subir portadas, guardar o eliminar libros, tomos y capítulos, y emite estados que reflejan el resultado de esas operaciones, como carga exitosa, carga fallida o carga en progreso.
 class AdminBloc extends Bloc<AdminEvent, AdminState> {
   final GetBooks getBooks;
   final CreateBook createBook;
@@ -43,6 +44,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     on<DeleteAdminChapter>(_onDeleteChapter);
   }
 
+  // Sube una portada y emite el estado con el nombre del archivo subido o un error si falla
   Future<void> _onUploadCover(
     UploadAdminCover event,
     Emitter<AdminState> emit,
@@ -55,6 +57,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     }
   }
 
+  // Carga los géneros y mantiene los libros cargados si ya se han cargado
   Future<void> _onLoadGenres(
     LoadAdminGenres event,
     Emitter<AdminState> emit,
@@ -73,6 +76,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     }
   }
 
+  // Carga los libros y mantiene los géneros cargados si ya se han cargado
   Future<void> _onLoadBooks(
     LoadAdminBooks event,
     Emitter<AdminState> emit,
@@ -86,6 +90,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     }
   }
 
+  // Guarda o actualiza un libro, luego recarga la lista de libros para reflejar los cambios
   Future<void> _onSaveBook(
     SaveAdminBook event,
     Emitter<AdminState> emit,
@@ -105,6 +110,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     }
   }
 
+  // Elimina un libro, luego recarga la lista de libros para reflejar los cambios
   Future<void> _onDeleteBook(
     DeleteAdminBook event,
     Emitter<AdminState> emit,
@@ -119,6 +125,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     }
   }
 
+  // Guarda o actualiza un tomo, luego recarga la lista de libros para reflejar los cambios
   Future<void> _onSaveTook(
     SaveAdminTook event,
     Emitter<AdminState> emit,
@@ -137,6 +144,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     }
   }
 
+  // Elimina un tomo, luego recarga la lista de libros para reflejar los cambios
   Future<void> _onDeleteTook(
     DeleteAdminTook event,
     Emitter<AdminState> emit,
@@ -150,6 +158,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     }
   }
 
+  // Guarda o actualiza un capítulo, luego recarga la lista de libros para reflejar los cambios
   Future<void> _onSaveChapter(
     SaveAdminChapter event,
     Emitter<AdminState> emit,
@@ -168,6 +177,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     }
   }
 
+  // Elimina un capítulo, luego recarga la lista de libros para reflejar los cambios
   Future<void> _onDeleteChapter(
     DeleteAdminChapter event,
     Emitter<AdminState> emit,

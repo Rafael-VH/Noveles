@@ -1,24 +1,34 @@
-//  BLOC
-export 'package:noveles/features/presentation/bloc/book_bloc.dart';
-export 'package:noveles/features/presentation/bloc/genre_bloc.dart';
-export 'package:noveles/features/presentation/bloc/admin_bloc.dart';
-//  EVENT
-export 'package:noveles/features/presentation/bloc/book_event.dart';
-export 'package:noveles/features/presentation/bloc/genre_event.dart';
-export 'package:noveles/features/presentation/bloc/admin_event.dart';
-//  STATE
-export 'package:noveles/features/presentation/bloc/book_state.dart';
-export 'package:noveles/features/presentation/bloc/genre_state.dart';
-export 'package:noveles/features/presentation/bloc/admin_state.dart';
-export 'package:noveles/features/presentation/bloc/theme_bloc.dart';
-export 'package:noveles/features/presentation/bloc/theme_event.dart';
-export 'package:noveles/features/presentation/bloc/theme_state.dart';
-export 'package:noveles/features/presentation/bloc/auth_bloc.dart';
-export 'package:noveles/features/presentation/bloc/auth_event.dart';
-export 'package:noveles/features/presentation/bloc/auth_state.dart';
-export 'package:noveles/features/presentation/bloc/profile_bloc.dart';
-export 'package:noveles/features/presentation/bloc/profile_event.dart';
-export 'package:noveles/features/presentation/bloc/profile_state.dart';
-export 'package:noveles/features/presentation/bloc/chapter_bloc.dart';
-export 'package:noveles/features/presentation/bloc/chapter_event.dart';
-export 'package:noveles/features/presentation/bloc/chapter_state.dart';
+// Admin Bloc
+export 'package:noveles/features/presentation/bloc/admin/admin_bloc.dart';
+export 'package:noveles/features/presentation/bloc/admin/admin_event.dart';
+export 'package:noveles/features/presentation/bloc/admin/admin_state.dart';
+
+// Auth Bloc
+export 'package:noveles/features/presentation/bloc/auth/auth_bloc.dart';
+export 'package:noveles/features/presentation/bloc/auth/auth_event.dart';
+export 'package:noveles/features/presentation/bloc/auth/auth_state.dart';
+
+// Book Bloc
+export 'package:noveles/features/presentation/bloc/book/book_bloc.dart';
+export 'package:noveles/features/presentation/bloc/book/book_event.dart';
+export 'package:noveles/features/presentation/bloc/book/book_state.dart';
+
+// Chapter Bloc
+export 'package:noveles/features/presentation/bloc/chapter/chapter_bloc.dart';
+export 'package:noveles/features/presentation/bloc/chapter/chapter_event.dart';
+export 'package:noveles/features/presentation/bloc/chapter/chapter_state.dart';
+
+// Genre Bloc
+export 'package:noveles/features/presentation/bloc/genre/genre_bloc.dart';
+export 'package:noveles/features/presentation/bloc/genre/genre_event.dart';
+export 'package:noveles/features/presentation/bloc/genre/genre_state.dart';
+
+// Profile Bloc
+export 'package:noveles/features/presentation/bloc/profile/profile_bloc.dart';
+export 'package:noveles/features/presentation/bloc/profile/profile_event.dart';
+export 'package:noveles/features/presentation/bloc/profile/profile_state.dart';
+
+// Theme Bloc
+export 'package:noveles/features/presentation/bloc/theme/theme_bloc.dart';
+export 'package:noveles/features/presentation/bloc/theme/theme_event.dart';
+export 'package:noveles/features/presentation/bloc/theme/theme_state.dart';
