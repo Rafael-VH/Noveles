@@ -4,6 +4,7 @@ import 'package:noveles/features/data/repositories/auth_repository_impl.dart';
 import 'package:noveles/features/data/repositories/book_repository_impl.dart';
 import 'package:noveles/features/data/repositories/chapter_repository_impl.dart';
 import 'package:noveles/features/data/repositories/genre_repository_impl.dart';
+import 'package:noveles/features/data/repositories/label_repository_impl.dart';
 import 'package:noveles/features/data/repositories/profiles_repository_impl.dart';
 import 'package:noveles/features/data/repositories/took_repository_impl.dart';
 //
@@ -11,6 +12,7 @@ import 'package:noveles/features/domain/repositories/auth_repository.dart';
 import 'package:noveles/features/domain/repositories/book_repository.dart';
 import 'package:noveles/features/domain/repositories/chapter_repository.dart';
 import 'package:noveles/features/domain/repositories/genre_repository.dart';
+import 'package:noveles/features/domain/repositories/label_repository.dart';
 import 'package:noveles/features/domain/repositories/profiles_repository.dart';
 import 'package:noveles/features/domain/repositories/took_repository.dart';
 //
@@ -27,6 +29,11 @@ import 'package:noveles/features/domain/use_cases/delete_genre.dart';
 import 'package:noveles/features/domain/use_cases/delete_took.dart';
 import 'package:noveles/features/domain/use_cases/get_book.dart';
 import 'package:noveles/features/domain/use_cases/get_book_by_id.dart';
+import 'package:noveles/features/domain/use_cases/get_labels.dart';
+import 'package:noveles/features/domain/use_cases/create_label.dart';
+import 'package:noveles/features/domain/use_cases/delete_label.dart';
+import 'package:noveles/features/domain/use_cases/assign_label_to_book.dart';
+import 'package:noveles/features/domain/use_cases/remove_label_from_book.dart';
 import 'package:noveles/features/domain/use_cases/get_chapter.dart';
 import 'package:noveles/features/domain/use_cases/get_chapter_by_id.dart';
 import 'package:noveles/features/domain/use_cases/get_current_user.dart';
@@ -54,6 +61,7 @@ import 'package:noveles/features/presentation/bloc/genre/genre_bloc.dart';
 import 'package:noveles/features/presentation/bloc/profile/profile_bloc.dart';
 import 'package:noveles/features/presentation/bloc/chapter/chapter_bloc.dart';
 import 'package:noveles/features/presentation/bloc/admin/admin_bloc.dart';
+import 'package:noveles/features/presentation/bloc/label/label_bloc.dart';
 
 final getIt = GetIt.instance;
 
@@ -66,6 +74,7 @@ void setupDependencies() {
   getIt.registerLazySingleton<ChapterRepository>(() => ChapterRepositoryImpl());
   getIt.registerLazySingleton<ProfilesRepository>(
       () => ProfilesRepositoryImpl());
+  getIt.registerLazySingleton<LabelRepository>(() => LabelRepositoryImpl());
 
   // Use Cases
   getIt.registerLazySingleton(() => Login(getIt()));
@@ -100,6 +109,11 @@ void setupDependencies() {
   getIt.registerLazySingleton(() => GetChapterContent(getIt()));
   getIt.registerLazySingleton(() => GetBooksByGenre());
   getIt.registerLazySingleton(() => ToggleBookVisibility(getIt()));
+  getIt.registerLazySingleton(() => GetLabels(getIt()));
+  getIt.registerLazySingleton(() => CreateLabel(getIt()));
+  getIt.registerLazySingleton(() => DeleteLabel(getIt()));
+  getIt.registerLazySingleton(() => AssignLabelToBook(getIt()));
+  getIt.registerLazySingleton(() => RemoveLabelFromBook(getIt()));
 
   // Blocs
   getIt.registerFactory(
@@ -133,6 +147,16 @@ void setupDependencies() {
     () => AdminBloc(
       getBooks: getIt(),
       toggleBookVisibility: getIt(),
+    ),
+  );
+
+  getIt.registerFactory(
+    () => LabelBloc(
+      getLabels: getIt(),
+      createLabel: getIt(),
+      deleteLabel: getIt(),
+      assignLabel: getIt(),
+      removeLabel: getIt(),
     ),
   );
 

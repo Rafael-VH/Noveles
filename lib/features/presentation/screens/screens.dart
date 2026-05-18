@@ -8,6 +8,7 @@ export 'package:noveles/features/presentation/screens/auth/login_screen.dart';
 export 'package:noveles/features/presentation/screens/auth/register_screen.dart';
 export 'package:noveles/features/presentation/screens/profile/profile_screen.dart';
 export 'package:noveles/features/presentation/screens/admin/admin_main_screen.dart';
+export 'package:noveles/features/presentation/screens/label/label_management_screen.dart';
 export 'package:noveles/features/presentation/screens/scan/scan_main_screen.dart';
 export 'package:noveles/features/presentation/screens/scan/scan_book_edit_screen.dart';
 export 'package:noveles/features/presentation/screens/scan/scan_took_edit_screen.dart';

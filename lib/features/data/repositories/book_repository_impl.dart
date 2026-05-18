@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
+import 'package:noveles/features/domain/entities/label_entity.dart';
 import 'package:noveles/features/domain/repositories/repositories.dart';
 
 class BookRepositoryImpl implements BookRepository {
@@ -10,7 +11,7 @@ class BookRepositoryImpl implements BookRepository {
       var query = supabase
           .from('books')
           .select(
-              '*, authors!inner(*), books_genres!inner(genre_id, genres(*)), tooks(*, chapters(*))');
+              '*, authors!inner(*), books_genres!inner(genre_id, genres(*)), books_labels(*, labels(*)), tooks(*, chapters(*))');
 
       if (onlyVisible) {
         query = query.eq('is_visible', true);
@@ -50,6 +51,16 @@ class BookRepositoryImpl implements BookRepository {
         createdAt: DateTime.parse(g['created_at']),
         name: g['name'] ?? '',
         description: g['description'] ?? '',
+      );
+    }).toList();
+
+    final listLabel = ((json['books_labels'] as List<dynamic>?) ?? []).map((bl) {
+      final l = Map<String, dynamic>.from(bl['labels']);
+      return LabelEntity(
+        id: l['id'],
+        createdAt: DateTime.parse(l['created_at']),
+        name: l['name'] ?? '',
+        color: l['color'] ?? '#71A202',
       );
     }).toList();
 
@@ -99,6 +110,7 @@ class BookRepositoryImpl implements BookRepository {
       isVisible: json['is_visible'] ?? true,
       listGenre: listGenre,
       listTook: listTook,
+      listLabel: listLabel,
     );
   }
 
@@ -152,6 +164,12 @@ class BookRepositoryImpl implements BookRepository {
           'genre_id': genre.id,
         });
       }
+      for (final label in book.listLabel) {
+        await supabase.from('books_labels').insert({
+          'book_id': newBookId,
+          'label_id': label.id,
+        });
+      }
     } catch (e) {
       throw Exception('Error al crear libro: $e');
     }
@@ -182,6 +200,13 @@ class BookRepositoryImpl implements BookRepository {
         await supabase.from('books_genres').insert({
           'book_id': book.id,
           'genre_id': genre.id,
+        });
+      }
+      await supabase.from('books_labels').delete().eq('book_id', book.id);
+      for (final label in book.listLabel) {
+        await supabase.from('books_labels').insert({
+          'book_id': book.id,
+          'label_id': label.id,
         });
       }
     } catch (e) {

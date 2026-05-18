@@ -36,3 +36,9 @@ export 'package:noveles/features/domain/use_cases/change_password.dart';
 export 'package:noveles/features/domain/use_cases/get_chapter_content.dart';
 export 'package:noveles/features/domain/use_cases/get_books_by_genre.dart';
 export 'package:noveles/features/domain/use_cases/toggle_book_visibility.dart';
+//  LABEL
+export 'package:noveles/features/domain/use_cases/get_labels.dart';
+export 'package:noveles/features/domain/use_cases/create_label.dart';
+export 'package:noveles/features/domain/use_cases/delete_label.dart';
+export 'package:noveles/features/domain/use_cases/assign_label_to_book.dart';
+export 'package:noveles/features/domain/use_cases/remove_label_from_book.dart';

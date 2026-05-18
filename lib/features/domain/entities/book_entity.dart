@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:noveles/features/domain/entities/genre_entity.dart';
+import 'package:noveles/features/domain/entities/label_entity.dart';
 import 'package:noveles/features/domain/entities/took_entity.dart';
 
 class BookEntity extends Equatable {
@@ -24,6 +25,7 @@ class BookEntity extends Equatable {
   final bool isVisible;
   final List<GenreEntity> listGenre;
   final List<TookEntity> listTook;
+  final List<LabelEntity> listLabel;
 
   const BookEntity({
     required this.id,
@@ -47,6 +49,7 @@ class BookEntity extends Equatable {
     required this.isVisible,
     required this.listGenre,
     required this.listTook,
+    required this.listLabel,
   });
 
   @override
@@ -72,5 +75,6 @@ class BookEntity extends Equatable {
         isVisible,
         listGenre,
         listTook,
+        listLabel,
       ];
 }
