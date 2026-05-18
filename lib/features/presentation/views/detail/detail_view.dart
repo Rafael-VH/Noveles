@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
-import 'package:noveles/features/presentation/views/detail/widgets/card_info_v1_detail.dart';
+import 'package:noveles/features/presentation/views/detail/widgets/card_info_detail.dart';
 import 'package:noveles/features/presentation/widgets/widgets.dart';
 
 class DetailView extends StatefulWidget {
@@ -40,7 +40,7 @@ class _DetailViewState extends State<DetailView> {
             ),
             Padding(
               padding: const EdgeInsets.all(6.0),
-              child: CardInfoV1Detail(
+              child: CardInfoDetail(
                 title1: "Publicado",
                 text1: widget.books.release,
                 title2: "Tipo de Novela",
@@ -49,7 +49,7 @@ class _DetailViewState extends State<DetailView> {
             ),
             Padding(
               padding: const EdgeInsets.all(6.0),
-              child: CardInfoV1Detail(
+              child: CardInfoDetail(
                 title1: "País",
                 text1: widget.books.country,
                 title2: "Estado",
@@ -58,7 +58,7 @@ class _DetailViewState extends State<DetailView> {
             ),
             Padding(
               padding: const EdgeInsets.all(6.0),
-              child: CardInfoV1Detail(
+              child: CardInfoDetail(
                 title1: "Tomos",
                 text1: widget.books.tookCount,
                 title2: "Capítulos",

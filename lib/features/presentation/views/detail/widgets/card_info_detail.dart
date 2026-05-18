@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class CardInfoV1Detail extends StatelessWidget {
-  const CardInfoV1Detail({
+class CardInfoDetail extends StatelessWidget {
+  const CardInfoDetail({
     super.key,
     required this.title1,
     required this.title2,
