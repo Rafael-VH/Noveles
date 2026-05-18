@@ -42,7 +42,21 @@ BEGIN
 END;
 $$;
 
--- Step 6: Recreate all write policies with 'scan' role
+-- Step 6: Drop old scan policies (idempotent safe)
+DO $$
+DECLARE
+  tbl TEXT;
+BEGIN
+  FOR tbl IN SELECT unnest(ARRAY['books', 'genres', 'tooks', 'chapters', 'books_genres', 'authors'])
+  LOOP
+    EXECUTE format('DROP POLICY IF EXISTS "Enable insert for scan only" ON %I', tbl);
+    EXECUTE format('DROP POLICY IF EXISTS "Enable update for scan only" ON %I', tbl);
+    EXECUTE format('DROP POLICY IF EXISTS "Enable delete for scan only" ON %I', tbl);
+  END LOOP;
+END;
+$$;
+
+-- Step 7: Recreate all write policies with 'scan' role
 DO $$
 DECLARE
   tbl TEXT;

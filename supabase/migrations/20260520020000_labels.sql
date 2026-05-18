@@ -16,12 +16,18 @@ ALTER TABLE labels ENABLE ROW LEVEL SECURITY;
 ALTER TABLE books_labels ENABLE ROW LEVEL SECURITY;
 
 -- Labels policies
+DROP POLICY IF EXISTS "Enable read for all users" ON labels;
 CREATE POLICY "Enable read for all users" ON labels FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Enable insert for scan and admin" ON labels;
 CREATE POLICY "Enable insert for scan and admin" ON labels FOR INSERT WITH CHECK (public.is_scan() OR public.is_admin());
+DROP POLICY IF EXISTS "Enable update for scan and admin" ON labels;
 CREATE POLICY "Enable update for scan and admin" ON labels FOR UPDATE USING (public.is_scan() OR public.is_admin());
+DROP POLICY IF EXISTS "Enable delete for scan and admin" ON labels;
 CREATE POLICY "Enable delete for scan and admin" ON labels FOR DELETE USING (public.is_scan() OR public.is_admin());
 
--- Books_labels policies
+DROP POLICY IF EXISTS "Enable read for all users" ON books_labels;
 CREATE POLICY "Enable read for all users" ON books_labels FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Enable insert for scan and admin" ON books_labels;
 CREATE POLICY "Enable insert for scan and admin" ON books_labels FOR INSERT WITH CHECK (public.is_scan() OR public.is_admin());
+DROP POLICY IF EXISTS "Enable delete for scan and admin" ON books_labels;
 CREATE POLICY "Enable delete for scan and admin" ON books_labels FOR DELETE USING (public.is_scan() OR public.is_admin());

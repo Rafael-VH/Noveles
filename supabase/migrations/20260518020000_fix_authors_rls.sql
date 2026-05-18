@@ -1,5 +1,6 @@
 -- Fix 1: Agregar política SELECT faltante en authors
 -- RLS está activado pero no hay política de lectura → inner join excluye todos los libros
+DROP POLICY IF EXISTS "Enable read for all users" ON authors;
 CREATE POLICY "Enable read for all users" ON authors
   FOR SELECT USING (true);
 

@@ -3,13 +3,13 @@
 
 -- 1. Agregar columna created_by en books, tooks, chapters
 ALTER TABLE books
-  ADD COLUMN created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL;
+  ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL;
 
 ALTER TABLE tooks
-  ADD COLUMN created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL;
+  ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL;
 
 ALTER TABLE chapters
-  ADD COLUMN created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL;
+  ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL;
 
 -- 2. Asignar las novelas existentes a la cuenta admin
 UPDATE books SET created_by = 'c63c361c-6bc7-4b66-9aac-157e8999271c' WHERE created_by IS NULL;
@@ -42,6 +42,7 @@ DROP POLICY IF EXISTS "Authenticated update" ON tooks;
 -- 4. Agregar política SELECT faltante en authors
 -- La tabla authors tiene RLS activado pero sin política de lectura,
 -- lo que hace que el INNER JOIN authors!inner(*) falle y excluya todos los libros
+DROP POLICY IF EXISTS "Enable read for all users" ON authors;
 CREATE POLICY "Enable read for all users" ON authors
   FOR SELECT USING (true);
 

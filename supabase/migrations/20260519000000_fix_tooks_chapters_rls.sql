@@ -5,5 +5,7 @@
 ALTER TABLE tooks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE chapters ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Enable read for all users" ON tooks;
 CREATE POLICY "Enable read for all users" ON tooks FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Enable read for all users" ON chapters;
 CREATE POLICY "Enable read for all users" ON chapters FOR SELECT USING (true);
