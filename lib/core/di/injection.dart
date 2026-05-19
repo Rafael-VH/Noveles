@@ -52,6 +52,8 @@ import 'package:noveles/features/domain/use_cases/update_profile.dart';
 import 'package:noveles/features/domain/use_cases/update_took.dart';
 import 'package:noveles/features/domain/use_cases/toggle_book_visibility.dart';
 import 'package:noveles/features/domain/use_cases/upload_avatar.dart';
+import 'package:noveles/features/domain/use_cases/get_book_labels.dart';
+import 'package:noveles/features/domain/use_cases/listen_auth_state.dart';
 import 'package:noveles/features/domain/use_cases/upload_cover.dart';
 //
 import 'package:noveles/features/presentation/bloc/scan/scan_bloc.dart';
@@ -114,6 +116,8 @@ void setupDependencies() {
   getIt.registerLazySingleton(() => DeleteLabel(getIt()));
   getIt.registerLazySingleton(() => AssignLabelToBook(getIt()));
   getIt.registerLazySingleton(() => RemoveLabelFromBook(getIt()));
+  getIt.registerLazySingleton(() => GetBookLabels(getIt()));
+  getIt.registerLazySingleton(() => ListenAuthState(getIt()));
 
   // Blocs
   getIt.registerFactory(
@@ -122,6 +126,7 @@ void setupDependencies() {
       register: getIt(),
       logout: getIt(),
       getCurrentUser: getIt(),
+      listenAuthState: getIt(),
     ),
   );
   getIt.registerFactory(
@@ -157,6 +162,7 @@ void setupDependencies() {
       deleteLabel: getIt(),
       assignLabel: getIt(),
       removeLabel: getIt(),
+      getBookLabels: getIt(),
     ),
   );
 

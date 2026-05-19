@@ -8,4 +8,5 @@ abstract class BookRepository {
   Future<void> updateBook(BookEntity book);
   Future<void> deleteBook(int id);
   Future<String> uploadCover(String filePath);
+  Future<Map<int, Set<int>>> getBookLabels();
 }

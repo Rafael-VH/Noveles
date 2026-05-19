@@ -1,5 +1,4 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/domain/use_cases/use_cases.dart';
 import 'package:noveles/features/presentation/bloc/label/label_event.dart';
 import 'package:noveles/features/presentation/bloc/label/label_state.dart';
@@ -10,6 +9,7 @@ class LabelBloc extends Bloc<LabelEvent, LabelState> {
   final DeleteLabel deleteLabel;
   final AssignLabelToBook assignLabel;
   final RemoveLabelFromBook removeLabel;
+  final GetBookLabels getBookLabels;
 
   LabelBloc({
     required this.getLabels,
@@ -17,7 +17,8 @@ class LabelBloc extends Bloc<LabelEvent, LabelState> {
     required this.deleteLabel,
     required this.assignLabel,
     required this.removeLabel,
-  }) : super(LabelInitial()) {
+    required this.getBookLabels,
+  }) : super(const LabelInitial()) {
     on<LoadLabels>(_onLoadLabels);
     on<CreateLabelEvent>(_onCreateLabel);
     on<DeleteLabelEvent>(_onDeleteLabel);
@@ -25,23 +26,14 @@ class LabelBloc extends Bloc<LabelEvent, LabelState> {
     on<RemoveLabelEvent>(_onRemoveLabel);
   }
 
-  Future<Map<int, Set<int>>> _fetchBookLabels() async {
-    final rows = await supabase.from('books_labels').select();
-    final map = <int, Set<int>>{};
-    for (final row in rows) {
-      map.putIfAbsent(row['book_id'], () => {}).add(row['label_id']);
-    }
-    return map;
-  }
-
   Future<void> _emitLoaded(Emitter<LabelState> emit, {String? message}) async {
     final labels = await getLabels();
-    final bookLabels = await _fetchBookLabels();
+    final bookLabels = await getBookLabels();
     emit(LabelLoaded(labels, bookLabels, message: message));
   }
 
   Future<void> _onLoadLabels(LoadLabels event, Emitter<LabelState> emit) async {
-    emit(LabelLoading());
+    emit(const LabelLoading());
     try {
       await _emitLoaded(emit);
     } catch (e) {
