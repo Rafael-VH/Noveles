@@ -52,7 +52,7 @@ void main() {
         isFavorite: false,
         isVisible: true,
         listGenre: const [],
-        listTook: const [],
+        listTook: const [], listLabel: const [],
       ),
     ];
 

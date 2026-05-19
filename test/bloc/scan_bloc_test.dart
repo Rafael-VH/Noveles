@@ -8,16 +8,27 @@ import 'package:noveles/features/presentation/bloc/scan/scan_event.dart';
 import 'package:noveles/features/presentation/bloc/scan/scan_state.dart';
 
 class MockGetBooks extends Mock implements GetBooks {}
+
 class MockCreateBook extends Mock implements CreateBook {}
+
 class MockUpdateBook extends Mock implements UpdateBook {}
+
 class MockDeleteBook extends Mock implements DeleteBook {}
+
 class MockCreateTook extends Mock implements CreateTook {}
+
 class MockUpdateTook extends Mock implements UpdateTook {}
+
 class MockDeleteTook extends Mock implements DeleteTook {}
+
 class MockCreateChapter extends Mock implements CreateChapter {}
+
 class MockUpdateChapter extends Mock implements UpdateChapter {}
+
 class MockDeleteChapter extends Mock implements DeleteChapter {}
+
 class MockGetGenre extends Mock implements GetGenre {}
+
 class MockUploadCover extends Mock implements UploadCover {}
 
 void main() {
@@ -37,33 +48,79 @@ void main() {
 
   final testBooks = [
     BookEntity(
-      id: 1, createdAt: DateTime(2024), cover: 'cover.png',
-      name: 'Test Book', short: '', alternative: '', description: '',
-      authorId: 1, author: 'Author', country: 'JP', state: 'ongoing',
-      type: 'novel', release: '2024', tookCount: '1', chapterCount: '10',
-      source: '', link: '', isFavorite: false, isVisible: true, listGenre: const [], listTook: const [],
+      id: 1,
+      createdAt: DateTime(2024),
+      cover: 'cover.png',
+      name: 'Test Book',
+      short: '',
+      alternative: '',
+      description: '',
+      authorId: 1,
+      author: 'Author',
+      country: 'JP',
+      state: 'ongoing',
+      type: 'novel',
+      release: '2024',
+      tookCount: '1',
+      chapterCount: '10',
+      source: '',
+      link: '',
+      isFavorite: false,
+      isVisible: true,
+      listGenre: const [],
+      listTook: const [],
+      listLabel: const [],
     ),
   ];
 
   setUpAll(() {
     registerFallbackValue(BookEntity(
-      id: 0, createdAt: DateTime(2024), cover: '',
-      name: '', short: '', alternative: '', description: '',
-      authorId: 0, author: '', country: '', state: '',
-      type: '', release: '', tookCount: '', chapterCount: '',
-      source: '', link: '', isFavorite: false, isVisible: true, listGenre: const [], listTook: const [],
+      id: 0,
+      createdAt: DateTime(2024),
+      cover: '',
+      name: '',
+      short: '',
+      alternative: '',
+      description: '',
+      authorId: 0,
+      author: '',
+      country: '',
+      state: '',
+      type: '',
+      release: '',
+      tookCount: '',
+      chapterCount: '',
+      source: '',
+      link: '',
+      isFavorite: false,
+      isVisible: true,
+      listGenre: const [],
+      listTook: const [],
+      listLabel: const [],
     ));
     registerFallbackValue(TookEntity(
-      id: 0, createdAt: DateTime(2024), cover: '',
-      number: '', title: '', chapterCount: '',
-      bookId: 1, listChapter: const [],
+      id: 0,
+      createdAt: DateTime(2024),
+      cover: '',
+      number: '',
+      title: '',
+      chapterCount: '',
+      bookId: 1,
+      listChapter: const [],
     ));
     registerFallbackValue(ChapterEntity(
-      id: 0, createdAt: DateTime(2024), number: '',
-      title: '', content: '', tookId: 1,
+      id: 0,
+      createdAt: DateTime(2024),
+      number: '',
+      title: '',
+      content: '',
+      tookId: 1,
     ));
     registerFallbackValue(GenreEntity(
-      id: 0, createdAt: DateTime(2024), name: '', description: '',
+      id: 0,
+      createdAt: DateTime(2024),
+      name: '',
+      description: '',
     ));
   });
 
@@ -127,7 +184,8 @@ void main() {
       act: (bloc) => bloc.add(LoadScanBooks()),
       expect: () => [
         isA<ScanLoading>(),
-        isA<ScanError>().having((s) => s.message, 'message', contains('Error de red')),
+        isA<ScanError>()
+            .having((s) => s.message, 'message', contains('Error de red')),
       ],
     );
 
@@ -135,8 +193,16 @@ void main() {
       'emits ScanGenresLoaded when LoadScanGenres succeeds',
       build: () {
         final genres = [
-          GenreEntity(id: 1, createdAt: DateTime(2024), name: 'Acción', description: ''),
-          GenreEntity(id: 2, createdAt: DateTime(2024), name: 'Romance', description: ''),
+          GenreEntity(
+              id: 1,
+              createdAt: DateTime(2024),
+              name: 'Acción',
+              description: ''),
+          GenreEntity(
+              id: 2,
+              createdAt: DateTime(2024),
+              name: 'Romance',
+              description: ''),
         ];
         when(() => mockGetGenre()).thenAnswer((_) async => genres);
         return scanBloc;
@@ -187,7 +253,8 @@ void main() {
       act: (bloc) => bloc.add(DeleteScanBook(1)),
       expect: () => [
         isA<ScanLoading>(),
-        isA<ScanLoaded>().having((s) => s.message, 'message', 'Libro eliminado'),
+        isA<ScanLoaded>()
+            .having((s) => s.message, 'message', 'Libro eliminado'),
       ],
     );
 
@@ -208,14 +275,16 @@ void main() {
     blocTest<ScanBloc, ScanState>(
       'emits [ScanLoading, ScanError] when SaveScanBook fails',
       build: () {
-        when(() => mockCreateBook(any())).thenThrow(Exception('Error al crear'));
+        when(() => mockCreateBook(any()))
+            .thenThrow(Exception('Error al crear'));
         when(() => mockGetBooks()).thenAnswer((_) async => testBooks);
         return scanBloc;
       },
       act: (bloc) => bloc.add(SaveScanBook(testBooks.first, isUpdate: false)),
       expect: () => [
         isA<ScanLoading>(),
-        isA<ScanError>().having((s) => s.message, 'message', contains('Error al crear')),
+        isA<ScanError>()
+            .having((s) => s.message, 'message', contains('Error al crear')),
       ],
     );
 
@@ -227,8 +296,15 @@ void main() {
         return scanBloc;
       },
       act: (bloc) => bloc.add(SaveScanTook(
-        TookEntity(id: 1, createdAt: DateTime(2024), cover: '',
-            number: '1', title: '', chapterCount: '', bookId: 1, listChapter: const []),
+        TookEntity(
+            id: 1,
+            createdAt: DateTime(2024),
+            cover: '',
+            number: '1',
+            title: '',
+            chapterCount: '',
+            bookId: 1,
+            listChapter: const []),
         isUpdate: true,
       )),
       expect: () => [
@@ -245,8 +321,15 @@ void main() {
         return scanBloc;
       },
       act: (bloc) => bloc.add(SaveScanTook(
-        TookEntity(id: 0, createdAt: DateTime(2024), cover: '',
-            number: '1', title: '', chapterCount: '', bookId: 1, listChapter: const []),
+        TookEntity(
+            id: 0,
+            createdAt: DateTime(2024),
+            cover: '',
+            number: '1',
+            title: '',
+            chapterCount: '',
+            bookId: 1,
+            listChapter: const []),
         isUpdate: false,
       )),
       expect: () => [
@@ -262,8 +345,15 @@ void main() {
         return scanBloc;
       },
       act: (bloc) => bloc.add(SaveScanTook(
-        TookEntity(id: 0, createdAt: DateTime(2024), cover: '',
-            number: '1', title: '', chapterCount: '', bookId: 1, listChapter: const []),
+        TookEntity(
+            id: 0,
+            createdAt: DateTime(2024),
+            cover: '',
+            number: '1',
+            title: '',
+            chapterCount: '',
+            bookId: 1,
+            listChapter: const []),
         isUpdate: false,
       )),
       expect: () => [
@@ -307,13 +397,19 @@ void main() {
         return scanBloc;
       },
       act: (bloc) => bloc.add(SaveScanChapter(
-        ChapterEntity(id: 1, createdAt: DateTime(2024), number: '1',
-            title: '', content: 'texto', tookId: 1),
+        ChapterEntity(
+            id: 1,
+            createdAt: DateTime(2024),
+            number: '1',
+            title: '',
+            content: 'texto',
+            tookId: 1),
         isUpdate: true,
       )),
       expect: () => [
         isA<ScanLoading>(),
-        isA<ScanLoaded>().having((s) => s.message, 'message', 'Capítulo guardado'),
+        isA<ScanLoaded>()
+            .having((s) => s.message, 'message', 'Capítulo guardado'),
       ],
     );
 
@@ -325,13 +421,19 @@ void main() {
         return scanBloc;
       },
       act: (bloc) => bloc.add(SaveScanChapter(
-        ChapterEntity(id: 0, createdAt: DateTime(2024), number: '1',
-            title: '', content: 'nuevo', tookId: 1),
+        ChapterEntity(
+            id: 0,
+            createdAt: DateTime(2024),
+            number: '1',
+            title: '',
+            content: 'nuevo',
+            tookId: 1),
         isUpdate: false,
       )),
       expect: () => [
         isA<ScanLoading>(),
-        isA<ScanLoaded>().having((s) => s.message, 'message', 'Capítulo creado'),
+        isA<ScanLoaded>()
+            .having((s) => s.message, 'message', 'Capítulo creado'),
       ],
     );
 
@@ -342,8 +444,13 @@ void main() {
         return scanBloc;
       },
       act: (bloc) => bloc.add(SaveScanChapter(
-        ChapterEntity(id: 0, createdAt: DateTime(2024), number: '1',
-            title: '', content: 'nuevo', tookId: 1),
+        ChapterEntity(
+            id: 0,
+            createdAt: DateTime(2024),
+            number: '1',
+            title: '',
+            content: 'nuevo',
+            tookId: 1),
         isUpdate: false,
       )),
       expect: () => [
@@ -362,7 +469,8 @@ void main() {
       act: (bloc) => bloc.add(DeleteScanChapter(1)),
       expect: () => [
         isA<ScanLoading>(),
-        isA<ScanLoaded>().having((s) => s.message, 'message', 'Capítulo eliminado'),
+        isA<ScanLoaded>()
+            .having((s) => s.message, 'message', 'Capítulo eliminado'),
       ],
     );
 

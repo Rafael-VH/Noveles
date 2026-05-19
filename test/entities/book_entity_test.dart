@@ -23,9 +23,9 @@ void main() {
       link: '',
       isFavorite: false,
       isVisible: true,
-      listGenre: [],
-      listTook: [],
-      listLabel: [],
+      listGenre: const [],
+      listTook: const [],
+      listLabel: const [],
     );
 
     test('creates with required values', () {
@@ -61,8 +61,8 @@ void main() {
         link: '',
         isFavorite: false,
         isVisible: true,
-        listGenre: [],
-        listTook: [],
+        listGenre: const [],
+        listTook: const [],
         listLabel: [label],
       );
       expect(book.listLabel.length, 1);
