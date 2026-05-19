@@ -23,7 +23,7 @@ void main() {
   late MockListenAuthState mockListenAuthState;
   late StreamController<AuthChangeEvent> authStateController;
 
-  final testUser = UserEntity(
+  const testUser = UserEntity(
     id: '1',
     email: 'test@example.com',
     role: 'user',

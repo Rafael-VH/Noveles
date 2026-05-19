@@ -93,7 +93,7 @@ void main() {
       },
       act: (bloc) => bloc.add(LoadChapterContent(
         initialIndex: 0,
-        chapters: [],
+        chapters: const [],
       )),
       expect: () => [
         isA<ChapterLoading>(),

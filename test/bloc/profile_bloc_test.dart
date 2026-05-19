@@ -21,7 +21,7 @@ void main() {
   late MockUploadAvatar mockUploadAvatar;
   late MockChangePassword mockChangePassword;
 
-  final testUser = UserEntity(
+  const testUser = UserEntity(
     id: '1',
     email: 'test@example.com',
     role: 'user',
@@ -30,7 +30,7 @@ void main() {
     avatarUrl: null,
   );
 
-  final updatedUser = UserEntity(
+  const updatedUser = UserEntity(
     id: '1',
     email: 'test@example.com',
     role: 'user',
