@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'package:noveles/core/errors/repository_exception.dart';
 import 'package:noveles/core/supabase/supabase_client.dart';
+import 'package:noveles/features/data/models/models.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/domain/repositories/repositories.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -15,9 +17,13 @@ class ProfilesRepositoryImpl implements ProfilesRepository {
           .select('*')
           .eq('id', user.id)
           .single();
-      return _mapToEntity(response);
+      return UserModel.fromJson(response);
     } catch (e) {
-      throw Exception('Error al obtener perfil: $e');
+      throw RepositoryException(
+        message: 'Error al obtener perfil',
+        originalException: e,
+        repositoryName: 'ProfilesRepository',
+      );
     }
   }
 
@@ -36,9 +42,13 @@ class ProfilesRepositoryImpl implements ProfilesRepository {
           .update(data)
           .eq('id', user.id)
           .single();
-      return _mapToEntity(response);
+      return UserModel.fromJson(response);
     } catch (e) {
-      throw Exception('Error al actualizar perfil: $e');
+      throw RepositoryException(
+        message: 'Error al actualizar perfil',
+        originalException: e,
+        repositoryName: 'ProfilesRepository',
+      );
     }
   }
 
@@ -56,7 +66,11 @@ class ProfilesRepositoryImpl implements ProfilesRepository {
       final url = supabase.storage.from('avatars').getPublicUrl(path);
       return '$url?v=${DateTime.now().millisecondsSinceEpoch}';
     } catch (e) {
-      throw Exception('Error al subir avatar: $e');
+      throw RepositoryException(
+        message: 'Error al subir avatar',
+        originalException: e,
+        repositoryName: 'ProfilesRepository',
+      );
     }
   }
 
@@ -65,18 +79,11 @@ class ProfilesRepositoryImpl implements ProfilesRepository {
     try {
       await supabase.auth.updateUser(UserAttributes(password: newPassword));
     } catch (e) {
-      throw Exception('Error al cambiar contraseña: $e');
+      throw RepositoryException(
+        message: 'Error al cambiar contraseña',
+        originalException: e,
+        repositoryName: 'ProfilesRepository',
+      );
     }
-  }
-
-  UserEntity _mapToEntity(Map<String, dynamic> data) {
-    return UserEntity(
-      id: data['id'],
-      email: supabase.auth.currentUser?.email ?? '',
-      role: data['role'] ?? 'user',
-      displayName: data['display_name'],
-      bio: data['bio'],
-      avatarUrl: data['avatar_url'],
-    );
   }
 }

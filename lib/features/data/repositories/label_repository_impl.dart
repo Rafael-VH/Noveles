@@ -1,4 +1,6 @@
+import 'package:noveles/core/errors/repository_exception.dart';
 import 'package:noveles/core/supabase/supabase_client.dart';
+import 'package:noveles/features/data/models/models.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/domain/repositories/repositories.dart';
 
@@ -10,14 +12,13 @@ class LabelRepositoryImpl implements LabelRepository {
           .from('labels')
           .select()
           .order('id');
-      return response.map((json) => LabelEntity(
-        id: json['id'],
-        createdAt: DateTime.parse(json['created_at']),
-        name: json['name'] ?? '',
-        color: json['color'] ?? '#71A202',
-      )).toList();
+      return response.map((json) => LabelModel.fromJson(json)).toList();
     } catch (e) {
-      throw Exception('Error al obtener etiquetas: $e');
+      throw RepositoryException(
+        message: 'Error al obtener etiquetas',
+        originalException: e,
+        repositoryName: 'LabelRepository',
+      );
     }
   }
 
@@ -26,7 +27,11 @@ class LabelRepositoryImpl implements LabelRepository {
     try {
       await supabase.from('labels').insert({'name': name, 'color': color});
     } catch (e) {
-      throw Exception('Error al crear etiqueta: $e');
+      throw RepositoryException(
+        message: 'Error al crear etiqueta',
+        originalException: e,
+        repositoryName: 'LabelRepository',
+      );
     }
   }
 
@@ -35,7 +40,11 @@ class LabelRepositoryImpl implements LabelRepository {
     try {
       await supabase.from('labels').delete().eq('id', id);
     } catch (e) {
-      throw Exception('Error al eliminar etiqueta: $e');
+      throw RepositoryException(
+        message: 'Error al eliminar etiqueta',
+        originalException: e,
+        repositoryName: 'LabelRepository',
+      );
     }
   }
 
@@ -47,7 +56,11 @@ class LabelRepositoryImpl implements LabelRepository {
         'label_id': labelId,
       });
     } catch (e) {
-      throw Exception('Error al asignar etiqueta: $e');
+      throw RepositoryException(
+        message: 'Error al asignar etiqueta',
+        originalException: e,
+        repositoryName: 'LabelRepository',
+      );
     }
   }
 
@@ -60,7 +73,11 @@ class LabelRepositoryImpl implements LabelRepository {
           .eq('book_id', bookId)
           .eq('label_id', labelId);
     } catch (e) {
-      throw Exception('Error al quitar etiqueta: $e');
+      throw RepositoryException(
+        message: 'Error al quitar etiqueta',
+        originalException: e,
+        repositoryName: 'LabelRepository',
+      );
     }
   }
 }

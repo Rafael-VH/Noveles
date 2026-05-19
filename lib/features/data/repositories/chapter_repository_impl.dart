@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:noveles/core/errors/repository_exception.dart';
 import 'package:noveles/core/supabase/chapter_cache.dart';
 import 'package:noveles/core/supabase/supabase_client.dart';
+import 'package:noveles/features/data/models/models.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/domain/repositories/repositories.dart';
 
@@ -11,9 +13,13 @@ class ChapterRepositoryImpl implements ChapterRepository {
     try {
       final response =
           await supabase.from('chapters').select('*').order('id').limit(100);
-      return response.map((json) => _mapToChapterEntity(json)).toList();
+      return response.map((json) => ChapterModel.fromJson(json)).toList();
     } catch (e) {
-      throw Exception('Error al obtener capítulos: $e');
+      throw RepositoryException(
+        message: 'Error al obtener capítulos',
+        originalException: e,
+        repositoryName: 'ChapterRepository',
+      );
     }
   }
 
@@ -26,28 +32,20 @@ class ChapterRepositoryImpl implements ChapterRepository {
           .eq('id', id)
           .maybeSingle();
       if (response == null) return null;
-      return _mapToChapterEntity(response);
+      return ChapterModel.fromJson(response);
     } catch (e) {
-      throw Exception('Error al obtener capítulo: $e');
+      throw RepositoryException(
+        message: 'Error al obtener capítulo',
+        originalException: e,
+        repositoryName: 'ChapterRepository',
+      );
     }
-  }
-
-  ChapterEntity _mapToChapterEntity(Map<String, dynamic> json) {
-    return ChapterEntity(
-      id: json['id'],
-      createdAt: DateTime.parse(json['created_at']),
-      number: json['number'] ?? '',
-      title: json['title'] ?? '',
-      content: json['content'] ?? '',
-      tookId: json['took_id'] ?? 0,
-    );
   }
 
   @override
   Future<void> createChapter(ChapterEntity chapter) async {
     try {
       await supabase.from('chapters').insert({
-        'id': chapter.id,
         'created_at': chapter.createdAt.toIso8601String(),
         'number': chapter.number,
         'title': chapter.title,
@@ -55,7 +53,11 @@ class ChapterRepositoryImpl implements ChapterRepository {
         'took_id': chapter.tookId,
       });
     } catch (e) {
-      throw Exception('Error al crear capítulo: $e');
+      throw RepositoryException(
+        message: 'Error al crear capítulo',
+        originalException: e,
+        repositoryName: 'ChapterRepository',
+      );
     }
   }
 
@@ -69,7 +71,11 @@ class ChapterRepositoryImpl implements ChapterRepository {
         'took_id': chapter.tookId,
       }).eq('id', chapter.id);
     } catch (e) {
-      throw Exception('Error al actualizar capítulo: $e');
+      throw RepositoryException(
+        message: 'Error al actualizar capítulo',
+        originalException: e,
+        repositoryName: 'ChapterRepository',
+      );
     }
   }
 
@@ -78,7 +84,11 @@ class ChapterRepositoryImpl implements ChapterRepository {
     try {
       await supabase.from('chapters').delete().eq('id', id);
     } catch (e) {
-      throw Exception('Error al eliminar capítulo: $e');
+      throw RepositoryException(
+        message: 'Error al eliminar capítulo',
+        originalException: e,
+        repositoryName: 'ChapterRepository',
+      );
     }
   }
 
@@ -92,7 +102,11 @@ class ChapterRepositoryImpl implements ChapterRepository {
       await ChapterCache.save(path, bytes);
       return content;
     } catch (e) {
-      throw Exception('Error al descargar contenido: $e');
+      throw RepositoryException(
+        message: 'Error al descargar contenido',
+        originalException: e,
+        repositoryName: 'ChapterRepository',
+      );
     }
   }
 }

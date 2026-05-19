@@ -1,7 +1,8 @@
 import 'dart:io';
+import 'package:noveles/core/errors/repository_exception.dart';
 import 'package:noveles/core/supabase/supabase_client.dart';
+import 'package:noveles/features/data/models/models.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
-import 'package:noveles/features/domain/entities/label_entity.dart';
 import 'package:noveles/features/domain/repositories/repositories.dart';
 
 class BookRepositoryImpl implements BookRepository {
@@ -18,9 +19,13 @@ class BookRepositoryImpl implements BookRepository {
       }
 
       final response = await query.order('id').limit(100);
-      return response.map((json) => _mapToBookEntity(json)).toList();
+      return response.map((json) => BookModel.fromJson(json)).toList();
     } catch (e) {
-      throw Exception('Error al obtener libros: $e');
+      throw RepositoryException(
+        message: 'Error al obtener libros',
+        originalException: e,
+        repositoryName: 'BookRepository',
+      );
     }
   }
 
@@ -35,83 +40,14 @@ class BookRepositoryImpl implements BookRepository {
           .maybeSingle();
 
       if (response == null) return null;
-      return _mapToBookEntity(response);
+      return BookModel.fromJson(response);
     } catch (e) {
-      throw Exception('Error al obtener libro: $e');
+      throw RepositoryException(
+        message: 'Error al obtener libro',
+        originalException: e,
+        repositoryName: 'BookRepository',
+      );
     }
-  }
-
-  BookEntity _mapToBookEntity(Map<String, dynamic> json) {
-    final authorData = Map<String, dynamic>.from(json['authors']);
-
-    final listGenre = (json['books_genres'] as List<dynamic>).map((bg) {
-      final g = Map<String, dynamic>.from(bg['genres']);
-      return GenreEntity(
-        id: g['id'],
-        createdAt: DateTime.parse(g['created_at']),
-        name: g['name'] ?? '',
-        description: g['description'] ?? '',
-      );
-    }).toList();
-
-    final listLabel = ((json['books_labels'] as List<dynamic>?) ?? []).map((bl) {
-      final l = Map<String, dynamic>.from(bl['labels']);
-      return LabelEntity(
-        id: l['id'],
-        createdAt: DateTime.parse(l['created_at']),
-        name: l['name'] ?? '',
-        color: l['color'] ?? '#71A202',
-      );
-    }).toList();
-
-    final listTook = ((json['tooks'] as List<dynamic>?) ?? []).map((t) {
-      final took = Map<String, dynamic>.from(t);
-      final chapters = ((took['chapters'] as List<dynamic>?) ?? []).map((ch) {
-        return ChapterEntity(
-          id: ch['id'],
-          createdAt: DateTime.parse(ch['created_at']),
-          number: ch['number'] ?? '',
-          title: ch['title'] ?? '',
-          content: ch['content'] ?? '',
-          tookId: ch['took_id'] ?? 0,
-        );
-      }).toList();
-      return TookEntity(
-        id: took['id'],
-        createdAt: DateTime.parse(took['created_at']),
-        cover: took['cover'] ?? '',
-        number: took['number'] ?? '',
-        title: took['title'] ?? '',
-        chapterCount: took['content'] ?? '',
-        bookId: took['book_id'] ?? 0,
-        listChapter: chapters,
-      );
-    }).toList();
-
-    return BookEntity(
-      id: json['id'],
-      createdAt: DateTime.parse(json['created_at']),
-      cover: json['cover'] ?? '',
-      name: json['name'] ?? '',
-      short: json['short'] ?? '',
-      alternative: json['alternative'] ?? '',
-      description: json['description'] ?? '',
-      authorId: json['author_id'] ?? 0,
-      author: authorData['name'] ?? '',
-      country: json['country'] ?? '',
-      state: json['state'] ?? '',
-      type: json['type'] ?? '',
-      release: json['release'] ?? '',
-      tookCount: json['took_count'] ?? '',
-      chapterCount: json['chapter_count'] ?? '',
-      source: json['source'] ?? '',
-      link: json['link'] ?? '',
-      isFavorite: json['is_favorite'] ?? false,
-      isVisible: json['is_visible'] ?? true,
-      listGenre: listGenre,
-      listTook: listTook,
-      listLabel: listLabel,
-    );
   }
 
   @override
@@ -154,6 +90,7 @@ class BookRepositoryImpl implements BookRepository {
             'source': book.source,
             'link': book.link,
             'is_favorite': book.isFavorite,
+            'created_by': supabase.auth.currentUser!.id,
           })
           .select('id')
           .single();
@@ -171,7 +108,11 @@ class BookRepositoryImpl implements BookRepository {
         });
       }
     } catch (e) {
-      throw Exception('Error al crear libro: $e');
+      throw RepositoryException(
+        message: 'Error al crear libro',
+        originalException: e,
+        repositoryName: 'BookRepository',
+      );
     }
   }
 
@@ -210,7 +151,11 @@ class BookRepositoryImpl implements BookRepository {
         });
       }
     } catch (e) {
-      throw Exception('Error al actualizar libro: $e');
+      throw RepositoryException(
+        message: 'Error al actualizar libro',
+        originalException: e,
+        repositoryName: 'BookRepository',
+      );
     }
   }
 
@@ -226,7 +171,11 @@ class BookRepositoryImpl implements BookRepository {
       await supabase.from('tooks').delete().eq('book_id', id);
       await supabase.from('books').delete().eq('id', id);
     } catch (e) {
-      throw Exception('Error al eliminar libro: $e');
+      throw RepositoryException(
+        message: 'Error al eliminar libro',
+        originalException: e,
+        repositoryName: 'BookRepository',
+      );
     }
   }
 
@@ -238,7 +187,11 @@ class BookRepositoryImpl implements BookRepository {
           .update({'is_visible': isVisible})
           .eq('id', bookId);
     } catch (e) {
-      throw Exception('Error al cambiar visibilidad: $e');
+      throw RepositoryException(
+        message: 'Error al cambiar visibilidad',
+        originalException: e,
+        repositoryName: 'BookRepository',
+      );
     }
   }
 
@@ -251,7 +204,29 @@ class BookRepositoryImpl implements BookRepository {
       await supabase.storage.from('covers').upload(filename, file);
       return filename;
     } catch (e) {
-      throw Exception('Error al subir cover: $e');
+      throw RepositoryException(
+        message: 'Error al subir cover',
+        originalException: e,
+        repositoryName: 'BookRepository',
+      );
+    }
+  }
+
+  @override
+  Future<Map<int, Set<int>>> getBookLabels() async {
+    try {
+      final rows = await supabase.from('books_labels').select();
+      final map = <int, Set<int>>{};
+      for (final row in rows) {
+        map.putIfAbsent(row['book_id'], () => {}).add(row['label_id']);
+      }
+      return map;
+    } catch (e) {
+      throw RepositoryException(
+        message: 'Error al obtener etiquetas de libros',
+        originalException: e,
+        repositoryName: 'BookRepository',
+      );
     }
   }
 }

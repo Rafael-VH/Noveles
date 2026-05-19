@@ -1,4 +1,6 @@
+import 'package:noveles/core/errors/repository_exception.dart';
 import 'package:noveles/core/supabase/supabase_client.dart';
+import 'package:noveles/features/data/models/models.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/domain/repositories/repositories.dart';
 
@@ -13,10 +15,14 @@ class TookRepositoryImpl implements TookRepository {
           .limit(100);
 
       return response
-          .map((json) => _mapToTookEntity(Map<String, dynamic>.from(json)))
+          .map((json) => TookModel.fromJson(Map<String, dynamic>.from(json)))
           .toList();
     } catch (e) {
-      throw Exception('Error al obtener tomos: $e');
+      throw RepositoryException(
+        message: 'Error al obtener tomos',
+        originalException: e,
+        repositoryName: 'TookRepository',
+      );
     }
   }
 
@@ -30,50 +36,33 @@ class TookRepositoryImpl implements TookRepository {
           .maybeSingle();
 
       if (response == null) return null;
-      return _mapToTookEntity(Map<String, dynamic>.from(response));
+      return TookModel.fromJson(Map<String, dynamic>.from(response));
     } catch (e) {
-      throw Exception('Error al obtener tomo: $e');
-    }
-  }
-
-  TookEntity _mapToTookEntity(Map<String, dynamic> json) {
-    final chapters = ((json['chapters'] as List<dynamic>?) ?? []).map((ch) {
-      return ChapterEntity(
-        id: ch['id'],
-        createdAt: DateTime.parse(ch['created_at']),
-        number: ch['number'] ?? '',
-        title: ch['title'] ?? '',
-        content: ch['content'] ?? '',
-        tookId: ch['took_id'] ?? 0,
+      throw RepositoryException(
+        message: 'Error al obtener tomo',
+        originalException: e,
+        repositoryName: 'TookRepository',
       );
-    }).toList();
-
-    return TookEntity(
-      id: json['id'],
-      createdAt: DateTime.parse(json['created_at']),
-      cover: json['cover'] ?? '',
-      number: json['number'] ?? '',
-      title: json['title'] ?? '',
-      chapterCount: json['content'] ?? '',
-      bookId: json['book_id'] ?? 0,
-      listChapter: chapters,
-    );
+    }
   }
 
   @override
   Future<void> createTook(TookEntity took) async {
     try {
       await supabase.from('tooks').insert({
-        'id': took.id,
         'created_at': took.createdAt.toIso8601String(),
         'cover': took.cover,
         'number': took.number,
         'title': took.title,
-        'content': took.chapterCount,
+        'chapter_count': took.chapterCount,
         'book_id': took.bookId,
       });
     } catch (e) {
-      throw Exception('Error al crear tomo: $e');
+      throw RepositoryException(
+        message: 'Error al crear tomo',
+        originalException: e,
+        repositoryName: 'TookRepository',
+      );
     }
   }
 
@@ -84,11 +73,15 @@ class TookRepositoryImpl implements TookRepository {
         'cover': took.cover,
         'number': took.number,
         'title': took.title,
-        'content': took.chapterCount,
+        'chapter_count': took.chapterCount,
         'book_id': took.bookId,
       }).eq('id', took.id);
     } catch (e) {
-      throw Exception('Error al actualizar tomo: $e');
+      throw RepositoryException(
+        message: 'Error al actualizar tomo',
+        originalException: e,
+        repositoryName: 'TookRepository',
+      );
     }
   }
 
@@ -98,7 +91,11 @@ class TookRepositoryImpl implements TookRepository {
       await supabase.from('chapters').delete().eq('took_id', id);
       await supabase.from('tooks').delete().eq('id', id);
     } catch (e) {
-      throw Exception('Error al eliminar tomo: $e');
+      throw RepositoryException(
+        message: 'Error al eliminar tomo',
+        originalException: e,
+        repositoryName: 'TookRepository',
+      );
     }
   }
 }

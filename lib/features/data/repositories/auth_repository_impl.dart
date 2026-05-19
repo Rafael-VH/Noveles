@@ -1,6 +1,8 @@
+import 'package:noveles/core/errors/repository_exception.dart';
 import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/domain/repositories/repositories.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show AuthChangeEvent;
 
 class AuthRepositoryImpl implements AuthRepository {
   @override
@@ -21,7 +23,11 @@ class AuthRepositoryImpl implements AuthRepository {
         role: profile['role'] ?? 'user',
       );
     } catch (e) {
-      throw Exception('Error al iniciar sesión: $e');
+      throw RepositoryException(
+        message: 'Error al iniciar sesión',
+        originalException: e,
+        repositoryName: 'AuthRepository',
+      );
     }
   }
 
@@ -34,7 +40,7 @@ class AuthRepositoryImpl implements AuthRepository {
       );
 
       final user = response.user;
-      if (user == null) throw Exception('Error al registrarse');
+      if (user == null) throw const RepositoryException(message: 'Error al registrarse');
 
       final profile = await _getProfile(user.id);
       return UserEntity(
@@ -43,7 +49,11 @@ class AuthRepositoryImpl implements AuthRepository {
         role: profile['role'] ?? 'user',
       );
     } catch (e) {
-      throw Exception('Error al registrarse: $e');
+      throw RepositoryException(
+        message: 'Error al registrarse',
+        originalException: e,
+        repositoryName: 'AuthRepository',
+      );
     }
   }
 
@@ -52,7 +62,11 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       await supabase.auth.signOut();
     } catch (e) {
-      throw Exception('Error al cerrar sesión: $e');
+      throw RepositoryException(
+        message: 'Error al cerrar sesión',
+        originalException: e,
+        repositoryName: 'AuthRepository',
+      );
     }
   }
 
@@ -74,9 +88,17 @@ class AuthRepositoryImpl implements AuthRepository {
         return null;
       }
     } catch (e) {
-      throw Exception('Error al obtener usuario actual: $e');
+      throw RepositoryException(
+        message: 'Error al obtener usuario actual',
+        originalException: e,
+        repositoryName: 'AuthRepository',
+      );
     }
   }
+
+  @override
+  Stream<AuthChangeEvent> onAuthStateChange() =>
+      supabase.auth.onAuthStateChange.map((data) => data.event);
 
   Future<Map<String, dynamic>> _getProfile(String userId) async {
     try {
@@ -96,7 +118,11 @@ class AuthRepositoryImpl implements AuthRepository {
 
       return Map<String, dynamic>.from(response);
     } catch (e) {
-      throw Exception('Error al obtener perfil: $e');
+      throw RepositoryException(
+        message: 'Error al obtener perfil',
+        originalException: e,
+        repositoryName: 'AuthRepository',
+      );
     }
   }
 }

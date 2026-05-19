@@ -1,4 +1,6 @@
+import 'package:noveles/core/errors/repository_exception.dart';
 import 'package:noveles/core/supabase/supabase_client.dart';
+import 'package:noveles/features/data/models/models.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/domain/repositories/repositories.dart';
 
@@ -8,9 +10,13 @@ class GenreRepositoryImpl implements GenreRepository {
     try {
       final response =
           await supabase.from('genres').select('*').order('id').limit(100);
-      return response.map((json) => _mapToGenreEntity(json)).toList();
+      return response.map((json) => GenreModel.fromJson(json)).toList();
     } catch (e) {
-      throw Exception('Error al obtener géneros: $e');
+      throw RepositoryException(
+        message: 'Error al obtener géneros',
+        originalException: e,
+        repositoryName: 'GenreRepository',
+      );
     }
   }
 
@@ -20,19 +26,14 @@ class GenreRepositoryImpl implements GenreRepository {
       final response =
           await supabase.from('genres').select('*').eq('id', id).maybeSingle();
       if (response == null) return null;
-      return _mapToGenreEntity(response);
+      return GenreModel.fromJson(response);
     } catch (e) {
-      throw Exception('Error al obtener género: $e');
+      throw RepositoryException(
+        message: 'Error al obtener género',
+        originalException: e,
+        repositoryName: 'GenreRepository',
+      );
     }
-  }
-
-  GenreEntity _mapToGenreEntity(Map<String, dynamic> json) {
-    return GenreEntity(
-      id: json['id'],
-      createdAt: DateTime.parse(json['created_at']),
-      name: json['name'] ?? '',
-      description: json['description'] ?? '',
-    );
   }
 
   @override
@@ -45,7 +46,11 @@ class GenreRepositoryImpl implements GenreRepository {
         'description': genre.description,
       });
     } catch (e) {
-      throw Exception('Error al crear género: $e');
+      throw RepositoryException(
+        message: 'Error al crear género',
+        originalException: e,
+        repositoryName: 'GenreRepository',
+      );
     }
   }
 
@@ -57,7 +62,11 @@ class GenreRepositoryImpl implements GenreRepository {
         'description': genre.description,
       }).eq('id', genre.id);
     } catch (e) {
-      throw Exception('Error al actualizar género: $e');
+      throw RepositoryException(
+        message: 'Error al actualizar género',
+        originalException: e,
+        repositoryName: 'GenreRepository',
+      );
     }
   }
 
@@ -66,7 +75,11 @@ class GenreRepositoryImpl implements GenreRepository {
     try {
       await supabase.from('genres').delete().eq('id', id);
     } catch (e) {
-      throw Exception('Error al eliminar género: $e');
+      throw RepositoryException(
+        message: 'Error al eliminar género',
+        originalException: e,
+        repositoryName: 'GenreRepository',
+      );
     }
   }
 }
