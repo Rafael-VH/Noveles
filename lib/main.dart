@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:noveles/core/app/app.dart';
 import 'package:noveles/core/di/injection.dart';
@@ -13,8 +12,6 @@ Future<void> main() async {
     url: dotenv.env['SUPABASE_URL']!,
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
-
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
   setupDependencies();
 

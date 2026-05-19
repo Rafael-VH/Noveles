@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/domain/helpers/text_stats.dart';
@@ -35,6 +36,7 @@ class _ChapterScreenState extends State<ChapterScreen> {
 
   @override
   void initState() {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
     super.initState();
     textEditingController.text = textSize.toString();
     scrollController.addListener(() {
@@ -58,6 +60,7 @@ class _ChapterScreenState extends State<ChapterScreen> {
 
   @override
   void dispose() {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     textEditingController.dispose();
     scrollController.dispose();
     super.dispose();
