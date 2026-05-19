@@ -30,25 +30,23 @@ class _GenreScreenState extends State<GenreScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      slivers: [
-        SliverAppBar(
-          title: Text('Genero: ${widget.genre}'),
-        ),
-        widget.books.isEmpty
-            ? const SliverToBoxAdapter(
-                child: Center(child: Text('No books available for this genre')))
-            : SliverGrid(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 8.0,
-                  crossAxisSpacing: 8.0,
-                  childAspectRatio: 0.65,
-                ),
-                delegate: SliverChildBuilderDelegate(
-                  childCount: widget.books.length,
-                  (BuildContext context, int index) {
-                    final book = widget.books[index];
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Género: ${widget.genre}'),
+      ),
+      body: filteredBooks.isEmpty
+          ? const Center(child: Text('No hay libros disponibles para este género'))
+          : GridView.builder(
+              padding: const EdgeInsets.all(8),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 8.0,
+                crossAxisSpacing: 8.0,
+                childAspectRatio: 0.65,
+              ),
+              itemCount: filteredBooks.length,
+              itemBuilder: (BuildContext context, int index) {
+                final book = filteredBooks[index];
 
                     return Card(
                       child: Stack(
@@ -100,8 +98,6 @@ class _GenreScreenState extends State<GenreScreen> {
                     );
                   },
                 ),
-              ),
-      ],
     );
   }
 }

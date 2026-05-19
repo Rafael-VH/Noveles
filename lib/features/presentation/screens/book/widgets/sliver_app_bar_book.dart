@@ -9,19 +9,14 @@ class SliverAppBarBook extends StatelessWidget {
   const SliverAppBarBook({
     super.key,
     required this.books,
-    required this.infoIcon,
   });
 
   final BookEntity books;
-  final IconButton infoIcon;
 
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
       title: const Text('Details'),
-      actions: [
-        infoIcon,
-      ],
       backgroundColor: Colors.transparent,
       centerTitle: true,
       elevation: 0,

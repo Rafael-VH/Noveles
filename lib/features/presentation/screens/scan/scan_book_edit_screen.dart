@@ -63,7 +63,7 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
         setState(() => _allGenres = state.genres);
       } else if (state is ScanCoverUploaded && mounted) {
         setState(() => _coverCtrl.text = state.filename);
-      } else if (state is ScanLoaded && mounted) {
+      } else if (state is ScanLoaded && mounted && !_isSaving) {
         final match = state.books.firstWhere(
           (b) =>
               b.id == widget.book?.id ||
@@ -133,13 +133,14 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
       link: _linkCtrl.text.trim(),
       isFavorite: widget.book?.isFavorite ?? false,
       isVisible: widget.book?.isVisible ?? true,
+      listLabel: widget.book?.listLabel ?? [],
       listGenre:
           _allGenres.where((g) => _selectedGenreIds.contains(g.id)).toList(),
       listTook: widget.book?.listTook ?? [],
     );
 
     // Save book
-    setState(() => _isSaving = true);
+    if (mounted) setState(() => _isSaving = true);
 
     // Listen for result
     try {

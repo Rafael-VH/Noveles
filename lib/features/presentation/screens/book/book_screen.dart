@@ -47,33 +47,6 @@ class _BookScreenState extends State<BookScreen>
     super.dispose();
   }
 
-  void showInfoDialog() {
-    showDialog(
-      context: context,
-      useSafeArea: true,
-      barrierDismissible: true,
-      useRootNavigator: true,
-      barrierColor:
-          Theme.of(context).colorScheme.surface.withValues(alpha: 0.85),
-      builder: (context) => AlertDialog(
-        scrollable: true,
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        actions: [
-          ElevatedButton(
-            onPressed: () {},
-            child: const Text("Aceptar"),
-          ),
-        ],
-        title: const Center(
-          child: Text('Información'),
-        ),
-        content: const Column(
-          children: [],
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,13 +54,7 @@ class _BookScreenState extends State<BookScreen>
         child: NestedScrollView(
           headerSliverBuilder: (context, _) {
             return [
-              SliverAppBarBook(
-                books: widget.books,
-                infoIcon: IconButton(
-                  onPressed: () => showInfoDialog(),
-                  icon: const Icon(Icons.info_outlined),
-                ),
-              ),
+              SliverAppBarBook(books: widget.books),
               SliverPersistentHeaderBook(
                 tabController: _tabController,
                 tabs: nameTab,
