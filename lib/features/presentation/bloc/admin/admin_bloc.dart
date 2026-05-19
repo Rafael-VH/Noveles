@@ -4,7 +4,6 @@ import 'package:noveles/features/domain/use_cases/toggle_book_visibility.dart' a
 import 'package:noveles/features/presentation/bloc/admin/admin_event.dart';
 import 'package:noveles/features/presentation/bloc/admin/admin_state.dart';
 
-// Bloc para la gestión de libros en el panel de administración
 class AdminBloc extends Bloc<AdminEvent, AdminState> {
   final GetBooks getBooks;
   final usecases.ToggleBookVisibility toggleBookVisibility;
@@ -17,7 +16,6 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     on<ToggleBookVisibility>(_onToggleVisibility);
   }
 
-  // Carga la lista de libros para el panel de administración
   Future<void> _onLoadBooks(
     LoadAdminBooks event,
     Emitter<AdminState> emit,
@@ -31,7 +29,6 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     }
   }
 
-  // Alterna la visibilidad de un libro en el panel de administración
   Future<void> _onToggleVisibility(
     ToggleBookVisibility event,
     Emitter<AdminState> emit,

@@ -4,7 +4,6 @@ import 'package:noveles/features/domain/use_cases/use_cases.dart';
 import 'package:noveles/features/presentation/bloc/scan/scan_event.dart';
 import 'package:noveles/features/presentation/bloc/scan/scan_state.dart';
 
-// ScanBloc es un Bloc que maneja los eventos y estados relacionados con la administración de libros, tomos, capítulos y géneros en la aplicación. Utiliza casos de uso para interactuar con el dominio y actualizar el estado en consecuencia. El ScanBloc escucha eventos como cargar libros, cargar géneros, subir portadas, guardar o eliminar libros, tomos y capítulos, y emite estados que reflejan el resultado de esas operaciones, como carga exitosa, carga fallida o carga en progreso.
 class ScanBloc extends Bloc<ScanEvent, ScanState> {
   final GetBooks getBooks;
   final CreateBook createBook;
@@ -44,7 +43,6 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     on<DeleteScanChapter>(_onDeleteChapter);
   }
 
-  // Sube una portada y emite el estado con el nombre del archivo subido o un error si falla
   Future<void> _onUploadCover(
     UploadScanCover event,
     Emitter<ScanState> emit,
@@ -57,7 +55,6 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     }
   }
 
-  // Carga los géneros y mantiene los libros cargados si ya se han cargado
   Future<void> _onLoadGenres(
     LoadScanGenres event,
     Emitter<ScanState> emit,
@@ -76,7 +73,6 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     }
   }
 
-  // Carga los libros y mantiene los géneros cargados si ya se han cargado
   Future<void> _onLoadBooks(
     LoadScanBooks event,
     Emitter<ScanState> emit,
@@ -90,7 +86,6 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     }
   }
 
-  // Guarda o actualiza un libro, luego recarga la lista de libros para reflejar los cambios
   Future<void> _onSaveBook(
     SaveScanBook event,
     Emitter<ScanState> emit,
@@ -110,7 +105,6 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     }
   }
 
-  // Elimina un libro, luego recarga la lista de libros para reflejar los cambios
   Future<void> _onDeleteBook(
     DeleteScanBook event,
     Emitter<ScanState> emit,
@@ -125,7 +119,6 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     }
   }
 
-  // Guarda o actualiza un tomo, luego recarga la lista de libros para reflejar los cambios
   Future<void> _onSaveTook(
     SaveScanTook event,
     Emitter<ScanState> emit,
@@ -144,7 +137,6 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     }
   }
 
-  // Elimina un tomo, luego recarga la lista de libros para reflejar los cambios
   Future<void> _onDeleteTook(
     DeleteScanTook event,
     Emitter<ScanState> emit,
@@ -158,7 +150,6 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     }
   }
 
-  // Guarda o actualiza un capítulo, luego recarga la lista de libros para reflejar los cambios
   Future<void> _onSaveChapter(
     SaveScanChapter event,
     Emitter<ScanState> emit,
@@ -177,7 +168,6 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     }
   }
 
-  // Elimina un capítulo, luego recarga la lista de libros para reflejar los cambios
   Future<void> _onDeleteChapter(
     DeleteScanChapter event,
     Emitter<ScanState> emit,

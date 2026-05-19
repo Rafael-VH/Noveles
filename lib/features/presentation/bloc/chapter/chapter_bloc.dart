@@ -4,7 +4,6 @@ import 'package:noveles/features/domain/use_cases/use_cases.dart';
 import 'package:noveles/features/presentation/bloc/chapter/chapter_event.dart';
 import 'package:noveles/features/presentation/bloc/chapter/chapter_state.dart';
 
-// ChapterBloc es una clase que extiende Bloc y se encarga de manejar los eventos relacionados con los capítulos y emitir los estados correspondientes.
 class ChapterBloc extends Bloc<ChapterEvent, ChapterState> {
   final GetChapterContent getChapterContent;
 
@@ -12,7 +11,6 @@ class ChapterBloc extends Bloc<ChapterEvent, ChapterState> {
     on<LoadChapterContent>(_onLoadContent);
   }
 
-  // Método que maneja el evento LoadChapterContent, que se encarga de cargar el contenido de un capítulo específico. Este método emite un estado de carga mientras se realiza la operación, y luego emite un estado de éxito con la lista de capítulos cargados o un estado de error si ocurre algún problema durante la carga.
   Future<void> _onLoadContent(
     LoadChapterContent event,
     Emitter<ChapterState> emit,
