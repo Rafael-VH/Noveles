@@ -22,24 +22,36 @@ class App extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             title: 'NovelEs',
             theme: state.themeData,
-            home: BlocBuilder<AuthBloc, AuthState>(
-              builder: (context, authState) {
-                if (authState is AuthLoading) {
-                  return const Scaffold(
-                    body: Center(child: CircularProgressIndicator()),
+            home: BlocListener<AuthBloc, AuthState>(
+              listener: (context, state) {
+                if (state is AuthError) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(state.message),
+                      backgroundColor: Theme.of(context).colorScheme.error,
+                    ),
                   );
                 }
-                if (authState is AuthAuthenticated) {
-                  if (authState.user.isAdmin) {
-                    return const AdminMainScreen();
-                  }
-                  if (authState.user.isScan) {
-                    return const ScanMainScreen();
-                  }
-                  return const MainScreen();
-                }
-                return const LoginScreen();
               },
+              child: BlocBuilder<AuthBloc, AuthState>(
+                builder: (context, authState) {
+                  if (authState is AuthLoading) {
+                    return const Scaffold(
+                      body: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+                  if (authState is AuthAuthenticated) {
+                    if (authState.user.isAdmin) {
+                      return const AdminMainScreen();
+                    }
+                    if (authState.user.isScan) {
+                      return const ScanMainScreen();
+                    }
+                    return const MainScreen();
+                  }
+                  return const LoginScreen();
+                },
+              ),
             ),
           );
         },
