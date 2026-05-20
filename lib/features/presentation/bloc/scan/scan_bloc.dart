@@ -46,6 +46,8 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     on<ToggleScanBookVisibility>(_onToggleVisibility);
   }
 
+  // Upload a cover image and emit the uploaded state with the filename to update the UI with the new cover image after a successful
+  // upload, ensuring a responsive user experience.
   Future<void> _onUploadCover(
     UploadScanCover event,
     Emitter<ScanState> emit,
@@ -58,6 +60,7 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     }
   }
 
+  // Load the list of genres and emit the loaded state with the retrieved genres to update the UI with the latest data from the backend.
   Future<void> _onLoadGenres(
     LoadScanGenres event,
     Emitter<ScanState> emit,
@@ -76,6 +79,7 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     }
   }
 
+  // Load the list of books and emit the loaded state with the retrieved books to update the UI with the latest data from the backend.
   Future<void> _onLoadBooks(
     LoadScanBooks event,
     Emitter<ScanState> emit,
@@ -89,6 +93,8 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     }
   }
 
+  // Save a book (create or update) and refresh the list of books after the operation to ensure the UI reflects the latest data
+  // from the backend, preventing issues with stale data and ensuring a consistent user experience.
   Future<void> _onSaveBook(
     SaveScanBook event,
     Emitter<ScanState> emit,
@@ -108,6 +114,8 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     }
   }
 
+  // Delete a book by ID and refresh the list of books after deletion to ensure the UI is updated correctly with the latest data
+  // from the backend, avoiding potential issues with stale data.
   Future<void> _onDeleteBook(
     DeleteScanBook event,
     Emitter<ScanState> emit,
@@ -122,6 +130,8 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     }
   }
 
+  // Save a took (create or update) and refresh the list of books after the operation to ensure the UI reflects the latest data
+  // from the backend, preventing issues with stale data and ensuring a consistent user experience.
   Future<void> _onSaveTook(
     SaveScanTook event,
     Emitter<ScanState> emit,
@@ -140,6 +150,8 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     }
   }
 
+  // Delete a took by ID and refresh the list of books after deletion to ensure the UI is updated correctly with the latest data
+  // from the backend, avoiding potential issues with stale data and ensuring a consistent user experience.
   Future<void> _onDeleteTook(
     DeleteScanTook event,
     Emitter<ScanState> emit,
@@ -153,6 +165,8 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     }
   }
 
+  // Save a chapter (create or update) and refresh the list of books after the operation to ensure the UI reflects the latest data
+  // from the backend, preventing issues with stale data and ensuring a consistent user experience.
   Future<void> _onSaveChapter(
     SaveScanChapter event,
     Emitter<ScanState> emit,
@@ -171,6 +185,8 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     }
   }
 
+  // Delete a chapter by ID and refresh the list of books after deletion to ensure the UI is updated correctly with the latest data
+  // from the backend, avoiding potential issues with stale data and ensuring a consistent user experience.
   Future<void> _onDeleteChapter(
     DeleteScanChapter event,
     Emitter<ScanState> emit,
@@ -184,6 +200,8 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     }
   }
 
+  // Toggle visibility of a book for users and refresh the list of books after the operation to ensure the UI reflects the latest
+  // data from the backend, preventing issues with stale data and ensuring a consistent user experience.
   Future<void> _onToggleVisibility(
     ToggleScanBookVisibility event,
     Emitter<ScanState> emit,
