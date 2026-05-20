@@ -133,7 +133,7 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
       source: _sourceCtrl.text.trim(),
       link: _linkCtrl.text.trim(),
       isFavorite: widget.book?.isFavorite ?? false,
-      isVisible: widget.book?.isVisible ?? true,
+      isVisible: widget.book?.isVisible ?? false,
       listLabel: widget.book?.listLabel ?? [],
       listGenre:
           _allGenres.where((g) => _selectedGenreIds.contains(g.id)).toList(),
@@ -150,12 +150,7 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
       bloc.add(SaveScanBook(book, isUpdate: _isEditing));
       final result = await future;
       if (result is ScanLoaded && mounted) {
-        if (_isEditing) return widget.book;
-        if (result.books.isEmpty) return null;
-        return result.books.firstWhere(
-          (b) => b.name == book.name && b.author == book.author,
-          orElse: () => result.books.last,
-        );
+        return _isEditing ? widget.book : book;
       } else if (result is ScanError && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -169,26 +164,6 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
     return null;
   }
 
-  // Save and add tomo
-  Future<void> _saveAndAddTomo() async {
-    // Save book first
-    final saved = await _saveBook();
-
-    // If save was successful, navigate to tomo edit screen
-    if (saved != null && mounted) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => BlocProvider.value(
-            value: context.read<ScanBloc>(),
-            child: ScanTookEditScreen(bookId: saved.id),
-          ),
-        ),
-      );
-    }
-  }
-
-  // Delete tomo
   Future<void> _save() async {
     final saved = await _saveBook();
     if (saved != null && mounted) Navigator.pop(context);
@@ -325,42 +300,53 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
                 },
               ),
 
-              const SizedBox(height: 12),
-
-              // Took List
-              TookListSection(
-                isEditing: _isEditing,
-                tooks: _tooks,
-                bookId: widget.book?.id,
-                onAddTook: _isEditing
-                    ? () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => BlocProvider.value(
-                              value: context.read<ScanBloc>(),
-                              child:
-                                  ScanTookEditScreen(bookId: widget.book!.id),
-                            ),
-                          ),
-                        )
-                    : _saveAndAddTomo,
-                onEditTook: (took, bookId) => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => BlocProvider.value(
-                      value: context.read<ScanBloc>(),
-                      child: ScanTookEditScreen(took: took, bookId: bookId),
+              if (_isEditing)
+                TookListSection(
+                  isEditing: true,
+                  tooks: _tooks,
+                  bookId: widget.book!.id,
+                  onAddTook: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => BlocProvider.value(
+                        value: context.read<ScanBloc>(),
+                        child:
+                            ScanTookEditScreen(bookId: widget.book!.id),
+                      ),
                     ),
                   ),
+                  onEditTook: (took, bookId) => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => BlocProvider.value(
+                        value: context.read<ScanBloc>(),
+                        child: ScanTookEditScreen(took: took, bookId: bookId),
+                      ),
+                    ),
+                  ),
+                  onDeleteTook: (tookId) {
+                    context.read<ScanBloc>().add(DeleteScanTook(tookId));
+                  },
                 ),
-                onDeleteTook: (tookId) {
-                  context.read<ScanBloc>().add(DeleteScanTook(tookId));
-                },
-              ),
             ],
           ),
         ),
       ),
+      floatingActionButton: _isEditing
+          ? FloatingActionButton(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => BlocProvider.value(
+                    value: context.read<ScanBloc>(),
+                    child:
+                        ScanTookEditScreen(bookId: widget.book!.id),
+                  ),
+                ),
+              ),
+              child: const Icon(Icons.add),
+            )
+          : null,
     );
   }
 }

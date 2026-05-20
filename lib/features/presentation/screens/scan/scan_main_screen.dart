@@ -147,7 +147,15 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            // Edit Button
+                            Switch(
+                              value: book.isVisible,
+                              onChanged: (value) {
+                                context
+                                    .read<ScanBloc>()
+                                    .add(ToggleScanBookVisibility(
+                                        book.id, value));
+                              },
+                            ),
                             IconButton(
                               icon: Icon(
                                 Icons.edit,
@@ -155,8 +163,6 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
                               ),
                               onPressed: () => _editBook(context, book),
                             ),
-
-                            // Delete Button
                             IconButton(
                               icon: Icon(
                                 Icons.delete,

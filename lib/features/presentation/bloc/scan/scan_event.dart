@@ -75,3 +75,13 @@ class DeleteScanChapter extends ScanEvent {
   @override
   List<Object> get props => [chapterId];
 }
+
+class ToggleScanBookVisibility extends ScanEvent {
+  final int bookId;
+  final bool isVisible;
+
+  ToggleScanBookVisibility(this.bookId, this.isVisible);
+
+  @override
+  List<Object> get props => [bookId, isVisible];
+}

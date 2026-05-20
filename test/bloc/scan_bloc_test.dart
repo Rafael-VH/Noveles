@@ -31,6 +31,9 @@ class MockGetGenre extends Mock implements GetGenre {}
 
 class MockUploadCover extends Mock implements UploadCover {}
 
+class MockToggleBookVisibility extends Mock
+    implements ToggleBookVisibility {}
+
 void main() {
   late MockGetBooks mockGetBooks;
   late MockCreateBook mockCreateBook;
@@ -44,6 +47,7 @@ void main() {
   late MockDeleteChapter mockDeleteChapter;
   late MockGetGenre mockGetGenre;
   late MockUploadCover mockUploadCover;
+  late MockToggleBookVisibility mockToggleVisibility;
   late ScanBloc scanBloc;
 
   final testBooks = [
@@ -137,6 +141,7 @@ void main() {
     mockDeleteChapter = MockDeleteChapter();
     mockGetGenre = MockGetGenre();
     mockUploadCover = MockUploadCover();
+    mockToggleVisibility = MockToggleBookVisibility();
     scanBloc = ScanBloc(
       getBooks: mockGetBooks,
       createBook: mockCreateBook,
@@ -150,6 +155,7 @@ void main() {
       deleteChapter: mockDeleteChapter,
       getGenres: mockGetGenre,
       uploadCover: mockUploadCover,
+      toggleBookVisibility: mockToggleVisibility,
     );
   });
 
@@ -481,6 +487,36 @@ void main() {
         return scanBloc;
       },
       act: (bloc) => bloc.add(DeleteScanChapter(999)),
+      expect: () => [
+        isA<ScanLoading>(),
+        isA<ScanError>(),
+      ],
+    );
+
+    blocTest<ScanBloc, ScanState>(
+      'emits [ScanLoading, ScanLoaded] when ToggleScanBookVisibility hides',
+      build: () {
+        when(() => mockToggleVisibility(any(), any()))
+            .thenAnswer((_) async {});
+        when(() => mockGetBooks()).thenAnswer((_) async => testBooks);
+        return scanBloc;
+      },
+      act: (bloc) => bloc.add(ToggleScanBookVisibility(1, false)),
+      expect: () => [
+        isA<ScanLoading>(),
+        isA<ScanLoaded>()
+            .having((s) => s.message, 'message', 'Novela oculta'),
+      ],
+    );
+
+    blocTest<ScanBloc, ScanState>(
+      'emits [ScanLoading, ScanError] when ToggleScanBookVisibility fails',
+      build: () {
+        when(() => mockToggleVisibility(any(), any()))
+            .thenThrow(Exception('Error'));
+        return scanBloc;
+      },
+      act: (bloc) => bloc.add(ToggleScanBookVisibility(1, true)),
       expect: () => [
         isA<ScanLoading>(),
         isA<ScanError>(),

@@ -194,6 +194,7 @@ void setupDependencies() {
       deleteChapter: getIt(),
       getGenres: getIt(),
       uploadCover: getIt(),
+      toggleBookVisibility: getIt(),
     ),
   );
 }

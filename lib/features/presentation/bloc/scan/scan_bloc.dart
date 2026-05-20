@@ -17,6 +17,7 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
   final DeleteChapter deleteChapter;
   final GetGenre getGenres;
   final UploadCover uploadCover;
+  final ToggleBookVisibility toggleBookVisibility;
 
   ScanBloc({
     required this.getBooks,
@@ -31,6 +32,7 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     required this.deleteChapter,
     required this.getGenres,
     required this.uploadCover,
+    required this.toggleBookVisibility,
   }) : super(ScanInitial()) {
     on<LoadScanBooks>(_onLoadBooks);
     on<LoadScanGenres>(_onLoadGenres);
@@ -41,6 +43,7 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     on<DeleteScanTook>(_onDeleteTook);
     on<SaveScanChapter>(_onSaveChapter);
     on<DeleteScanChapter>(_onDeleteChapter);
+    on<ToggleScanBookVisibility>(_onToggleVisibility);
   }
 
   Future<void> _onUploadCover(
@@ -176,6 +179,22 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     try {
       await deleteChapter(event.chapterId);
       emit(ScanLoaded(await getBooks(), message: 'Capítulo eliminado'));
+    } catch (e) {
+      emit(ScanError(e.toString()));
+    }
+  }
+
+  Future<void> _onToggleVisibility(
+    ToggleScanBookVisibility event,
+    Emitter<ScanState> emit,
+  ) async {
+    emit(ScanLoading());
+    try {
+      await toggleBookVisibility(event.bookId, event.isVisible);
+      emit(ScanLoaded(await getBooks(),
+          message: event.isVisible
+              ? 'Novela visible para usuarios'
+              : 'Novela oculta'));
     } catch (e) {
       emit(ScanError(e.toString()));
     }
