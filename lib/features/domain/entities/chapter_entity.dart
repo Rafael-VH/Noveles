@@ -7,6 +7,7 @@ class ChapterEntity extends Equatable {
   final String title;
   final String content;
   final int tookId;
+  final String? createdBy;
 
   const ChapterEntity({
     required this.id,
@@ -15,8 +16,17 @@ class ChapterEntity extends Equatable {
     required this.title,
     required this.content,
     required this.tookId,
+    this.createdBy,
   });
 
   @override
-  List<Object> get props => [id, createdAt, number, title, content, tookId];
+  List<Object?> get props => [
+        id,
+        createdAt,
+        number,
+        title,
+        content,
+        tookId,
+        createdBy,
+      ];
 }

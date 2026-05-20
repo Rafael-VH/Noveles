@@ -27,6 +27,7 @@ class BookModel extends BookEntity {
     required super.listGenre,
     required super.listTook,
     required super.listLabel,
+    super.createdBy,
   });
 
   factory BookModel.fromJson(Map<String, dynamic> json) {
@@ -64,6 +65,7 @@ class BookModel extends BookEntity {
       link: (json['link'] as String?) ?? '',
       isFavorite: (json['is_favorite'] as bool?) ?? false,
       isVisible: (json['is_visible'] as bool?) ?? true,
+      createdBy: json['created_by'] as String?,
       listGenre: listGenre,
       listTook: listTook,
       listLabel: listLabel,
@@ -89,6 +91,7 @@ class BookModel extends BookEntity {
     'link': link,
     'is_favorite': isFavorite,
     'is_visible': isVisible,
+    'created_by': createdBy,
   };
 
   factory BookModel.fromEntity(BookEntity entity) => BookModel(
@@ -114,5 +117,6 @@ class BookModel extends BookEntity {
     listGenre: entity.listGenre,
     listTook: entity.listTook,
     listLabel: entity.listLabel,
+    createdBy: entity.createdBy,
   );
 }

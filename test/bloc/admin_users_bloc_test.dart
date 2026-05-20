@@ -13,13 +13,13 @@ void main() {
   late MockGetAllProfiles mockGetAllProfiles;
 
   final testUsers = [
-    UserEntity(
+    const UserEntity(
       id: '1',
       email: 'admin@test.com',
       role: 'admin',
       displayName: 'Admin',
     ),
-    UserEntity(
+    const UserEntity(
       id: '2',
       email: 'scan@test.com',
       role: 'scan',

@@ -15,8 +15,6 @@ class App extends StatelessWidget {
         BlocProvider(
           create: (_) => getIt<AuthBloc>()..add(CheckAuthSession()),
         ),
-        BlocProvider(create: (_) => getIt<GenreBloc>()..add(LoadGenres())),
-        BlocProvider(create: (_) => getIt<ScanBloc>()),
       ],
       child: BlocBuilder<ThemeBloc, ThemeState>(
         builder: (context, state) {

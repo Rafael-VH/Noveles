@@ -75,7 +75,24 @@ class _ChapterScreenState extends State<ChapterScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           if (state is ChapterError) {
-            return Center(child: Text(state.message));
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(state.message),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () => context.read<ChapterBloc>().add(
+                      LoadChapterContent(
+                        initialIndex: widget.i,
+                        chapters: widget.chapters,
+                      ),
+                    ),
+                    child: const Text('Reintentar'),
+                  ),
+                ],
+              ),
+            );
           }
           if (state is ChapterLoaded) {
             return SafeArea(

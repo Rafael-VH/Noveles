@@ -80,7 +80,8 @@ class ProfilesRepositoryImpl implements ProfilesRepository {
       final response = await supabase
           .from('profiles')
           .select('*')
-          .order('email');
+          .order('email')
+          .limit(100);
       return response.map((json) => UserModel.fromJson(json)).toList();
     } catch (e) {
       throw RepositoryException(

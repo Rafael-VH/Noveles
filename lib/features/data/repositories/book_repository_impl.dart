@@ -9,10 +9,8 @@ class BookRepositoryImpl implements BookRepository {
   @override
   Future<List<BookEntity>> getBooks({bool onlyVisible = false}) async {
     try {
-      var query = supabase
-          .from('books')
-          .select(
-              '*, authors!inner(*), books_genres!inner(genre_id, genres(*)), books_labels(*, labels(*)), tooks(*, chapters(*))');
+      var query = supabase.from('books').select(
+          '*, authors!inner(*), books_genres!inner(genre_id, genres(*)), books_labels(*, labels(*)), tooks(*, chapters(*))');
 
       if (onlyVisible) {
         query = query.eq('is_visible', true);
@@ -35,7 +33,7 @@ class BookRepositoryImpl implements BookRepository {
       final response = await supabase
           .from('books')
           .select(
-              '*, authors!inner(*), books_genres!inner(genre_id, genres(*)), tooks(*, chapters(*))')
+              '*, authors!inner(*), books_genres!inner(genre_id, genres(*)), books_labels(*, labels(*)), tooks(*, chapters(*))')
           .eq('id', id)
           .maybeSingle();
 
@@ -184,8 +182,7 @@ class BookRepositoryImpl implements BookRepository {
     try {
       await supabase
           .from('books')
-          .update({'is_visible': isVisible})
-          .eq('id', bookId);
+          .update({'is_visible': isVisible}).eq('id', bookId);
     } catch (e) {
       throw RepositoryException(
         message: 'Error al cambiar visibilidad',

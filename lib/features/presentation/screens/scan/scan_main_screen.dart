@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/core/supabase/storage_helper.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
@@ -16,159 +17,156 @@ class ScanMainScreen extends StatefulWidget {
 
 class _ScanMainScreenState extends State<ScanMainScreen> {
   @override
-  void initState() {
-    super.initState();
-    context.read<ScanBloc>().add(LoadScanBooks());
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return BlocListener<ScanBloc, ScanState>(
-      listener: (context, state) {
-        // Show error message on error state
-        if (state is ScanError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message),
-              backgroundColor: Theme.of(context).colorScheme.error,
-            ),
-          );
-        }
-
-        // Show success message on load or save
-        if (state is ScanLoaded && state.message != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message!),
-              backgroundColor: Theme.of(context).colorScheme.tertiary,
-            ),
-          );
-        }
-      },
-      child: Scaffold(
-        drawer: const AppDrawer(isScan: true),
-        appBar: AppBar(
-          title: const Text('Panel Scan'),
-        ),
-        body: BlocBuilder<ScanBloc, ScanState>(
-          builder: (context, state) {
-            // Loading State
-            if (state is ScanLoading || state is ScanInitial) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-
-            // Error State
-            if (state is ScanError) {
-              return Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(state.message),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () => context.read<ScanBloc>().add(
-                            LoadScanBooks(),
-                          ),
-                      child: const Text('Reintentar'),
-                    ),
-                  ],
-                ),
-              );
-            }
-
-            // Loaded State
-            final books = switch (state) {
-              ScanLoaded(:final books) => books,
-              ScanGenresLoaded(:final books) => books,
-              _ => null,
-            };
-
-            // No Books State
-            if (books == null) return const SizedBox.shrink();
-
-            // Empty Books State
-            if (books.isEmpty) {
-              return const Center(
-                child: Text('No hay libros'),
-              );
-            }
-
-            // Books List
-            return RefreshIndicator(
-              onRefresh: () async {
-                context.read<ScanBloc>().add(LoadScanBooks());
-                await context.read<ScanBloc>().stream.firstWhere(
-                      (s) => s is ScanLoaded || s is ScanError,
-                    );
-              },
-              child: ListView.builder(
-                itemCount: books.length,
-                itemBuilder: (context, index) {
-                  final book = books[index];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 4,
-                    ),
-                    child: ListTile(
-                      leading: SizedBox(
-                        width: 48,
-                        height: 64,
-                        child: CachedNetworkImage(
-                          fit: BoxFit.cover,
-                          imageUrl: coverUrl(book.cover),
-                          errorWidget: (_, __, ___) => const Icon(
-                            Icons.book,
-                            size: 48,
-                          ),
-                        ),
-                      ),
-                      title: Text(
-                        book.name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      subtitle: Text(
-                        'ID: ${book.id} - ${book.tookCount} tomos',
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Edit Button
-                          IconButton(
-                            icon: Icon(
-                              Icons.edit,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                            onPressed: () => _editBook(context, book),
-                          ),
-
-                          // Delete Button
-                          IconButton(
-                            icon: Icon(
-                              Icons.delete,
-                              color: Theme.of(context).colorScheme.error,
-                            ),
-                            onPressed: () =>
-                                _deleteBook(context, book.id, book.name),
-                          ),
-                        ],
-                      ),
-                      onTap: () => _editBook(context, book),
-                    ),
-                  );
-                },
+    return BlocProvider(
+      create: (_) => getIt<ScanBloc>()..add(LoadScanBooks()),
+      child: BlocListener<ScanBloc, ScanState>(
+        listener: (context, state) {
+          // Show error message on error state
+          if (state is ScanError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: Theme.of(context).colorScheme.error,
               ),
             );
-          },
-        ),
+          }
 
-        // Add Book Button
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => _createBook(context),
-          child: const Icon(Icons.add),
+          // Show success message on load or save
+          if (state is ScanLoaded && state.message != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message!),
+                backgroundColor: Theme.of(context).colorScheme.tertiary,
+              ),
+            );
+          }
+        },
+        child: Scaffold(
+          drawer: const AppDrawer(isScan: true),
+          appBar: AppBar(
+            title: const Text('Panel Scan'),
+          ),
+          body: BlocBuilder<ScanBloc, ScanState>(
+            builder: (context, state) {
+              // Loading State
+              if (state is ScanLoading || state is ScanInitial) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+
+              // Error State
+              if (state is ScanError) {
+                return Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(state.message),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () => context.read<ScanBloc>().add(
+                              LoadScanBooks(),
+                            ),
+                        child: const Text('Reintentar'),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              // Loaded State
+              final books = switch (state) {
+                ScanLoaded(:final books) => books,
+                ScanGenresLoaded(:final books) => books,
+                _ => null,
+              };
+
+              // No Books State
+              if (books == null) return const SizedBox.shrink();
+
+              // Empty Books State
+              if (books.isEmpty) {
+                return const Center(
+                  child: Text('No hay libros'),
+                );
+              }
+
+              // Books List
+              return RefreshIndicator(
+                onRefresh: () async {
+                  context.read<ScanBloc>().add(LoadScanBooks());
+                  await context.read<ScanBloc>().stream.firstWhere(
+                        (s) => s is ScanLoaded || s is ScanError,
+                      );
+                },
+                child: ListView.builder(
+                  itemCount: books.length,
+                  itemBuilder: (context, index) {
+                    final book = books[index];
+                    return Card(
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
+                      child: ListTile(
+                        leading: SizedBox(
+                          width: 48,
+                          height: 64,
+                          child: CachedNetworkImage(
+                            fit: BoxFit.cover,
+                            imageUrl: coverUrl(book.cover),
+                            errorWidget: (_, __, ___) => const Icon(
+                              Icons.book,
+                              size: 48,
+                            ),
+                          ),
+                        ),
+                        title: Text(
+                          book.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        subtitle: Text(
+                          'ID: ${book.id} - ${book.tookCount} tomos',
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            // Edit Button
+                            IconButton(
+                              icon: Icon(
+                                Icons.edit,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                              onPressed: () => _editBook(context, book),
+                            ),
+
+                            // Delete Button
+                            IconButton(
+                              icon: Icon(
+                                Icons.delete,
+                                color: Theme.of(context).colorScheme.error,
+                              ),
+                              onPressed: () =>
+                                  _deleteBook(context, book.id, book.name),
+                            ),
+                          ],
+                        ),
+                        onTap: () => _editBook(context, book),
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
+          ),
+
+          // Add Book Button
+          floatingActionButton: FloatingActionButton(
+            onPressed: () => _createBook(context),
+            child: const Icon(Icons.add),
+          ),
         ),
       ),
     );

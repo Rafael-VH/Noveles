@@ -11,6 +11,7 @@ class TookModel extends TookEntity {
     required super.chapterCount,
     required super.bookId,
     required super.listChapter,
+    super.createdBy,
   });
 
   factory TookModel.fromJson(Map<String, dynamic> json) {
@@ -26,6 +27,7 @@ class TookModel extends TookEntity {
       title: (json['title'] as String?) ?? '',
       chapterCount: (json['chapter_count'] as String?) ?? (json['content'] as String?) ?? '',
       bookId: (json['book_id'] as int?) ?? 0,
+      createdBy: json['created_by'] as String?,
       listChapter: chapters,
     );
   }
@@ -36,6 +38,7 @@ class TookModel extends TookEntity {
     'title': title,
     'chapter_count': chapterCount,
     'book_id': bookId,
+    'created_by': createdBy,
   };
 
   factory TookModel.fromEntity(TookEntity entity) => TookModel(
@@ -47,5 +50,6 @@ class TookModel extends TookEntity {
     chapterCount: entity.chapterCount,
     bookId: entity.bookId,
     listChapter: entity.listChapter,
+    createdBy: entity.createdBy,
   );
 }

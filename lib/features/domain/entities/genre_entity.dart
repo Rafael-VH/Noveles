@@ -14,5 +14,10 @@ class GenreEntity extends Equatable {
   });
 
   @override
-  List<Object> get props => [id, createdAt, name, description];
+  List<Object> get props => [
+        id,
+        createdAt,
+        name,
+        description,
+      ];
 }

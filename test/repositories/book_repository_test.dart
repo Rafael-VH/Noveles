@@ -64,6 +64,7 @@ void main() {
       listGenre: const [],
       listTook: const [],
       listLabel: const [],
+      createdBy: null,
     ));
   });
 
@@ -199,6 +200,7 @@ void main() {
             listGenre: const [],
             listTook: const [],
             listLabel: const [],
+            createdBy: null,
           )),
           throwsA(isA<RepositoryException>()),
         );
@@ -231,10 +233,11 @@ void main() {
               link: '',
               isFavorite: false,
               isVisible: true,
-              listGenre: const [],
-              listTook: const [],
-              listLabel: const [],
-            ),
+            listGenre: const [],
+            listTook: const [],
+            listLabel: const [],
+            createdBy: null,
+          ),
           );
           fail('Expected RepositoryException');
         } on RepositoryException catch (e) {

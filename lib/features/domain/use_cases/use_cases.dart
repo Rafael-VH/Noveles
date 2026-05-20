@@ -36,5 +36,6 @@ export 'package:noveles/features/domain/use_cases/update_chapter.dart';
 export 'package:noveles/features/domain/use_cases/update_genre.dart';
 export 'package:noveles/features/domain/use_cases/update_profile.dart';
 export 'package:noveles/features/domain/use_cases/update_took.dart';
+export 'package:noveles/features/domain/use_cases/update_label.dart';
 export 'package:noveles/features/domain/use_cases/upload_avatar.dart';
 export 'package:noveles/features/domain/use_cases/upload_cover.dart';

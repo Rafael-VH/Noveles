@@ -26,6 +26,7 @@ class BookEntity extends Equatable {
   final List<GenreEntity> listGenre;
   final List<TookEntity> listTook;
   final List<LabelEntity> listLabel;
+  final String? createdBy;
 
   const BookEntity({
     required this.id,
@@ -50,10 +51,63 @@ class BookEntity extends Equatable {
     required this.listGenre,
     required this.listTook,
     required this.listLabel,
+    this.createdBy,
   });
 
+  BookEntity copyWith({
+    int? id,
+    DateTime? createdAt,
+    String? cover,
+    String? name,
+    String? short,
+    String? alternative,
+    String? description,
+    int? authorId,
+    String? author,
+    String? country,
+    String? state,
+    String? type,
+    String? release,
+    String? tookCount,
+    String? chapterCount,
+    String? source,
+    String? link,
+    bool? isFavorite,
+    bool? isVisible,
+    List<GenreEntity>? listGenre,
+    List<TookEntity>? listTook,
+    List<LabelEntity>? listLabel,
+    String? createdBy,
+  }) {
+    return BookEntity(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      cover: cover ?? this.cover,
+      name: name ?? this.name,
+      short: short ?? this.short,
+      alternative: alternative ?? this.alternative,
+      description: description ?? this.description,
+      authorId: authorId ?? this.authorId,
+      author: author ?? this.author,
+      country: country ?? this.country,
+      state: state ?? this.state,
+      type: type ?? this.type,
+      release: release ?? this.release,
+      tookCount: tookCount ?? this.tookCount,
+      chapterCount: chapterCount ?? this.chapterCount,
+      source: source ?? this.source,
+      link: link ?? this.link,
+      isFavorite: isFavorite ?? this.isFavorite,
+      isVisible: isVisible ?? this.isVisible,
+      listGenre: listGenre ?? this.listGenre,
+      listTook: listTook ?? this.listTook,
+      listLabel: listLabel ?? this.listLabel,
+      createdBy: createdBy ?? this.createdBy,
+    );
+  }
+
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         id,
         createdAt,
         cover,
@@ -76,5 +130,6 @@ class BookEntity extends Equatable {
         listGenre,
         listTook,
         listLabel,
+        createdBy,
       ];
 }

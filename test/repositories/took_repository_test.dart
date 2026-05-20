@@ -121,6 +121,7 @@ void main() {
               id: 0, createdAt: DateTime(2024),
               cover: '', number: '1', title: '',
               chapterCount: '', bookId: 1, listChapter: const [],
+              createdBy: null,
             ),
           );
           fail('Expected RepositoryException');
@@ -140,6 +141,7 @@ void main() {
               id: 1, createdAt: DateTime(2024),
               cover: '', number: '1', title: '',
               chapterCount: '', bookId: 1, listChapter: const [],
+              createdBy: null,
             ),
           );
           fail('Expected RepositoryException');

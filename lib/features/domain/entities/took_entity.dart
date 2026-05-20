@@ -10,6 +10,7 @@ class TookEntity extends Equatable {
   final String chapterCount;
   final int bookId;
   final List<ChapterEntity> listChapter;
+  final String? createdBy;
 
   const TookEntity({
     required this.id,
@@ -20,10 +21,11 @@ class TookEntity extends Equatable {
     required this.chapterCount,
     required this.bookId,
     required this.listChapter,
+    this.createdBy,
   });
 
   @override
-  List<Object> get props => [
+  List<Object?> get props => [
         id,
         createdAt,
         cover,
@@ -32,5 +34,6 @@ class TookEntity extends Equatable {
         chapterCount,
         bookId,
         listChapter,
+        createdBy,
       ];
 }

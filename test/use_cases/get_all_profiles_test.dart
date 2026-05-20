@@ -16,7 +16,7 @@ void main() {
   group('GetAllProfiles', () {
     test('returns user list from repository', () async {
       final users = [
-        UserEntity(
+        const UserEntity(
           id: '1',
           email: 'admin@test.com',
           role: 'admin',

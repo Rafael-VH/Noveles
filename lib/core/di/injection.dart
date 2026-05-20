@@ -32,6 +32,7 @@ import 'package:noveles/features/domain/use_cases/get_book_by_id.dart';
 import 'package:noveles/features/domain/use_cases/get_labels.dart';
 import 'package:noveles/features/domain/use_cases/create_label.dart';
 import 'package:noveles/features/domain/use_cases/delete_label.dart';
+import 'package:noveles/features/domain/use_cases/update_label.dart';
 import 'package:noveles/features/domain/use_cases/assign_label_to_book.dart';
 import 'package:noveles/features/domain/use_cases/remove_label_from_book.dart';
 import 'package:noveles/features/domain/use_cases/get_chapter.dart';
@@ -119,6 +120,7 @@ void setupDependencies() {
   getIt.registerLazySingleton(() => AssignLabelToBook(getIt()));
   getIt.registerLazySingleton(() => RemoveLabelFromBook(getIt()));
   getIt.registerLazySingleton(() => GetBookLabels(getIt()));
+  getIt.registerLazySingleton(() => UpdateLabel(getIt()));
   getIt.registerLazySingleton(() => GetAllProfiles(getIt()));
   getIt.registerLazySingleton(() => ListenAuthState(getIt()));
 

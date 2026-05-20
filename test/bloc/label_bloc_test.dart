@@ -42,6 +42,12 @@ void main() {
     2: {1},
   };
 
+  setUpAll(() {
+    registerFallbackValue(LabelEntity(
+      id: 0, createdAt: DateTime(2024), name: '', color: '',
+    ));
+  });
+
   setUp(() {
     mockGetLabels = MockGetLabels();
     mockCreateLabel = MockCreateLabel();
@@ -116,7 +122,7 @@ void main() {
     blocTest<LabelBloc, LabelState>(
       'emits LabelLoaded with message when CreateLabelEvent succeeds',
       build: () {
-        when(() => mockCreateLabel(any(), any())).thenAnswer((_) async {});
+        when(() => mockCreateLabel(any())).thenAnswer((_) async {});
         when(() => mockGetLabels()).thenAnswer((_) async => testLabels);
         when(() => mockGetBookLabels())
             .thenAnswer((_) async => testBookLabels);
@@ -142,7 +148,7 @@ void main() {
     blocTest<LabelBloc, LabelState>(
       'emits LabelError when CreateLabelEvent fails',
       build: () {
-        when(() => mockCreateLabel(any(), any()))
+        when(() => mockCreateLabel(any()))
             .thenThrow(Exception('Error al crear'));
         return LabelBloc(
           getLabels: mockGetLabels,

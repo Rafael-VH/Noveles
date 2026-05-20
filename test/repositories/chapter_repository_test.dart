@@ -185,6 +185,7 @@ void main() {
             ChapterEntity(
               id: 0, createdAt: DateTime(2024),
               number: '1', title: '', content: '', tookId: 1,
+              createdBy: null,
             ),
           );
           fail('Expected RepositoryException');
@@ -203,6 +204,7 @@ void main() {
             ChapterEntity(
               id: 1, createdAt: DateTime(2024),
               number: '1', title: '', content: '', tookId: 1,
+              createdBy: null,
             ),
           );
           fail('Expected RepositoryException');

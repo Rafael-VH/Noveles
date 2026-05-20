@@ -21,8 +21,14 @@ class UserEntity extends Equatable {
   bool get isAdmin => role == 'admin';
 
   @override
-  List<Object> get props =>
-      [id, email, role, displayName ?? '', bio ?? '', avatarUrl ?? ''];
+  List<Object> get props => [
+        id,
+        email,
+        role,
+        displayName ?? '',
+        bio ?? '',
+        avatarUrl ?? '',
+      ];
 
   UserEntity copyWith({
     String? id,

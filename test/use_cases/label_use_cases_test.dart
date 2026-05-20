@@ -13,6 +13,12 @@ void main() {
     mockRepo = MockLabelRepository();
   });
 
+  setUpAll(() {
+    registerFallbackValue(LabelEntity(
+      id: 0, createdAt: DateTime(2026), name: '', color: '',
+    ));
+  });
+
   group('GetLabels', () {
     test('returns label list from repository', () async {
       final labels = [
@@ -32,11 +38,23 @@ void main() {
   });
 
   group('CreateLabel', () {
-    test('calls repository.createLabel', () async {
-      when(() => mockRepo.createLabel(any(), any())).thenAnswer((_) async {});
+    test('calls repository.createLabel with LabelEntity', () async {
+      final label = LabelEntity(
+        id: 0, createdAt: DateTime(2026), name: 'Staff Pick', color: '#71A202',
+      );
+      when(() => mockRepo.createLabel(any())).thenAnswer((_) async {});
 
-      await CreateLabel(mockRepo)('Staff Pick', '#71A202');
-      verify(() => mockRepo.createLabel('Staff Pick', '#71A202')).called(1);
+      await CreateLabel(mockRepo)(label);
+      verify(() => mockRepo.createLabel(label)).called(1);
+    });
+  });
+
+  group('UpdateLabel', () {
+    test('calls repository.updateLabel', () async {
+      when(() => mockRepo.updateLabel(any(), any(), any())).thenAnswer((_) async {});
+
+      await UpdateLabel(mockRepo)(1, 'Staff Pick', '#71A202');
+      verify(() => mockRepo.updateLabel(1, 'Staff Pick', '#71A202')).called(1);
     });
   });
 

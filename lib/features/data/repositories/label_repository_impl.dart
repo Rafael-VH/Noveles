@@ -11,7 +11,8 @@ class LabelRepositoryImpl implements LabelRepository {
       final response = await supabase
           .from('labels')
           .select()
-          .order('id');
+          .order('id')
+          .limit(100);
       return response.map((json) => LabelModel.fromJson(json)).toList();
     } catch (e) {
       throw RepositoryException(
@@ -23,12 +24,25 @@ class LabelRepositoryImpl implements LabelRepository {
   }
 
   @override
-  Future<void> createLabel(String name, String color) async {
+  Future<void> createLabel(LabelEntity label) async {
     try {
-      await supabase.from('labels').insert({'name': name, 'color': color});
+      await supabase.from('labels').insert({'name': label.name, 'color': label.color});
     } catch (e) {
       throw RepositoryException(
         message: 'Error al crear etiqueta',
+        originalException: e,
+        repositoryName: 'LabelRepository',
+      );
+    }
+  }
+
+  @override
+  Future<void> updateLabel(int id, String name, String color) async {
+    try {
+      await supabase.from('labels').update({'name': name, 'color': color}).eq('id', id);
+    } catch (e) {
+      throw RepositoryException(
+        message: 'Error al actualizar etiqueta',
         originalException: e,
         repositoryName: 'LabelRepository',
       );

@@ -256,8 +256,8 @@ class _BooksContent extends StatelessWidget {
                                 },
                               ),
                               IconButton(
-                                icon: const Icon(Icons.delete,
-                                    color: Colors.red),
+                                icon:
+                                    const Icon(Icons.delete, color: Colors.red),
                                 onPressed: () =>
                                     _confirmDeleteBook(context, book.id),
                               ),
@@ -278,8 +278,7 @@ class _BooksContent extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Eliminar libro'),
-        content:
-            const Text('¿Estás seguro de que deseas eliminar este libro?'),
+        content: const Text('¿Estás seguro de que deseas eliminar este libro?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -290,8 +289,10 @@ class _BooksContent extends StatelessWidget {
               Navigator.pop(ctx);
               context.read<AdminBloc>().add(DeleteAdminBook(bookId));
             },
-            child: const Text('Eliminar',
-                style: TextStyle(color: Colors.red)),
+            child: const Text(
+              'Eliminar',
+              style: TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),
@@ -384,13 +385,11 @@ class _GenreListContent extends StatelessWidget {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.edit),
-                      onPressed: () =>
-                          _showEditGenreDialog(context, genre),
+                      onPressed: () => _showEditGenreDialog(context, genre),
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete, color: Colors.red),
-                      onPressed: () =>
-                          _confirmDeleteGenre(context, genre.id),
+                      onPressed: () => _confirmDeleteGenre(context, genre.id),
                     ),
                   ],
                 ),
@@ -518,8 +517,10 @@ class _GenreListContent extends StatelessWidget {
               Navigator.pop(ctx);
               context.read<GenreBloc>().add(DeleteGenreEvent(genreId));
             },
-            child: const Text('Eliminar',
-                style: TextStyle(color: Colors.red)),
+            child: const Text(
+              'Eliminar',
+              style: TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),

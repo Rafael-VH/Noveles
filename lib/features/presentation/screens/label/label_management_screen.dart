@@ -35,7 +35,20 @@ class LabelManagementScreen extends StatelessWidget {
               return _LabelManagementContent(state: state);
             }
             if (state is LabelError) {
-              return Center(child: Text(state.message));
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(state.message),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () =>
+                          context.read<LabelBloc>().add(const LoadLabels()),
+                      child: const Text('Reintentar'),
+                    ),
+                  ],
+                ),
+              );
             }
             return const SizedBox.shrink();
           },
@@ -50,7 +63,8 @@ class _LabelManagementContent extends StatefulWidget {
   const _LabelManagementContent({required this.state});
 
   @override
-  State<_LabelManagementContent> createState() => _LabelManagementContentState();
+  State<_LabelManagementContent> createState() =>
+      _LabelManagementContentState();
 }
 
 class _LabelManagementContentState extends State<_LabelManagementContent> {
@@ -72,7 +86,10 @@ class _LabelManagementContentState extends State<_LabelManagementContent> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Crear Etiqueta', style: Theme.of(context).textTheme.titleMedium),
+          Text(
+            'Crear Etiqueta',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
           const SizedBox(height: 8),
           TextField(
             controller: _nameController,
@@ -94,7 +111,9 @@ class _LabelManagementContentState extends State<_LabelManagementContent> {
                   decoration: BoxDecoration(
                     color: ColorUtils.fromHex(hex),
                     shape: BoxShape.circle,
-                    border: selected ? Border.all(color: Colors.white, width: 3) : null,
+                    border: selected
+                        ? Border.all(color: Colors.white, width: 3)
+                        : null,
                   ),
                 ),
               );
@@ -105,26 +124,32 @@ class _LabelManagementContentState extends State<_LabelManagementContent> {
             onPressed: () {
               final name = _nameController.text.trim();
               if (name.isEmpty) return;
-              context.read<LabelBloc>().add(CreateLabelEvent(name, _selectedColor));
+              context
+                  .read<LabelBloc>()
+                  .add(CreateLabelEvent(name, _selectedColor));
               _nameController.clear();
             },
             child: const Text('Crear Etiqueta'),
           ),
           const Divider(height: 32),
-
-          Text('Etiquetas Existentes', style: Theme.of(context).textTheme.titleMedium),
+          Text(
+            'Etiquetas Existentes',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
           const SizedBox(height: 8),
           if (labels.isEmpty)
             const Text('No hay etiquetas')
           else
-            ...labels.map((label) => ListTile(
-              leading: LabelBadge(name: label.name, color: label.color),
-              title: Text(label.name),
-              trailing: IconButton(
-                icon: const Icon(Icons.delete, color: Colors.red),
-                onPressed: () => context.read<LabelBloc>().add(DeleteLabelEvent(label.id)),
+            ...labels.map(
+              (label) => ListTile(
+                leading: LabelBadge(name: label.name, color: label.color),
+                title: Text(label.name),
+                trailing: IconButton(
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  onPressed: () => context.read<LabelBloc>().add(DeleteLabelEvent(label.id)),
+                ),
               ),
-            )),
+            ),
         ],
       ),
     );

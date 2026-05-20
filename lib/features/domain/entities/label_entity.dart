@@ -14,5 +14,10 @@ class LabelEntity extends Equatable {
   });
 
   @override
-  List<Object> get props => [id, createdAt, name, color];
+  List<Object> get props => [
+        id,
+        createdAt,
+        name,
+        color,
+      ];
 }

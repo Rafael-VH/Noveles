@@ -17,39 +17,72 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => BookBloc(
-        getBooks: getIt(),
-        getBookById: getIt(),
-        onlyVisible: true,
-      )..add(LoadBooks()),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) => BookBloc(
+            getBooks: getIt(),
+            getBookById: getIt(),
+            onlyVisible: true,
+          )..add(LoadBooks()),
+        ),
+        BlocProvider(
+          create: (_) => getIt<GenreBloc>()..add(LoadGenres()),
+        ),
+      ],
       child: Scaffold(
         drawer: const AppDrawer(),
         body: BlocBuilder<BookBloc, BookState>(
-        builder: (context, bookState) {
-          return BlocBuilder<GenreBloc, GenreState>(
-            builder: (context, genreState) {
-              if (bookState is BookLoading || genreState is GenreLoading) {
+          builder: (context, bookState) {
+            return BlocBuilder<GenreBloc, GenreState>(
+              builder: (context, genreState) {
+                if (bookState is BookLoading || genreState is GenreLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (bookState is BookError) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Error: ${bookState.message}'),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () =>
+                              context.read<BookBloc>().add(LoadBooks()),
+                          child: const Text('Reintentar'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                if (genreState is GenreError) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Error: ${genreState.message}'),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () =>
+                              context.read<GenreBloc>().add(LoadGenres()),
+                          child: const Text('Reintentar'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                if (bookState is BookLoaded && genreState is GenreLoaded) {
+                  final listBook = bookState.books;
+                  final listGenre = genreState.genres;
+                  return _buildContent(context, listBook, listGenre);
+                }
                 return const Center(child: CircularProgressIndicator());
-              }
-              if (bookState is BookError) {
-                return Center(child: Text('Error: ${bookState.message}'));
-              }
-              if (genreState is GenreError) {
-                return Center(child: Text('Error: ${genreState.message}'));
-              }
-              if (bookState is BookLoaded && genreState is GenreLoaded) {
-                final listBook = bookState.books;
-                final listGenre = genreState.genres;
-                return _buildContent(context, listBook, listGenre);
-              }
-              return const Center(child: CircularProgressIndicator());
-            },
-          );
-        },
+              },
+            );
+          },
+        ),
       ),
-    ),
-  );
+    );
   }
 
   Widget _buildContent(
