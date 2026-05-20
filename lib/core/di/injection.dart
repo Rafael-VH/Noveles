@@ -53,6 +53,7 @@ import 'package:noveles/features/domain/use_cases/update_took.dart';
 import 'package:noveles/features/domain/use_cases/toggle_book_visibility.dart';
 import 'package:noveles/features/domain/use_cases/upload_avatar.dart';
 import 'package:noveles/features/domain/use_cases/get_book_labels.dart';
+import 'package:noveles/features/domain/use_cases/get_all_profiles.dart';
 import 'package:noveles/features/domain/use_cases/listen_auth_state.dart';
 import 'package:noveles/features/domain/use_cases/upload_cover.dart';
 //
@@ -64,6 +65,7 @@ import 'package:noveles/features/presentation/bloc/profile/profile_bloc.dart';
 import 'package:noveles/features/presentation/bloc/chapter/chapter_bloc.dart';
 import 'package:noveles/features/presentation/bloc/admin/admin_bloc.dart';
 import 'package:noveles/features/presentation/bloc/label/label_bloc.dart';
+import 'package:noveles/features/presentation/bloc/admin_users/admin_users_bloc.dart';
 
 final getIt = GetIt.instance;
 
@@ -117,6 +119,7 @@ void setupDependencies() {
   getIt.registerLazySingleton(() => AssignLabelToBook(getIt()));
   getIt.registerLazySingleton(() => RemoveLabelFromBook(getIt()));
   getIt.registerLazySingleton(() => GetBookLabels(getIt()));
+  getIt.registerLazySingleton(() => GetAllProfiles(getIt()));
   getIt.registerLazySingleton(() => ListenAuthState(getIt()));
 
   // Blocs
@@ -135,7 +138,12 @@ void setupDependencies() {
       getBookById: getIt(),
     ),
   );
-  getIt.registerFactory(() => GenreBloc(getIt()));
+  getIt.registerFactory(() => GenreBloc(
+        getGenre: getIt(),
+        createGenre: getIt(),
+        updateGenre: getIt(),
+        deleteGenre: getIt(),
+      ));
   getIt.registerFactory(
     () => ProfileBloc(
       getProfile: getIt(),
@@ -152,7 +160,11 @@ void setupDependencies() {
     () => AdminBloc(
       getBooks: getIt(),
       toggleBookVisibility: getIt(),
+      deleteBook: getIt(),
     ),
+  );
+  getIt.registerFactory(
+    () => AdminUsersBloc(getAllProfiles: getIt()),
   );
 
   getIt.registerFactory(

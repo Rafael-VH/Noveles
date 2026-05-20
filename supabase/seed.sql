@@ -270,5 +270,5 @@ INSERT INTO chapters (id, created_at, took_id, number, title, content) VALUES
 (148, '2024-04-21', 3, 'Palabras del Autor', 'Palabras del Autor',       'assets/book/jp/oskar/oskarTook1Ch17.txt');
 
 -- ADMIN profile (usuario creado manualmente en auth.users)
-UPDATE profiles SET role = 'scan'
+UPDATE profiles SET role = 'admin'
 WHERE id = (SELECT id FROM auth.users WHERE email = 'admin@noveles.com');
