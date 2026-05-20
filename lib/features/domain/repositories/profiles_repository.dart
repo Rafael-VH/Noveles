@@ -6,4 +6,5 @@ abstract class ProfilesRepository {
       {String? displayName, String? bio, String? avatarUrl});
   Future<String> uploadAvatar(String filePath);
   Future<void> changePassword(String newPassword);
+  Future<List<UserEntity>> getAllProfiles();
 }

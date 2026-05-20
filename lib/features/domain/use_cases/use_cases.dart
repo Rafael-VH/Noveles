@@ -17,6 +17,7 @@ export 'package:noveles/features/domain/use_cases/get_chapter.dart';
 export 'package:noveles/features/domain/use_cases/get_chapter_by_id.dart';
 export 'package:noveles/features/domain/use_cases/get_chapter_content.dart';
 export 'package:noveles/features/domain/use_cases/get_current_user.dart';
+export 'package:noveles/features/domain/use_cases/get_all_profiles.dart';
 export 'package:noveles/features/domain/use_cases/get_genre.dart';
 export 'package:noveles/features/domain/use_cases/get_genre_by_id.dart';
 export 'package:noveles/features/domain/use_cases/get_labels.dart';

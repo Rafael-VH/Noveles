@@ -5,9 +5,20 @@ import 'package:noveles/features/presentation/bloc/genre/genre_state.dart';
 
 class GenreBloc extends Bloc<GenreEvent, GenreState> {
   final GetGenre getGenre;
+  final CreateGenre createGenre;
+  final UpdateGenre updateGenre;
+  final DeleteGenre deleteGenre;
 
-  GenreBloc(this.getGenre) : super(GenreInitial()) {
+  GenreBloc({
+    required this.getGenre,
+    required this.createGenre,
+    required this.updateGenre,
+    required this.deleteGenre,
+  }) : super(GenreInitial()) {
     on<LoadGenres>(_onLoadGenres);
+    on<CreateGenreEvent>(_onCreateGenre);
+    on<UpdateGenreEvent>(_onUpdateGenre);
+    on<DeleteGenreEvent>(_onDeleteGenre);
   }
 
   Future<void> _onLoadGenres(
@@ -18,6 +29,45 @@ class GenreBloc extends Bloc<GenreEvent, GenreState> {
     try {
       final genres = await getGenre();
       emit(GenreLoaded(genres));
+    } catch (e) {
+      emit(GenreError(e.toString()));
+    }
+  }
+
+  Future<void> _onCreateGenre(
+    CreateGenreEvent event,
+    Emitter<GenreState> emit,
+  ) async {
+    try {
+      await createGenre(event.genre);
+      final genres = await getGenre();
+      emit(GenreLoaded(genres, message: 'Género creado'));
+    } catch (e) {
+      emit(GenreError(e.toString()));
+    }
+  }
+
+  Future<void> _onUpdateGenre(
+    UpdateGenreEvent event,
+    Emitter<GenreState> emit,
+  ) async {
+    try {
+      await updateGenre(event.genre);
+      final genres = await getGenre();
+      emit(GenreLoaded(genres, message: 'Género actualizado'));
+    } catch (e) {
+      emit(GenreError(e.toString()));
+    }
+  }
+
+  Future<void> _onDeleteGenre(
+    DeleteGenreEvent event,
+    Emitter<GenreState> emit,
+  ) async {
+    try {
+      await deleteGenre(event.id);
+      final genres = await getGenre();
+      emit(GenreLoaded(genres, message: 'Género eliminado'));
     } catch (e) {
       emit(GenreError(e.toString()));
     }

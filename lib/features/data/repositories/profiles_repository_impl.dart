@@ -75,6 +75,23 @@ class ProfilesRepositoryImpl implements ProfilesRepository {
   }
 
   @override
+  Future<List<UserEntity>> getAllProfiles() async {
+    try {
+      final response = await supabase
+          .from('profiles')
+          .select('*')
+          .order('email');
+      return response.map((json) => UserModel.fromJson(json)).toList();
+    } catch (e) {
+      throw RepositoryException(
+        message: 'Error al obtener perfiles',
+        originalException: e,
+        repositoryName: 'ProfilesRepository',
+      );
+    }
+  }
+
+  @override
   Future<void> changePassword(String newPassword) async {
     try {
       await supabase.auth.updateUser(UserAttributes(password: newPassword));

@@ -12,11 +12,12 @@ class GenreLoading extends GenreState {}
 
 class GenreLoaded extends GenreState {
   final List<GenreEntity> genres;
+  final String? message;
 
-  GenreLoaded(this.genres);
+  GenreLoaded(this.genres, {this.message});
 
   @override
-  List<Object> get props => [genres];
+  List<Object> get props => [genres, message ?? ''];
 }
 
 class GenreError extends GenreState {
