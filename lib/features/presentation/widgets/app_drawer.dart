@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/supabase/storage_helper.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
+import 'package:noveles/features/presentation/screens/admin/admin_main_screen.dart';
 import 'package:noveles/features/presentation/screens/profile/profile_screen.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -53,7 +54,15 @@ class AppDrawer extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.admin_panel_settings),
               title: const Text('Panel Admin'),
-              onTap: () => Navigator.pop(context),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const AdminMainScreen(),
+                  ),
+                );
+              },
             ),
           if (!isAdmin)
             ListTile(
