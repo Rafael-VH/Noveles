@@ -2,6 +2,7 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:noveles/features/domain/entities/entities.dart';
+import 'package:noveles/features/domain/use_cases/delete_book.dart';
 import 'package:noveles/features/domain/use_cases/get_book.dart';
 import 'package:noveles/features/domain/use_cases/toggle_book_visibility.dart' as usecases;
 import 'package:noveles/features/presentation/bloc/admin/admin_bloc.dart';
@@ -11,10 +12,12 @@ import 'package:noveles/features/presentation/bloc/admin/admin_state.dart';
 class MockGetBooks extends Mock implements GetBooks {}
 class MockToggleBookVisibility extends Mock
     implements usecases.ToggleBookVisibility {}
+class MockDeleteBook extends Mock implements DeleteBook {}
 
 void main() {
   late MockGetBooks mockGetBooks;
   late MockToggleBookVisibility mockToggleVisibility;
+  late MockDeleteBook mockDeleteBook;
 
   final testBooks = [
     BookEntity(
@@ -46,6 +49,7 @@ void main() {
   setUp(() {
     mockGetBooks = MockGetBooks();
     mockToggleVisibility = MockToggleBookVisibility();
+    mockDeleteBook = MockDeleteBook();
   });
 
   group('AdminBloc', () {
@@ -53,6 +57,7 @@ void main() {
       final bloc = AdminBloc(
         getBooks: mockGetBooks,
         toggleBookVisibility: mockToggleVisibility,
+        deleteBook: mockDeleteBook,
       );
       expect(bloc.state, const AdminInitial());
       bloc.close();
@@ -65,6 +70,7 @@ void main() {
         return AdminBloc(
           getBooks: mockGetBooks,
           toggleBookVisibility: mockToggleVisibility,
+          deleteBook: mockDeleteBook,
         );
       },
       act: (bloc) => bloc.add(const LoadAdminBooks()),
@@ -85,6 +91,7 @@ void main() {
         return AdminBloc(
           getBooks: mockGetBooks,
           toggleBookVisibility: mockToggleVisibility,
+          deleteBook: mockDeleteBook,
         );
       },
       act: (bloc) => bloc.add(const LoadAdminBooks()),
@@ -107,6 +114,7 @@ void main() {
         return AdminBloc(
           getBooks: mockGetBooks,
           toggleBookVisibility: mockToggleVisibility,
+          deleteBook: mockDeleteBook,
         );
       },
       act: (bloc) => bloc.add(const ToggleBookVisibility(1, true)),
@@ -128,6 +136,7 @@ void main() {
         return AdminBloc(
           getBooks: mockGetBooks,
           toggleBookVisibility: mockToggleVisibility,
+          deleteBook: mockDeleteBook,
         );
       },
       act: (bloc) => bloc.add(const ToggleBookVisibility(1, false)),
@@ -148,6 +157,7 @@ void main() {
         return AdminBloc(
           getBooks: mockGetBooks,
           toggleBookVisibility: mockToggleVisibility,
+          deleteBook: mockDeleteBook,
         );
       },
       act: (bloc) => bloc.add(const ToggleBookVisibility(1, true)),
@@ -156,6 +166,47 @@ void main() {
           (s) => s.message,
           'message',
           contains('Error de visibilidad'),
+        ),
+      ],
+    );
+
+    blocTest<AdminBloc, AdminState>(
+      'emits AdminLoaded with message when DeleteAdminBook succeeds',
+      build: () {
+        when(() => mockDeleteBook(any())).thenAnswer((_) async {});
+        when(() => mockGetBooks()).thenAnswer((_) async => testBooks);
+        return AdminBloc(
+          getBooks: mockGetBooks,
+          toggleBookVisibility: mockToggleVisibility,
+          deleteBook: mockDeleteBook,
+        );
+      },
+      act: (bloc) => bloc.add(const DeleteAdminBook(1)),
+      expect: () => [
+        isA<AdminLoaded>().having(
+          (s) => s.message,
+          'message',
+          'Libro eliminado',
+        ),
+      ],
+    );
+
+    blocTest<AdminBloc, AdminState>(
+      'emits AdminError when DeleteAdminBook fails',
+      build: () {
+        when(() => mockDeleteBook(any())).thenThrow(Exception('Delete error'));
+        return AdminBloc(
+          getBooks: mockGetBooks,
+          toggleBookVisibility: mockToggleVisibility,
+          deleteBook: mockDeleteBook,
+        );
+      },
+      act: (bloc) => bloc.add(const DeleteAdminBook(1)),
+      expect: () => [
+        isA<AdminError>().having(
+          (s) => s.message,
+          'message',
+          contains('Delete error'),
         ),
       ],
     );

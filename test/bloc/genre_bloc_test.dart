@@ -8,14 +8,37 @@ import 'package:noveles/features/presentation/bloc/genre/genre_event.dart';
 import 'package:noveles/features/presentation/bloc/genre/genre_state.dart';
 
 class MockGetGenre extends Mock implements GetGenre {}
+class MockCreateGenre extends Mock implements CreateGenre {}
+class MockUpdateGenre extends Mock implements UpdateGenre {}
+class MockDeleteGenre extends Mock implements DeleteGenre {}
 
 void main() {
+  setUpAll(() {
+    registerFallbackValue(GenreEntity(
+      id: 0,
+      createdAt: DateTime(2024),
+      name: '',
+      description: '',
+    ));
+  });
+
   late MockGetGenre mockGetGenre;
+  late MockCreateGenre mockCreateGenre;
+  late MockUpdateGenre mockUpdateGenre;
+  late MockDeleteGenre mockDeleteGenre;
   late GenreBloc genreBloc;
 
   setUp(() {
     mockGetGenre = MockGetGenre();
-    genreBloc = GenreBloc(mockGetGenre);
+    mockCreateGenre = MockCreateGenre();
+    mockUpdateGenre = MockUpdateGenre();
+    mockDeleteGenre = MockDeleteGenre();
+    genreBloc = GenreBloc(
+      getGenre: mockGetGenre,
+      createGenre: mockCreateGenre,
+      updateGenre: mockUpdateGenre,
+      deleteGenre: mockDeleteGenre,
+    );
   });
 
   tearDown(() {
@@ -31,6 +54,13 @@ void main() {
         description: 'Fantasy genre',
       ),
     ];
+
+    final testGenre = GenreEntity(
+      id: 2,
+      createdAt: DateTime(2024),
+      name: 'Sci-Fi',
+      description: 'Sci-Fi genre',
+    );
 
     test('initial state is GenreInitial', () {
       expect(genreBloc.state, equals(GenreInitial()));
@@ -59,6 +89,105 @@ void main() {
       expect: () => [
         isA<GenreLoading>(),
         isA<GenreError>().having((s) => s.message, 'message', contains('API error')),
+      ],
+    );
+
+    blocTest<GenreBloc, GenreState>(
+      'emits GenreLoaded with message when CreateGenreEvent succeeds',
+      build: () {
+        when(() => mockCreateGenre(any())).thenAnswer((_) async {});
+        when(() => mockGetGenre()).thenAnswer((_) async => testGenres);
+        return genreBloc;
+      },
+      act: (bloc) => bloc.add(CreateGenreEvent(testGenre)),
+      expect: () => [
+        isA<GenreLoaded>().having(
+          (s) => s.message,
+          'message',
+          'Género creado',
+        ),
+      ],
+    );
+
+    blocTest<GenreBloc, GenreState>(
+      'emits GenreError when CreateGenreEvent fails',
+      build: () {
+        when(() => mockCreateGenre(any())).thenThrow(Exception('Create error'));
+        return genreBloc;
+      },
+      act: (bloc) => bloc.add(CreateGenreEvent(testGenre)),
+      expect: () => [
+        isA<GenreError>().having(
+          (s) => s.message,
+          'message',
+          contains('Create error'),
+        ),
+      ],
+    );
+
+    blocTest<GenreBloc, GenreState>(
+      'emits GenreLoaded with message when UpdateGenreEvent succeeds',
+      build: () {
+        when(() => mockUpdateGenre(any())).thenAnswer((_) async {});
+        when(() => mockGetGenre()).thenAnswer((_) async => testGenres);
+        return genreBloc;
+      },
+      act: (bloc) => bloc.add(UpdateGenreEvent(testGenre)),
+      expect: () => [
+        isA<GenreLoaded>().having(
+          (s) => s.message,
+          'message',
+          'Género actualizado',
+        ),
+      ],
+    );
+
+    blocTest<GenreBloc, GenreState>(
+      'emits GenreError when UpdateGenreEvent fails',
+      build: () {
+        when(() => mockUpdateGenre(any())).thenThrow(Exception('Update error'));
+        return genreBloc;
+      },
+      act: (bloc) => bloc.add(UpdateGenreEvent(testGenre)),
+      expect: () => [
+        isA<GenreError>().having(
+          (s) => s.message,
+          'message',
+          contains('Update error'),
+        ),
+      ],
+    );
+
+    blocTest<GenreBloc, GenreState>(
+      'emits GenreLoaded with message when DeleteGenreEvent succeeds',
+      build: () {
+        when(() => mockDeleteGenre(any())).thenAnswer((_) async {});
+        when(() => mockGetGenre()).thenAnswer((_) async => testGenres);
+        return genreBloc;
+      },
+      act: (bloc) => bloc.add(DeleteGenreEvent(1)),
+      expect: () => [
+        isA<GenreLoaded>().having(
+          (s) => s.message,
+          'message',
+          'Género eliminado',
+        ),
+      ],
+    );
+
+    blocTest<GenreBloc, GenreState>(
+      'emits GenreError when DeleteGenreEvent fails',
+      build: () {
+        when(() => mockDeleteGenre(any())).thenThrow(Exception('Delete error'));
+        return genreBloc;
+      },
+      act: (bloc) => bloc.add(DeleteGenreEvent(1)),
+      expect: () => [
+        isA<GenreError>().having(
+          (s) => s.message,
+          'message',
+          contains('Delete error'),
+        ),
       ],
     );
   });
