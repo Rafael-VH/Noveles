@@ -213,9 +213,12 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
                             onPressed: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) => ScanChapterEditScreen(
-                                  chapter: ch,
-                                  tookId: _currentTook!.id,
+                                builder: (_) => BlocProvider.value(
+                                  value: context.read<ScanBloc>(),
+                                  child: ScanChapterEditScreen(
+                                    chapter: ch,
+                                    tookId: _currentTook!.id,
+                                  ),
                                 ),
                               ),
                             ),
@@ -234,9 +237,12 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
                       onTap: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => ScanChapterEditScreen(
-                            chapter: ch,
-                            tookId: _currentTook!.id,
+                          builder: (_) => BlocProvider.value(
+                            value: context.read<ScanBloc>(),
+                            child: ScanChapterEditScreen(
+                              chapter: ch,
+                              tookId: _currentTook!.id,
+                            ),
                           ),
                         ),
                       ),
@@ -249,8 +255,11 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
                   onPressed: () => Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => ScanChapterEditScreen(
-                        tookId: _currentTook!.id,
+                      builder: (_) => BlocProvider.value(
+                        value: context.read<ScanBloc>(),
+                        child: ScanChapterEditScreen(
+                          tookId: _currentTook!.id,
+                        ),
                       ),
                     ),
                   ),

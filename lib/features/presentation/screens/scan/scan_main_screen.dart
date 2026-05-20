@@ -16,10 +16,24 @@ class ScanMainScreen extends StatefulWidget {
 }
 
 class _ScanMainScreenState extends State<ScanMainScreen> {
+  late final ScanBloc _bloc;
+
+  @override
+  void initState() {
+    super.initState();
+    _bloc = getIt<ScanBloc>()..add(LoadScanBooks());
+  }
+
+  @override
+  void dispose() {
+    _bloc.close();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => getIt<ScanBloc>()..add(LoadScanBooks()),
+    return BlocProvider.value(
+      value: _bloc,
       child: BlocListener<ScanBloc, ScanState>(
         listener: (context, state) {
           // Show error message on error state
@@ -177,7 +191,10 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => ScanBookEditScreen(book: book),
+        builder: (_) => BlocProvider.value(
+          value: _bloc,
+          child: ScanBookEditScreen(book: book),
+        ),
       ),
     );
   }
@@ -187,7 +204,10 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => const ScanBookEditScreen(),
+        builder: (_) => BlocProvider.value(
+          value: _bloc,
+          child: const ScanBookEditScreen(),
+        ),
       ),
     );
   }

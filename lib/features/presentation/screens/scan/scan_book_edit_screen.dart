@@ -64,6 +64,7 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
       } else if (state is ScanCoverUploaded && mounted) {
         setState(() => _coverCtrl.text = state.filename);
       } else if (state is ScanLoaded && mounted && !_isSaving) {
+        if (state.books.isEmpty) return;
         final match = state.books.firstWhere(
           (b) =>
               b.id == widget.book?.id ||
@@ -149,12 +150,12 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
       bloc.add(SaveScanBook(book, isUpdate: _isEditing));
       final result = await future;
       if (result is ScanLoaded && mounted) {
-        return _isEditing
-            ? widget.book
-            : result.books.firstWhere(
-                (b) => b.name == book.name && b.author == book.author,
-                orElse: () => result.books.last,
-              );
+        if (_isEditing) return widget.book;
+        if (result.books.isEmpty) return null;
+        return result.books.firstWhere(
+          (b) => b.name == book.name && b.author == book.author,
+          orElse: () => result.books.last,
+        );
       } else if (result is ScanError && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -178,7 +179,10 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => ScanTookEditScreen(bookId: saved.id),
+          builder: (_) => BlocProvider.value(
+            value: context.read<ScanBloc>(),
+            child: ScanTookEditScreen(bookId: saved.id),
+          ),
         ),
       );
     }
@@ -332,16 +336,21 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
                     ? () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) =>
-                                ScanTookEditScreen(bookId: widget.book!.id),
+                            builder: (_) => BlocProvider.value(
+                              value: context.read<ScanBloc>(),
+                              child:
+                                  ScanTookEditScreen(bookId: widget.book!.id),
+                            ),
                           ),
                         )
                     : _saveAndAddTomo,
                 onEditTook: (took, bookId) => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) =>
-                        ScanTookEditScreen(took: took, bookId: bookId),
+                    builder: (_) => BlocProvider.value(
+                      value: context.read<ScanBloc>(),
+                      child: ScanTookEditScreen(took: took, bookId: bookId),
+                    ),
                   ),
                 ),
                 onDeleteTook: (tookId) {
