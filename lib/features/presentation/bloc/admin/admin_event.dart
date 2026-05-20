@@ -20,3 +20,12 @@ class ToggleBookVisibility extends AdminEvent {
   @override
   List<Object> get props => [bookId, isVisible];
 }
+
+class DeleteAdminBook extends AdminEvent {
+  final int bookId;
+
+  const DeleteAdminBook(this.bookId);
+
+  @override
+  List<Object> get props => [bookId];
+}

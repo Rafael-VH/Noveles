@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:noveles/features/domain/use_cases/delete_book.dart';
 import 'package:noveles/features/domain/use_cases/get_book.dart';
 import 'package:noveles/features/domain/use_cases/toggle_book_visibility.dart' as usecases;
 import 'package:noveles/features/presentation/bloc/admin/admin_event.dart';
@@ -7,13 +8,16 @@ import 'package:noveles/features/presentation/bloc/admin/admin_state.dart';
 class AdminBloc extends Bloc<AdminEvent, AdminState> {
   final GetBooks getBooks;
   final usecases.ToggleBookVisibility toggleBookVisibility;
+  final DeleteBook deleteBook;
 
   AdminBloc({
     required this.getBooks,
     required this.toggleBookVisibility,
+    required this.deleteBook,
   }) : super(const AdminInitial()) {
     on<LoadAdminBooks>(_onLoadBooks);
     on<ToggleBookVisibility>(_onToggleVisibility);
+    on<DeleteAdminBook>(_onDeleteBook);
   }
 
   Future<void> _onLoadBooks(
@@ -39,6 +43,22 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
       emit(AdminLoaded(
         books,
         message: event.isVisible ? 'Libro publicado' : 'Libro ocultado',
+      ));
+    } catch (e) {
+      emit(AdminError(e.toString()));
+    }
+  }
+
+  Future<void> _onDeleteBook(
+    DeleteAdminBook event,
+    Emitter<AdminState> emit,
+  ) async {
+    try {
+      await deleteBook(event.bookId);
+      final books = await getBooks();
+      emit(AdminLoaded(
+        books,
+        message: 'Libro eliminado',
       ));
     } catch (e) {
       emit(AdminError(e.toString()));

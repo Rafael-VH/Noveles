@@ -42,3 +42,8 @@ export 'package:noveles/features/presentation/bloc/admin/admin_state.dart';
 export 'package:noveles/features/presentation/bloc/label/label_bloc.dart';
 export 'package:noveles/features/presentation/bloc/label/label_event.dart';
 export 'package:noveles/features/presentation/bloc/label/label_state.dart';
+
+// Admin Users Bloc
+export 'package:noveles/features/presentation/bloc/admin_users/admin_users_bloc.dart';
+export 'package:noveles/features/presentation/bloc/admin_users/admin_users_event.dart';
+export 'package:noveles/features/presentation/bloc/admin_users/admin_users_state.dart';
