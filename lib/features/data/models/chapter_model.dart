@@ -12,7 +12,7 @@ class ChapterModel extends ChapterEntity {
   });
 
   factory ChapterModel.fromJson(Map<String, dynamic> json) => ChapterModel(
-    id: json['id'],
+    id: json['id'] as int,
     createdAt: DateTime.parse(json['created_at'] as String),
     number: (json['number'] as String?) ?? '',
     title: (json['title'] as String?) ?? '',

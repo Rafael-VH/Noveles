@@ -31,9 +31,9 @@ class BookModel extends BookEntity {
   });
 
   factory BookModel.fromJson(Map<String, dynamic> json) {
-    final authorData = Map<String, dynamic>.from(json['authors']);
+    final authorData = Map<String, dynamic>.from(json['authors'] ?? <String, dynamic>{});
 
-    final listGenre = (json['books_genres'] as List<dynamic>).map((bg) {
+    final listGenre = ((json['books_genres'] as List<dynamic>?) ?? []).map((bg) {
       return GenreModel.fromJson(Map<String, dynamic>.from(bg['genres']));
     }).toList();
 

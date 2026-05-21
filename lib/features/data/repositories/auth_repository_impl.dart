@@ -21,6 +21,9 @@ class AuthRepositoryImpl implements AuthRepository {
         id: user.id,
         email: user.email ?? '',
         role: profile['role'] ?? 'user',
+        displayName: profile['display_name'] as String?,
+        bio: profile['bio'] as String?,
+        avatarUrl: profile['avatar_url'] as String?,
       );
     } catch (e) {
       throw RepositoryException(
@@ -47,6 +50,9 @@ class AuthRepositoryImpl implements AuthRepository {
         id: user.id,
         email: user.email ?? '',
         role: profile['role'] ?? 'user',
+        displayName: profile['display_name'] as String?,
+        bio: profile['bio'] as String?,
+        avatarUrl: profile['avatar_url'] as String?,
       );
     } catch (e) {
       throw RepositoryException(
@@ -83,6 +89,9 @@ class AuthRepositoryImpl implements AuthRepository {
           id: user.id,
           email: user.email ?? '',
           role: profile['role'] ?? 'user',
+          displayName: profile['display_name'] as String?,
+          bio: profile['bio'] as String?,
+          avatarUrl: profile['avatar_url'] as String?,
         );
       } catch (_) {
         return null;
@@ -104,7 +113,7 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       final response = await supabase
           .from('profiles')
-          .select('role')
+          .select('*')
           .eq('id', userId)
           .maybeSingle();
 

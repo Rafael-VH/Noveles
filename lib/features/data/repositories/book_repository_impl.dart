@@ -88,7 +88,7 @@ class BookRepositoryImpl implements BookRepository {
             'source': book.source,
             'link': book.link,
             'is_favorite': book.isFavorite,
-            'created_by': supabase.auth.currentUser!.id,
+            'created_by': supabase.auth.currentUser?.id,
           })
           .select('id')
           .single();
@@ -160,13 +160,6 @@ class BookRepositoryImpl implements BookRepository {
   @override
   Future<void> deleteBook(int id) async {
     try {
-      await supabase.from('books_genres').delete().eq('book_id', id);
-      final tookIds =
-          await supabase.from('tooks').select('id').eq('book_id', id);
-      for (final row in tookIds) {
-        await supabase.from('chapters').delete().eq('took_id', row['id']);
-      }
-      await supabase.from('tooks').delete().eq('book_id', id);
       await supabase.from('books').delete().eq('id', id);
     } catch (e) {
       throw RepositoryException(

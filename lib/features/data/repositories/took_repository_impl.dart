@@ -15,7 +15,7 @@ class TookRepositoryImpl implements TookRepository {
           .limit(100);
 
       return response
-          .map((json) => TookModel.fromJson(Map<String, dynamic>.from(json)))
+          .map((json) => TookModel.fromJson(json))
           .toList();
     } catch (e) {
       throw RepositoryException(
@@ -36,7 +36,7 @@ class TookRepositoryImpl implements TookRepository {
           .maybeSingle();
 
       if (response == null) return null;
-      return TookModel.fromJson(Map<String, dynamic>.from(response));
+      return TookModel.fromJson(response);
     } catch (e) {
       throw RepositoryException(
         message: 'Error al obtener tomo',
@@ -56,6 +56,7 @@ class TookRepositoryImpl implements TookRepository {
         'title': took.title,
         'chapter_count': took.chapterCount,
         'book_id': took.bookId,
+        'created_by': supabase.auth.currentUser?.id,
       });
     } catch (e) {
       throw RepositoryException(

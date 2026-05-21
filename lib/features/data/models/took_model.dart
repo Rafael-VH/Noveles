@@ -25,7 +25,7 @@ class TookModel extends TookEntity {
       cover: (json['cover'] as String?) ?? '',
       number: (json['number'] as String?) ?? '',
       title: (json['title'] as String?) ?? '',
-      chapterCount: (json['chapter_count'] as String?) ?? (json['content'] as String?) ?? '',
+      chapterCount: (json['chapter_count'] as String?) ?? '',
       bookId: (json['book_id'] as int?) ?? 0,
       createdBy: json['created_by'] as String?,
       listChapter: chapters,

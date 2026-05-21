@@ -51,6 +51,7 @@ class ChapterRepositoryImpl implements ChapterRepository {
         'title': chapter.title,
         'content': chapter.content,
         'took_id': chapter.tookId,
+        'created_by': supabase.auth.currentUser?.id,
       });
     } catch (e) {
       throw RepositoryException(

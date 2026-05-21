@@ -40,7 +40,6 @@ class GenreRepositoryImpl implements GenreRepository {
   Future<void> createGenre(GenreEntity genre) async {
     try {
       await supabase.from('genres').insert({
-        'id': genre.id,
         'created_at': genre.createdAt.toIso8601String(),
         'name': genre.name,
         'description': genre.description,
