@@ -19,6 +19,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        // Proporciona el BookBloc a la jerarquía de widgets, permitiendo que los widgets hijos accedan al estado de los libros y respondan a los eventos relacionados con los libros.
         BlocProvider(
           create: (_) => BookBloc(
             getBooks: getIt(),
@@ -26,6 +27,8 @@ class _MainScreenState extends State<MainScreen> {
             onlyVisible: true,
           )..add(LoadBooks()),
         ),
+
+        // Proporciona el GenreBloc a la jerarquía de widgets, permitiendo que los widgets hijos accedan al estado de los géneros y respondan a los eventos relacionados con los géneros.
         BlocProvider(
           create: (_) => getIt<GenreBloc>()..add(LoadGenres()),
         ),
@@ -36,9 +39,12 @@ class _MainScreenState extends State<MainScreen> {
           builder: (context, bookState) {
             return BlocBuilder<GenreBloc, GenreState>(
               builder: (context, genreState) {
+                // Manejo de estados: muestra un indicador de carga, mensajes de error o el contenido principal según el estado actual de los blocs.
                 if (bookState is BookLoading || genreState is GenreLoading) {
                   return const Center(child: CircularProgressIndicator());
                 }
+
+                // Manejo de errores: muestra un mensaje de error y un botón para reintentar la carga de datos si ocurre un error en cualquiera de los blocs.
                 if (bookState is BookError) {
                   return Center(
                     child: Column(
@@ -55,6 +61,8 @@ class _MainScreenState extends State<MainScreen> {
                     ),
                   );
                 }
+
+                // Manejo de errores: muestra un mensaje de error y un botón para reintentar la carga de datos si ocurre un error en cualquiera de los blocs.
                 if (genreState is GenreError) {
                   return Center(
                     child: Column(
@@ -71,11 +79,15 @@ class _MainScreenState extends State<MainScreen> {
                     ),
                   );
                 }
+
+                // Si ambos blocs han cargado correctamente, se construye el contenido principal de la pantalla utilizando los datos de libros y géneros.
                 if (bookState is BookLoaded && genreState is GenreLoaded) {
                   final listBook = bookState.books;
                   final listGenre = genreState.genres;
                   return _buildContent(context, listBook, listGenre);
                 }
+
+                // Estado por defecto: muestra un indicador de carga mientras se espera la carga de datos.
                 return const Center(child: CircularProgressIndicator());
               },
             );
@@ -85,6 +97,7 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
+  // Construye el contenido principal de la pantalla, incluyendo el carrusel de libros y la lista de géneros.
   Widget _buildContent(
     BuildContext context,
     List<BookEntity> listBook,
@@ -93,6 +106,7 @@ class _MainScreenState extends State<MainScreen> {
     return SafeArea(
       child: CustomScrollView(
         slivers: [
+          // Carousel
           SliverAppBarHome(
             listBook: listBook,
             onBookTap: (book) => Navigator.push(
@@ -111,7 +125,10 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ],
           ),
+
           const SliverToBoxAdapter(child: SizedBox(height: 32.0)),
+
+          // Géneros
           SliverToBoxAdapter(
             child: SizedBox(
               height: 60.0,

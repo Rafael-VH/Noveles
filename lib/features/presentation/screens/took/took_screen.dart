@@ -21,9 +21,12 @@ class _TookScreenState extends State<TookScreen> {
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
+            // Construye un SliverAppBar que muestra el número del "took" como título.
             SliverAppBar(
               title: Text(widget.tooks.number),
             ),
+
+            // Construye una lista de capítulos utilizando SliverList, donde cada elemento de la lista es un ListTile que muestra el título y número del capítulo. Al hacer clic en un capítulo, se navega a la pantalla de detalles del capítulo correspondiente.
             SliverList.builder(
               itemCount: widget.tooks.listChapter.length,
               itemBuilder: (context, index) {
