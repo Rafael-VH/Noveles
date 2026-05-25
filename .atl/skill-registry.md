@@ -14,6 +14,7 @@
 | find-skills | `~/.agents/skills/find-skills/SKILL.md` | "how do I do X", "find a skill for X", "is there a skill that can...", extending capabilities |
 | supabase | `~/.agents/skills/supabase/SKILL.md` | Any Supabase task (Database, Auth, Edge Functions, Realtime, Storage, Vectors, Cron, Queues); supabase-js, @supabase/ssr; auth issues; Supabase CLI or MCP server; schema changes, migrations |
 | supabase-postgres-best-practices | `~/.agents/skills/supabase-postgres-best-practices/SKILL.md` | Writing, reviewing, or optimizing Postgres queries, schema designs, or database configurations |
+| arqui | `~/.gemini/config/skills/arqui/SKILL.md` | Revisa si el código generado o los cambios planeados cumplen rigurosamente con los principios de Arquitectura Limpia (Clean Architecture). |
 
 ### SDD Skills (built-in)
 
@@ -50,3 +51,11 @@ No project-level convention files found (CLAUDE.md, AGENTS.md, .cursorrules, etc
 - Use supabase-postgres-best-practices for schema and query work
 - Migrations in `supabase/migrations/` directory
 - Local config in `supabase/config.toml`
+
+### arqui
+- Regla de Dependencia Estricta: Capas internas (Domain) NUNCA importan capas externas (Data, Presentation) ni paquetes de Flutter/Supabase.
+- Domain Puro: Solo Dart nativo. Contiene entidades de negocio puras (sin serialización JSON), Casos de Uso (lógica) e interfaces de repositorios abstractas.
+- Capa de Datos: Contiene modelos que heredan de entidades con mappers (fromJson/toJson) e implementaciones de repositorios. Captura excepciones técnicas y retorna Failures de dominio.
+- Capa de Presentación: UI, Screens, Widgets y BLoCs/Cubits. Dependen únicamente de Casos de Uso y Entidades. JAMÁS importan repositorios concretos o datasources.
+- Inyección de Dependencias: Usa interfaces abstractas inyectadas mediante GetIt, nunca instancias directas.
+
