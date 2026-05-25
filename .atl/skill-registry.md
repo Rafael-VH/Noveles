@@ -5,7 +5,7 @@
 ### User Skills
 
 | Skill | Path | Triggers |
-|-------|------|----------|
+| ------- | ------ | ---------- |
 | branch-pr | `~/.claude/skills/branch-pr/SKILL.md` | Creating a pull request, opening a PR, preparing changes for review |
 | issue-creation | `~/.claude/skills/issue-creation/SKILL.md` | Creating a GitHub issue, reporting a bug, requesting a feature |
 | skill-creator | `~/.claude/skills/skill-creator/SKILL.md` | Creating a new skill, adding agent instructions, documenting patterns for AI |
@@ -19,7 +19,7 @@
 ### SDD Skills (built-in)
 
 | Skill | Path |
-|-------|------|
+| ------- | ------ |
 | sdd-init | `~/.claude/skills/sdd-init/SKILL.md` |
 | sdd-explore | `~/.claude/skills/sdd-explore/SKILL.md` |
 | sdd-propose | `~/.claude/skills/sdd-propose/SKILL.md` |
@@ -38,6 +38,7 @@ No project-level convention files found (CLAUDE.md, AGENTS.md, .cursorrules, etc
 ### Compact Rules
 
 **Flutter/Dart project** — match on `.dart` files:
+
 - Use BLoC pattern for state management (flutter_bloc)
 - Use get_it for dependency injection
 - Clean Architecture: data/repositories → domain/use_cases → presentation/bloc
@@ -47,15 +48,16 @@ No project-level convention files found (CLAUDE.md, AGENTS.md, .cursorrules, etc
 - Test: `flutter test` for unit/widget tests
 
 **Supabase** — match on `supabase/` path or supabase_flutter usage:
+
 - Load supabase skill for all Supabase-related work
 - Use supabase-postgres-best-practices for schema and query work
 - Migrations in `supabase/migrations/` directory
 - Local config in `supabase/config.toml`
 
 ### arqui
+
 - Regla de Dependencia Estricta: Capas internas (Domain) NUNCA importan capas externas (Data, Presentation) ni paquetes de Flutter/Supabase.
 - Domain Puro: Solo Dart nativo. Contiene entidades de negocio puras (sin serialización JSON), Casos de Uso (lógica) e interfaces de repositorios abstractas.
 - Capa de Datos: Contiene modelos que heredan de entidades con mappers (fromJson/toJson) e implementaciones de repositorios. Captura excepciones técnicas y retorna Failures de dominio.
 - Capa de Presentación: UI, Screens, Widgets y BLoCs/Cubits. Dependen únicamente de Casos de Uso y Entidades. JAMÁS importan repositorios concretos o datasources.
 - Inyección de Dependencias: Usa interfaces abstractas inyectadas mediante GetIt, nunca instancias directas.
-
