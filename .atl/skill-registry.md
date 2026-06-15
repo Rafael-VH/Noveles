@@ -15,6 +15,7 @@
 | supabase | `~/.agents/skills/supabase/SKILL.md` | Any Supabase task (Database, Auth, Edge Functions, Realtime, Storage, Vectors, Cron, Queues); supabase-js, @supabase/ssr; auth issues; Supabase CLI or MCP server; schema changes, migrations |
 | supabase-postgres-best-practices | `~/.agents/skills/supabase-postgres-best-practices/SKILL.md` | Writing, reviewing, or optimizing Postgres queries, schema designs, or database configurations |
 | arqui | `~/.gemini/config/skills/arqui/SKILL.md` | Revisa si el código generado o los cambios planeados cumplen rigurosamente con los principios de Arquitectura Limpia (Clean Architecture). |
+| arquic | `~/.config/opencode/skills/arquic/SKILL.md` | [Opencode] Revisor de Clean Architecture para Noveles. Analiza planes, diseño y código antes de aplicar cambios. Trigger: "arquic review", "clean check", "revisar arquitectura". |
 
 ### SDD Skills (built-in)
 
