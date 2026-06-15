@@ -273,6 +273,7 @@ class _BooksContent extends StatelessWidget {
     );
   }
 
+  // Muestra un diálogo de confirmación para eliminar un libro, asegurándose de que el administrador no elimine un libro por accidente. Si el administrador confirma la eliminación, se envía un evento para eliminar el libro de la base de datos.
   void _confirmDeleteBook(BuildContext context, int bookId) {
     showDialog(
       context: context,
@@ -300,6 +301,7 @@ class _BooksContent extends StatelessWidget {
   }
 }
 
+// Este widget muestra la lista de géneros disponibles en la aplicación, permitiendo a los administradores agregar nuevos géneros, editar los existentes o eliminarlos. Si no hay géneros disponibles, se muestra un mensaje indicando que no hay géneros.
 class _GenresTab extends StatefulWidget {
   const _GenresTab();
 
@@ -307,6 +309,7 @@ class _GenresTab extends StatefulWidget {
   State<_GenresTab> createState() => _GenresTabState();
 }
 
+// Este widget muestra la lista de géneros disponibles en la aplicación, permitiendo a los administradores agregar nuevos géneros, editar los existentes o eliminarlos. Si no hay géneros disponibles, se muestra un mensaje indicando que no hay géneros.
 class _GenresTabState extends State<_GenresTab> {
   @override
   Widget build(BuildContext context) {
@@ -314,6 +317,7 @@ class _GenresTabState extends State<_GenresTab> {
       create: (_) => getIt<GenreBloc>()..add(LoadGenres()),
       child: BlocConsumer<GenreBloc, GenreState>(
         listener: (context, state) {
+          // Muestra un mensaje de éxito si se cargan, crean, actualizan o eliminan géneros correctamente
           if (state is GenreLoaded && state.message != null) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -322,6 +326,8 @@ class _GenresTabState extends State<_GenresTab> {
               ),
             );
           }
+
+          // Muestra un mensaje de error si ocurre un error al cargar, crear, actualizar o eliminar géneros
           if (state is GenreError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -332,12 +338,15 @@ class _GenresTabState extends State<_GenresTab> {
           }
         },
         builder: (context, state) {
+          // Muestra un indicador de carga mientras se obtienen los géneros
           if (state is GenreLoading || state is GenreInitial) {
             return const Center(child: CircularProgressIndicator());
           }
+          // Si los géneros se cargaron correctamente, se muestra la lista de géneros con opciones para agregar, editar o eliminar cada uno.
           if (state is GenreLoaded) {
             return _GenreListContent(genres: state.genres);
           }
+          // Muestra un mensaje de error con opción para reintentar
           if (state is GenreError) {
             return Center(
               child: Column(
@@ -354,6 +363,7 @@ class _GenresTabState extends State<_GenresTab> {
               ),
             );
           }
+          // En caso de un estado inesperado, se muestra un widget vacío. Esto no debería ocurrir si el bloc está bien implementado, pero es una medida de seguridad para evitar errores en la interfaz.
           return const SizedBox.shrink();
         },
       ),
@@ -361,6 +371,7 @@ class _GenresTabState extends State<_GenresTab> {
   }
 }
 
+// Este widget muestra la lista de géneros disponibles en la aplicación, permitiendo a los administradores agregar nuevos géneros, editar los existentes o eliminarlos. Si no hay géneros disponibles, se muestra un mensaje indicando que no hay géneros.
 class _GenreListContent extends StatelessWidget {
   final List<GenreEntity> genres;
   const _GenreListContent({required this.genres});
@@ -369,8 +380,10 @@ class _GenreListContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
+        // Si no hay géneros, muestra un mensaje indicando que no hay géneros disponibles. De lo contrario, muestra una lista de géneros con opciones para editar o eliminar cada uno.
         if (genres.isEmpty)
           const Center(child: Text('No hay géneros'))
+        // Si hay géneros, se muestra una lista de ellos. Cada género se muestra con su nombre y dos botones: uno para editar el género (que abre un diálogo para cambiar su nombre) y otro para eliminarlo (que muestra un diálogo de confirmación antes de eliminarlo).
         else
           ListView.builder(
             padding: const EdgeInsets.only(bottom: 80),
@@ -396,6 +409,8 @@ class _GenreListContent extends StatelessWidget {
               );
             },
           ),
+
+        // Botón flotante para agregar un nuevo género, ubicado en la esquina inferior derecha de la pantalla. Al presionarlo, se muestra un diálogo para ingresar el nombre del nuevo género.
         Positioned(
           bottom: 16,
           right: 16,
@@ -408,6 +423,7 @@ class _GenreListContent extends StatelessWidget {
     );
   }
 
+  // Muestra un diálogo para agregar un nuevo género, permitiendo al administrador crear uno nuevo
   void _showAddGenreDialog(BuildContext context) {
     final controller = TextEditingController();
     showDialog(
@@ -423,6 +439,7 @@ class _GenreListContent extends StatelessWidget {
           autofocus: true,
         ),
         actions: [
+          // Al cancelar, simplemente se cierra el diálogo sin hacer nada
           TextButton(
             onPressed: () {
               controller.dispose();
@@ -430,6 +447,8 @@ class _GenreListContent extends StatelessWidget {
             },
             child: const Text('Cancelar'),
           ),
+
+          // Al agregar, se crea un nuevo género con el nombre ingresado
           TextButton(
             onPressed: () {
               final name = controller.text.trim();
@@ -454,6 +473,7 @@ class _GenreListContent extends StatelessWidget {
     );
   }
 
+  // Muestra un diálogo para editar un género existente, permitiendo al administrador cambiar su nombre. Al guardar, se envía un evento para actualizar el género en la base de datos.
   void _showEditGenreDialog(BuildContext context, GenreEntity genre) {
     final controller = TextEditingController(text: genre.name);
     showDialog(
@@ -469,6 +489,7 @@ class _GenreListContent extends StatelessWidget {
           autofocus: true,
         ),
         actions: [
+          // Al cancelar, simplemente se cierra el diálogo sin hacer cambios
           TextButton(
             onPressed: () {
               controller.dispose();
@@ -476,6 +497,8 @@ class _GenreListContent extends StatelessWidget {
             },
             child: const Text('Cancelar'),
           ),
+
+          // Al guardar, se actualiza el género con el nuevo nombre
           TextButton(
             onPressed: () {
               final name = controller.text.trim();
@@ -500,6 +523,7 @@ class _GenreListContent extends StatelessWidget {
     );
   }
 
+  // Muestra un diálogo de confirmación para eliminar un género
   void _confirmDeleteGenre(BuildContext context, int genreId) {
     showDialog(
       context: context,
@@ -528,6 +552,7 @@ class _GenreListContent extends StatelessWidget {
   }
 }
 
+// Este widget muestra la lista de usuarios registrados en la aplicación, destacando su rol (admin o usuario normal) con un estilo visual distintivo. Permite a los administradores ver rápidamente quiénes son los usuarios y qué rol tienen, lo que facilita la gestión de permisos y el monitoreo de la base de usuarios.
 class _UsersTab extends StatefulWidget {
   const _UsersTab();
 
@@ -535,6 +560,7 @@ class _UsersTab extends StatefulWidget {
   State<_UsersTab> createState() => _UsersTabState();
 }
 
+// Este widget muestra la lista de usuarios registrados en la aplicación, destacando su rol (admin o usuario normal) con un estilo visual distintivo. Permite a los administradores ver rápidamente quiénes son los usuarios y qué rol tienen, lo que facilita la gestión de permisos y el monitoreo de la base de usuarios.
 class _UsersTabState extends State<_UsersTab> {
   @override
   Widget build(BuildContext context) {
@@ -542,9 +568,12 @@ class _UsersTabState extends State<_UsersTab> {
       create: (_) => getIt<AdminUsersBloc>()..add(const LoadAdminUsers()),
       child: BlocBuilder<AdminUsersBloc, AdminUsersState>(
         builder: (context, state) {
+          // Muestra un indicador de carga mientras se obtienen los usuarios
           if (state is AdminUsersLoading || state is AdminUsersInitial) {
             return const Center(child: CircularProgressIndicator());
           }
+
+          // Muestra la lista de usuarios con su rol destacado
           if (state is AdminUsersLoaded) {
             final users = state.users;
             if (users.isEmpty) {
@@ -570,6 +599,8 @@ class _UsersTabState extends State<_UsersTab> {
               },
             );
           }
+
+          // Muestra un mensaje de error con opción para reintentar
           if (state is AdminUsersError) {
             return Center(
               child: Column(
@@ -594,6 +625,7 @@ class _UsersTabState extends State<_UsersTab> {
   }
 }
 
+// Widget para mostrar el rol del usuario con un estilo distintivo
 class _RoleBadge extends StatelessWidget {
   final String role;
   const _RoleBadge({required this.role});
@@ -606,7 +638,7 @@ class _RoleBadge extends StatelessWidget {
       decoration: BoxDecoration(
         color: isAdmin
             ? Theme.of(context).colorScheme.primaryContainer
-            : Theme.of(context).colorScheme.surfaceVariant,
+            : Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
@@ -623,6 +655,7 @@ class _RoleBadge extends StatelessWidget {
   }
 }
 
+// Placeholder for the analytics tab, which can be expanded in the future with actual analytics features
 class _AnalyticsTab extends StatelessWidget {
   const _AnalyticsTab();
 
@@ -636,6 +669,7 @@ class _AnalyticsTab extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // Icon for the analytics section
               Icon(
                 Icons.analytics_outlined,
                 size: 64,
@@ -644,12 +678,18 @@ class _AnalyticsTab extends StatelessWidget {
                     .primary
                     .withValues(alpha: 0.5),
               ),
+
               const SizedBox(height: 16),
+
+              // Title for the analytics section
               Text(
                 'Analíticas',
                 style: Theme.of(context).textTheme.titleLarge,
               ),
+
               const SizedBox(height: 8),
+
+              // Placeholder text for future analytics features
               Text(
                 'Próximamente',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
