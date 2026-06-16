@@ -1,6 +1,8 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:noveles/core/errors/result.dart';
+import 'package:noveles/core/errors/failure.dart';
 import 'package:noveles/features/genres/domain/genre_entity.dart';
 import 'package:noveles/features/genres/domain/get_genre.dart';
 import 'package:noveles/features/genres/domain/create_genre.dart';
@@ -75,7 +77,7 @@ void main() {
     blocTest<GenreBloc, GenreState>(
       'emits [GenreLoading, GenreLoaded] when LoadGenres succeeds',
       build: () {
-        when(() => mockGetGenre()).thenAnswer((_) async => testGenres);
+        when(() => mockGetGenre()).thenAnswer((_) async => Ok(testGenres));
         return genreBloc;
       },
       act: (bloc) => bloc.add(LoadGenres()),
@@ -88,7 +90,8 @@ void main() {
     blocTest<GenreBloc, GenreState>(
       'emits [GenreLoading, GenreError] when GetGenres fails',
       build: () {
-        when(() => mockGetGenre()).thenThrow(Exception('API error'));
+        when(() => mockGetGenre())
+            .thenAnswer((_) async => Err(GenreFailure('API error')));
         return genreBloc;
       },
       act: (bloc) => bloc.add(LoadGenres()),
@@ -102,8 +105,9 @@ void main() {
     blocTest<GenreBloc, GenreState>(
       'emits GenreLoaded with message when CreateGenreEvent succeeds',
       build: () {
-        when(() => mockCreateGenre(any())).thenAnswer((_) async {});
-        when(() => mockGetGenre()).thenAnswer((_) async => testGenres);
+        when(() => mockCreateGenre(any()))
+            .thenAnswer((_) async => const Ok(null));
+        when(() => mockGetGenre()).thenAnswer((_) async => Ok(testGenres));
         return genreBloc;
       },
       act: (bloc) => bloc.add(CreateGenreEvent(testGenre)),
@@ -119,7 +123,8 @@ void main() {
     blocTest<GenreBloc, GenreState>(
       'emits GenreError when CreateGenreEvent fails',
       build: () {
-        when(() => mockCreateGenre(any())).thenThrow(Exception('Create error'));
+        when(() => mockCreateGenre(any()))
+            .thenAnswer((_) async => Err(GenreFailure('Create error')));
         return genreBloc;
       },
       act: (bloc) => bloc.add(CreateGenreEvent(testGenre)),
@@ -135,8 +140,9 @@ void main() {
     blocTest<GenreBloc, GenreState>(
       'emits GenreLoaded with message when UpdateGenreEvent succeeds',
       build: () {
-        when(() => mockUpdateGenre(any())).thenAnswer((_) async {});
-        when(() => mockGetGenre()).thenAnswer((_) async => testGenres);
+        when(() => mockUpdateGenre(any()))
+            .thenAnswer((_) async => const Ok(null));
+        when(() => mockGetGenre()).thenAnswer((_) async => Ok(testGenres));
         return genreBloc;
       },
       act: (bloc) => bloc.add(UpdateGenreEvent(testGenre)),
@@ -152,7 +158,8 @@ void main() {
     blocTest<GenreBloc, GenreState>(
       'emits GenreError when UpdateGenreEvent fails',
       build: () {
-        when(() => mockUpdateGenre(any())).thenThrow(Exception('Update error'));
+        when(() => mockUpdateGenre(any()))
+            .thenAnswer((_) async => Err(GenreFailure('Update error')));
         return genreBloc;
       },
       act: (bloc) => bloc.add(UpdateGenreEvent(testGenre)),
@@ -168,8 +175,9 @@ void main() {
     blocTest<GenreBloc, GenreState>(
       'emits GenreLoaded with message when DeleteGenreEvent succeeds',
       build: () {
-        when(() => mockDeleteGenre(any())).thenAnswer((_) async {});
-        when(() => mockGetGenre()).thenAnswer((_) async => testGenres);
+        when(() => mockDeleteGenre(any()))
+            .thenAnswer((_) async => const Ok(null));
+        when(() => mockGetGenre()).thenAnswer((_) async => Ok(testGenres));
         return genreBloc;
       },
       act: (bloc) => bloc.add(DeleteGenreEvent(1)),
@@ -185,7 +193,8 @@ void main() {
     blocTest<GenreBloc, GenreState>(
       'emits GenreError when DeleteGenreEvent fails',
       build: () {
-        when(() => mockDeleteGenre(any())).thenThrow(Exception('Delete error'));
+        when(() => mockDeleteGenre(any()))
+            .thenAnswer((_) async => Err(GenreFailure('Delete error')));
         return genreBloc;
       },
       act: (bloc) => bloc.add(DeleteGenreEvent(1)),

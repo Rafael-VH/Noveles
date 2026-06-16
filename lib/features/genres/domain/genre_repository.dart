@@ -1,9 +1,10 @@
+import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/genres/domain/genre_entity.dart';
 
 abstract class GenreRepository {
-  Future<List<GenreEntity>> getGenres();
-  Future<GenreEntity?> getGenreById(int id);
-  Future<void> createGenre(GenreEntity genre);
-  Future<void> updateGenre(GenreEntity genre);
-  Future<void> deleteGenre(int id);
+  Future<Result<List<GenreEntity>>> getGenres();
+  Future<Result<GenreEntity?>> getGenreById(int id);
+  Future<Result<void>> createGenre(GenreEntity genre);
+  Future<Result<void>> updateGenre(GenreEntity genre);
+  Future<Result<void>> deleteGenre(int id);
 }

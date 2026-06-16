@@ -1,3 +1,4 @@
+import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/genres/domain/genre_repository.dart';
 
 class DeleteGenre {
@@ -5,7 +6,7 @@ class DeleteGenre {
 
   DeleteGenre(this.repository);
 
-  Future<void> call(int id) async {
-    return await repository.deleteGenre(id);
+  Future<Result<void>> call(int id) async {
+    return repository.deleteGenre(id);
   }
 }

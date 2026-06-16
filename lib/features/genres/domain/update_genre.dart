@@ -1,3 +1,4 @@
+import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/genres/domain/genre_entity.dart';
 import 'package:noveles/features/genres/domain/genre_repository.dart';
 
@@ -6,7 +7,7 @@ class UpdateGenre {
 
   UpdateGenre(this.repository);
 
-  Future<void> call(GenreEntity genre) async {
-    return await repository.updateGenre(genre);
+  Future<Result<void>> call(GenreEntity genre) async {
+    return repository.updateGenre(genre);
   }
 }
