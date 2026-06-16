@@ -1,138 +1,147 @@
-import 'package:noveles/core/errors/repository_exception.dart';
-import 'package:noveles/core/supabase/supabase_client.dart';
-import 'package:noveles/features/profiles/domain/user_entity.dart';
-import 'package:noveles/features/auth/domain/auth_repository.dart';
+import 'dart:async';
 import 'package:supabase_flutter/supabase_flutter.dart' show AuthChangeEvent;
+import 'package:noveles/core/errors/failure.dart';
+import 'package:noveles/core/errors/result.dart';
+import 'package:noveles/core/supabase/supabase_client.dart';
+import 'package:noveles/features/profiles/data/user_model.dart';
+import 'package:noveles/features/profiles/domain/user_entity.dart';
+import 'package:noveles/features/auth/domain/auth_event.dart';
+import 'package:noveles/features/auth/domain/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
+  final SupabaseClientProvider _supabase;
+
+  AuthRepositoryImpl(this._supabase);
+
   @override
-  Future<UserEntity> login(String email, String password) async {
+  Future<Result<UserEntity>> login(String email, String password) async {
     try {
-      final response = await supabase.auth.signInWithPassword(
+      final response = await _supabase.client.auth.signInWithPassword(
         email: email,
         password: password,
       );
 
       final user = response.user;
-      if (user == null) throw Exception('Error al iniciar sesión');
-
-      final profile = await _getProfile(user.id);
-      return UserEntity(
-        id: user.id,
-        email: user.email ?? '',
-        role: profile['role'] ?? 'user',
-        displayName: profile['display_name'] as String?,
-        bio: profile['bio'] as String?,
-        avatarUrl: profile['avatar_url'] as String?,
-      );
-    } catch (e) {
-      throw RepositoryException(
-        message: 'Error al iniciar sesión',
-        originalException: e,
-        repositoryName: 'AuthRepository',
-      );
-    }
-  }
-
-  @override
-  Future<UserEntity> register(String email, String password) async {
-    try {
-      final response = await supabase.auth.signUp(
-        email: email,
-        password: password,
-      );
-
-      final user = response.user;
-      if (user == null)
-        throw const RepositoryException(message: 'Error al registrarse');
-
-      final profile = await _getProfile(user.id);
-      return UserEntity(
-        id: user.id,
-        email: user.email ?? '',
-        role: profile['role'] ?? 'user',
-        displayName: profile['display_name'] as String?,
-        bio: profile['bio'] as String?,
-        avatarUrl: profile['avatar_url'] as String?,
-      );
-    } catch (e) {
-      throw RepositoryException(
-        message: 'Error al registrarse',
-        originalException: e,
-        repositoryName: 'AuthRepository',
-      );
-    }
-  }
-
-  @override
-  Future<void> logout() async {
-    try {
-      await supabase.auth.signOut();
-    } catch (e) {
-      throw RepositoryException(
-        message: 'Error al cerrar sesión',
-        originalException: e,
-        repositoryName: 'AuthRepository',
-      );
-    }
-  }
-
-  @override
-  Future<UserEntity?> getCurrentUser() async {
-    try {
-      final session = supabase.auth.currentSession;
-      final user = supabase.auth.currentUser;
-      if (session == null || user == null) return null;
-
-      try {
-        final profile = await _getProfile(user.id);
-        return UserEntity(
-          id: user.id,
-          email: user.email ?? '',
-          role: profile['role'] ?? 'user',
-          displayName: profile['display_name'] as String?,
-          bio: profile['bio'] as String?,
-          avatarUrl: profile['avatar_url'] as String?,
-        );
-      } catch (_) {
-        return null;
+      if (user == null) {
+        return const Err(AuthFailure('Error al iniciar sesión'));
       }
+
+      final profileResult = await _getProfile(user.id);
+      if (profileResult is Err<Map<String, dynamic>>) {
+        return Err(profileResult.error);
+      }
+      final profile = (profileResult as Ok<Map<String, dynamic>>).value;
+      return Ok(UserModel.fromJson({
+        'id': user.id,
+        'email': user.email ?? '',
+        ...profile,
+      }));
     } catch (e) {
-      throw RepositoryException(
-        message: 'Error al obtener usuario actual',
-        originalException: e,
-        repositoryName: 'AuthRepository',
-      );
+      return Err(AuthFailure('Error al iniciar sesión', cause: e));
     }
   }
 
   @override
-  Stream<AuthChangeEvent> onAuthStateChange() =>
-      supabase.auth.onAuthStateChange.map((data) => data.event);
-
-  Future<Map<String, dynamic>> _getProfile(String userId) async {
+  Future<Result<UserEntity>> register(String email, String password) async {
     try {
-      final response = await supabase
+      final response = await _supabase.client.auth.signUp(
+        email: email,
+        password: password,
+      );
+
+      final user = response.user;
+      if (user == null) {
+        return const Err(AuthFailure('Error al registrarse'));
+      }
+
+      final profileResult = await _getProfile(user.id);
+      if (profileResult is Err<Map<String, dynamic>>) {
+        return Err(profileResult.error);
+      }
+      final profile = (profileResult as Ok<Map<String, dynamic>>).value;
+      return Ok(UserModel.fromJson({
+        'id': user.id,
+        'email': user.email ?? '',
+        ...profile,
+      }));
+    } catch (e) {
+      return Err(AuthFailure('Error al registrarse', cause: e));
+    }
+  }
+
+  @override
+  Future<Result<void>> logout() async {
+    try {
+      await _supabase.client.auth.signOut();
+      return const Ok(null);
+    } catch (e) {
+      return Err(AuthFailure('Error al cerrar sesión', cause: e));
+    }
+  }
+
+  @override
+  Future<Result<UserEntity?>> getCurrentUser() async {
+    try {
+      final session = _supabase.client.auth.currentSession;
+      final user = _supabase.client.auth.currentUser;
+      if (session == null || user == null) return const Ok(null);
+
+      final profileResult = await _getProfile(user.id);
+      if (profileResult is Err<Map<String, dynamic>>) {
+        return Err(profileResult.error);
+      }
+      final profile = (profileResult as Ok<Map<String, dynamic>>).value;
+      return Ok(UserModel.fromJson({
+        'id': user.id,
+        'email': user.email ?? '',
+        ...profile,
+      }));
+    } catch (e) {
+      return Err(AuthFailure('Error al obtener usuario actual', cause: e));
+    }
+  }
+
+  @override
+  Stream<AuthEvent> onAuthStateChange() {
+    return _supabase.client.auth.onAuthStateChange
+        .map((data) => switch (data.event) {
+              AuthChangeEvent.signedIn => AuthEvent.signedIn,
+              AuthChangeEvent.signedOut => AuthEvent.signedOut,
+              AuthChangeEvent.tokenRefreshed => AuthEvent.tokenRefreshed,
+              AuthChangeEvent.userUpdated => AuthEvent.userChanged,
+              _ => AuthEvent.userChanged,
+            })
+        .transform(StreamTransformer.fromHandlers(
+          handleError: (_, __, sink) => sink.add(AuthEvent.signedOut),
+        ));
+  }
+
+  Future<Result<Map<String, dynamic>>> _getProfile(String userId) async {
+    try {
+      final response = await _supabase.client
           .from('profiles')
           .select('*')
           .eq('id', userId)
           .maybeSingle();
 
       if (response == null) {
-        await supabase.from('profiles').insert({
-          'id': userId,
-          'role': 'user',
-        });
-        return {'role': 'user'};
+        try {
+          await _supabase.client.from('profiles').insert({
+            'id': userId,
+            'role': 'user',
+          });
+        } catch (e) {
+          return Err(ProfileFailure(
+            'No se pudo crear el perfil automáticamente',
+            cause: e,
+          ));
+        }
+        return Ok({'role': 'user'});
       }
 
-      return Map<String, dynamic>.from(response);
+      return Ok(Map<String, dynamic>.from(response));
     } catch (e) {
-      throw RepositoryException(
-        message: 'Error al obtener perfil',
-        originalException: e,
-        repositoryName: 'AuthRepository',
-      );
+      return Err(ProfileFailure('Error al obtener perfil', cause: e));
     }
   }
 }

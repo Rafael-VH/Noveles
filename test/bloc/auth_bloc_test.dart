@@ -2,16 +2,18 @@ import 'dart:async';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:noveles/features/profiles/domain/user_entity.dart';
+import 'package:noveles/core/errors/failure.dart';
+import 'package:noveles/core/errors/result.dart';
+import 'package:noveles/features/auth/domain/auth_event.dart' as domain;
 import 'package:noveles/features/auth/domain/login.dart';
 import 'package:noveles/features/auth/domain/register.dart';
 import 'package:noveles/features/auth/domain/logout.dart';
 import 'package:noveles/features/auth/domain/get_current_user.dart';
 import 'package:noveles/features/auth/domain/listen_auth_state.dart';
+import 'package:noveles/features/profiles/domain/user_entity.dart';
 import 'package:noveles/features/presentation/bloc/auth/auth_bloc.dart';
 import 'package:noveles/features/presentation/bloc/auth/auth_event.dart';
 import 'package:noveles/features/presentation/bloc/auth/auth_state.dart';
-import 'package:supabase_flutter/supabase_flutter.dart' show AuthChangeEvent;
 
 class MockLogin extends Mock implements Login {}
 
@@ -29,7 +31,7 @@ void main() {
   late MockLogout mockLogout;
   late MockGetCurrentUser mockGetCurrentUser;
   late MockListenAuthState mockListenAuthState;
-  late StreamController<AuthChangeEvent> authStateController;
+  late StreamController<domain.AuthEvent> authStateController;
 
   const testUser = UserEntity(
     id: '1',
@@ -46,7 +48,7 @@ void main() {
     mockLogout = MockLogout();
     mockGetCurrentUser = MockGetCurrentUser();
     mockListenAuthState = MockListenAuthState();
-    authStateController = StreamController<AuthChangeEvent>();
+    authStateController = StreamController<domain.AuthEvent>();
     when(() => mockListenAuthState())
         .thenAnswer((_) => authStateController.stream);
   });
@@ -72,7 +74,7 @@ void main() {
       'emits [AuthLoading, AuthAuthenticated] when LoginRequested succeeds',
       build: () {
         when(() => mockLogin('a@b.com', 'pass'))
-            .thenAnswer((_) async => testUser);
+            .thenAnswer((_) async => const Ok(testUser));
         return AuthBloc(
           login: mockLogin,
           register: mockRegister,
@@ -96,7 +98,7 @@ void main() {
       'emits [AuthLoading, AuthError] when LoginRequested fails',
       build: () {
         when(() => mockLogin('a@b.com', 'wrong'))
-            .thenThrow(Exception('Invalid credentials'));
+            .thenAnswer((_) async => const Err<UserEntity>(AuthFailure('Invalid credentials')));
         return AuthBloc(
           login: mockLogin,
           register: mockRegister,
@@ -120,7 +122,7 @@ void main() {
       'emits [AuthLoading, AuthAuthenticated] when RegisterRequested succeeds',
       build: () {
         when(() => mockRegister('a@b.com', 'pass'))
-            .thenAnswer((_) async => testUser);
+            .thenAnswer((_) async => const Ok(testUser));
         return AuthBloc(
           login: mockLogin,
           register: mockRegister,
@@ -144,7 +146,7 @@ void main() {
       'emits [AuthLoading, AuthError] when RegisterRequested fails',
       build: () {
         when(() => mockRegister('a@b.com', 'pass'))
-            .thenThrow(Exception('Email taken'));
+            .thenAnswer((_) async => const Err<UserEntity>(AuthFailure('Email taken')));
         return AuthBloc(
           login: mockLogin,
           register: mockRegister,
@@ -167,7 +169,7 @@ void main() {
     blocTest<AuthBloc, AuthState>(
       'emits [AuthLoading, AuthUnauthenticated] when LogoutRequested succeeds',
       build: () {
-        when(() => mockLogout()).thenAnswer((_) async {});
+        when(() => mockLogout()).thenAnswer((_) async => const Ok(null));
         return AuthBloc(
           login: mockLogin,
           register: mockRegister,
@@ -186,7 +188,7 @@ void main() {
     blocTest<AuthBloc, AuthState>(
       'emits [AuthLoading, AuthError] when LogoutRequested fails',
       build: () {
-        when(() => mockLogout()).thenThrow(Exception('Error'));
+        when(() => mockLogout()).thenAnswer((_) async => const Err<void>(AuthFailure('Error')));
         return AuthBloc(
           login: mockLogin,
           register: mockRegister,
@@ -209,7 +211,7 @@ void main() {
     blocTest<AuthBloc, AuthState>(
       'emits [AuthLoading, AuthAuthenticated] when CheckAuthSession has user',
       build: () {
-        when(() => mockGetCurrentUser()).thenAnswer((_) async => testUser);
+        when(() => mockGetCurrentUser()).thenAnswer((_) async => const Ok(testUser));
         return AuthBloc(
           login: mockLogin,
           register: mockRegister,
@@ -232,7 +234,7 @@ void main() {
     blocTest<AuthBloc, AuthState>(
       'emits [AuthLoading, AuthUnauthenticated] when CheckAuthSession has no user',
       build: () {
-        when(() => mockGetCurrentUser()).thenAnswer((_) async => null);
+        when(() => mockGetCurrentUser()).thenAnswer((_) async => const Ok(null));
         return AuthBloc(
           login: mockLogin,
           register: mockRegister,
@@ -249,9 +251,9 @@ void main() {
     );
 
     blocTest<AuthBloc, AuthState>(
-      'emits [AuthLoading, AuthUnauthenticated] when CheckAuthSession throws',
+      'emits [AuthLoading, AuthError] when CheckAuthSession fails',
       build: () {
-        when(() => mockGetCurrentUser()).thenThrow(Exception('Error'));
+        when(() => mockGetCurrentUser()).thenAnswer((_) async => const Err<UserEntity?>(AuthFailure('Error')));
         return AuthBloc(
           login: mockLogin,
           register: mockRegister,
@@ -263,7 +265,11 @@ void main() {
       act: (bloc) => bloc.add(CheckAuthSession()),
       expect: () => [
         isA<AuthLoading>(),
-        isA<AuthUnauthenticated>(),
+        isA<AuthError>().having(
+          (s) => s.message,
+          'message',
+          contains('Error'),
+        ),
       ],
     );
   });

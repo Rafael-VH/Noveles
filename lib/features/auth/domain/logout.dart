@@ -1,3 +1,4 @@
+import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/auth/domain/auth_repository.dart';
 
 class Logout {
@@ -5,7 +6,7 @@ class Logout {
 
   Logout(this.repository);
 
-  Future<void> call() async {
+  Future<Result<void>> call() async {
     return await repository.logout();
   }
 }
