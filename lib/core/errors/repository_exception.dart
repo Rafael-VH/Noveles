@@ -12,7 +12,8 @@ class RepositoryException implements Exception {
   @override
   String toString() {
     final prefix = repositoryName != null ? '[$repositoryName] ' : '';
-    final original = originalException != null ? ' (cause: $originalException)' : '';
+    final original =
+        originalException != null ? ' (cause: $originalException)' : '';
     return '${prefix}Error: $message$original';
   }
 }
