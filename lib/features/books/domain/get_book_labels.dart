@@ -1,3 +1,4 @@
+import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/books/domain/book_repository.dart';
 
 class GetBookLabels {
@@ -5,5 +6,5 @@ class GetBookLabels {
 
   GetBookLabels(this.repository);
 
-  Future<Map<int, Set<int>>> call() => repository.getBookLabels();
+  Future<Result<Map<int, Set<int>>>> call() => repository.getBookLabels();
 }

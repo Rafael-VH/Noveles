@@ -1,3 +1,4 @@
+import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/books/domain/book_entity.dart';
 import 'package:noveles/features/books/domain/book_repository.dart';
 
@@ -6,7 +7,7 @@ class GetBooks {
 
   GetBooks(this.repository);
 
-  Future<List<BookEntity>> call({bool onlyVisible = false}) async {
-    return await repository.getBooks(onlyVisible: onlyVisible);
+  Future<Result<List<BookEntity>>> call({bool onlyVisible = false}) async {
+    return repository.getBooks(onlyVisible: onlyVisible);
   }
 }

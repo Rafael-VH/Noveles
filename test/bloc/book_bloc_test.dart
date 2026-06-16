@@ -1,6 +1,8 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:noveles/core/errors/result.dart';
+import 'package:noveles/core/errors/failure.dart';
 import 'package:noveles/features/books/domain/book_entity.dart';
 import 'package:noveles/features/books/domain/get_book.dart';
 import 'package:noveles/features/books/domain/get_book_by_id.dart';
@@ -46,8 +48,8 @@ void main() {
         state: 'ongoing',
         type: 'novel',
         release: '2024',
-        tookCount: '5',
-        chapterCount: '50',
+        tookCount: 5,
+        chapterCount: 50,
         source: 'source',
         link: '',
         isFavorite: false,
@@ -65,7 +67,7 @@ void main() {
     blocTest<BookBloc, BookState>(
       'emits [BookLoading, BookLoaded] when LoadBooks is added',
       build: () {
-        when(() => mockGetBooks()).thenAnswer((_) async => testBooks);
+        when(() => mockGetBooks()).thenAnswer((_) async => Ok(testBooks));
         return bookBloc;
       },
       act: (bloc) => bloc.add(LoadBooks()),
@@ -78,7 +80,8 @@ void main() {
     blocTest<BookBloc, BookState>(
       'emits [BookLoading, BookError] when GetBooks fails',
       build: () {
-        when(() => mockGetBooks()).thenThrow(Exception('API error'));
+        when(() => mockGetBooks())
+            .thenAnswer((_) async => Err(BookFailure('API error')));
         return bookBloc;
       },
       act: (bloc) => bloc.add(LoadBooks()),
@@ -92,7 +95,8 @@ void main() {
     blocTest<BookBloc, BookState>(
       'emits [BookLoading, BookDetailLoaded] when LoadBookById succeeds',
       build: () {
-        when(() => mockGetBookById(1)).thenAnswer((_) async => testBooks.first);
+        when(() => mockGetBookById(1))
+            .thenAnswer((_) async => Ok(testBooks.first));
         return bookBloc;
       },
       act: (bloc) => bloc.add(LoadBookById(1)),
@@ -105,7 +109,8 @@ void main() {
     blocTest<BookBloc, BookState>(
       'emits [BookLoading, BookError] when book is null',
       build: () {
-        when(() => mockGetBookById(999)).thenAnswer((_) async => null);
+        when(() => mockGetBookById(999))
+            .thenAnswer((_) async => Ok<BookEntity?>(null));
         return bookBloc;
       },
       act: (bloc) => bloc.add(LoadBookById(999)),

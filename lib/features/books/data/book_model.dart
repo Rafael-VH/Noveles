@@ -49,7 +49,7 @@ class BookModel extends BookEntity {
     }).toList();
 
     return BookModel(
-      id: json['id'],
+      id: json['id'] as int,
       createdAt: DateTime.parse(json['created_at'] as String),
       cover: (json['cover'] as String?) ?? '',
       name: (json['name'] as String?) ?? '',
@@ -62,8 +62,8 @@ class BookModel extends BookEntity {
       state: (json['state'] as String?) ?? '',
       type: (json['type'] as String?) ?? '',
       release: (json['release'] as String?) ?? '',
-      tookCount: (json['took_count'] as String?) ?? '',
-      chapterCount: (json['chapter_count'] as String?) ?? '',
+      tookCount: (json['took_count'] as int?) ?? 0,
+      chapterCount: (json['chapter_count'] as int?) ?? 0,
       source: (json['source'] as String?) ?? '',
       link: (json['link'] as String?) ?? '',
       isFavorite: (json['is_favorite'] as bool?) ?? false,
@@ -76,8 +76,6 @@ class BookModel extends BookEntity {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'created_at': createdAt.toIso8601String(),
         'cover': cover,
         'name': name,
         'short': short,

@@ -1,4 +1,5 @@
 import 'package:get_it/get_it.dart';
+import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/books/data/book_repository_impl.dart';
 import 'package:noveles/features/books/domain/book_repository.dart';
 import 'package:noveles/features/books/domain/create_book.dart';
@@ -15,17 +16,39 @@ import 'package:noveles/features/presentation/bloc/book/book_bloc.dart';
 final getIt = GetIt.instance;
 
 void initBooksDependencies() {
-  getIt.registerLazySingleton<BookRepository>(() => BookRepositoryImpl());
+  getIt.registerLazySingleton<BookRepository>(
+    () => BookRepositoryImpl(
+      getIt<SupabaseClientProvider>(),
+    ),
+  );
 
-  getIt.registerLazySingleton(() => GetBooks(getIt()));
-  getIt.registerLazySingleton(() => GetBookById(getIt()));
-  getIt.registerLazySingleton(() => CreateBook(getIt()));
-  getIt.registerLazySingleton(() => UpdateBook(getIt()));
-  getIt.registerLazySingleton(() => DeleteBook(getIt()));
-  getIt.registerLazySingleton(() => UploadCover(getIt()));
-  getIt.registerLazySingleton(() => GetBooksByGenre());
-  getIt.registerLazySingleton(() => ToggleBookVisibility(getIt()));
-  getIt.registerLazySingleton(() => GetBookLabels(getIt()));
+  getIt.registerLazySingleton(
+    () => GetBooks(getIt()),
+  );
+  getIt.registerLazySingleton(
+    () => GetBookById(getIt()),
+  );
+  getIt.registerLazySingleton(
+    () => CreateBook(getIt()),
+  );
+  getIt.registerLazySingleton(
+    () => UpdateBook(getIt()),
+  );
+  getIt.registerLazySingleton(
+    () => DeleteBook(getIt()),
+  );
+  getIt.registerLazySingleton(
+    () => UploadCover(getIt()),
+  );
+  getIt.registerLazySingleton(
+    () => GetBooksByGenre(),
+  );
+  getIt.registerLazySingleton(
+    () => ToggleBookVisibility(getIt()),
+  );
+  getIt.registerLazySingleton(
+    () => GetBookLabels(getIt()),
+  );
 
   getIt.registerFactory(
     () => BookBloc(

@@ -1,3 +1,4 @@
+import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/books/domain/book_entity.dart';
 import 'package:noveles/features/books/domain/book_repository.dart';
 
@@ -6,7 +7,7 @@ class GetBookById {
 
   GetBookById(this.repository);
 
-  Future<BookEntity?> call(int id) async {
-    return await repository.getBookById(id);
+  Future<Result<BookEntity?>> call(int id) async {
+    return repository.getBookById(id);
   }
 }

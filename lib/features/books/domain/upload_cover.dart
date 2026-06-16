@@ -1,3 +1,4 @@
+import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/books/domain/book_repository.dart';
 
 class UploadCover {
@@ -5,7 +6,7 @@ class UploadCover {
 
   UploadCover(this.repository);
 
-  Future<String> call(String filePath) async {
-    return await repository.uploadCover(filePath);
+  Future<Result<String>> call(String filePath) async {
+    return repository.uploadCover(filePath);
   }
 }

@@ -1,3 +1,4 @@
+import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/books/domain/book_repository.dart';
 
 class DeleteBook {
@@ -5,7 +6,7 @@ class DeleteBook {
 
   DeleteBook(this.repository);
 
-  Future<void> call(int id) async {
-    return await repository.deleteBook(id);
+  Future<Result<void>> call(int id) async {
+    return repository.deleteBook(id);
   }
 }

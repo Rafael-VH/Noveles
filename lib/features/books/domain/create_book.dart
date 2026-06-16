@@ -1,3 +1,4 @@
+import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/books/domain/book_entity.dart';
 import 'package:noveles/features/books/domain/book_repository.dart';
 
@@ -6,7 +7,7 @@ class CreateBook {
 
   CreateBook(this.repository);
 
-  Future<void> call(BookEntity book) async {
-    return await repository.createBook(book);
+  Future<Result<void>> call(BookEntity book) async {
+    return repository.createBook(book);
   }
 }

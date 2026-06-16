@@ -17,8 +17,8 @@ class BookEntity extends Equatable {
   final String state;
   final String type;
   final String release;
-  final String tookCount;
-  final String chapterCount;
+  final int tookCount;
+  final int chapterCount;
   final String source;
   final String link;
   final bool isFavorite;
@@ -68,8 +68,8 @@ class BookEntity extends Equatable {
     String? state,
     String? type,
     String? release,
-    String? tookCount,
-    String? chapterCount,
+    int? tookCount,
+    int? chapterCount,
     String? source,
     String? link,
     bool? isFavorite,
