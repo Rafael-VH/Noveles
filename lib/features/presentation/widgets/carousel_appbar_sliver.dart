@@ -1,7 +1,8 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:noveles/core/supabase/storage_helper.dart';
+import 'package:noveles/core/cover/cover_url_service.dart';
+import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/features/books/domain/book_entity.dart';
 import 'package:noveles/features/presentation/widgets/label_badge.dart';
 
@@ -42,7 +43,7 @@ class SliverAppBarHome extends StatelessWidget {
                 Positioned.fill(
                   child: CachedNetworkImage(
                     fit: BoxFit.cover,
-                    imageUrl: coverUrl(item.cover),
+                    imageUrl: getIt<CoverUrlService>()(item.cover),
                     errorWidget: (_, __, ___) => const SizedBox.shrink(),
                   ),
                 ),

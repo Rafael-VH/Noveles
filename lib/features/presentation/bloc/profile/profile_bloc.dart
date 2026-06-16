@@ -1,8 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:noveles/core/errors/result.dart';
+import 'package:noveles/core/presentation/notification_service.dart';
 import 'package:noveles/features/profiles/domain/get_profile.dart';
 import 'package:noveles/features/profiles/domain/update_profile.dart';
 import 'package:noveles/features/profiles/domain/upload_avatar.dart';
-import 'package:noveles/features/auth/domain/change_password.dart';
+import 'package:noveles/features/profiles/domain/change_password.dart';
 import 'package:noveles/features/presentation/bloc/profile/profile_event.dart'
     as events;
 import 'package:noveles/features/presentation/bloc/profile/profile_state.dart';
@@ -30,11 +32,13 @@ class ProfileBloc extends Bloc<events.ProfileEvent, ProfileState> {
     Emitter<ProfileState> emit,
   ) async {
     emit(ProfileLoading());
-    try {
-      final user = await getProfile();
-      emit(ProfileLoaded(user));
-    } catch (e) {
-      emit(ProfileError(e.toString()));
+    final result = await getProfile();
+    switch (result) {
+      case Ok(:final value):
+        emit(ProfileLoaded(value));
+      case Err(:final error):
+        emit(ProfileError(error.message));
+        NotificationService.error('Error al cargar el perfil: ${error.message}');
     }
   }
 
@@ -45,22 +49,36 @@ class ProfileBloc extends Bloc<events.ProfileEvent, ProfileState> {
     final currentState = state;
     if (currentState is! ProfileLoaded) {
       emit(ProfileError('No se puede actualizar: perfil no cargado'));
+      NotificationService.error('No se puede actualizar: perfil no cargado');
       return;
     }
     emit(ProfileSaving(currentState.user));
-    try {
-      String? avatarUrl = currentState.user.avatarUrl;
-      if (currentState.pendingAvatar != null) {
-        avatarUrl = await uploadAvatar(currentState.pendingAvatar!.path);
+    String? avatarUrl = currentState.user.avatarUrl;
+    if (currentState.pendingAvatar != null) {
+      final avatarResult =
+          await uploadAvatar(currentState.pendingAvatar!.path);
+      switch (avatarResult) {
+        case Ok(:final value):
+          avatarUrl = value;
+        case Err(:final error):
+          emit(ProfileError(error.message, user: currentState.user));
+          NotificationService.error(
+              'Error al subir el avatar: ${error.message}');
+          return;
       }
-      final user = await updateProfile(
-        displayName: event.displayName,
-        bio: event.bio,
-        avatarUrl: avatarUrl,
-      );
-      emit(ProfileLoaded(user, message: 'Perfil actualizado exitosamente'));
-    } catch (e) {
-      emit(ProfileError(e.toString(), user: currentState.user));
+    }
+    final updateResult = await updateProfile(
+      displayName: event.displayName,
+      bio: event.bio,
+      avatarUrl: avatarUrl,
+    );
+    switch (updateResult) {
+      case Ok(:final value):
+        emit(ProfileLoaded(value, message: 'Perfil actualizado exitosamente'));
+      case Err(:final error):
+        emit(ProfileError(error.message, user: currentState.user));
+        NotificationService.error(
+            'Error al actualizar el perfil: ${error.message}');
     }
   }
 
@@ -79,17 +97,21 @@ class ProfileBloc extends Bloc<events.ProfileEvent, ProfileState> {
   ) async {
     final currentState = state;
     if (currentState is! ProfileLoaded) {
-      emit(
-          ProfileError('No se puede cambiar la contraseña: perfil no cargado'));
+      emit(ProfileError('No se puede cambiar la contraseña: perfil no cargado'));
+      NotificationService.error(
+          'No se puede cambiar la contraseña: perfil no cargado');
       return;
     }
     emit(ProfileSaving(currentState.user));
-    try {
-      await changePassword(event.newPassword);
-      emit(ProfileLoaded(currentState.user,
-          message: 'Contraseña actualizada exitosamente'));
-    } catch (e) {
-      emit(ProfileError(e.toString(), user: currentState.user));
+    final result = await changePassword(event.newPassword);
+    switch (result) {
+      case Ok():
+        emit(ProfileLoaded(currentState.user,
+            message: 'Contraseña actualizada exitosamente'));
+      case Err(:final error):
+        emit(ProfileError(error.message, user: currentState.user));
+        NotificationService.error(
+            'Error al cambiar la contraseña: ${error.message}');
     }
   }
 }

@@ -77,6 +77,9 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
         _tooks = match.listTook;
       }
     });
+    if (_isEditing) {
+      _tooks = widget.book?.listTook ?? [];
+    }
     context.read<ScanBloc>().add(LoadScanGenres());
   }
 
@@ -130,8 +133,8 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
       state: _stateCtrl.text.trim(),
       type: _typeCtrl.text.trim(),
       release: _releaseCtrl.text.trim(),
-      tookCount: widget.book?.tookCount ?? '',
-      chapterCount: widget.book?.chapterCount ?? '',
+      tookCount: widget.book?.tookCount ?? 0,
+      chapterCount: widget.book?.chapterCount ?? 0,
       source: _sourceCtrl.text.trim(),
       link: _linkCtrl.text.trim(),
       isFavorite: widget.book?.isFavorite ?? false,
@@ -308,26 +311,58 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
                   isEditing: true,
                   tooks: _tooks,
                   bookId: widget.book!.id,
-                  onAddTook: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => BlocProvider.value(
-                        value: context.read<ScanBloc>(),
-                        child: ScanTookEditScreen(bookId: widget.book!.id),
+                  onAddTook: () async {
+                    final refreshed = await Navigator.push<bool>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ScanTookEditScreen(
+                          bookId: widget.book!.id,
+                        ),
                       ),
-                    ),
-                  ),
-                  onEditTook: (took, bookId) => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => BlocProvider.value(
-                        value: context.read<ScanBloc>(),
-                        child: ScanTookEditScreen(took: took, bookId: bookId),
+                    );
+                    if (refreshed == true && mounted) {
+                      context.read<ScanBloc>().add(LoadScanBooks());
+                    }
+                  },
+                  onEditTook: (took, bookId) async {
+                    final refreshed = await Navigator.push<bool>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ScanTookEditScreen(
+                          took: took,
+                          bookId: bookId,
+                        ),
                       ),
-                    ),
-                  ),
-                  onDeleteTook: (tookId) {
-                    context.read<ScanBloc>().add(DeleteScanTook(tookId));
+                    );
+                    if (refreshed == true && mounted) {
+                      context.read<ScanBloc>().add(LoadScanBooks());
+                    }
+                  },
+                  onDeleteTook: (tookId) async {
+                    final bloc = context.read<ScanTookBloc>();
+                    final future = bloc.stream.firstWhere(
+                      (s) => s is ScanTookLoaded || s is ScanTookError,
+                    );
+                    bloc.add(DeleteScanTook(tookId));
+                    final result = await future;
+                    if (result is ScanTookLoaded && mounted) {
+                      setState(() => _tooks.removeWhere((t) => t.id == tookId));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(result.message ?? 'Tomo eliminado'),
+                          backgroundColor:
+                              Theme.of(context).colorScheme.tertiary,
+                        ),
+                      );
+                    } else if (result is ScanTookError && mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(result.message),
+                          backgroundColor:
+                              Theme.of(context).colorScheme.error,
+                        ),
+                      );
+                    }
                   },
                 ),
             ],
@@ -336,15 +371,19 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
       ),
       floatingActionButton: _isEditing
           ? FloatingActionButton(
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => BlocProvider.value(
-                    value: context.read<ScanBloc>(),
-                    child: ScanTookEditScreen(bookId: widget.book!.id),
+              onPressed: () async {
+                final refreshed = await Navigator.push<bool>(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ScanTookEditScreen(
+                      bookId: widget.book!.id,
+                    ),
                   ),
-                ),
-              ),
+                );
+                if (refreshed == true && mounted) {
+                  context.read<ScanBloc>().add(LoadScanBooks());
+                }
+              },
               child: const Icon(Icons.add),
             )
           : null,

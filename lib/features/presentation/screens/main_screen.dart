@@ -16,23 +16,33 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  late final BookBloc _bookBloc;
+  late final GenreBloc _genreBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    _bookBloc = BookBloc(
+      getBooks: getIt(),
+      getBookById: getIt(),
+      onlyVisible: true,
+    )..add(LoadBooks());
+    _genreBloc = getIt<GenreBloc>()..add(LoadGenres());
+  }
+
+  @override
+  void dispose() {
+    _bookBloc.close();
+    _genreBloc.close();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        // Proporciona el BookBloc a la jerarquía de widgets, permitiendo que los widgets hijos accedan al estado de los libros y respondan a los eventos relacionados con los libros.
-        BlocProvider(
-          create: (_) => BookBloc(
-            getBooks: getIt(),
-            getBookById: getIt(),
-            onlyVisible: true,
-          )..add(LoadBooks()),
-        ),
-
-        // Proporciona el GenreBloc a la jerarquía de widgets, permitiendo que los widgets hijos accedan al estado de los géneros y respondan a los eventos relacionados con los géneros.
-        BlocProvider(
-          create: (_) => getIt<GenreBloc>()..add(LoadGenres()),
-        ),
+        BlocProvider.value(value: _bookBloc),
+        BlocProvider.value(value: _genreBloc),
       ],
       child: Scaffold(
         drawer: const AppDrawer(),

@@ -2,6 +2,8 @@
 export 'package:noveles/features/presentation/bloc/scan/scan_bloc.dart';
 export 'package:noveles/features/presentation/bloc/scan/scan_event.dart';
 export 'package:noveles/features/presentation/bloc/scan/scan_state.dart';
+export 'package:noveles/features/presentation/bloc/scan/scan_took_bloc.dart';
+export 'package:noveles/features/presentation/bloc/scan/scan_chapter_bloc.dart';
 
 // Auth Bloc
 export 'package:noveles/features/presentation/bloc/auth/auth_bloc.dart';

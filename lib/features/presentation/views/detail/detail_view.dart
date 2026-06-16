@@ -60,9 +60,9 @@ class _DetailViewState extends State<DetailView> {
               padding: const EdgeInsets.all(6.0),
               child: CardInfoDetail(
                 title1: "Tomos",
-                text1: widget.books.tookCount,
+                text1: widget.books.tookCount.toString(),
                 title2: "Capítulos",
-                text2: widget.books.chapterCount,
+                text2: widget.books.chapterCount.toString(),
               ),
             ),
             TitleWidget(

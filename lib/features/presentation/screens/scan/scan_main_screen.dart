@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/di/injection.dart';
-import 'package:noveles/core/supabase/storage_helper.dart';
+import 'package:noveles/core/cover/cover_url_service.dart';
 import 'package:noveles/features/books/domain/book_entity.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
 import 'package:noveles/features/presentation/widgets/app_drawer.dart';
@@ -16,24 +16,10 @@ class ScanMainScreen extends StatefulWidget {
 }
 
 class _ScanMainScreenState extends State<ScanMainScreen> {
-  late final ScanBloc _bloc;
-
-  @override
-  void initState() {
-    super.initState();
-    _bloc = getIt<ScanBloc>()..add(LoadScanBooks());
-  }
-
-  @override
-  void dispose() {
-    _bloc.close();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: _bloc,
+    return BlocProvider(
+      create: (_) => getIt<ScanBloc>()..add(LoadScanBooks()),
       child: BlocListener<ScanBloc, ScanState>(
         listener: (context, state) {
           // Show error message on error state
@@ -129,7 +115,7 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
                           height: 64,
                           child: CachedNetworkImage(
                             fit: BoxFit.cover,
-                            imageUrl: coverUrl(book.cover),
+                            imageUrl: getIt<CoverUrlService>()(book.cover),
                             errorWidget: (_, __, ___) => const Icon(
                               Icons.book,
                               size: 48,
@@ -195,8 +181,11 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => BlocProvider.value(
-          value: _bloc,
+        builder: (_) => MultiBlocProvider(
+          providers: [
+            BlocProvider.value(value: context.read<ScanBloc>()),
+            BlocProvider(create: (_) => getIt<ScanTookBloc>()),
+          ],
           child: ScanBookEditScreen(book: book),
         ),
       ),
@@ -208,8 +197,11 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => BlocProvider.value(
-          value: _bloc,
+        builder: (_) => MultiBlocProvider(
+          providers: [
+            BlocProvider.value(value: context.read<ScanBloc>()),
+            BlocProvider(create: (_) => getIt<ScanTookBloc>()),
+          ],
           child: const ScanBookEditScreen(),
         ),
       ),

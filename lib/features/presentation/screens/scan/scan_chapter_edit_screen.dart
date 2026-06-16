@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
-import 'package:noveles/features/presentation/bloc/bloc.dart';
+import 'package:noveles/features/presentation/bloc/scan/scan_chapter_bloc.dart';
 
 class ScanChapterEditScreen extends StatefulWidget {
   final ChapterEntity? chapter;
@@ -60,15 +61,16 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
     // Save chapter
     setState(() => _isSaving = true);
 
-    // Listen for result
     try {
-      final bloc = context.read<ScanBloc>();
-      final future = bloc.stream.firstWhere((s) => s is! ScanLoading);
+      final bloc = context.read<ScanChapterBloc>();
+      final future = bloc.stream.firstWhere(
+        (s) => s is ScanChapterLoaded || s is ScanChapterError,
+      );
       bloc.add(SaveScanChapter(chapter, isUpdate: _isEditing));
       final result = await future;
-      if (result is ScanLoaded && mounted) {
-        Navigator.pop(context);
-      } else if (result is ScanError && mounted) {
+      if (result is ScanChapterLoaded && mounted) {
+        Navigator.pop(context, chapter);
+      } else if (result is ScanChapterError && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(result.message),
@@ -83,48 +85,51 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEditing ? 'Editar Capítulo' : 'Nuevo Capítulo'),
-        actions: [
-          TextButton(onPressed: _save, child: const Text('Guardar')),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              // Number
-              TextFormField(
-                controller: _numberCtrl,
-                decoration: const InputDecoration(labelText: 'Número'),
-              ),
-
-              const SizedBox(height: 8),
-
-              // Title
-              TextFormField(
-                controller: _titleCtrl,
-                decoration: const InputDecoration(labelText: 'Título'),
-              ),
-
-              const SizedBox(height: 16),
-
-              // Content
-              TextFormField(
-                controller: _contentCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'Contenido',
-                  border: OutlineInputBorder(),
-                  alignLabelWithHint: true,
+    return BlocProvider(
+      create: (_) => getIt<ScanChapterBloc>(),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(_isEditing ? 'Editar Capítulo' : 'Nuevo Capítulo'),
+          actions: [
+            TextButton(onPressed: _save, child: const Text('Guardar')),
+          ],
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                // Number
+                TextFormField(
+                  controller: _numberCtrl,
+                  decoration: const InputDecoration(labelText: 'Número'),
                 ),
-                maxLines: 20,
-                validator: (v) =>
-                    v?.isEmpty == true ? 'El contenido es requerido' : null,
-              ),
-            ],
+
+                const SizedBox(height: 8),
+
+                // Title
+                TextFormField(
+                  controller: _titleCtrl,
+                  decoration: const InputDecoration(labelText: 'Título'),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Content
+                TextFormField(
+                  controller: _contentCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Contenido',
+                    border: OutlineInputBorder(),
+                    alignLabelWithHint: true,
+                  ),
+                  maxLines: 20,
+                  validator: (v) =>
+                      v?.isEmpty == true ? 'El contenido es requerido' : null,
+                ),
+              ],
+            ),
           ),
         ),
       ),

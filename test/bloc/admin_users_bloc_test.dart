@@ -1,6 +1,8 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:noveles/core/errors/result.dart';
+import 'package:noveles/core/errors/failure.dart';
 import 'package:noveles/features/profiles/domain/user_entity.dart';
 import 'package:noveles/features/profiles/domain/get_all_profiles.dart';
 import 'package:noveles/features/presentation/bloc/admin_users/admin_users_bloc.dart';
@@ -41,7 +43,7 @@ void main() {
     blocTest<AdminUsersBloc, AdminUsersState>(
       'emits [AdminUsersLoading, AdminUsersLoaded] when LoadAdminUsers succeeds',
       build: () {
-        when(() => mockGetAllProfiles()).thenAnswer((_) async => testUsers);
+        when(() => mockGetAllProfiles()).thenAnswer((_) async => Ok(testUsers));
         return AdminUsersBloc(getAllProfiles: mockGetAllProfiles);
       },
       act: (bloc) => bloc.add(const LoadAdminUsers()),
@@ -58,7 +60,8 @@ void main() {
     blocTest<AdminUsersBloc, AdminUsersState>(
       'emits [AdminUsersLoading, AdminUsersError] when LoadAdminUsers fails',
       build: () {
-        when(() => mockGetAllProfiles()).thenThrow(Exception('Error de red'));
+        when(() => mockGetAllProfiles())
+            .thenAnswer((_) async => Err(ProfileFailure('Error de red')));
         return AdminUsersBloc(getAllProfiles: mockGetAllProfiles);
       },
       act: (bloc) => bloc.add(const LoadAdminUsers()),

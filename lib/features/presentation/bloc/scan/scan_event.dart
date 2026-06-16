@@ -1,7 +1,5 @@
 import 'package:equatable/equatable.dart';
 import 'package:noveles/features/books/domain/book_entity.dart';
-import 'package:noveles/features/tooks/domain/took_entity.dart';
-import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 
 // This file defines the events for the ScanBloc, which manages the state of the book scanning feature in the application. Each event
 // corresponds to a specific user action or operation related to books, tooks, chapters, genres, and cover uploads. The events are
@@ -50,52 +48,6 @@ class DeleteScanBook extends ScanEvent {
 
   @override
   List<Object> get props => [bookId];
-}
-
-// Save a took (create or update) and refresh the list of books after the operation to ensure the UI reflects the latest data
-// from the backend, preventing issues with stale data and ensuring a consistent user experience.
-class SaveScanTook extends ScanEvent {
-  final TookEntity took;
-  final bool isUpdate;
-
-  SaveScanTook(this.took, {required this.isUpdate});
-
-  @override
-  List<Object> get props => [took, isUpdate];
-}
-
-// Delete a took by ID and refresh the list of books after deletion to ensure the UI is updated correctly with the latest data
-// from the backend, avoiding potential issues with stale data and ensuring a consistent user experience.
-class DeleteScanTook extends ScanEvent {
-  final int tookId;
-
-  DeleteScanTook(this.tookId);
-
-  @override
-  List<Object> get props => [tookId];
-}
-
-// Save a chapter (create or update) and refresh the list of books after the operation to ensure the UI reflects the latest data
-// from the backend, preventing issues with stale data and ensuring a consistent user experience.
-class SaveScanChapter extends ScanEvent {
-  final ChapterEntity chapter;
-  final bool isUpdate;
-
-  SaveScanChapter(this.chapter, {required this.isUpdate});
-
-  @override
-  List<Object> get props => [chapter, isUpdate];
-}
-
-// Delete a chapter by ID and refresh the list of books after deletion to ensure the UI is updated correctly with the latest data
-// from the backend, avoiding potential issues with stale data and ensuring a consistent user experience.
-class DeleteScanChapter extends ScanEvent {
-  final int chapterId;
-
-  DeleteScanChapter(this.chapterId);
-
-  @override
-  List<Object> get props => [chapterId];
 }
 
 // Toggle visibility of a book for users and refresh the list of books after the operation to ensure the UI reflects

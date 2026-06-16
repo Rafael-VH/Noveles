@@ -2,7 +2,8 @@ import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:noveles/core/supabase/storage_helper.dart';
+import 'package:noveles/core/cover/cover_url_service.dart';
+import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/features/books/domain/book_entity.dart';
 
 class SliverAppBarBook extends StatelessWidget {
@@ -29,7 +30,7 @@ class SliverAppBarBook extends StatelessWidget {
             Positioned.fill(
               child: CachedNetworkImage(
                 fit: BoxFit.cover,
-                imageUrl: coverUrl(books.cover),
+                imageUrl: getIt<CoverUrlService>()(books.cover),
                 errorWidget: (_, __, ___) => const SizedBox.shrink(),
               ),
             ),
@@ -76,7 +77,7 @@ class SliverAppBarBook extends StatelessWidget {
                       flex: 10,
                       child: CachedNetworkImage(
                         fit: BoxFit.cover,
-                        imageUrl: coverUrl(books.cover),
+                        imageUrl: getIt<CoverUrlService>()(books.cover),
                         errorWidget: (_, __, ___) =>
                             const Icon(Icons.book, size: 48),
                       ),

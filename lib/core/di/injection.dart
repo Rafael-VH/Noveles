@@ -1,4 +1,6 @@
 import 'package:get_it/get_it.dart';
+import 'package:noveles/core/cover/cover_url_service.dart';
+import 'package:noveles/core/supabase/supabase_client.dart';
 import 'injection_profiles.dart';
 import 'injection_auth.dart';
 import 'injection_books.dart';
@@ -12,6 +14,7 @@ import 'injection_admin.dart';
 final getIt = GetIt.instance;
 
 void setupDependencies() {
+  _registerCore();
   initProfilesDependencies();
   initAuthDependencies();
   initBooksDependencies();
@@ -21,4 +24,13 @@ void setupDependencies() {
   initTooksDependencies();
   initScanDependencies();
   initAdminDependencies();
+}
+
+void _registerCore() {
+  getIt.registerLazySingleton<SupabaseClientProvider>(
+    () => SupabaseClientProviderImpl(),
+  );
+  getIt.registerLazySingleton(
+    () => CoverUrlService(getIt<SupabaseClientProvider>().client),
+  );
 }

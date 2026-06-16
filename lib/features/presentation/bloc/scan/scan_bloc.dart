@@ -1,4 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:noveles/core/errors/result.dart';
+import 'package:noveles/core/presentation/notification_service.dart';
 import 'package:noveles/features/books/domain/book_entity.dart';
 import 'package:noveles/features/books/domain/get_book.dart';
 import 'package:noveles/features/books/domain/create_book.dart';
@@ -6,12 +8,6 @@ import 'package:noveles/features/books/domain/update_book.dart';
 import 'package:noveles/features/books/domain/delete_book.dart';
 import 'package:noveles/features/books/domain/upload_cover.dart';
 import 'package:noveles/features/books/domain/toggle_book_visibility.dart';
-import 'package:noveles/features/tooks/domain/create_took.dart';
-import 'package:noveles/features/tooks/domain/update_took.dart';
-import 'package:noveles/features/tooks/domain/delete_took.dart';
-import 'package:noveles/features/chapters/domain/create_chapter.dart';
-import 'package:noveles/features/chapters/domain/update_chapter.dart';
-import 'package:noveles/features/chapters/domain/delete_chapter.dart';
 import 'package:noveles/features/genres/domain/get_genre.dart';
 import 'package:noveles/features/presentation/bloc/scan/scan_event.dart';
 import 'package:noveles/features/presentation/bloc/scan/scan_state.dart';
@@ -21,12 +17,6 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
   final CreateBook createBook;
   final UpdateBook updateBook;
   final DeleteBook deleteBook;
-  final CreateTook createTook;
-  final UpdateTook updateTook;
-  final DeleteTook deleteTook;
-  final CreateChapter createChapter;
-  final UpdateChapter updateChapter;
-  final DeleteChapter deleteChapter;
   final GetGenre getGenres;
   final UploadCover uploadCover;
   final ToggleBookVisibility toggleBookVisibility;
@@ -36,12 +26,6 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     required this.createBook,
     required this.updateBook,
     required this.deleteBook,
-    required this.createTook,
-    required this.updateTook,
-    required this.deleteTook,
-    required this.createChapter,
-    required this.updateChapter,
-    required this.deleteChapter,
     required this.getGenres,
     required this.uploadCover,
     required this.toggleBookVisibility,
@@ -51,10 +35,6 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     on<UploadScanCover>(_onUploadCover);
     on<SaveScanBook>(_onSaveBook);
     on<DeleteScanBook>(_onDeleteBook);
-    on<SaveScanTook>(_onSaveTook);
-    on<DeleteScanTook>(_onDeleteTook);
-    on<SaveScanChapter>(_onSaveChapter);
-    on<DeleteScanChapter>(_onDeleteChapter);
     on<ToggleScanBookVisibility>(_onToggleVisibility);
   }
 
@@ -64,11 +44,13 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     UploadScanCover event,
     Emitter<ScanState> emit,
   ) async {
-    try {
-      final filename = await uploadCover(event.filePath);
-      emit(ScanCoverUploaded(filename));
-    } catch (e) {
-      emit(ScanError(e.toString()));
+    final result = await uploadCover(event.filePath);
+    switch (result) {
+      case Ok(:final value):
+        emit(ScanCoverUploaded(value));
+      case Err(:final error):
+        emit(ScanError(error.message));
+        NotificationService.error('Error al subir la portada: ${error.message}');
     }
   }
 
@@ -77,17 +59,19 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     LoadScanGenres event,
     Emitter<ScanState> emit,
   ) async {
-    try {
-      final genres = await getGenres();
-      final currentState = state;
-      final books = switch (currentState) {
-        ScanLoaded(:final books) => books,
-        ScanGenresLoaded(:final books) => books,
-        _ => <BookEntity>[],
-      };
-      emit(ScanGenresLoaded(books, genres));
-    } catch (e) {
-      emit(ScanError(e.toString()));
+    final result = await getGenres();
+    switch (result) {
+      case Ok(:final value):
+        final currentState = state;
+        final books = switch (currentState) {
+          ScanLoaded(:final books) => books,
+          ScanGenresLoaded(:final books) => books,
+          _ => <BookEntity>[],
+        };
+        emit(ScanGenresLoaded(books, value));
+      case Err(:final error):
+        emit(ScanError(error.message));
+        NotificationService.error('Error al cargar géneros: ${error.message}');
     }
   }
 
@@ -97,11 +81,13 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     Emitter<ScanState> emit,
   ) async {
     emit(ScanLoading());
-    try {
-      final books = await getBooks();
-      emit(ScanLoaded(books));
-    } catch (e) {
-      emit(ScanError(e.toString()));
+    final result = await getBooks();
+    switch (result) {
+      case Ok(:final value):
+        emit(ScanLoaded(value));
+      case Err(:final error):
+        emit(ScanError(error.message));
+        NotificationService.error('Error al cargar libros: ${error.message}');
     }
   }
 
@@ -111,18 +97,23 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     SaveScanBook event,
     Emitter<ScanState> emit,
   ) async {
-    emit(ScanLoading());
-    try {
-      if (event.isUpdate) {
-        await updateBook(event.book);
-      } else {
-        await createBook(event.book);
-      }
-      final books = await getBooks();
-      emit(ScanLoaded(books,
-          message: event.isUpdate ? 'Libro guardado' : 'Libro creado'));
-    } catch (e) {
-      emit(ScanError(e.toString()));
+    final saveResult = event.isUpdate
+        ? await updateBook(event.book)
+        : await createBook(event.book);
+    switch (saveResult) {
+      case Ok():
+        final booksResult = await getBooks();
+        switch (booksResult) {
+          case Ok(:final value):
+            emit(ScanLoaded(value,
+                message: event.isUpdate ? 'Libro guardado' : 'Libro creado'));
+          case Err(:final error):
+            NotificationService.error(
+                'Error al actualizar la lista: ${error.message}');
+        }
+      case Err(:final error):
+        emit(ScanError(error.message));
+        NotificationService.error('Error al guardar el libro: ${error.message}');
     }
   }
 
@@ -132,83 +123,20 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     DeleteScanBook event,
     Emitter<ScanState> emit,
   ) async {
-    emit(ScanLoading());
-    try {
-      await deleteBook(event.bookId);
-      final books = await getBooks();
-      emit(ScanLoaded(books, message: 'Libro eliminado'));
-    } catch (e) {
-      emit(ScanError(e.toString()));
-    }
-  }
-
-  // Save a took (create or update) and refresh the list of books after the operation to ensure the UI reflects the latest data
-  // from the backend, preventing issues with stale data and ensuring a consistent user experience.
-  Future<void> _onSaveTook(
-    SaveScanTook event,
-    Emitter<ScanState> emit,
-  ) async {
-    emit(ScanLoading());
-    try {
-      if (event.isUpdate) {
-        await updateTook(event.took);
-      } else {
-        await createTook(event.took);
-      }
-      emit(ScanLoaded(await getBooks(),
-          message: event.isUpdate ? 'Tomo guardado' : 'Tomo creado'));
-    } catch (e) {
-      emit(ScanError(e.toString()));
-    }
-  }
-
-  // Delete a took by ID and refresh the list of books after deletion to ensure the UI is updated correctly with the latest data
-  // from the backend, avoiding potential issues with stale data and ensuring a consistent user experience.
-  Future<void> _onDeleteTook(
-    DeleteScanTook event,
-    Emitter<ScanState> emit,
-  ) async {
-    emit(ScanLoading());
-    try {
-      await deleteTook(event.tookId);
-      emit(ScanLoaded(await getBooks(), message: 'Tomo eliminado'));
-    } catch (e) {
-      emit(ScanError(e.toString()));
-    }
-  }
-
-  // Save a chapter (create or update) and refresh the list of books after the operation to ensure the UI reflects the latest data
-  // from the backend, preventing issues with stale data and ensuring a consistent user experience.
-  Future<void> _onSaveChapter(
-    SaveScanChapter event,
-    Emitter<ScanState> emit,
-  ) async {
-    emit(ScanLoading());
-    try {
-      if (event.isUpdate) {
-        await updateChapter(event.chapter);
-      } else {
-        await createChapter(event.chapter);
-      }
-      emit(ScanLoaded(await getBooks(),
-          message: event.isUpdate ? 'Capítulo guardado' : 'Capítulo creado'));
-    } catch (e) {
-      emit(ScanError(e.toString()));
-    }
-  }
-
-  // Delete a chapter by ID and refresh the list of books after deletion to ensure the UI is updated correctly with the latest data
-  // from the backend, avoiding potential issues with stale data and ensuring a consistent user experience.
-  Future<void> _onDeleteChapter(
-    DeleteScanChapter event,
-    Emitter<ScanState> emit,
-  ) async {
-    emit(ScanLoading());
-    try {
-      await deleteChapter(event.chapterId);
-      emit(ScanLoaded(await getBooks(), message: 'Capítulo eliminado'));
-    } catch (e) {
-      emit(ScanError(e.toString()));
+    final deleteResult = await deleteBook(event.bookId);
+    switch (deleteResult) {
+      case Ok():
+        final booksResult = await getBooks();
+        switch (booksResult) {
+          case Ok(:final value):
+            emit(ScanLoaded(value, message: 'Libro eliminado'));
+          case Err(:final error):
+            NotificationService.error(
+                'Error al actualizar la lista: ${error.message}');
+        }
+      case Err(:final error):
+        emit(ScanError(error.message));
+        NotificationService.error('Error al eliminar el libro: ${error.message}');
     }
   }
 
@@ -218,15 +146,25 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     ToggleScanBookVisibility event,
     Emitter<ScanState> emit,
   ) async {
-    emit(ScanLoading());
-    try {
-      await toggleBookVisibility(event.bookId, event.isVisible);
-      emit(ScanLoaded(await getBooks(),
-          message: event.isVisible
-              ? 'Novela visible para usuarios'
-              : 'Novela oculta'));
-    } catch (e) {
-      emit(ScanError(e.toString()));
+    final toggleResult =
+        await toggleBookVisibility(event.bookId, event.isVisible);
+    switch (toggleResult) {
+      case Ok():
+        final booksResult = await getBooks();
+        switch (booksResult) {
+          case Ok(:final value):
+            emit(ScanLoaded(value,
+                message: event.isVisible
+                    ? 'Novela visible para usuarios'
+                    : 'Novela oculta'));
+          case Err(:final error):
+            NotificationService.error(
+                'Error al actualizar la lista: ${error.message}');
+        }
+      case Err(:final error):
+        emit(ScanError(error.message));
+        NotificationService.error(
+            'Error al cambiar visibilidad: ${error.message}');
     }
   }
 }

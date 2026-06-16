@@ -5,13 +5,32 @@ import 'package:noveles/core/utils/color_utils.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
 import 'package:noveles/features/presentation/widgets/label_badge.dart';
 
-class LabelManagementScreen extends StatelessWidget {
+class LabelManagementScreen extends StatefulWidget {
   const LabelManagementScreen({super.key});
 
   @override
+  State<LabelManagementScreen> createState() => _LabelManagementScreenState();
+}
+
+class _LabelManagementScreenState extends State<LabelManagementScreen> {
+  late final LabelBloc _labelBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    _labelBloc = getIt<LabelBloc>()..add(const LoadLabels());
+  }
+
+  @override
+  void dispose() {
+    _labelBloc.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => getIt<LabelBloc>()..add(const LoadLabels()),
+    return BlocProvider.value(
+      value: _labelBloc,
       child: Scaffold(
         appBar: AppBar(title: const Text('Gestionar Etiquetas')),
         body: BlocConsumer<LabelBloc, LabelState>(
@@ -112,7 +131,9 @@ class _LabelManagementContentState extends State<_LabelManagementContent> {
                     color: ColorUtils.fromHex(hex),
                     shape: BoxShape.circle,
                     border: selected
-                        ? Border.all(color: Colors.white, width: 3)
+                        ? Border.all(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            width: 3)
                         : null,
                   ),
                 ),
@@ -145,7 +166,8 @@ class _LabelManagementContentState extends State<_LabelManagementContent> {
                 leading: LabelBadge(name: label.name, color: label.color),
                 title: Text(label.name),
                 trailing: IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
+                  icon: Icon(Icons.delete,
+                      color: Theme.of(context).colorScheme.error),
                   onPressed: () =>
                       context.read<LabelBloc>().add(DeleteLabelEvent(label.id)),
                 ),

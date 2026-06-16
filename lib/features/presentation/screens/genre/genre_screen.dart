@@ -1,9 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:noveles/core/di/injection.dart';
-import 'package:noveles/core/supabase/storage_helper.dart';
+import 'package:get_it/get_it.dart';
+import 'package:noveles/core/cover/cover_url_service.dart';
 import 'package:noveles/features/books/domain/book_entity.dart';
-import 'package:noveles/features/books/domain/get_books_by_genre.dart';
 
 class GenreScreen extends StatefulWidget {
   const GenreScreen({
@@ -25,7 +24,9 @@ class _GenreScreenState extends State<GenreScreen> {
   @override
   void initState() {
     super.initState();
-    filteredBooks = getIt<GetBooksByGenre>()(widget.books, widget.genre);
+    filteredBooks = widget.books
+        .where((b) => b.listGenre.any((g) => g.name == widget.genre))
+        .toList();
   }
 
   @override
@@ -55,7 +56,7 @@ class _GenreScreenState extends State<GenreScreen> {
                       Positioned.fill(
                         child: CachedNetworkImage(
                           fit: BoxFit.cover,
-                          imageUrl: coverUrl(book.cover),
+                          imageUrl: GetIt.instance<CoverUrlService>()(book.cover),
                           errorWidget: (_, __, ___) =>
                               const Icon(Icons.book, size: 48),
                         ),

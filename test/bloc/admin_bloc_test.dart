@@ -1,6 +1,8 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:noveles/core/errors/result.dart';
+import 'package:noveles/core/errors/failure.dart';
 import 'package:noveles/features/books/domain/book_entity.dart';
 import 'package:noveles/features/books/domain/delete_book.dart';
 import 'package:noveles/features/books/domain/get_book.dart';
@@ -37,8 +39,8 @@ void main() {
       state: 'ongoing',
       type: 'novel',
       release: '2024',
-      tookCount: '5',
-      chapterCount: '10',
+      tookCount: 5,
+      chapterCount: 10,
       source: '',
       link: '',
       isFavorite: false,
@@ -69,7 +71,7 @@ void main() {
     blocTest<AdminBloc, AdminState>(
       'emits [AdminLoading, AdminLoaded] when LoadAdminBooks succeeds',
       build: () {
-        when(() => mockGetBooks()).thenAnswer((_) async => testBooks);
+        when(() => mockGetBooks()).thenAnswer((_) async => Ok(testBooks));
         return AdminBloc(
           getBooks: mockGetBooks,
           toggleBookVisibility: mockToggleVisibility,
@@ -90,7 +92,8 @@ void main() {
     blocTest<AdminBloc, AdminState>(
       'emits [AdminLoading, AdminError] when LoadAdminBooks fails',
       build: () {
-        when(() => mockGetBooks()).thenThrow(Exception('Error de red'));
+        when(() => mockGetBooks())
+            .thenAnswer((_) async => Err(BookFailure('Error de red')));
         return AdminBloc(
           getBooks: mockGetBooks,
           toggleBookVisibility: mockToggleVisibility,
@@ -111,8 +114,9 @@ void main() {
     blocTest<AdminBloc, AdminState>(
       'emits AdminLoaded with message when ToggleBookVisibility succeeds',
       build: () {
-        when(() => mockToggleVisibility(any(), any())).thenAnswer((_) async {});
-        when(() => mockGetBooks()).thenAnswer((_) async => testBooks);
+        when(() => mockToggleVisibility(any(), any()))
+            .thenAnswer((_) async => const Ok(null));
+        when(() => mockGetBooks()).thenAnswer((_) async => Ok(testBooks));
         return AdminBloc(
           getBooks: mockGetBooks,
           toggleBookVisibility: mockToggleVisibility,
@@ -132,8 +136,9 @@ void main() {
     blocTest<AdminBloc, AdminState>(
       'emits AdminLoaded with hidden message when ToggleBookVisibility hides',
       build: () {
-        when(() => mockToggleVisibility(any(), any())).thenAnswer((_) async {});
-        when(() => mockGetBooks()).thenAnswer((_) async => testBooks);
+        when(() => mockToggleVisibility(any(), any()))
+            .thenAnswer((_) async => const Ok(null));
+        when(() => mockGetBooks()).thenAnswer((_) async => Ok(testBooks));
         return AdminBloc(
           getBooks: mockGetBooks,
           toggleBookVisibility: mockToggleVisibility,
@@ -154,7 +159,7 @@ void main() {
       'emits AdminError when ToggleBookVisibility fails',
       build: () {
         when(() => mockToggleVisibility(any(), any()))
-            .thenThrow(Exception('Error de visibilidad'));
+            .thenAnswer((_) async => Err(BookFailure('Error de visibilidad')));
         return AdminBloc(
           getBooks: mockGetBooks,
           toggleBookVisibility: mockToggleVisibility,
@@ -174,8 +179,9 @@ void main() {
     blocTest<AdminBloc, AdminState>(
       'emits AdminLoaded with message when DeleteAdminBook succeeds',
       build: () {
-        when(() => mockDeleteBook(any())).thenAnswer((_) async {});
-        when(() => mockGetBooks()).thenAnswer((_) async => testBooks);
+        when(() => mockDeleteBook(any()))
+            .thenAnswer((_) async => const Ok(null));
+        when(() => mockGetBooks()).thenAnswer((_) async => Ok(testBooks));
         return AdminBloc(
           getBooks: mockGetBooks,
           toggleBookVisibility: mockToggleVisibility,
@@ -195,7 +201,8 @@ void main() {
     blocTest<AdminBloc, AdminState>(
       'emits AdminError when DeleteAdminBook fails',
       build: () {
-        when(() => mockDeleteBook(any())).thenThrow(Exception('Delete error'));
+        when(() => mockDeleteBook(any()))
+            .thenAnswer((_) async => Err(BookFailure('Delete error')));
         return AdminBloc(
           getBooks: mockGetBooks,
           toggleBookVisibility: mockToggleVisibility,

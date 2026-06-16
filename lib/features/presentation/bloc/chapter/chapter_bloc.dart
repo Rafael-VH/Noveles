@@ -1,4 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:noveles/core/errors/result.dart';
+import 'package:noveles/core/presentation/notification_service.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 import 'package:noveles/features/chapters/domain/get_chapter_content.dart';
 import 'package:noveles/features/presentation/bloc/chapter/chapter_event.dart';
@@ -16,24 +18,27 @@ class ChapterBloc extends Bloc<ChapterEvent, ChapterState> {
     Emitter<ChapterState> emit,
   ) async {
     emit(ChapterLoading());
-    try {
-      final resolved = await Future.wait(
-        event.chapters.map((ch) async {
-          final content = await getChapterContent(ch.content);
-          return ChapterEntity(
+    final resolved = <ChapterEntity>[];
+    for (final ch in event.chapters) {
+      final result = await getChapterContent(ch.content);
+      switch (result) {
+        case Ok(:final value):
+          resolved.add(ChapterEntity(
             id: ch.id,
             createdAt: ch.createdAt,
             number: ch.number,
             title: ch.title,
-            content: content,
+            content: value,
             tookId: ch.tookId,
-          );
-        }),
-      );
-      if (emit.isDone) return;
-      emit(ChapterLoaded(resolved, initialIndex: event.initialIndex));
-    } catch (e) {
-      emit(ChapterError('Error al cargar capítulos: $e'));
+          ));
+        case Err(:final error):
+          emit(ChapterError('Error al cargar capítulos: ${error.message}'));
+          NotificationService.error(
+              'Error al cargar capítulos: ${error.message}');
+          return;
+      }
     }
+    if (emit.isDone) return;
+    emit(ChapterLoaded(resolved, initialIndex: event.initialIndex));
   }
 }

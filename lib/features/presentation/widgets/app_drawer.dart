@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:noveles/core/supabase/storage_helper.dart';
+import 'package:noveles/core/cover/cover_url_service.dart';
+import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
 import 'package:noveles/features/presentation/screens/admin/admin_main_screen.dart';
 import 'package:noveles/features/presentation/screens/profile/profile_screen.dart';
@@ -14,7 +15,10 @@ class AppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authState = context.read<AuthBloc>().state;
-    final user = (authState as AuthAuthenticated).user;
+    if (authState is! AuthAuthenticated) {
+      return const Drawer(child: SizedBox.shrink());
+    }
+    final user = authState.user;
 
     return Drawer(
       child: ListView(
@@ -31,7 +35,7 @@ class AppDrawer extends StatelessWidget {
                   radius: 32,
                   backgroundImage:
                       user.avatarUrl != null && user.avatarUrl!.isNotEmpty
-                          ? NetworkImage(coverUrl(user.avatarUrl!))
+                          ? NetworkImage(getIt<CoverUrlService>()(user.avatarUrl!))
                           : null,
                   child: user.avatarUrl == null || user.avatarUrl!.isEmpty
                       ? const Icon(Icons.person, size: 32)

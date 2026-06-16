@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:noveles/core/supabase/storage_helper.dart';
+import 'package:noveles/core/cover/cover_url_service.dart';
+import 'package:noveles/core/di/injection.dart';
 
 class CoverPicker extends StatelessWidget {
   final TextEditingController controller;
@@ -34,7 +35,7 @@ class CoverPicker extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: Image.network(
-              coverUrl(controller.text),
+              getIt<CoverUrlService>()(controller.text),
               height: 150,
               width: double.infinity,
               fit: BoxFit.cover,
