@@ -1,8 +1,9 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
-import 'package:noveles/features/domain/use_cases/use_cases.dart';
+import 'package:noveles/features/books/domain/book_entity.dart';
+import 'package:noveles/features/books/domain/get_book.dart';
+import 'package:noveles/features/books/domain/get_book_by_id.dart';
 import 'package:noveles/features/presentation/bloc/book/book_bloc.dart';
 import 'package:noveles/features/presentation/bloc/book/book_event.dart';
 import 'package:noveles/features/presentation/bloc/book/book_state.dart';
@@ -52,7 +53,8 @@ void main() {
         isFavorite: false,
         isVisible: true,
         listGenre: const [],
-        listTook: const [], listLabel: const [],
+        listTook: const [],
+        listLabel: const [],
       ),
     ];
 
@@ -82,7 +84,8 @@ void main() {
       act: (bloc) => bloc.add(LoadBooks()),
       expect: () => [
         isA<BookLoading>(),
-        isA<BookError>().having((s) => s.message, 'message', contains('API error')),
+        isA<BookError>()
+            .having((s) => s.message, 'message', contains('API error')),
       ],
     );
 
@@ -108,7 +111,8 @@ void main() {
       act: (bloc) => bloc.add(LoadBookById(999)),
       expect: () => [
         isA<BookLoading>(),
-        isA<BookError>().having((s) => s.message, 'message', 'Libro no encontrado'),
+        isA<BookError>()
+            .having((s) => s.message, 'message', 'Libro no encontrado'),
       ],
     );
   });

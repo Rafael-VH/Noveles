@@ -1,15 +1,21 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
-import 'package:noveles/features/domain/use_cases/use_cases.dart';
+import 'package:noveles/features/genres/domain/genre_entity.dart';
+import 'package:noveles/features/genres/domain/get_genre.dart';
+import 'package:noveles/features/genres/domain/create_genre.dart';
+import 'package:noveles/features/genres/domain/update_genre.dart';
+import 'package:noveles/features/genres/domain/delete_genre.dart';
 import 'package:noveles/features/presentation/bloc/genre/genre_bloc.dart';
 import 'package:noveles/features/presentation/bloc/genre/genre_event.dart';
 import 'package:noveles/features/presentation/bloc/genre/genre_state.dart';
 
 class MockGetGenre extends Mock implements GetGenre {}
+
 class MockCreateGenre extends Mock implements CreateGenre {}
+
 class MockUpdateGenre extends Mock implements UpdateGenre {}
+
 class MockDeleteGenre extends Mock implements DeleteGenre {}
 
 void main() {
@@ -88,7 +94,8 @@ void main() {
       act: (bloc) => bloc.add(LoadGenres()),
       expect: () => [
         isA<GenreLoading>(),
-        isA<GenreError>().having((s) => s.message, 'message', contains('API error')),
+        isA<GenreError>()
+            .having((s) => s.message, 'message', contains('API error')),
       ],
     );
 

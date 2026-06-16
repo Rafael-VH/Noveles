@@ -2,17 +2,25 @@ import 'dart:async';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
-import 'package:noveles/features/domain/use_cases/use_cases.dart';
+import 'package:noveles/features/profiles/domain/user_entity.dart';
+import 'package:noveles/features/auth/domain/login.dart';
+import 'package:noveles/features/auth/domain/register.dart';
+import 'package:noveles/features/auth/domain/logout.dart';
+import 'package:noveles/features/auth/domain/get_current_user.dart';
+import 'package:noveles/features/auth/domain/listen_auth_state.dart';
 import 'package:noveles/features/presentation/bloc/auth/auth_bloc.dart';
 import 'package:noveles/features/presentation/bloc/auth/auth_event.dart';
 import 'package:noveles/features/presentation/bloc/auth/auth_state.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show AuthChangeEvent;
 
 class MockLogin extends Mock implements Login {}
+
 class MockRegister extends Mock implements Register {}
+
 class MockLogout extends Mock implements Logout {}
+
 class MockGetCurrentUser extends Mock implements GetCurrentUser {}
+
 class MockListenAuthState extends Mock implements ListenAuthState {}
 
 void main() {
@@ -201,8 +209,7 @@ void main() {
     blocTest<AuthBloc, AuthState>(
       'emits [AuthLoading, AuthAuthenticated] when CheckAuthSession has user',
       build: () {
-        when(() => mockGetCurrentUser())
-            .thenAnswer((_) async => testUser);
+        when(() => mockGetCurrentUser()).thenAnswer((_) async => testUser);
         return AuthBloc(
           login: mockLogin,
           register: mockRegister,
@@ -225,8 +232,7 @@ void main() {
     blocTest<AuthBloc, AuthState>(
       'emits [AuthLoading, AuthUnauthenticated] when CheckAuthSession has no user',
       build: () {
-        when(() => mockGetCurrentUser())
-            .thenAnswer((_) async => null);
+        when(() => mockGetCurrentUser()).thenAnswer((_) async => null);
         return AuthBloc(
           login: mockLogin,
           register: mockRegister,
@@ -245,8 +251,7 @@ void main() {
     blocTest<AuthBloc, AuthState>(
       'emits [AuthLoading, AuthUnauthenticated] when CheckAuthSession throws',
       build: () {
-        when(() => mockGetCurrentUser())
-            .thenThrow(Exception('Error'));
+        when(() => mockGetCurrentUser()).thenThrow(Exception('Error'));
         return AuthBloc(
           login: mockLogin,
           register: mockRegister,

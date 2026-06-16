@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
-import 'package:noveles/features/domain/repositories/repositories.dart';
-import 'package:noveles/features/domain/use_cases/use_cases.dart';
+import 'package:noveles/features/profiles/domain/user_entity.dart';
+import 'package:noveles/features/profiles/domain/profiles_repository.dart';
+import 'package:noveles/features/profiles/domain/get_all_profiles.dart';
 
 class MockProfilesRepository extends Mock implements ProfilesRepository {}
 

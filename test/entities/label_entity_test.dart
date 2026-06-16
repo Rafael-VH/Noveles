@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
+import 'package:noveles/features/labels/domain/label_entity.dart';
 
 void main() {
   group('LabelEntity', () {

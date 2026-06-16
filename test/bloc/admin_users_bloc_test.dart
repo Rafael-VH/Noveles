@@ -1,8 +1,8 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
-import 'package:noveles/features/domain/use_cases/get_all_profiles.dart';
+import 'package:noveles/features/profiles/domain/user_entity.dart';
+import 'package:noveles/features/profiles/domain/get_all_profiles.dart';
 import 'package:noveles/features/presentation/bloc/admin_users/admin_users_bloc.dart';
 import 'package:noveles/features/presentation/bloc/admin_users/admin_users_event.dart';
 import 'package:noveles/features/presentation/bloc/admin_users/admin_users_state.dart';

@@ -3,11 +3,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:noveles/core/errors/repository_exception.dart';
 import 'package:noveles/core/supabase/supabase_client.dart';
-import 'package:noveles/features/data/repositories/book_repository_impl.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
+import 'package:noveles/features/books/data/book_repository_impl.dart';
+import 'package:noveles/features/books/domain/book_entity.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MockSupabaseClient extends Mock implements SupabaseClient {}
+
 class MockSupabaseQueryBuilder extends Mock implements SupabaseQueryBuilder {}
 
 /// Mock for PostgrestFilterBuilder<PostgrestList> (the type returned by
@@ -81,24 +82,24 @@ void main() {
     when(() => mockClient.from(any())).thenAnswer((_) => mockQueryBuilder);
     when(() => mockQueryBuilder.select(any())).thenAnswer((_) => mockFilter);
     when(() => mockQueryBuilder.insert(
-      any(),
-      defaultToNull: any(named: 'defaultToNull'),
-    )).thenAnswer((_) => mockFilter);
+          any(),
+          defaultToNull: any(named: 'defaultToNull'),
+        )).thenAnswer((_) => mockFilter);
     when(() => mockQueryBuilder.update(any())).thenAnswer((_) => mockFilter);
     when(() => mockQueryBuilder.delete()).thenAnswer((_) => mockFilter);
 
     // Default chain: filter methods return filter
     when(() => mockFilter.eq(any(), any())).thenAnswer((_) => mockFilter);
     when(() => mockFilter.order(
-      any(),
-      ascending: any(named: 'ascending'),
-      nullsFirst: any(named: 'nullsFirst'),
-      referencedTable: any(named: 'referencedTable'),
-    )).thenAnswer((_) => mockFilter);
+          any(),
+          ascending: any(named: 'ascending'),
+          nullsFirst: any(named: 'nullsFirst'),
+          referencedTable: any(named: 'referencedTable'),
+        )).thenAnswer((_) => mockFilter);
     when(() => mockFilter.limit(
-      any(),
-      referencedTable: any(named: 'referencedTable'),
-    )).thenAnswer((_) => mockFilter);
+          any(),
+          referencedTable: any(named: 'referencedTable'),
+        )).thenAnswer((_) => mockFilter);
   });
 
   tearDown(() {
@@ -111,31 +112,33 @@ void main() {
   group('BookRepositoryImpl', () {
     group('getBooks', () {
       test('returns list of BookEntity on success', () async {
-        mockFilter.thenReturns([{
-          'id': 1,
-          'created_at': '2024-01-01T00:00:00.000',
-          'cover': 'cover.jpg',
-          'name': 'Test Book',
-          'short': '',
-          'alternative': '',
-          'description': '',
-          'author_id': 1,
-          'author': 'Author',
-          'country': 'JP',
-          'state': 'ongoing',
-          'type': 'novel',
-          'release': '2024',
-          'took_count': '5',
-          'chapter_count': '10',
-          'source': '',
-          'link': '',
-          'is_favorite': false,
-          'is_visible': true,
-          'authors': {'id': 1, 'name': 'Author', 'created_at': '2024-01-01'},
-          'books_genres': <Map<String, dynamic>>[],
-          'books_labels': <Map<String, dynamic>>[],
-          'tooks': <Map<String, dynamic>>[],
-        }]);
+        mockFilter.thenReturns([
+          {
+            'id': 1,
+            'created_at': '2024-01-01T00:00:00.000',
+            'cover': 'cover.jpg',
+            'name': 'Test Book',
+            'short': '',
+            'alternative': '',
+            'description': '',
+            'author_id': 1,
+            'author': 'Author',
+            'country': 'JP',
+            'state': 'ongoing',
+            'type': 'novel',
+            'release': '2024',
+            'took_count': '5',
+            'chapter_count': '10',
+            'source': '',
+            'link': '',
+            'is_favorite': false,
+            'is_visible': true,
+            'authors': {'id': 1, 'name': 'Author', 'created_at': '2024-01-01'},
+            'books_genres': <Map<String, dynamic>>[],
+            'books_labels': <Map<String, dynamic>>[],
+            'tooks': <Map<String, dynamic>>[],
+          }
+        ]);
 
         final books = await repository.getBooks();
 
@@ -155,11 +158,11 @@ void main() {
 
       test('throws RepositoryException on error', () async {
         when(() => mockFilter.order(
-          any(),
-          ascending: any(named: 'ascending'),
-          nullsFirst: any(named: 'nullsFirst'),
-          referencedTable: any(named: 'referencedTable'),
-        )).thenThrow(Exception('DB error'));
+              any(),
+              ascending: any(named: 'ascending'),
+              nullsFirst: any(named: 'nullsFirst'),
+              referencedTable: any(named: 'referencedTable'),
+            )).thenThrow(Exception('DB error'));
 
         try {
           await repository.getBooks();
@@ -174,7 +177,8 @@ void main() {
       test('throws RepositoryException on error', () async {
         // The createBook flow with authorId=0 enters the author lookup branch
         // and calls maybeSingle(). Stub it to throw to test the error path.
-        when(() => mockFilter.maybeSingle()).thenThrow(Exception('Insert failed'));
+        when(() => mockFilter.maybeSingle())
+            .thenThrow(Exception('Insert failed'));
 
         expect(
           repository.createBook(BookEntity(
@@ -209,7 +213,8 @@ void main() {
 
     group('updateBook', () {
       test('throws RepositoryException on error', () async {
-        when(() => mockFilter.eq(any(), any())).thenThrow(Exception('Update failed'));
+        when(() => mockFilter.eq(any(), any()))
+            .thenThrow(Exception('Update failed'));
 
         try {
           await repository.updateBook(
@@ -233,11 +238,11 @@ void main() {
               link: '',
               isFavorite: false,
               isVisible: true,
-            listGenre: const [],
-            listTook: const [],
-            listLabel: const [],
-            createdBy: null,
-          ),
+              listGenre: const [],
+              listTook: const [],
+              listLabel: const [],
+              createdBy: null,
+            ),
           );
           fail('Expected RepositoryException');
         } on RepositoryException catch (e) {
@@ -248,7 +253,8 @@ void main() {
 
     group('deleteBook', () {
       test('throws RepositoryException on error', () async {
-        when(() => mockFilter.eq(any(), any())).thenThrow(Exception('Delete failed'));
+        when(() => mockFilter.eq(any(), any()))
+            .thenThrow(Exception('Delete failed'));
 
         try {
           await repository.deleteBook(1);
@@ -261,7 +267,8 @@ void main() {
 
     group('toggleBookVisibility', () {
       test('throws RepositoryException on error', () async {
-        when(() => mockFilter.eq(any(), any())).thenThrow(Exception('Toggle failed'));
+        when(() => mockFilter.eq(any(), any()))
+            .thenThrow(Exception('Toggle failed'));
 
         try {
           await repository.toggleBookVisibility(1, true);
@@ -280,11 +287,14 @@ void main() {
 
         final result = await repository.getBookLabels();
 
-        expect(result, {1: {2}});
+        expect(result, {
+          1: {2}
+        });
       });
 
       test('throws RepositoryException on error', () async {
-        when(() => mockQueryBuilder.select(any())).thenThrow(Exception('Label query failed'));
+        when(() => mockQueryBuilder.select(any()))
+            .thenThrow(Exception('Label query failed'));
 
         try {
           await repository.getBookLabels();

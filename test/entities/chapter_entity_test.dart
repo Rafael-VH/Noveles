@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
+import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 
 void main() {
   group('ChapterEntity', () {

@@ -3,11 +3,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:noveles/core/errors/repository_exception.dart';
 import 'package:noveles/core/supabase/supabase_client.dart';
-import 'package:noveles/features/data/repositories/chapter_repository_impl.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
+import 'package:noveles/features/chapters/data/chapter_repository_impl.dart';
+import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MockSupabaseClient extends Mock implements SupabaseClient {}
+
 class MockSupabaseQueryBuilder extends Mock implements SupabaseQueryBuilder {}
 
 /// Mock for PostgrestFilterBuilder<PostgrestList>.
@@ -76,22 +77,22 @@ void main() {
     when(() => mockClient.from(any())).thenAnswer((_) => mockQueryBuilder);
     when(() => mockQueryBuilder.select(any())).thenAnswer((_) => mockFilter);
     when(() => mockQueryBuilder.insert(
-      any(),
-      defaultToNull: any(named: 'defaultToNull'),
-    )).thenAnswer((_) => mockFilter);
+          any(),
+          defaultToNull: any(named: 'defaultToNull'),
+        )).thenAnswer((_) => mockFilter);
     when(() => mockQueryBuilder.update(any())).thenAnswer((_) => mockFilter);
     when(() => mockQueryBuilder.delete()).thenAnswer((_) => mockFilter);
     when(() => mockFilter.eq(any(), any())).thenAnswer((_) => mockFilter);
     when(() => mockFilter.order(
-      any(),
-      ascending: any(named: 'ascending'),
-      nullsFirst: any(named: 'nullsFirst'),
-      referencedTable: any(named: 'referencedTable'),
-    )).thenAnswer((_) => mockFilter);
+          any(),
+          ascending: any(named: 'ascending'),
+          nullsFirst: any(named: 'nullsFirst'),
+          referencedTable: any(named: 'referencedTable'),
+        )).thenAnswer((_) => mockFilter);
     when(() => mockFilter.limit(
-      any(),
-      referencedTable: any(named: 'referencedTable'),
-    )).thenAnswer((_) => mockFilter);
+          any(),
+          referencedTable: any(named: 'referencedTable'),
+        )).thenAnswer((_) => mockFilter);
     when(() => mockFilter.maybeSingle()).thenAnswer((_) => mockTransform);
   });
 
@@ -102,14 +103,16 @@ void main() {
   group('ChapterRepositoryImpl', () {
     group('getChapters', () {
       test('returns list of ChapterEntity on success', () async {
-        mockFilter.thenReturns([{
-          'id': 1,
-          'created_at': '2024-01-01T00:00:00.000',
-          'number': '1',
-          'title': 'Chapter 1',
-          'content': 'ch1.txt',
-          'took_id': 1,
-        }]);
+        mockFilter.thenReturns([
+          {
+            'id': 1,
+            'created_at': '2024-01-01T00:00:00.000',
+            'number': '1',
+            'title': 'Chapter 1',
+            'content': 'ch1.txt',
+            'took_id': 1,
+          }
+        ]);
 
         final chapters = await repository.getChapters();
 
@@ -121,11 +124,11 @@ void main() {
 
       test('throws RepositoryException on error', () async {
         when(() => mockFilter.order(
-          any(),
-          ascending: any(named: 'ascending'),
-          nullsFirst: any(named: 'nullsFirst'),
-          referencedTable: any(named: 'referencedTable'),
-        )).thenThrow(Exception('DB error'));
+              any(),
+              ascending: any(named: 'ascending'),
+              nullsFirst: any(named: 'nullsFirst'),
+              referencedTable: any(named: 'referencedTable'),
+            )).thenThrow(Exception('DB error'));
 
         try {
           await repository.getChapters();
@@ -162,7 +165,8 @@ void main() {
       });
 
       test('throws RepositoryException on error', () async {
-        when(() => mockFilter.eq(any(), any())).thenThrow(Exception('DB error'));
+        when(() => mockFilter.eq(any(), any()))
+            .thenThrow(Exception('DB error'));
 
         try {
           await repository.getChapterById(1);
@@ -176,15 +180,19 @@ void main() {
     group('createChapter', () {
       test('throws RepositoryException on error', () async {
         when(() => mockQueryBuilder.insert(
-          any(),
-          defaultToNull: any(named: 'defaultToNull'),
-        )).thenThrow(Exception('Insert failed'));
+              any(),
+              defaultToNull: any(named: 'defaultToNull'),
+            )).thenThrow(Exception('Insert failed'));
 
         try {
           await repository.createChapter(
             ChapterEntity(
-              id: 0, createdAt: DateTime(2024),
-              number: '1', title: '', content: '', tookId: 1,
+              id: 0,
+              createdAt: DateTime(2024),
+              number: '1',
+              title: '',
+              content: '',
+              tookId: 1,
               createdBy: null,
             ),
           );
@@ -197,13 +205,18 @@ void main() {
 
     group('updateChapter', () {
       test('throws RepositoryException on error', () async {
-        when(() => mockFilter.eq(any(), any())).thenThrow(Exception('Update failed'));
+        when(() => mockFilter.eq(any(), any()))
+            .thenThrow(Exception('Update failed'));
 
         try {
           await repository.updateChapter(
             ChapterEntity(
-              id: 1, createdAt: DateTime(2024),
-              number: '1', title: '', content: '', tookId: 1,
+              id: 1,
+              createdAt: DateTime(2024),
+              number: '1',
+              title: '',
+              content: '',
+              tookId: 1,
               createdBy: null,
             ),
           );
@@ -216,7 +229,8 @@ void main() {
 
     group('deleteChapter', () {
       test('throws RepositoryException on error', () async {
-        when(() => mockFilter.eq(any(), any())).thenThrow(Exception('Delete failed'));
+        when(() => mockFilter.eq(any(), any()))
+            .thenThrow(Exception('Delete failed'));
 
         try {
           await repository.deleteChapter(1);

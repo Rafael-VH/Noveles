@@ -1,8 +1,23 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
-import 'package:noveles/features/domain/use_cases/use_cases.dart';
+import 'package:noveles/features/books/domain/book_entity.dart';
+import 'package:noveles/features/tooks/domain/took_entity.dart';
+import 'package:noveles/features/chapters/domain/chapter_entity.dart';
+import 'package:noveles/features/genres/domain/genre_entity.dart';
+import 'package:noveles/features/books/domain/get_book.dart';
+import 'package:noveles/features/books/domain/create_book.dart';
+import 'package:noveles/features/books/domain/update_book.dart';
+import 'package:noveles/features/books/domain/delete_book.dart';
+import 'package:noveles/features/books/domain/upload_cover.dart';
+import 'package:noveles/features/books/domain/toggle_book_visibility.dart';
+import 'package:noveles/features/tooks/domain/create_took.dart';
+import 'package:noveles/features/tooks/domain/update_took.dart';
+import 'package:noveles/features/tooks/domain/delete_took.dart';
+import 'package:noveles/features/chapters/domain/create_chapter.dart';
+import 'package:noveles/features/chapters/domain/update_chapter.dart';
+import 'package:noveles/features/chapters/domain/delete_chapter.dart';
+import 'package:noveles/features/genres/domain/get_genre.dart';
 import 'package:noveles/features/presentation/bloc/scan/scan_bloc.dart';
 import 'package:noveles/features/presentation/bloc/scan/scan_event.dart';
 import 'package:noveles/features/presentation/bloc/scan/scan_state.dart';
@@ -31,8 +46,7 @@ class MockGetGenre extends Mock implements GetGenre {}
 
 class MockUploadCover extends Mock implements UploadCover {}
 
-class MockToggleBookVisibility extends Mock
-    implements ToggleBookVisibility {}
+class MockToggleBookVisibility extends Mock implements ToggleBookVisibility {}
 
 void main() {
   late MockGetBooks mockGetBooks;
@@ -496,16 +510,14 @@ void main() {
     blocTest<ScanBloc, ScanState>(
       'emits [ScanLoading, ScanLoaded] when ToggleScanBookVisibility hides',
       build: () {
-        when(() => mockToggleVisibility(any(), any()))
-            .thenAnswer((_) async {});
+        when(() => mockToggleVisibility(any(), any())).thenAnswer((_) async {});
         when(() => mockGetBooks()).thenAnswer((_) async => testBooks);
         return scanBloc;
       },
       act: (bloc) => bloc.add(ToggleScanBookVisibility(1, false)),
       expect: () => [
         isA<ScanLoading>(),
-        isA<ScanLoaded>()
-            .having((s) => s.message, 'message', 'Novela oculta'),
+        isA<ScanLoaded>().having((s) => s.message, 'message', 'Novela oculta'),
       ],
     );
 

@@ -1,8 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
-import 'package:noveles/features/domain/repositories/repositories.dart';
-import 'package:noveles/features/domain/use_cases/use_cases.dart';
+import 'package:noveles/features/labels/domain/label_entity.dart';
+import 'package:noveles/features/labels/domain/label_repository.dart';
+import 'package:noveles/features/labels/domain/create_label.dart';
+import 'package:noveles/features/labels/domain/get_labels.dart';
+import 'package:noveles/features/labels/domain/update_label.dart';
+import 'package:noveles/features/labels/domain/delete_label.dart';
+import 'package:noveles/features/labels/domain/assign_label_to_book.dart';
+import 'package:noveles/features/labels/domain/remove_label_from_book.dart';
 
 class MockLabelRepository extends Mock implements LabelRepository {}
 
@@ -15,7 +20,10 @@ void main() {
 
   setUpAll(() {
     registerFallbackValue(LabelEntity(
-      id: 0, createdAt: DateTime(2026), name: '', color: '',
+      id: 0,
+      createdAt: DateTime(2026),
+      name: '',
+      color: '',
     ));
   });
 
@@ -40,7 +48,10 @@ void main() {
   group('CreateLabel', () {
     test('calls repository.createLabel with LabelEntity', () async {
       final label = LabelEntity(
-        id: 0, createdAt: DateTime(2026), name: 'Staff Pick', color: '#71A202',
+        id: 0,
+        createdAt: DateTime(2026),
+        name: 'Staff Pick',
+        color: '#71A202',
       );
       when(() => mockRepo.createLabel(any())).thenAnswer((_) async {});
 
@@ -51,7 +62,8 @@ void main() {
 
   group('UpdateLabel', () {
     test('calls repository.updateLabel', () async {
-      when(() => mockRepo.updateLabel(any(), any(), any())).thenAnswer((_) async {});
+      when(() => mockRepo.updateLabel(any(), any(), any()))
+          .thenAnswer((_) async {});
 
       await UpdateLabel(mockRepo)(1, 'Staff Pick', '#71A202');
       verify(() => mockRepo.updateLabel(1, 'Staff Pick', '#71A202')).called(1);

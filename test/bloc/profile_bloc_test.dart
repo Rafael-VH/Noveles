@@ -1,18 +1,23 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
-import 'package:noveles/features/domain/use_cases/get_profile.dart';
-import 'package:noveles/features/domain/use_cases/update_profile.dart' as usecases;
-import 'package:noveles/features/domain/use_cases/upload_avatar.dart' as usecases2;
-import 'package:noveles/features/domain/use_cases/change_password.dart' as usecases3;
+import 'package:noveles/features/profiles/domain/user_entity.dart';
+import 'package:noveles/features/profiles/domain/get_profile.dart';
+import 'package:noveles/features/profiles/domain/update_profile.dart'
+    as usecases;
+import 'package:noveles/features/profiles/domain/upload_avatar.dart'
+    as usecases2;
+import 'package:noveles/features/auth/domain/change_password.dart' as usecases3;
 import 'package:noveles/features/presentation/bloc/profile/profile_bloc.dart';
 import 'package:noveles/features/presentation/bloc/profile/profile_event.dart';
 import 'package:noveles/features/presentation/bloc/profile/profile_state.dart';
 
 class MockGetProfile extends Mock implements GetProfile {}
+
 class MockUpdateProfile extends Mock implements usecases.UpdateProfile {}
+
 class MockUploadAvatar extends Mock implements usecases2.UploadAvatar {}
+
 class MockChangePassword extends Mock implements usecases3.ChangePassword {}
 
 void main() {
@@ -69,7 +74,7 @@ void main() {
           changePassword: mockChangePassword,
         );
       },
-        act: (bloc) => bloc.add(LoadProfile()),
+      act: (bloc) => bloc.add(LoadProfile()),
       expect: () => [
         isA<ProfileLoading>(),
         isA<ProfileLoaded>().having(
@@ -91,7 +96,7 @@ void main() {
           changePassword: mockChangePassword,
         );
       },
-        act: (bloc) => bloc.add(LoadProfile()),
+      act: (bloc) => bloc.add(LoadProfile()),
       expect: () => [
         isA<ProfileLoading>(),
         isA<ProfileError>().having(
@@ -109,10 +114,10 @@ void main() {
       },
       build: () {
         when(() => mockUpdateProfile(
-          displayName: any(named: 'displayName'),
-          bio: any(named: 'bio'),
-          avatarUrl: any(named: 'avatarUrl'),
-        )).thenAnswer((_) async => updatedUser);
+              displayName: any(named: 'displayName'),
+              bio: any(named: 'bio'),
+              avatarUrl: any(named: 'avatarUrl'),
+            )).thenAnswer((_) async => updatedUser);
         return ProfileBloc(
           getProfile: mockGetProfile,
           updateProfile: mockUpdateProfile,
@@ -146,10 +151,10 @@ void main() {
       },
       build: () {
         when(() => mockUpdateProfile(
-          displayName: any(named: 'displayName'),
-          bio: any(named: 'bio'),
-          avatarUrl: any(named: 'avatarUrl'),
-        )).thenThrow(Exception('Error al actualizar'));
+              displayName: any(named: 'displayName'),
+              bio: any(named: 'bio'),
+              avatarUrl: any(named: 'avatarUrl'),
+            )).thenThrow(Exception('Error al actualizar'));
         return ProfileBloc(
           getProfile: mockGetProfile,
           updateProfile: mockUpdateProfile,
@@ -164,15 +169,17 @@ void main() {
       )),
       expect: () => [
         isA<ProfileSaving>(),
-        isA<ProfileError>().having(
-          (s) => s.message,
-          'message',
-          contains('Error al actualizar'),
-        ).having(
-          (s) => s.user?.displayName,
-          'user preserved',
-          'Test User',
-        ),
+        isA<ProfileError>()
+            .having(
+              (s) => s.message,
+              'message',
+              contains('Error al actualizar'),
+            )
+            .having(
+              (s) => s.user?.displayName,
+              'user preserved',
+              'Test User',
+            ),
       ],
     );
 

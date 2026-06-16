@@ -1,8 +1,8 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
-import 'package:noveles/features/domain/use_cases/use_cases.dart';
+import 'package:noveles/features/chapters/domain/chapter_entity.dart';
+import 'package:noveles/features/chapters/domain/get_chapter_content.dart';
 import 'package:noveles/features/presentation/bloc/chapter/chapter_bloc.dart';
 import 'package:noveles/features/presentation/bloc/chapter/chapter_event.dart';
 import 'package:noveles/features/presentation/bloc/chapter/chapter_state.dart';

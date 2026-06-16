@@ -1,17 +1,27 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
-import 'package:noveles/features/domain/use_cases/use_cases.dart';
+import 'package:noveles/features/labels/domain/label_entity.dart';
+import 'package:noveles/features/labels/domain/get_labels.dart';
+import 'package:noveles/features/labels/domain/create_label.dart';
+import 'package:noveles/features/labels/domain/delete_label.dart';
+import 'package:noveles/features/labels/domain/assign_label_to_book.dart';
+import 'package:noveles/features/labels/domain/remove_label_from_book.dart';
+import 'package:noveles/features/books/domain/get_book_labels.dart';
 import 'package:noveles/features/presentation/bloc/label/label_bloc.dart';
 import 'package:noveles/features/presentation/bloc/label/label_event.dart';
 import 'package:noveles/features/presentation/bloc/label/label_state.dart';
 
 class MockGetLabels extends Mock implements GetLabels {}
+
 class MockCreateLabel extends Mock implements CreateLabel {}
+
 class MockDeleteLabel extends Mock implements DeleteLabel {}
+
 class MockAssignLabelToBook extends Mock implements AssignLabelToBook {}
+
 class MockRemoveLabelFromBook extends Mock implements RemoveLabelFromBook {}
+
 class MockGetBookLabels extends Mock implements GetBookLabels {}
 
 void main() {
@@ -44,7 +54,10 @@ void main() {
 
   setUpAll(() {
     registerFallbackValue(LabelEntity(
-      id: 0, createdAt: DateTime(2024), name: '', color: '',
+      id: 0,
+      createdAt: DateTime(2024),
+      name: '',
+      color: '',
     ));
   });
 
@@ -75,8 +88,7 @@ void main() {
       'emits [LabelLoading, LabelLoaded] when LoadLabels succeeds',
       build: () {
         when(() => mockGetLabels()).thenAnswer((_) async => testLabels);
-        when(() => mockGetBookLabels())
-            .thenAnswer((_) async => testBookLabels);
+        when(() => mockGetBookLabels()).thenAnswer((_) async => testBookLabels);
         return LabelBloc(
           getLabels: mockGetLabels,
           createLabel: mockCreateLabel,
@@ -124,8 +136,7 @@ void main() {
       build: () {
         when(() => mockCreateLabel(any())).thenAnswer((_) async {});
         when(() => mockGetLabels()).thenAnswer((_) async => testLabels);
-        when(() => mockGetBookLabels())
-            .thenAnswer((_) async => testBookLabels);
+        when(() => mockGetBookLabels()).thenAnswer((_) async => testBookLabels);
         return LabelBloc(
           getLabels: mockGetLabels,
           createLabel: mockCreateLabel,
@@ -174,8 +185,7 @@ void main() {
       build: () {
         when(() => mockAssignLabel(any(), any())).thenAnswer((_) async {});
         when(() => mockGetLabels()).thenAnswer((_) async => testLabels);
-        when(() => mockGetBookLabels())
-            .thenAnswer((_) async => testBookLabels);
+        when(() => mockGetBookLabels()).thenAnswer((_) async => testBookLabels);
         return LabelBloc(
           getLabels: mockGetLabels,
           createLabel: mockCreateLabel,
@@ -224,8 +234,7 @@ void main() {
       build: () {
         when(() => mockRemoveLabel(any(), any())).thenAnswer((_) async {});
         when(() => mockGetLabels()).thenAnswer((_) async => testLabels);
-        when(() => mockGetBookLabels())
-            .thenAnswer((_) async => testBookLabels);
+        when(() => mockGetBookLabels()).thenAnswer((_) async => testBookLabels);
         return LabelBloc(
           getLabels: mockGetLabels,
           createLabel: mockCreateLabel,

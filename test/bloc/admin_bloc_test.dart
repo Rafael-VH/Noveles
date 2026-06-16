@@ -1,17 +1,20 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
-import 'package:noveles/features/domain/use_cases/delete_book.dart';
-import 'package:noveles/features/domain/use_cases/get_book.dart';
-import 'package:noveles/features/domain/use_cases/toggle_book_visibility.dart' as usecases;
+import 'package:noveles/features/books/domain/book_entity.dart';
+import 'package:noveles/features/books/domain/delete_book.dart';
+import 'package:noveles/features/books/domain/get_book.dart';
+import 'package:noveles/features/books/domain/toggle_book_visibility.dart'
+    as usecases;
 import 'package:noveles/features/presentation/bloc/admin/admin_bloc.dart';
 import 'package:noveles/features/presentation/bloc/admin/admin_event.dart';
 import 'package:noveles/features/presentation/bloc/admin/admin_state.dart';
 
 class MockGetBooks extends Mock implements GetBooks {}
+
 class MockToggleBookVisibility extends Mock
     implements usecases.ToggleBookVisibility {}
+
 class MockDeleteBook extends Mock implements DeleteBook {}
 
 void main() {
@@ -108,8 +111,7 @@ void main() {
     blocTest<AdminBloc, AdminState>(
       'emits AdminLoaded with message when ToggleBookVisibility succeeds',
       build: () {
-        when(() => mockToggleVisibility(any(), any()))
-            .thenAnswer((_) async {});
+        when(() => mockToggleVisibility(any(), any())).thenAnswer((_) async {});
         when(() => mockGetBooks()).thenAnswer((_) async => testBooks);
         return AdminBloc(
           getBooks: mockGetBooks,
@@ -130,8 +132,7 @@ void main() {
     blocTest<AdminBloc, AdminState>(
       'emits AdminLoaded with hidden message when ToggleBookVisibility hides',
       build: () {
-        when(() => mockToggleVisibility(any(), any()))
-            .thenAnswer((_) async {});
+        when(() => mockToggleVisibility(any(), any())).thenAnswer((_) async {});
         when(() => mockGetBooks()).thenAnswer((_) async => testBooks);
         return AdminBloc(
           getBooks: mockGetBooks,
