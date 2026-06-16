@@ -1,3 +1,4 @@
+import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/labels/domain/label_repository.dart';
 
 class RemoveLabelFromBook {
@@ -5,6 +6,6 @@ class RemoveLabelFromBook {
 
   RemoveLabelFromBook(this.repository);
 
-  Future<void> call(int bookId, int labelId) =>
+  Future<Result<void>> call(int bookId, int labelId) =>
       repository.removeLabel(bookId, labelId);
 }

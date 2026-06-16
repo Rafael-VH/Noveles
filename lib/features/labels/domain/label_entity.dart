@@ -13,6 +13,20 @@ class LabelEntity extends Equatable {
     required this.color,
   });
 
+  LabelEntity copyWith({
+    int? id,
+    DateTime? createdAt,
+    String? name,
+    String? color,
+  }) {
+    return LabelEntity(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      name: name ?? this.name,
+      color: color ?? this.color,
+    );
+  }
+
   @override
   List<Object> get props => [
         id,

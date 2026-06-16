@@ -1,3 +1,4 @@
+import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/labels/domain/label_entity.dart';
 import 'package:noveles/features/labels/domain/label_repository.dart';
 
@@ -6,5 +7,5 @@ class GetLabels {
 
   GetLabels(this.repository);
 
-  Future<List<LabelEntity>> call() => repository.getLabels();
+  Future<Result<List<LabelEntity>>> call() => repository.getLabels();
 }
