@@ -1,3 +1,4 @@
+import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/profiles/domain/user_entity.dart';
 import 'package:noveles/features/profiles/domain/profiles_repository.dart';
 
@@ -6,7 +7,7 @@ class GetAllProfiles {
 
   GetAllProfiles(this.repository);
 
-  Future<List<UserEntity>> call() async {
-    return await repository.getAllProfiles();
+  Future<Result<List<UserEntity>>> call() async {
+    return repository.getAllProfiles();
   }
 }

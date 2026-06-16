@@ -1,22 +1,38 @@
 import 'package:get_it/get_it.dart';
+import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/profiles/data/profiles_repository_impl.dart';
 import 'package:noveles/features/profiles/domain/profiles_repository.dart';
 import 'package:noveles/features/profiles/domain/get_profile.dart';
 import 'package:noveles/features/profiles/domain/update_profile.dart';
 import 'package:noveles/features/profiles/domain/upload_avatar.dart';
 import 'package:noveles/features/profiles/domain/get_all_profiles.dart';
+import 'package:noveles/features/profiles/domain/change_password.dart';
 import 'package:noveles/features/presentation/bloc/profile/profile_bloc.dart';
 
 final getIt = GetIt.instance;
 
 void initProfilesDependencies() {
   getIt.registerLazySingleton<ProfilesRepository>(
-      () => ProfilesRepositoryImpl());
+    () => ProfilesRepositoryImpl(
+      getIt<SupabaseClientProvider>(),
+    ),
+  );
 
-  getIt.registerLazySingleton(() => GetProfile(getIt()));
-  getIt.registerLazySingleton(() => UpdateProfile(getIt()));
-  getIt.registerLazySingleton(() => UploadAvatar(getIt()));
-  getIt.registerLazySingleton(() => GetAllProfiles(getIt()));
+  getIt.registerLazySingleton(
+    () => GetProfile(getIt()),
+  );
+  getIt.registerLazySingleton(
+    () => UpdateProfile(getIt()),
+  );
+  getIt.registerLazySingleton(
+    () => UploadAvatar(getIt()),
+  );
+  getIt.registerLazySingleton(
+    () => GetAllProfiles(getIt()),
+  );
+  getIt.registerLazySingleton(
+    () => ChangePassword(getIt()),
+  );
 
   getIt.registerFactory(
     () => ProfileBloc(

@@ -1,3 +1,4 @@
+import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/profiles/domain/user_entity.dart';
 import 'package:noveles/features/profiles/domain/profiles_repository.dart';
 
@@ -6,9 +7,9 @@ class UpdateProfile {
 
   UpdateProfile(this.repository);
 
-  Future<UserEntity> call(
+  Future<Result<UserEntity>> call(
       {String? displayName, String? bio, String? avatarUrl}) async {
-    return await repository.updateProfile(
+    return repository.updateProfile(
         displayName: displayName, bio: bio, avatarUrl: avatarUrl);
   }
 }

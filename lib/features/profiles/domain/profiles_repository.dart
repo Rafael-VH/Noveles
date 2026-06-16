@@ -1,10 +1,11 @@
+import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/profiles/domain/user_entity.dart';
 
 abstract class ProfilesRepository {
-  Future<UserEntity> getProfile();
-  Future<UserEntity> updateProfile(
+  Future<Result<UserEntity>> getProfile();
+  Future<Result<UserEntity>> updateProfile(
       {String? displayName, String? bio, String? avatarUrl});
-  Future<String> uploadAvatar(String filePath);
-  Future<void> changePassword(String newPassword);
-  Future<List<UserEntity>> getAllProfiles();
+  Future<Result<String>> uploadAvatar(String filePath);
+  Future<Result<void>> changePassword(String newPassword);
+  Future<Result<List<UserEntity>>> getAllProfiles();
 }

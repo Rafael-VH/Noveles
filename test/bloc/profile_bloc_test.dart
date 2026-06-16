@@ -1,13 +1,16 @@
+import 'dart:io';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:noveles/core/errors/result.dart';
+import 'package:noveles/core/errors/failure.dart';
 import 'package:noveles/features/profiles/domain/user_entity.dart';
 import 'package:noveles/features/profiles/domain/get_profile.dart';
 import 'package:noveles/features/profiles/domain/update_profile.dart'
     as usecases;
 import 'package:noveles/features/profiles/domain/upload_avatar.dart'
     as usecases2;
-import 'package:noveles/features/auth/domain/change_password.dart' as usecases3;
+import 'package:noveles/features/profiles/domain/change_password.dart' as usecases3;
 import 'package:noveles/features/presentation/bloc/profile/profile_bloc.dart';
 import 'package:noveles/features/presentation/bloc/profile/profile_event.dart';
 import 'package:noveles/features/presentation/bloc/profile/profile_state.dart';
@@ -66,7 +69,7 @@ void main() {
     blocTest<ProfileBloc, ProfileState>(
       'emits [ProfileLoading, ProfileLoaded] when LoadProfile succeeds',
       build: () {
-        when(() => mockGetProfile()).thenAnswer((_) async => testUser);
+        when(() => mockGetProfile()).thenAnswer((_) async => Ok(testUser));
         return ProfileBloc(
           getProfile: mockGetProfile,
           updateProfile: mockUpdateProfile,
@@ -88,7 +91,8 @@ void main() {
     blocTest<ProfileBloc, ProfileState>(
       'emits [ProfileLoading, ProfileError] when LoadProfile fails',
       build: () {
-        when(() => mockGetProfile()).thenThrow(Exception('Error al cargar'));
+        when(() => mockGetProfile())
+            .thenAnswer((_) async => Err(ProfileFailure('Error al cargar')));
         return ProfileBloc(
           getProfile: mockGetProfile,
           updateProfile: mockUpdateProfile,
@@ -110,14 +114,14 @@ void main() {
     blocTest<ProfileBloc, ProfileState>(
       'emits [ProfileSaving, ProfileLoaded] when UpdateProfile succeeds',
       setUp: () {
-        when(() => mockGetProfile()).thenAnswer((_) async => testUser);
+        when(() => mockGetProfile()).thenAnswer((_) async => Ok(testUser));
       },
       build: () {
         when(() => mockUpdateProfile(
               displayName: any(named: 'displayName'),
               bio: any(named: 'bio'),
               avatarUrl: any(named: 'avatarUrl'),
-            )).thenAnswer((_) async => updatedUser);
+            )).thenAnswer((_) async => Ok(updatedUser));
         return ProfileBloc(
           getProfile: mockGetProfile,
           updateProfile: mockUpdateProfile,
@@ -147,14 +151,14 @@ void main() {
     blocTest<ProfileBloc, ProfileState>(
       'emits [ProfileSaving, ProfileError] when UpdateProfile fails',
       setUp: () {
-        when(() => mockGetProfile()).thenAnswer((_) async => testUser);
+        when(() => mockGetProfile()).thenAnswer((_) async => Ok(testUser));
       },
       build: () {
         when(() => mockUpdateProfile(
               displayName: any(named: 'displayName'),
               bio: any(named: 'bio'),
               avatarUrl: any(named: 'avatarUrl'),
-            )).thenThrow(Exception('Error al actualizar'));
+            )).thenAnswer((_) async => Err(ProfileFailure('Error al actualizar')));
         return ProfileBloc(
           getProfile: mockGetProfile,
           updateProfile: mockUpdateProfile,
@@ -186,10 +190,10 @@ void main() {
     blocTest<ProfileBloc, ProfileState>(
       'emits [ProfileSaving, ProfileLoaded] when ChangePassword succeeds',
       setUp: () {
-        when(() => mockGetProfile()).thenAnswer((_) async => testUser);
+        when(() => mockGetProfile()).thenAnswer((_) async => Ok(testUser));
       },
       build: () {
-        when(() => mockChangePassword(any())).thenAnswer((_) async {});
+        when(() => mockChangePassword(any())).thenAnswer((_) async => const Ok(null));
         return ProfileBloc(
           getProfile: mockGetProfile,
           updateProfile: mockUpdateProfile,
@@ -212,11 +216,11 @@ void main() {
     blocTest<ProfileBloc, ProfileState>(
       'emits [ProfileSaving, ProfileError] when ChangePassword fails',
       setUp: () {
-        when(() => mockGetProfile()).thenAnswer((_) async => testUser);
+        when(() => mockGetProfile()).thenAnswer((_) async => Ok(testUser));
       },
       build: () {
         when(() => mockChangePassword(any()))
-            .thenThrow(Exception('Error al cambiar'));
+            .thenAnswer((_) async => Err(ProfileFailure('Error al cambiar')));
         return ProfileBloc(
           getProfile: mockGetProfile,
           updateProfile: mockUpdateProfile,
@@ -254,6 +258,50 @@ void main() {
           contains('No se puede actualizar'),
         ),
       ],
+    );
+
+    blocTest<ProfileBloc, ProfileState>(
+      'emits ProfileLoaded with pendingAvatar when PickAvatar succeeds',
+      setUp: () {
+        when(() => mockGetProfile()).thenAnswer((_) async => Ok(testUser));
+      },
+      build: () {
+        return ProfileBloc(
+          getProfile: mockGetProfile,
+          updateProfile: mockUpdateProfile,
+          uploadAvatar: mockUploadAvatar,
+          changePassword: mockChangePassword,
+        );
+      },
+      seed: () => ProfileLoaded(testUser),
+      act: (bloc) => bloc.add(PickAvatar(File('/tmp/avatar.png'))),
+      expect: () => [
+        isA<ProfileLoaded>()
+            .having(
+              (s) => s.user.displayName,
+              'user preserved',
+              'Test User',
+            )
+            .having(
+              (s) => s.pendingAvatar?.path,
+              'pendingAvatar path',
+              '/tmp/avatar.png',
+            ),
+      ],
+    );
+
+    blocTest<ProfileBloc, ProfileState>(
+      'does not emit when PickAvatar is called on ProfileInitial',
+      build: () {
+        return ProfileBloc(
+          getProfile: mockGetProfile,
+          updateProfile: mockUpdateProfile,
+          uploadAvatar: mockUploadAvatar,
+          changePassword: mockChangePassword,
+        );
+      },
+      act: (bloc) => bloc.add(PickAvatar(File('/tmp/avatar.png'))),
+      expect: () => [],
     );
 
     blocTest<ProfileBloc, ProfileState>(
