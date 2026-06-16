@@ -25,7 +25,8 @@ class LabelBadge extends StatelessWidget {
       ),
       child: Text(
         name,
-        style: TextStyle(color: textColor, fontSize: fontSize, fontWeight: FontWeight.w600),
+        style: TextStyle(
+            color: textColor, fontSize: fontSize, fontWeight: FontWeight.w600),
       ),
     );
   }

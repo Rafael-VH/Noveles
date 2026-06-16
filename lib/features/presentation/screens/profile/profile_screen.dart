@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:noveles/core/di/injection.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
+import 'package:noveles/features/profiles/domain/user_entity.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
 import 'package:noveles/features/presentation/screens/profile/widgets/avatar_section.dart';
 import 'package:noveles/features/presentation/screens/profile/widgets/profile_edit_form.dart';
@@ -151,10 +151,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 24),
           Text(
             user.email,
-            style: Theme.of(context)
-                .textTheme
-                .bodyLarge
-                ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant),
           ),
           const SizedBox(height: 24),
           ProfileEditForm(

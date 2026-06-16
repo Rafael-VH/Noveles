@@ -2,7 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
+import 'package:noveles/features/books/domain/book_entity.dart';
+import 'package:noveles/features/genres/domain/genre_entity.dart';
+import 'package:noveles/features/tooks/domain/took_entity.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
 import 'package:noveles/features/presentation/screens/scan/scan_took_edit_screen.dart';
 import 'package:noveles/features/presentation/screens/scan/widgets/cover_picker.dart';
@@ -164,6 +166,7 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
     return null;
   }
 
+  // Save and exit
   Future<void> _save() async {
     final saved = await _saveBook();
     if (saved != null && mounted) Navigator.pop(context);
@@ -310,8 +313,7 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
                     MaterialPageRoute(
                       builder: (_) => BlocProvider.value(
                         value: context.read<ScanBloc>(),
-                        child:
-                            ScanTookEditScreen(bookId: widget.book!.id),
+                        child: ScanTookEditScreen(bookId: widget.book!.id),
                       ),
                     ),
                   ),
@@ -339,8 +341,7 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
                 MaterialPageRoute(
                   builder: (_) => BlocProvider.value(
                     value: context.read<ScanBloc>(),
-                    child:
-                        ScanTookEditScreen(bookId: widget.book!.id),
+                    child: ScanTookEditScreen(bookId: widget.book!.id),
                   ),
                 ),
               ),

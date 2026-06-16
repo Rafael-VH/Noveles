@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
+import 'package:noveles/features/tooks/domain/took_entity.dart';
 
 class TookView extends StatefulWidget {
   final List<TookEntity> tooks;

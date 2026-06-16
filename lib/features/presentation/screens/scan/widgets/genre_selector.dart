@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
+import 'package:noveles/features/genres/domain/genre_entity.dart';
 
 class GenreSelector extends StatelessWidget {
   final List<GenreEntity> genres;

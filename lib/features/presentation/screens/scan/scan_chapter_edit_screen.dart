@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
+import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
 
 class ScanChapterEditScreen extends StatefulWidget {

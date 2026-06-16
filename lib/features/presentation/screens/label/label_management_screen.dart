@@ -146,7 +146,8 @@ class _LabelManagementContentState extends State<_LabelManagementContent> {
                 title: Text(label.name),
                 trailing: IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () => context.read<LabelBloc>().add(DeleteLabelEvent(label.id)),
+                  onPressed: () =>
+                      context.read<LabelBloc>().add(DeleteLabelEvent(label.id)),
                 ),
               ),
             ),

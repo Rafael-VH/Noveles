@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
+import 'package:noveles/features/books/domain/book_entity.dart';
 import 'package:noveles/features/presentation/views/detail/widgets/card_info_detail.dart';
 import 'package:noveles/features/presentation/widgets/widgets.dart';
 
@@ -80,7 +80,8 @@ class _DetailViewState extends State<DetailView> {
                     onTap: () {},
                     child: Chip(
                       elevation: 8.0,
-                      backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
+                      backgroundColor:
+                          Theme.of(context).colorScheme.surfaceContainerLow,
                       label: Text(
                         item.name,
                         style: Theme.of(context).textTheme.bodySmall,

@@ -2,7 +2,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:noveles/core/supabase/storage_helper.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
+import 'package:noveles/features/books/domain/book_entity.dart';
 import 'package:noveles/features/presentation/widgets/label_badge.dart';
 
 class SliverAppBarHome extends StatelessWidget {
@@ -83,17 +83,22 @@ class SliverAppBarHome extends StatelessWidget {
                           style: Theme.of(context)
                               .textTheme
                               .labelSmall
-                              ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                              ?.copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant),
                         ),
                         if (item.listLabel.isNotEmpty) ...[
                           const SizedBox(height: 4),
                           Wrap(
                             spacing: 4,
                             runSpacing: 2,
-                            children: item.listLabel.map((l) => LabelBadge(
-                              name: l.name,
-                              color: l.color,
-                            )).toList(),
+                            children: item.listLabel
+                                .map((l) => LabelBadge(
+                                      name: l.name,
+                                      color: l.color,
+                                    ))
+                                .toList(),
                           ),
                         ],
                       ],

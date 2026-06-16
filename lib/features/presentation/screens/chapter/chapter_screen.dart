@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
-import 'package:noveles/features/domain/helpers/text_stats.dart';
+import 'package:noveles/features/chapters/domain/chapter_entity.dart';
+import 'package:noveles/features/books/domain/text_stats.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
 
 class ChapterScreen extends StatefulWidget {
@@ -83,11 +83,11 @@ class _ChapterScreenState extends State<ChapterScreen> {
                   const SizedBox(height: 16),
                   ElevatedButton(
                     onPressed: () => context.read<ChapterBloc>().add(
-                      LoadChapterContent(
-                        initialIndex: widget.i,
-                        chapters: widget.chapters,
-                      ),
-                    ),
+                          LoadChapterContent(
+                            initialIndex: widget.i,
+                            chapters: widget.chapters,
+                          ),
+                        ),
                     child: const Text('Reintentar'),
                   ),
                 ],

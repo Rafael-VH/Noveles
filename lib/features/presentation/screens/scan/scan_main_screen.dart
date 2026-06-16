@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/core/supabase/storage_helper.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
+import 'package:noveles/features/books/domain/book_entity.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
 import 'package:noveles/features/presentation/widgets/app_drawer.dart';
 import 'package:noveles/features/presentation/screens/scan/scan_book_edit_screen.dart';
@@ -150,10 +150,8 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
                             Switch(
                               value: book.isVisible,
                               onChanged: (value) {
-                                context
-                                    .read<ScanBloc>()
-                                    .add(ToggleScanBookVisibility(
-                                        book.id, value));
+                                context.read<ScanBloc>().add(
+                                    ToggleScanBookVisibility(book.id, value));
                               },
                             ),
                             IconButton(
