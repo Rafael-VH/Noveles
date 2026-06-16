@@ -1,0 +1,12 @@
+export 'package:noveles/features/books/domain/book_entity.dart';
+export 'package:noveles/features/books/domain/book_repository.dart';
+export 'package:noveles/features/books/domain/text_stats.dart';
+export 'package:noveles/features/books/domain/create_book.dart';
+export 'package:noveles/features/books/domain/get_book.dart';
+export 'package:noveles/features/books/domain/get_book_by_id.dart';
+export 'package:noveles/features/books/domain/get_books_by_genre.dart';
+export 'package:noveles/features/books/domain/update_book.dart';
+export 'package:noveles/features/books/domain/delete_book.dart';
+export 'package:noveles/features/books/domain/toggle_book_visibility.dart';
+export 'package:noveles/features/books/domain/upload_cover.dart';
+export 'package:noveles/features/books/domain/get_book_labels.dart';
