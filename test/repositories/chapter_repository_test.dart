@@ -1,11 +1,14 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:noveles/core/errors/repository_exception.dart';
+import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/chapters/data/chapter_repository_impl.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+class MockSupabaseClientProvider extends Mock implements SupabaseClientProvider {}
 
 class MockSupabaseClient extends Mock implements SupabaseClient {}
 
@@ -57,22 +60,52 @@ class MockTransformBuilder extends Mock
   }
 }
 
+class MockGoTrueClient extends Mock implements GoTrueClient {}
+
+class MockSupabaseStorageClient extends Mock implements SupabaseStorageClient {}
+
+class MockStorageFileApi extends Mock implements StorageFileApi {}
+
 void main() {
+  late MockSupabaseClientProvider mockProvider;
   late MockSupabaseClient mockClient;
   late MockSupabaseQueryBuilder mockQueryBuilder;
   late MockFilterBuilder mockFilter;
   late MockTransformBuilder mockTransform;
+  late MockGoTrueClient mockAuth;
+  late MockSupabaseStorageClient mockStorage;
+  late MockStorageFileApi mockStorageFileApi;
   late ChapterRepositoryImpl repository;
 
+  setUpAll(() {
+    registerFallbackValue(ChapterEntity(
+      id: 0,
+      createdAt: DateTime(2024),
+      number: '',
+      title: '',
+      content: '',
+      tookId: 0,
+    ));
+    registerFallbackValue(File(''));
+  });
+
   setUp(() {
+    mockProvider = MockSupabaseClientProvider();
     mockClient = MockSupabaseClient();
     mockQueryBuilder = MockSupabaseQueryBuilder();
     mockFilter = MockFilterBuilder();
     mockTransform = MockTransformBuilder();
+    mockAuth = MockGoTrueClient();
+    mockStorage = MockSupabaseStorageClient();
+    mockStorageFileApi = MockStorageFileApi();
 
-    supabase = mockClient;
+    when(() => mockProvider.client).thenReturn(mockClient);
+    when(() => mockClient.auth).thenReturn(mockAuth);
+    when(() => mockAuth.currentUser).thenReturn(null);
+    when(() => mockClient.storage).thenReturn(mockStorage);
+    when(() => mockStorage.from(any())).thenReturn(mockStorageFileApi);
 
-    repository = ChapterRepositoryImpl();
+    repository = ChapterRepositoryImpl(mockProvider);
 
     when(() => mockClient.from(any())).thenAnswer((_) => mockQueryBuilder);
     when(() => mockQueryBuilder.select(any())).thenAnswer((_) => mockFilter);
@@ -114,15 +147,16 @@ void main() {
           }
         ]);
 
-        final chapters = await repository.getChapters();
+        final result = await repository.getChapters();
 
-        expect(chapters, isA<List<ChapterEntity>>());
-        expect(chapters.length, 1);
-        expect(chapters.first.title, 'Chapter 1');
+        expect(result, isA<Ok<List<ChapterEntity>>>());
+        final value = (result as Ok<List<ChapterEntity>>).value;
+        expect(value.length, 1);
+        expect(value.first.title, 'Chapter 1');
         verify(() => mockClient.from('chapters')).called(1);
       });
 
-      test('throws RepositoryException on error', () async {
+      test('returns Err on error', () async {
         when(() => mockFilter.order(
               any(),
               ascending: any(named: 'ascending'),
@@ -130,12 +164,10 @@ void main() {
               referencedTable: any(named: 'referencedTable'),
             )).thenThrow(Exception('DB error'));
 
-        try {
-          await repository.getChapters();
-          fail('Expected RepositoryException');
-        } on RepositoryException catch (e) {
-          expect(e.message, contains('Error al obtener capítulos'));
-        }
+        final result = await repository.getChapters();
+        expect(result, isA<Err<List<ChapterEntity>>>());
+        final error = (result as Err<List<ChapterEntity>>).error;
+        expect(error.message, contains('Error al obtener capítulos'));
       });
     });
 
@@ -150,94 +182,164 @@ void main() {
           'took_id': 1,
         });
 
-        final chapter = await repository.getChapterById(1);
+        final result = await repository.getChapterById(1);
 
-        expect(chapter, isNotNull);
-        expect(chapter!.id, 1);
+        expect(result, isA<Ok<ChapterEntity?>>());
+        final value = (result as Ok<ChapterEntity?>).value;
+        expect(value, isNotNull);
+        expect(value!.id, 1);
       });
 
       test('returns null when not found', () async {
         mockTransform.thenReturns(null);
 
-        final chapter = await repository.getChapterById(999);
+        final result = await repository.getChapterById(999);
 
-        expect(chapter, isNull);
+        expect(result, isA<Ok<ChapterEntity?>>());
+        final value = (result as Ok<ChapterEntity?>).value;
+        expect(value, isNull);
       });
 
-      test('throws RepositoryException on error', () async {
+      test('returns Err on error', () async {
         when(() => mockFilter.eq(any(), any()))
             .thenThrow(Exception('DB error'));
 
-        try {
-          await repository.getChapterById(1);
-          fail('Expected RepositoryException');
-        } on RepositoryException catch (e) {
-          expect(e.message, contains('Error al obtener capítulo'));
-        }
+        final result = await repository.getChapterById(1);
+        expect(result, isA<Err<ChapterEntity?>>());
+        final error = (result as Err<ChapterEntity?>).error;
+        expect(error.message, contains('Error al obtener capítulo'));
       });
     });
 
     group('createChapter', () {
-      test('throws RepositoryException on error', () async {
+      test('returns Ok on success', () async {
+        mockFilter.thenReturns(<Map<String, dynamic>>[]);
+
+        final result = await repository.createChapter(
+          ChapterEntity(
+            id: 0,
+            createdAt: DateTime(2024),
+            number: '1',
+            title: 'New Chapter',
+            content: '',
+            tookId: 1,
+            createdBy: null,
+          ),
+        );
+
+        expect(result, isA<Ok<void>>());
+        verify(() => mockQueryBuilder.insert(
+              any(),
+              defaultToNull: any(named: 'defaultToNull'),
+            )).called(1);
+      });
+
+      test('returns Err on error', () async {
         when(() => mockQueryBuilder.insert(
               any(),
               defaultToNull: any(named: 'defaultToNull'),
             )).thenThrow(Exception('Insert failed'));
 
-        try {
-          await repository.createChapter(
-            ChapterEntity(
-              id: 0,
-              createdAt: DateTime(2024),
-              number: '1',
-              title: '',
-              content: '',
-              tookId: 1,
-              createdBy: null,
-            ),
-          );
-          fail('Expected RepositoryException');
-        } on RepositoryException catch (e) {
-          expect(e.message, contains('Error al crear capítulo'));
-        }
+        final result = await repository.createChapter(
+          ChapterEntity(
+            id: 0,
+            createdAt: DateTime(2024),
+            number: '1',
+            title: '',
+            content: '',
+            tookId: 1,
+            createdBy: null,
+          ),
+        );
+        expect(result, isA<Err<void>>());
+        final error = (result as Err<void>).error;
+        expect(error.message, contains('Error al crear capítulo'));
       });
     });
 
     group('updateChapter', () {
-      test('throws RepositoryException on error', () async {
+      test('returns Ok on success', () async {
+        mockFilter.thenReturns(<Map<String, dynamic>>[]);
+
+        final result = await repository.updateChapter(
+          ChapterEntity(
+            id: 1,
+            createdAt: DateTime(2024),
+            number: '1',
+            title: 'Updated',
+            content: '',
+            tookId: 1,
+            createdBy: null,
+          ),
+        );
+
+        expect(result, isA<Ok<void>>());
+        verify(() => mockQueryBuilder.update(any())).called(1);
+      });
+
+      test('returns Err on error', () async {
         when(() => mockFilter.eq(any(), any()))
             .thenThrow(Exception('Update failed'));
 
-        try {
-          await repository.updateChapter(
-            ChapterEntity(
-              id: 1,
-              createdAt: DateTime(2024),
-              number: '1',
-              title: '',
-              content: '',
-              tookId: 1,
-              createdBy: null,
-            ),
-          );
-          fail('Expected RepositoryException');
-        } on RepositoryException catch (e) {
-          expect(e.message, contains('Error al actualizar capítulo'));
-        }
+        final result = await repository.updateChapter(
+          ChapterEntity(
+            id: 1,
+            createdAt: DateTime(2024),
+            number: '1',
+            title: '',
+            content: '',
+            tookId: 1,
+            createdBy: null,
+          ),
+        );
+        expect(result, isA<Err<void>>());
+        final error = (result as Err<void>).error;
+        expect(error.message, contains('Error al actualizar capítulo'));
       });
     });
 
     group('deleteChapter', () {
-      test('throws RepositoryException on error', () async {
+      test('returns Ok on success', () async {
+        mockFilter.thenReturns(<Map<String, dynamic>>[]);
+
+        final result = await repository.deleteChapter(1);
+
+        expect(result, isA<Ok<void>>());
+        verify(() => mockFilter.eq('id', 1)).called(1);
+      });
+
+      test('returns Err on error', () async {
         when(() => mockFilter.eq(any(), any()))
             .thenThrow(Exception('Delete failed'));
 
-        try {
-          await repository.deleteChapter(1);
-          fail('Expected RepositoryException');
-        } on RepositoryException catch (e) {
-          expect(e.message, contains('Error al eliminar capítulo'));
-        }
+        final result = await repository.deleteChapter(1);
+        expect(result, isA<Err<void>>());
+        final error = (result as Err<void>).error;
+        expect(error.message, contains('Error al eliminar capítulo'));
+      });
+    });
+
+    group('downloadContent', () {
+      test('returns path as-is when not a storage path', () async {
+        final result = await repository.downloadContent('inline text');
+
+        expect(result, isA<Ok<String>>());
+        final value = (result as Ok<String>).value;
+        expect(value, 'inline text');
+      });
+
+      test('returns Err on storage download error', () async {
+        when(() => mockStorageFileApi.download(
+              any(),
+              transform: any(named: 'transform'),
+              queryParams: any(named: 'queryParams'),
+            )).thenThrow(Exception('Download failed'));
+
+        final result = await repository.downloadContent('ch1.txt');
+
+        expect(result, isA<Err<String>>());
+        final error = (result as Err<String>).error;
+        expect(error.message, contains('Error al descargar contenido'));
       });
     });
   });

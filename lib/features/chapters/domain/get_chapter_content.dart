@@ -1,3 +1,4 @@
+import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/chapters/domain/chapter_repository.dart';
 
 class GetChapterContent {
@@ -5,11 +6,7 @@ class GetChapterContent {
 
   GetChapterContent(this.repository);
 
-  bool _isStoragePath(String s) =>
-      s.contains('/') || s.endsWith('.txt') || s.endsWith('.json');
-
-  Future<String> call(String rawContent) async {
-    if (!_isStoragePath(rawContent)) return rawContent;
-    return await repository.downloadContent(rawContent);
+  Future<Result<String>> call(String contentOrPath) async {
+    return repository.downloadContent(contentOrPath);
   }
 }

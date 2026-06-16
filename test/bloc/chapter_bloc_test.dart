@@ -1,6 +1,8 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:noveles/core/errors/result.dart';
+import 'package:noveles/core/errors/failure.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 import 'package:noveles/features/chapters/domain/get_chapter_content.dart';
 import 'package:noveles/features/presentation/bloc/chapter/chapter_bloc.dart';
@@ -46,7 +48,7 @@ void main() {
       'emits [ChapterLoading, ChapterLoaded] when LoadChapterContent succeeds',
       build: () {
         when(() => mockGetChapterContent(any()))
-            .thenAnswer((_) async => 'Resolved content');
+            .thenAnswer((_) async => Ok('Resolved content'));
         return ChapterBloc(getChapterContent: mockGetChapterContent);
       },
       act: (bloc) => bloc.add(LoadChapterContent(
@@ -69,7 +71,7 @@ void main() {
       'emits [ChapterLoading, ChapterError] when LoadChapterContent fails',
       build: () {
         when(() => mockGetChapterContent(any()))
-            .thenThrow(Exception('Error al descargar'));
+            .thenAnswer((_) async => Err(ChapterFailure('Error al descargar')));
         return ChapterBloc(getChapterContent: mockGetChapterContent);
       },
       act: (bloc) => bloc.add(LoadChapterContent(
