@@ -1,100 +1,88 @@
-import 'package:noveles/core/errors/repository_exception.dart';
+import 'package:noveles/core/errors/failure.dart';
+import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/tooks/data/took_model.dart';
 import 'package:noveles/features/tooks/domain/took_entity.dart';
 import 'package:noveles/features/tooks/domain/took_repository.dart';
 
 class TookRepositoryImpl implements TookRepository {
+  final SupabaseClientProvider _supabase;
+
+  TookRepositoryImpl(this._supabase);
+
   @override
-  Future<List<TookEntity>> getTooks() async {
+  Future<Result<List<TookEntity>>> getTooks() async {
     try {
-      final response = await supabase
+      final response = await _supabase.client
           .from('tooks')
           .select('*, chapters(*)')
           .order('id')
           .limit(100);
 
-      return response.map((json) => TookModel.fromJson(json)).toList();
+      final tooks = response.map((json) => TookModel.fromJson(json)).toList();
+      return Ok(tooks);
     } catch (e) {
-      throw RepositoryException(
-        message: 'Error al obtener tomos',
-        originalException: e,
-        repositoryName: 'TookRepository',
-      );
+      return Err(TookFailure('Error al obtener tomos', cause: e));
     }
   }
 
   @override
-  Future<TookEntity?> getTookById(int id) async {
+  Future<Result<TookEntity?>> getTookById(int id) async {
     try {
-      final response = await supabase
+      final response = await _supabase.client
           .from('tooks')
           .select('*, chapters(*)')
           .eq('id', id)
           .maybeSingle();
 
-      if (response == null) return null;
-      return TookModel.fromJson(response);
+      if (response == null) return const Ok(null);
+      return Ok(TookModel.fromJson(response));
     } catch (e) {
-      throw RepositoryException(
-        message: 'Error al obtener tomo',
-        originalException: e,
-        repositoryName: 'TookRepository',
-      );
+      return Err(TookFailure('Error al obtener tomo', cause: e));
     }
   }
 
   @override
-  Future<void> createTook(TookEntity took) async {
+  Future<Result<void>> createTook(TookEntity took) async {
     try {
-      await supabase.from('tooks').insert({
+      await _supabase.client.from('tooks').insert({
         'created_at': took.createdAt.toIso8601String(),
         'cover': took.cover,
         'number': took.number,
         'title': took.title,
         'chapter_count': took.chapterCount,
         'book_id': took.bookId,
-        'created_by': supabase.auth.currentUser?.id,
+        'created_by': _supabase.client.auth.currentUser?.id,
       });
+      return const Ok(null);
     } catch (e) {
-      throw RepositoryException(
-        message: 'Error al crear tomo',
-        originalException: e,
-        repositoryName: 'TookRepository',
-      );
+      return Err(TookFailure('Error al crear tomo', cause: e));
     }
   }
 
   @override
-  Future<void> updateTook(TookEntity took) async {
+  Future<Result<void>> updateTook(TookEntity took) async {
     try {
-      await supabase.from('tooks').update({
+      await _supabase.client.from('tooks').update({
         'cover': took.cover,
         'number': took.number,
         'title': took.title,
         'chapter_count': took.chapterCount,
         'book_id': took.bookId,
       }).eq('id', took.id);
+      return const Ok(null);
     } catch (e) {
-      throw RepositoryException(
-        message: 'Error al actualizar tomo',
-        originalException: e,
-        repositoryName: 'TookRepository',
-      );
+      return Err(TookFailure('Error al actualizar tomo', cause: e));
     }
   }
 
   @override
-  Future<void> deleteTook(int id) async {
+  Future<Result<void>> deleteTook(int id) async {
     try {
-      await supabase.from('chapters').delete().eq('took_id', id);
-      await supabase.from('tooks').delete().eq('id', id);
+      await _supabase.client.from('tooks').delete().eq('id', id);
+      return const Ok(null);
     } catch (e) {
-      throw RepositoryException(
-        message: 'Error al eliminar tomo',
-        originalException: e,
-        repositoryName: 'TookRepository',
-      );
+      return Err(TookFailure('Error al eliminar tomo', cause: e));
     }
   }
 }

@@ -7,7 +7,7 @@ class TookEntity extends Equatable {
   final String cover;
   final String number;
   final String title;
-  final String chapterCount;
+  final int chapterCount;
   final int bookId;
   final List<ChapterEntity> listChapter;
   final String? createdBy;
@@ -23,6 +23,30 @@ class TookEntity extends Equatable {
     required this.listChapter,
     this.createdBy,
   });
+
+  TookEntity copyWith({
+    int? id,
+    DateTime? createdAt,
+    String? cover,
+    String? number,
+    String? title,
+    int? chapterCount,
+    int? bookId,
+    List<ChapterEntity>? listChapter,
+    String? createdBy,
+  }) {
+    return TookEntity(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      cover: cover ?? this.cover,
+      number: number ?? this.number,
+      title: title ?? this.title,
+      chapterCount: chapterCount ?? this.chapterCount,
+      bookId: bookId ?? this.bookId,
+      listChapter: listChapter ?? this.listChapter,
+      createdBy: createdBy ?? this.createdBy,
+    );
+  }
 
   @override
   List<Object?> get props => [

@@ -20,12 +20,12 @@ class TookModel extends TookEntity {
     }).toList();
 
     return TookModel(
-      id: json['id'],
+      id: json['id'] as int,
       createdAt: DateTime.parse(json['created_at'] as String),
       cover: (json['cover'] as String?) ?? '',
       number: (json['number'] as String?) ?? '',
       title: (json['title'] as String?) ?? '',
-      chapterCount: (json['chapter_count'] as String?) ?? '',
+      chapterCount: (json['chapter_count'] as int?) ?? 0,
       bookId: (json['book_id'] as int?) ?? 0,
       createdBy: json['created_by'] as String?,
       listChapter: chapters,

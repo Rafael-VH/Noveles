@@ -1,3 +1,4 @@
+import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/tooks/domain/took_entity.dart';
 import 'package:noveles/features/tooks/domain/took_repository.dart';
 
@@ -6,7 +7,7 @@ class GetTookById {
 
   GetTookById(this.repository);
 
-  Future<TookEntity?> call(int id) async {
-    return await repository.getTookById(id);
+  Future<Result<TookEntity?>> call(int id) async {
+    return repository.getTookById(id);
   }
 }

@@ -1,3 +1,4 @@
+import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/tooks/domain/took_repository.dart';
 
 class DeleteTook {
@@ -5,7 +6,7 @@ class DeleteTook {
 
   DeleteTook(this.repository);
 
-  Future<void> call(int id) async {
-    return await repository.deleteTook(id);
+  Future<Result<void>> call(int id) async {
+    return repository.deleteTook(id);
   }
 }
