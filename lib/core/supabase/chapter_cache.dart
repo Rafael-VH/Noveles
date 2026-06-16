@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
+
+import 'package:noveles/core/utils/logger.dart';
 
 class ChapterCache {
   static Future<Directory> _cacheDir() async {
@@ -24,7 +25,7 @@ class ChapterCache {
       if (!await file.exists()) return null;
       return utf8.decode(await file.readAsBytes());
     } catch (e) {
-      debugPrint('ChapterCache.read error for $filename: $e');
+      AppLogger.warning('ChapterCache.read error for $filename: $e');
       return null;
     }
   }
@@ -35,7 +36,7 @@ class ChapterCache {
       final file = File('${dir.path}/$filename');
       await file.writeAsBytes(bytes);
     } catch (e) {
-      debugPrint('ChapterCache.save error for $filename: $e');
+      AppLogger.warning('ChapterCache.save error for $filename: $e');
     }
   }
 }
