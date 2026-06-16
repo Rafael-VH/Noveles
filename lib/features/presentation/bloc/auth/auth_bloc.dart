@@ -1,6 +1,10 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:noveles/features/domain/use_cases/use_cases.dart';
+import 'package:noveles/features/auth/domain/login.dart';
+import 'package:noveles/features/auth/domain/register.dart';
+import 'package:noveles/features/auth/domain/logout.dart';
+import 'package:noveles/features/auth/domain/get_current_user.dart';
+import 'package:noveles/features/auth/domain/listen_auth_state.dart';
 import 'package:noveles/features/presentation/bloc/auth/auth_event.dart';
 import 'package:noveles/features/presentation/bloc/auth/auth_state.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show AuthChangeEvent;

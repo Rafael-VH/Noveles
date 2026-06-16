@@ -1,6 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:noveles/features/domain/use_cases/use_cases.dart';
-import 'package:noveles/features/presentation/bloc/profile/profile_event.dart' as events;
+import 'package:noveles/features/profiles/domain/get_profile.dart';
+import 'package:noveles/features/profiles/domain/update_profile.dart';
+import 'package:noveles/features/profiles/domain/upload_avatar.dart';
+import 'package:noveles/features/auth/domain/change_password.dart';
+import 'package:noveles/features/presentation/bloc/profile/profile_event.dart'
+    as events;
 import 'package:noveles/features/presentation/bloc/profile/profile_state.dart';
 
 class ProfileBloc extends Bloc<events.ProfileEvent, ProfileState> {
@@ -75,13 +79,15 @@ class ProfileBloc extends Bloc<events.ProfileEvent, ProfileState> {
   ) async {
     final currentState = state;
     if (currentState is! ProfileLoaded) {
-      emit(ProfileError('No se puede cambiar la contraseña: perfil no cargado'));
+      emit(
+          ProfileError('No se puede cambiar la contraseña: perfil no cargado'));
       return;
     }
     emit(ProfileSaving(currentState.user));
     try {
       await changePassword(event.newPassword);
-      emit(ProfileLoaded(currentState.user, message: 'Contraseña actualizada exitosamente'));
+      emit(ProfileLoaded(currentState.user,
+          message: 'Contraseña actualizada exitosamente'));
     } catch (e) {
       emit(ProfileError(e.toString(), user: currentState.user));
     }

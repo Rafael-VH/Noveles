@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
+import 'package:noveles/features/books/domain/book_entity.dart';
 
 abstract class BookState extends Equatable {
   @override

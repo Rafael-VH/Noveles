@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
+import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 
 abstract class ChapterEvent extends Equatable {
   @override

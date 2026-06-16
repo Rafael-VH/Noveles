@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
-import 'package:noveles/features/domain/use_cases/use_cases.dart';
+import 'package:noveles/features/chapters/domain/chapter_entity.dart';
+import 'package:noveles/features/chapters/domain/get_chapter_content.dart';
 import 'package:noveles/features/presentation/bloc/chapter/chapter_event.dart';
 import 'package:noveles/features/presentation/bloc/chapter/chapter_state.dart';
 

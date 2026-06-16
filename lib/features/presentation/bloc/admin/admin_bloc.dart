@@ -1,7 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:noveles/features/domain/use_cases/delete_book.dart';
-import 'package:noveles/features/domain/use_cases/get_book.dart';
-import 'package:noveles/features/domain/use_cases/toggle_book_visibility.dart' as usecases;
+import 'package:noveles/features/books/domain/delete_book.dart';
+import 'package:noveles/features/books/domain/get_book.dart';
+import 'package:noveles/features/books/domain/toggle_book_visibility.dart'
+    as usecases;
 import 'package:noveles/features/presentation/bloc/admin/admin_event.dart';
 import 'package:noveles/features/presentation/bloc/admin/admin_state.dart';
 

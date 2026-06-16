@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
+import 'package:noveles/features/books/domain/book_entity.dart';
+import 'package:noveles/features/tooks/domain/took_entity.dart';
+import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 
 // This file defines the events for the ScanBloc, which manages the state of the book scanning feature in the application. Each event
 // corresponds to a specific user action or operation related to books, tooks, chapters, genres, and cover uploads. The events are

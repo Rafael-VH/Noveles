@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
+import 'package:noveles/features/books/domain/book_entity.dart';
+import 'package:noveles/features/genres/domain/genre_entity.dart';
 
 // This file defines the states for the ScanBloc, which manages the state of the book scanning feature in the application.
 // Each state represents a specific condition of the UI, such as loading, loaded with data, or error states. The states are

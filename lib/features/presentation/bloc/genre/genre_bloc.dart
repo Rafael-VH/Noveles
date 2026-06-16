@@ -1,5 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:noveles/features/domain/use_cases/use_cases.dart';
+import 'package:noveles/features/genres/domain/get_genre.dart';
+import 'package:noveles/features/genres/domain/create_genre.dart';
+import 'package:noveles/features/genres/domain/update_genre.dart';
+import 'package:noveles/features/genres/domain/delete_genre.dart';
 import 'package:noveles/features/presentation/bloc/genre/genre_event.dart';
 import 'package:noveles/features/presentation/bloc/genre/genre_state.dart';
 

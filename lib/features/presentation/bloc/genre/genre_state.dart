@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
+import 'package:noveles/features/genres/domain/genre_entity.dart';
 
 abstract class GenreState extends Equatable {
   @override

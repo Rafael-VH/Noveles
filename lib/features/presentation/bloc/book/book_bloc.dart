@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:noveles/features/domain/use_cases/use_cases.dart';
+import 'package:noveles/features/books/domain/get_book.dart';
+import 'package:noveles/features/books/domain/get_book_by_id.dart';
 import 'package:noveles/features/presentation/bloc/book/book_event.dart';
 import 'package:noveles/features/presentation/bloc/book/book_state.dart';
 

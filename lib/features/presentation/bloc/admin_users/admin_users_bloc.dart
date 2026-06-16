@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:noveles/features/domain/use_cases/get_all_profiles.dart';
+import 'package:noveles/features/profiles/domain/get_all_profiles.dart';
 import 'package:noveles/features/presentation/bloc/admin_users/admin_users_event.dart';
 import 'package:noveles/features/presentation/bloc/admin_users/admin_users_state.dart';
 

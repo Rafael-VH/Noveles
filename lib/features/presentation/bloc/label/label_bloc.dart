@@ -1,6 +1,11 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
-import 'package:noveles/features/domain/use_cases/use_cases.dart';
+import 'package:noveles/features/labels/domain/label_entity.dart';
+import 'package:noveles/features/labels/domain/get_labels.dart';
+import 'package:noveles/features/labels/domain/create_label.dart';
+import 'package:noveles/features/labels/domain/delete_label.dart';
+import 'package:noveles/features/labels/domain/assign_label_to_book.dart';
+import 'package:noveles/features/labels/domain/remove_label_from_book.dart';
+import 'package:noveles/features/books/domain/get_book_labels.dart';
 import 'package:noveles/features/presentation/bloc/label/label_event.dart';
 import 'package:noveles/features/presentation/bloc/label/label_state.dart';
 
@@ -42,10 +47,14 @@ class LabelBloc extends Bloc<LabelEvent, LabelState> {
     }
   }
 
-  Future<void> _onCreateLabel(CreateLabelEvent event, Emitter<LabelState> emit) async {
+  Future<void> _onCreateLabel(
+      CreateLabelEvent event, Emitter<LabelState> emit) async {
     try {
       await createLabel(LabelEntity(
-        id: 0, createdAt: DateTime.now(), name: event.name, color: event.color,
+        id: 0,
+        createdAt: DateTime.now(),
+        name: event.name,
+        color: event.color,
       ));
       await _emitLoaded(emit, message: 'Etiqueta creada');
     } catch (e) {
@@ -53,7 +62,8 @@ class LabelBloc extends Bloc<LabelEvent, LabelState> {
     }
   }
 
-  Future<void> _onDeleteLabel(DeleteLabelEvent event, Emitter<LabelState> emit) async {
+  Future<void> _onDeleteLabel(
+      DeleteLabelEvent event, Emitter<LabelState> emit) async {
     try {
       await deleteLabel(event.id);
       await _emitLoaded(emit, message: 'Etiqueta eliminada');
@@ -62,7 +72,8 @@ class LabelBloc extends Bloc<LabelEvent, LabelState> {
     }
   }
 
-  Future<void> _onAssignLabel(AssignLabelEvent event, Emitter<LabelState> emit) async {
+  Future<void> _onAssignLabel(
+      AssignLabelEvent event, Emitter<LabelState> emit) async {
     try {
       await assignLabel(event.bookId, event.labelId);
       await _emitLoaded(emit, message: 'Etiqueta asignada');
@@ -71,7 +82,8 @@ class LabelBloc extends Bloc<LabelEvent, LabelState> {
     }
   }
 
-  Future<void> _onRemoveLabel(RemoveLabelEvent event, Emitter<LabelState> emit) async {
+  Future<void> _onRemoveLabel(
+      RemoveLabelEvent event, Emitter<LabelState> emit) async {
     try {
       await removeLabel(event.bookId, event.labelId);
       await _emitLoaded(emit, message: 'Etiqueta removida');

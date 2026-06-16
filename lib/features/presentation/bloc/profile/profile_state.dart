@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:equatable/equatable.dart';
-import 'package:noveles/features/domain/entities/entities.dart';
+import 'package:noveles/features/profiles/domain/user_entity.dart';
 
 abstract class ProfileState extends Equatable {
   @override
