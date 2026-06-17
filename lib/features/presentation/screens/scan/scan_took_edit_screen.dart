@@ -187,6 +187,14 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
             ),
           ],
         ),
+        floatingActionButton: _isEditing
+            ? FloatingActionButton(
+                onPressed: () => _navigateToChapterEdit(
+                  tookId: widget.took!.id,
+                ),
+                child: const Icon(Icons.add),
+              )
+            : null,
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Form(
@@ -275,14 +283,6 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
                     ),
                   ),
 
-                  // Add Chapter Button
-                  ElevatedButton.icon(
-                    onPressed: () => _navigateToChapterEdit(
-                      tookId: widget.took!.id,
-                    ),
-                    icon: const Icon(Icons.add),
-                    label: const Text('Añadir Capítulo'),
-                  ),
                 ],
               ],
             ),
