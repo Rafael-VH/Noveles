@@ -1,7 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:noveles/core/errors/result.dart';
-import 'package:noveles/core/presentation/notification_service.dart';
 import 'package:noveles/features/tooks/domain/took_entity.dart';
 import 'package:noveles/features/tooks/domain/create_took.dart';
 import 'package:noveles/features/tooks/domain/update_took.dart';
@@ -75,7 +74,6 @@ class ScanTookBloc extends Bloc<ScanTookEvent, ScanTookState> {
         emit(ScanTookLoaded(message: event.isUpdate ? 'Tomo guardado' : 'Tomo creado'));
       case Err(:final error):
         emit(ScanTookError(error.message));
-        NotificationService.error('Error al guardar el tomo: ${error.message}');
     }
   }
 
@@ -87,7 +85,6 @@ class ScanTookBloc extends Bloc<ScanTookEvent, ScanTookState> {
         emit(ScanTookLoaded(message: 'Tomo eliminado'));
       case Err(:final error):
         emit(ScanTookError(error.message));
-        NotificationService.error('Error al eliminar el tomo: ${error.message}');
     }
   }
 }

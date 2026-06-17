@@ -1,7 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:noveles/core/errors/result.dart';
-import 'package:noveles/core/presentation/notification_service.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 import 'package:noveles/features/chapters/domain/create_chapter.dart';
 import 'package:noveles/features/chapters/domain/update_chapter.dart';
@@ -75,7 +74,6 @@ class ScanChapterBloc extends Bloc<ScanChapterEvent, ScanChapterState> {
         emit(ScanChapterLoaded(message: event.isUpdate ? 'Capítulo guardado' : 'Capítulo creado'));
       case Err(:final error):
         emit(ScanChapterError(error.message));
-        NotificationService.error('Error al guardar el capítulo: ${error.message}');
     }
   }
 
@@ -87,7 +85,6 @@ class ScanChapterBloc extends Bloc<ScanChapterEvent, ScanChapterState> {
         emit(ScanChapterLoaded(message: 'Capítulo eliminado'));
       case Err(:final error):
         emit(ScanChapterError(error.message));
-        NotificationService.error('Error al eliminar el capítulo: ${error.message}');
     }
   }
 }

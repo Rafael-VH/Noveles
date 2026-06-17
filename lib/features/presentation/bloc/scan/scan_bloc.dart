@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/errors/result.dart';
-import 'package:noveles/core/presentation/notification_service.dart';
 import 'package:noveles/features/books/domain/book_entity.dart';
 import 'package:noveles/features/books/domain/get_book.dart';
 import 'package:noveles/features/books/domain/create_book.dart';
@@ -50,7 +49,6 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
         emit(ScanCoverUploaded(value));
       case Err(:final error):
         emit(ScanError(error.message));
-        NotificationService.error('Error al subir la portada: ${error.message}');
     }
   }
 
@@ -71,7 +69,6 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
         emit(ScanGenresLoaded(books, value));
       case Err(:final error):
         emit(ScanError(error.message));
-        NotificationService.error('Error al cargar géneros: ${error.message}');
     }
   }
 
@@ -87,7 +84,6 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
         emit(ScanLoaded(value));
       case Err(:final error):
         emit(ScanError(error.message));
-        NotificationService.error('Error al cargar libros: ${error.message}');
     }
   }
 
@@ -102,18 +98,21 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
         : await createBook(event.book);
     switch (saveResult) {
       case Ok():
+        final previousBooks = switch (state) {
+          ScanLoaded(:final books) => books,
+          _ => <BookEntity>[],
+        };
         final booksResult = await getBooks();
         switch (booksResult) {
           case Ok(:final value):
             emit(ScanLoaded(value,
                 message: event.isUpdate ? 'Libro guardado' : 'Libro creado'));
           case Err(:final error):
-            NotificationService.error(
-                'Error al actualizar la lista: ${error.message}');
+            emit(ScanLoaded(previousBooks,
+                message: 'Error al refrescar: ${error.message}'));
         }
       case Err(:final error):
         emit(ScanError(error.message));
-        NotificationService.error('Error al guardar el libro: ${error.message}');
     }
   }
 
@@ -126,17 +125,20 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     final deleteResult = await deleteBook(event.bookId);
     switch (deleteResult) {
       case Ok():
+        final previousBooks = switch (state) {
+          ScanLoaded(:final books) => books,
+          _ => <BookEntity>[],
+        };
         final booksResult = await getBooks();
         switch (booksResult) {
           case Ok(:final value):
             emit(ScanLoaded(value, message: 'Libro eliminado'));
           case Err(:final error):
-            NotificationService.error(
-                'Error al actualizar la lista: ${error.message}');
+            emit(ScanLoaded(previousBooks,
+                message: 'Error al refrescar: ${error.message}'));
         }
       case Err(:final error):
         emit(ScanError(error.message));
-        NotificationService.error('Error al eliminar el libro: ${error.message}');
     }
   }
 
@@ -150,6 +152,10 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
         await toggleBookVisibility(event.bookId, event.isVisible);
     switch (toggleResult) {
       case Ok():
+        final previousBooks = switch (state) {
+          ScanLoaded(:final books) => books,
+          _ => <BookEntity>[],
+        };
         final booksResult = await getBooks();
         switch (booksResult) {
           case Ok(:final value):
@@ -158,13 +164,11 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
                     ? 'Novela visible para usuarios'
                     : 'Novela oculta'));
           case Err(:final error):
-            NotificationService.error(
-                'Error al actualizar la lista: ${error.message}');
+            emit(ScanLoaded(previousBooks,
+                message: 'Error al refrescar: ${error.message}'));
         }
       case Err(:final error):
         emit(ScanError(error.message));
-        NotificationService.error(
-            'Error al cambiar visibilidad: ${error.message}');
     }
   }
 }
