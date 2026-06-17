@@ -1,0 +1,26 @@
+* text=auto
+
+*.dart text diff=dart
+*.yaml text
+*.yml text
+*.json text
+*.md text
+*.sql text
+*.txt text
+*.xml text
+*.toml text
+*.gradle text
+*.properties text
+*.plist text
+*.storyboard text
+*.xcconfig text
+*.swift text
+*.kt text
+*.sh text
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.icns binary

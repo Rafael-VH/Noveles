@@ -183,8 +183,7 @@ class BookRepositoryImpl implements BookRepository {
       final ext = filePath.split('.').last;
       final filename = '${DateTime.now().millisecondsSinceEpoch}.$ext';
       await _supabase.client.storage.from('covers').upload(filename, file);
-      final url = _supabase.client.storage.from('covers').getPublicUrl(filename);
-      return Ok(url);
+      return Ok(filename);
     } catch (e) {
       return Err(BookFailure('Error al subir cover', cause: e));
     }
