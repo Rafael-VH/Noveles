@@ -10,4 +10,8 @@ abstract class ChapterRepository {
   /// Downloads content from a storage path, or returns inline content as-is.
   /// The implementation determines if [path] is a storage reference or inline text.
   Future<Result<String>> downloadContent(String path);
+
+  /// Uploads a file (e.g. .md or .txt) to the chapters storage bucket.
+  /// Returns the public URL of the uploaded file.
+  Future<Result<String>> uploadContent(String filePath);
 }

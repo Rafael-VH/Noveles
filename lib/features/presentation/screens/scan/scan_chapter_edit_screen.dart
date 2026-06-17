@@ -1,7 +1,10 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/di/injection.dart';
+import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
+import 'package:noveles/features/chapters/domain/upload_chapter_content.dart';
 import 'package:noveles/features/presentation/bloc/scan/scan_chapter_bloc.dart';
 
 class ScanChapterEditScreen extends StatefulWidget {
@@ -19,6 +22,7 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
   late TextEditingController _numberCtrl;
   late TextEditingController _titleCtrl;
   late TextEditingController _contentCtrl;
+  String _uploadedFileName = '';
   bool _isSaving = false;
   late final ScanChapterBloc _scanChapterBloc;
 
@@ -31,6 +35,7 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
     _numberCtrl = TextEditingController(text: c?.number ?? '');
     _titleCtrl = TextEditingController(text: c?.title ?? '');
     _contentCtrl = TextEditingController(text: c?.content ?? '');
+    _uploadedFileName = _extractFileName(c?.content ?? '');
     _scanChapterBloc = getIt<ScanChapterBloc>();
   }
 
@@ -41,6 +46,47 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
     _contentCtrl.dispose();
     _scanChapterBloc.close();
     super.dispose();
+  }
+
+  /// Extract a display-friendly filename from a URL or storage path.
+  String _extractFileName(String value) {
+    if (value.isEmpty) return '';
+    // If it looks like a URL (contains /)
+    if (value.contains('/')) {
+      return value.split('/').last;
+    }
+    // If it ends with .txt but is not a URL (just a filename)
+    if (value.endsWith('.txt')) return value;
+    // Otherwise it's inline content — show nothing special
+    return '';
+  }
+
+  // Pick and upload content file
+  Future<void> _pickContentFile() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['md', 'txt'],
+    );
+    if (result == null || !mounted) return;
+    final filePath = result.files.single.path;
+    if (filePath == null) return;
+
+    final uploadResult = await getIt<UploadChapterContent>()(filePath);
+    if (!mounted) return;
+    switch (uploadResult) {
+      case Ok<String>(:final value):
+        setState(() {
+          _contentCtrl.text = value;
+          _uploadedFileName = result.files.single.name;
+        });
+      case Err(:final error):
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error.message),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+    }
   }
 
   // Save chapter
@@ -87,6 +133,8 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final hasContent = _contentCtrl.text.isNotEmpty;
+
     return BlocProvider.value(
       value: _scanChapterBloc,
       child: Scaffold(
@@ -101,14 +149,17 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
           child: Form(
             key: _formKey,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Number
                 TextFormField(
                   controller: _numberCtrl,
                   decoration: const InputDecoration(labelText: 'Número'),
+                  validator: (v) =>
+                      v?.trim().isEmpty == true ? 'Requerido' : null,
                 ),
 
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
 
                 // Title
                 TextFormField(
@@ -116,20 +167,66 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
                   decoration: const InputDecoration(labelText: 'Título'),
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 24),
 
-                // Content
-                TextFormField(
-                  controller: _contentCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Contenido',
-                    border: OutlineInputBorder(),
-                    alignLabelWithHint: true,
+                // Content file
+                const Text(
+                  'Archivo de contenido',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
-                  maxLines: 20,
-                  validator: (v) =>
-                      v?.isEmpty == true ? 'El contenido es requerido' : null,
                 ),
+
+                const SizedBox(height: 8),
+
+                if (hasContent)
+                  Card(
+                    child: ListTile(
+                      leading: const Icon(Icons.description),
+                      title: Text(
+                        _uploadedFileName.isNotEmpty
+                            ? _uploadedFileName
+                            : _contentCtrl.text,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      trailing: TextButton(
+                        onPressed: _pickContentFile,
+                        child: const Text('Reemplazar'),
+                      ),
+                    ),
+                  )
+                else
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Ningún archivo seleccionado',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                  ),
+
+                ElevatedButton.icon(
+                  onPressed: _pickContentFile,
+                  icon: const Icon(Icons.upload_file),
+                  label: const Text('Seleccionar archivo .md o .txt'),
+                ),
+
+                if (!hasContent)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      'El contenido se subirá a Supabase Storage',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),

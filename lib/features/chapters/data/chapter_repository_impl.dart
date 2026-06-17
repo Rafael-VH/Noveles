@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:noveles/core/errors/failure.dart';
 import 'package:noveles/core/errors/result.dart';
@@ -79,6 +80,20 @@ class ChapterRepositoryImpl implements ChapterRepository {
       return const Ok(null);
     } catch (e) {
       return Err(ChapterFailure('Error al eliminar capítulo', cause: e));
+    }
+  }
+
+  @override
+  Future<Result<String>> uploadContent(String filePath) async {
+    try {
+      final file = File(filePath);
+      final ext = filePath.split('.').last;
+      final filename = '${DateTime.now().millisecondsSinceEpoch}.$ext';
+      await _supabase.client.storage.from('chapters').upload(filename, file);
+      final url = _supabase.client.storage.from('chapters').getPublicUrl(filename);
+      return Ok(url);
+    } catch (e) {
+      return Err(ChapterFailure('Error al subir contenido', cause: e));
     }
   }
 
