@@ -63,29 +63,53 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
 
   // Pick and upload content file
   Future<void> _pickContentFile() async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: ['md', 'txt'],
-    );
-    if (result == null || !mounted) return;
-    final filePath = result.files.single.path;
-    if (filePath == null) return;
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['md', 'txt'],
+      );
 
-    final uploadResult = await getIt<UploadChapterContent>()(filePath);
-    if (!mounted) return;
-    switch (uploadResult) {
-      case Ok<String>(:final value):
-        setState(() {
-          _contentCtrl.text = value;
-          _uploadedFileName = result.files.single.name;
-        });
-      case Err(:final error):
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(error.message),
-            backgroundColor: Theme.of(context).colorScheme.error,
-          ),
-        );
+      if (result == null || !mounted) return;
+
+      final filePath = result.files.single.path;
+
+      if (filePath == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('No se pudo acceder al archivo'),
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+          );
+        }
+        return;
+      }
+
+      final uploadResult = await getIt<UploadChapterContent>()(filePath);
+
+      if (!mounted) return;
+      switch (uploadResult) {
+        case Ok<String>(:final value):
+          setState(() {
+            _contentCtrl.text = value;
+            _uploadedFileName = result.files.single.name;
+          });
+        case Err(:final error):
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(error.message),
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+          );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al seleccionar archivo: $e'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
+      );
     }
   }
 

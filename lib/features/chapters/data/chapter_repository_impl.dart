@@ -93,7 +93,7 @@ class ChapterRepositoryImpl implements ChapterRepository {
       final url = _supabase.client.storage.from('chapters').getPublicUrl(filename);
       return Ok(url);
     } catch (e) {
-      return Err(ChapterFailure('Error al subir contenido', cause: e));
+      return Err(ChapterFailure('Error al subir contenido: $e', cause: e));
     }
   }
 
