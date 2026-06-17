@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -29,18 +28,18 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
   late TextEditingController _descriptionCtrl;
   late TextEditingController _authorCtrl;
   late TextEditingController _countryCtrl;
-  late TextEditingController _stateCtrl;
-  late TextEditingController _typeCtrl;
+  String _state = '';
+  String _type = '';
   late TextEditingController _releaseCtrl;
   late TextEditingController _sourceCtrl;
   late TextEditingController _linkCtrl;
   List<GenreEntity> _allGenres = [];
   Set<int> _selectedGenreIds = {};
   List<TookEntity> _tooks = [];
+  int? _bookId;
   bool _isSaving = false;
-  StreamSubscription? _stateSub;
 
-  bool get _isEditing => widget.book != null;
+  bool get _isEditing => _bookId != null;
 
   @override
   void initState() {
@@ -53,33 +52,14 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
     _descriptionCtrl = TextEditingController(text: b?.description ?? '');
     _authorCtrl = TextEditingController(text: b?.author ?? '');
     _countryCtrl = TextEditingController(text: b?.country ?? '');
-    _stateCtrl = TextEditingController(text: b?.state ?? '');
-    _typeCtrl = TextEditingController(text: b?.type ?? '');
+    _state = b?.state ?? '';
+    _type = b?.type ?? '';
     _releaseCtrl = TextEditingController(text: b?.release ?? '');
     _sourceCtrl = TextEditingController(text: b?.source ?? '');
     _linkCtrl = TextEditingController(text: b?.link ?? '');
     _selectedGenreIds = b?.listGenre.map((g) => g.id).toSet() ?? {};
-    _tooks = b?.listTook ?? [];
-    _stateSub = context.read<ScanBloc>().stream.listen((state) {
-      if (state is ScanGenresLoaded && mounted) {
-        setState(() => _allGenres = state.genres);
-      } else if (state is ScanCoverUploaded && mounted) {
-        setState(() => _coverCtrl.text = state.filename);
-      } else if (state is ScanLoaded && mounted && !_isSaving) {
-        if (state.books.isEmpty) return;
-        final match = state.books.firstWhere(
-          (b) =>
-              b.id == widget.book?.id ||
-              (b.name == _nameCtrl.text.trim() &&
-                  b.author == _authorCtrl.text.trim()),
-          orElse: () => _isEditing ? widget.book! : state.books.last,
-        );
-        _tooks = match.listTook;
-      }
-    });
-    if (_isEditing) {
-      _tooks = widget.book?.listTook ?? [];
-    }
+    _bookId = widget.book?.id;
+    _tooks = widget.book?.listTook ?? [];
     context.read<ScanBloc>().add(LoadScanGenres());
   }
 
@@ -92,12 +72,9 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
     _descriptionCtrl.dispose();
     _authorCtrl.dispose();
     _countryCtrl.dispose();
-    _stateCtrl.dispose();
-    _typeCtrl.dispose();
     _releaseCtrl.dispose();
     _sourceCtrl.dispose();
     _linkCtrl.dispose();
-    _stateSub?.cancel();
     super.dispose();
   }
 
@@ -130,8 +107,8 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
       authorId: widget.book?.authorId ?? 0,
       author: _authorCtrl.text.trim(),
       country: _countryCtrl.text.trim(),
-      state: _stateCtrl.text.trim(),
-      type: _typeCtrl.text.trim(),
+      state: _state,
+      type: _type,
       release: _releaseCtrl.text.trim(),
       tookCount: widget.book?.tookCount ?? 0,
       chapterCount: widget.book?.chapterCount ?? 0,
@@ -142,7 +119,7 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
       listLabel: widget.book?.listLabel ?? [],
       listGenre:
           _allGenres.where((g) => _selectedGenreIds.contains(g.id)).toList(),
-      listTook: widget.book?.listTook ?? [],
+      listTook: _tooks,
     );
 
     // Save book
@@ -151,11 +128,20 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
     // Listen for result
     try {
       final bloc = context.read<ScanBloc>();
-      final future = bloc.stream.firstWhere((s) => s is! ScanLoading);
+      final future = bloc.stream.firstWhere(
+        (s) => s is ScanLoaded || s is ScanError,
+      );
       bloc.add(SaveScanBook(book, isUpdate: _isEditing));
       final result = await future;
       if (result is ScanLoaded && mounted) {
-        return _isEditing ? widget.book : book;
+        if (_isEditing) return widget.book;
+        // New book — capture the real DB-generated ID from the reloaded list
+        final match = result.books.firstWhere(
+          (b) => b.name == book.name && b.author == book.author,
+          orElse: () => result.books.last,
+        );
+        _bookId = match.id;
+        return match;
       } else if (result is ScanError && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -175,218 +161,255 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
     if (saved != null && mounted) Navigator.pop(context);
   }
 
+  // Navigate to took edit (save book first if it's new)
+  Future<void> _addTook() async {
+    int bookId;
+    if (_bookId != null) {
+      bookId = _bookId!;
+    } else {
+      // New book — save first to get a real book ID
+      final saved = await _saveBook();
+      if (saved == null || _bookId == null) return;
+      bookId = _bookId!;
+    }
+    final refreshed = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ScanTookEditScreen(bookId: bookId),
+      ),
+    );
+    if (refreshed == true && mounted) {
+      context.read<ScanBloc>().add(LoadScanBooks());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEditing ? 'Editar Libro' : 'Nuevo Libro'),
-        actions: [
-          TextButton(onPressed: _save, child: const Text('Guardar')),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              // Name
-              TextFormField(
-                controller: _nameCtrl,
-                decoration: const InputDecoration(labelText: 'Nombre'),
-                validator: (v) =>
-                    v?.trim().isEmpty == true ? 'Requerido' : null,
-              ),
-
-              const SizedBox(height: 12),
-
-              // Cover
-              CoverPicker(
-                controller: _coverCtrl,
-                onPick: _pickCover,
-                onClear: () => setState(() => _coverCtrl.clear()),
-              ),
-
-              const SizedBox(height: 12),
-
-              // Short Name
-              TextFormField(
-                controller: _shortCtrl,
-                decoration: const InputDecoration(labelText: 'Nombre corto'),
-              ),
-
-              const SizedBox(height: 12),
-
-              // Alternative Name
-              TextFormField(
-                controller: _alternativeCtrl,
-                decoration:
-                    const InputDecoration(labelText: 'Nombre alternativo'),
-              ),
-
-              const SizedBox(height: 12),
-
-              // Description
-              TextFormField(
-                maxLines: 3,
-                controller: _descriptionCtrl,
-                decoration: const InputDecoration(labelText: 'Descripción'),
-              ),
-
-              const SizedBox(height: 12),
-
-              // Author
-              TextFormField(
-                controller: _authorCtrl,
-                decoration: const InputDecoration(labelText: 'Autor'),
-              ),
-
-              const SizedBox(height: 12),
-
-              // Country
-              TextFormField(
-                controller: _countryCtrl,
-                decoration: const InputDecoration(labelText: 'País'),
-              ),
-
-              const SizedBox(height: 12),
-
-              // State
-              TextFormField(
-                controller: _stateCtrl,
-                decoration: const InputDecoration(labelText: 'Estado'),
-              ),
-
-              const SizedBox(height: 12),
-
-              // Type
-              TextFormField(
-                controller: _typeCtrl,
-                decoration: const InputDecoration(labelText: 'Tipo'),
-              ),
-
-              const SizedBox(height: 12),
-
-              // Release
-              TextFormField(
-                controller: _releaseCtrl,
-                decoration: const InputDecoration(labelText: 'Lanzamiento'),
-              ),
-
-              const SizedBox(height: 12),
-
-              // Source
-              TextFormField(
-                controller: _sourceCtrl,
-                decoration: const InputDecoration(labelText: 'Fuente'),
-              ),
-
-              const SizedBox(height: 12),
-
-              // Link
-              TextFormField(
-                controller: _linkCtrl,
-                decoration: const InputDecoration(labelText: 'Link'),
-              ),
-
-              const SizedBox(height: 16),
-
-              // Genres
-              GenreSelector(
-                genres: _allGenres,
-                selectedIds: _selectedGenreIds,
-                onToggle: (id, selected) {
-                  setState(() {
-                    if (selected) {
-                      _selectedGenreIds.add(id);
-                    } else {
-                      _selectedGenreIds.remove(id);
-                    }
-                  });
-                },
-              ),
-
-              if (_isEditing)
-                TookListSection(
-                  isEditing: true,
-                  tooks: _tooks,
-                  bookId: widget.book!.id,
-                  onAddTook: () async {
-                    final refreshed = await Navigator.push<bool>(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => ScanTookEditScreen(
-                          bookId: widget.book!.id,
-                        ),
-                      ),
-                    );
-                    if (refreshed == true && mounted) {
-                      context.read<ScanBloc>().add(LoadScanBooks());
-                    }
-                  },
-                  onEditTook: (took, bookId) async {
-                    final refreshed = await Navigator.push<bool>(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => ScanTookEditScreen(
-                          took: took,
-                          bookId: bookId,
-                        ),
-                      ),
-                    );
-                    if (refreshed == true && mounted) {
-                      context.read<ScanBloc>().add(LoadScanBooks());
-                    }
-                  },
-                  onDeleteTook: (tookId) async {
-                    final bloc = context.read<ScanTookBloc>();
-                    final future = bloc.stream.firstWhere(
-                      (s) => s is ScanTookLoaded || s is ScanTookError,
-                    );
-                    bloc.add(DeleteScanTook(tookId));
-                    final result = await future;
-                    if (result is ScanTookLoaded && mounted) {
-                      setState(() => _tooks.removeWhere((t) => t.id == tookId));
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(result.message ?? 'Tomo eliminado'),
-                          backgroundColor:
-                              Theme.of(context).colorScheme.tertiary,
-                        ),
-                      );
-                    } else if (result is ScanTookError && mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(result.message),
-                          backgroundColor:
-                              Theme.of(context).colorScheme.error,
-                        ),
-                      );
-                    }
-                  },
-                ),
+    return BlocListener<ScanBloc, ScanState>(
+        listener: (context, state) {
+          if (state is ScanGenresLoaded) {
+            setState(() => _allGenres = state.genres);
+          } else if (state is ScanCoverUploaded) {
+            _coverCtrl.text = state.filename;
+          } else if (state is ScanLoaded && !_isSaving) {
+            if (state.books.isEmpty) return;
+            final match = state.books.firstWhere(
+              (b) =>
+                  b.id == _bookId ||
+                  (b.name == _nameCtrl.text.trim() &&
+                      b.author == _authorCtrl.text.trim()),
+              orElse: () => state.books.last,
+            );
+            _tooks = match.listTook;
+          }
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(_isEditing ? 'Editar Libro' : 'Nuevo Libro'),
+            actions: [
+              TextButton(onPressed: _save, child: const Text('Guardar')),
             ],
           ),
-        ),
-      ),
-      floatingActionButton: _isEditing
-          ? FloatingActionButton(
-              onPressed: () async {
-                final refreshed = await Navigator.push<bool>(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ScanTookEditScreen(
-                      bookId: widget.book!.id,
-                    ),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  // Name
+                  TextFormField(
+                    controller: _nameCtrl,
+                    decoration: const InputDecoration(labelText: 'Nombre'),
+                    validator: (v) =>
+                        v?.trim().isEmpty == true ? 'Requerido' : null,
                   ),
-                );
-                if (refreshed == true && mounted) {
-                  context.read<ScanBloc>().add(LoadScanBooks());
-                }
-              },
-              child: const Icon(Icons.add),
-            )
-          : null,
-    );
+
+                  const SizedBox(height: 12),
+
+                  // Cover
+                  CoverPicker(
+                    controller: _coverCtrl,
+                    onPick: _pickCover,
+                    onClear: () => setState(() => _coverCtrl.clear()),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Short Name
+                  TextFormField(
+                    controller: _shortCtrl,
+                    decoration:
+                        const InputDecoration(labelText: 'Nombre corto'),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Alternative Name
+                  TextFormField(
+                    controller: _alternativeCtrl,
+                    decoration:
+                        const InputDecoration(labelText: 'Nombre alternativo'),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Description
+                  TextFormField(
+                    maxLines: 3,
+                    controller: _descriptionCtrl,
+                    decoration: const InputDecoration(labelText: 'Descripción'),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Author
+                  TextFormField(
+                    controller: _authorCtrl,
+                    decoration: const InputDecoration(labelText: 'Autor'),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Country
+                  TextFormField(
+                    controller: _countryCtrl,
+                    decoration: const InputDecoration(labelText: 'País'),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // State
+                  DropdownButtonFormField<String>(
+                    initialValue: _state,
+                    decoration: const InputDecoration(labelText: 'Estado'),
+                    items: const [
+                      DropdownMenuItem(value: '', child: Text('Seleccioná...')),
+                      DropdownMenuItem(
+                          value: 'Emisión', child: Text('Emisión')),
+                      DropdownMenuItem(
+                          value: 'Finalizado', child: Text('Finalizado')),
+                      DropdownMenuItem(
+                          value: 'Pausado', child: Text('Pausado')),
+                      DropdownMenuItem(
+                          value: 'Abandonado', child: Text('Abandonado')),
+                    ],
+                    onChanged: (v) => setState(() => _state = v ?? ''),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Type
+                  DropdownButtonFormField<String>(
+                    initialValue: _type,
+                    decoration: const InputDecoration(labelText: 'Tipo'),
+                    items: const [
+                      DropdownMenuItem(value: '', child: Text('Seleccioná...')),
+                      DropdownMenuItem(value: 'Web', child: Text('Web Novel')),
+                      DropdownMenuItem(
+                          value: 'Ligera', child: Text('Light Novel')),
+                    ],
+                    onChanged: (v) => setState(() => _type = v ?? ''),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Release
+                  TextFormField(
+                    controller: _releaseCtrl,
+                    decoration: const InputDecoration(labelText: 'Lanzamiento'),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Source
+                  TextFormField(
+                    controller: _sourceCtrl,
+                    decoration: const InputDecoration(labelText: 'Fuente'),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // Link
+                  TextFormField(
+                    controller: _linkCtrl,
+                    decoration: const InputDecoration(labelText: 'Link'),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Genres
+                  GenreSelector(
+                    genres: _allGenres,
+                    selectedIds: _selectedGenreIds,
+                    onToggle: (id, selected) {
+                      setState(() {
+                        if (selected) {
+                          _selectedGenreIds.add(id);
+                        } else {
+                          _selectedGenreIds.remove(id);
+                        }
+                      });
+                    },
+                  ),
+
+                  if (_isEditing)
+                    TookListSection(
+                      isEditing: true,
+                      tooks: _tooks,
+                      bookId: _bookId,
+                      onAddTook: _addTook,
+                      onEditTook: (took, bookId) async {
+                        final refreshed = await Navigator.push<bool>(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ScanTookEditScreen(
+                              took: took,
+                              bookId: bookId,
+                            ),
+                          ),
+                        );
+                        if (refreshed == true && mounted) {
+                          context.read<ScanBloc>().add(LoadScanBooks());
+                        }
+                      },
+                      onDeleteTook: (tookId) async {
+                        final bloc = context.read<ScanTookBloc>();
+                        final future = bloc.stream.firstWhere(
+                          (s) => s is ScanTookLoaded || s is ScanTookError,
+                        );
+                        bloc.add(DeleteScanTook(tookId));
+                        final result = await future;
+                        if (result is ScanTookLoaded && mounted) {
+                          setState(
+                              () => _tooks.removeWhere((t) => t.id == tookId));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(result.message ?? 'Tomo eliminado'),
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.tertiary,
+                            ),
+                          );
+                        } else if (result is ScanTookError && mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(result.message),
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.error,
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                ],
+              ),
+            ),
+          ),
+          floatingActionButton: _isEditing
+              ? FloatingActionButton(
+                  onPressed: _addTook,
+                  child: const Icon(Icons.add),
+                )
+              : null,
+        ));
   }
 }

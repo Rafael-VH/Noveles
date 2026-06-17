@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:noveles/core/di/injection.dart';
+import 'package:noveles/core/errors/result.dart';
+import 'package:noveles/features/books/domain/upload_cover.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 import 'package:noveles/features/tooks/domain/took_entity.dart';
 import 'package:noveles/features/presentation/bloc/scan/scan_took_bloc.dart';
 import 'package:noveles/features/presentation/bloc/scan/scan_chapter_bloc.dart';
 import 'package:noveles/features/presentation/screens/scan/scan_chapter_edit_screen.dart';
+import 'package:noveles/features/presentation/screens/scan/widgets/cover_picker.dart';
 
 class ScanTookEditScreen extends StatefulWidget {
   final TookEntity? took;
@@ -24,6 +28,8 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
   late TextEditingController _coverCtrl;
   bool _isSaving = false;
   List<ChapterEntity> _chapters = [];
+  late final ScanTookBloc _scanTookBloc;
+  late final ScanChapterBloc _scanChapterBloc;
 
   bool get _isEditing => widget.took != null;
 
@@ -35,6 +41,8 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
     _numberCtrl = TextEditingController(text: t?.number ?? '');
     _titleCtrl = TextEditingController(text: t?.title ?? '');
     _coverCtrl = TextEditingController(text: t?.cover ?? '');
+    _scanTookBloc = getIt<ScanTookBloc>();
+    _scanChapterBloc = getIt<ScanChapterBloc>();
   }
 
   @override
@@ -42,6 +50,8 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
     _numberCtrl.dispose();
     _titleCtrl.dispose();
     _coverCtrl.dispose();
+    _scanTookBloc.close();
+    _scanChapterBloc.close();
     super.dispose();
   }
 
@@ -63,11 +73,10 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
 
     setState(() => _isSaving = true);
     try {
-      final bloc = context.read<ScanTookBloc>();
-      final future = bloc.stream.firstWhere(
+      final future = _scanTookBloc.stream.firstWhere(
         (s) => s is ScanTookLoaded || s is ScanTookError,
       );
-      bloc.add(SaveScanTook(took, isUpdate: _isEditing));
+      _scanTookBloc.add(SaveScanTook(took, isUpdate: _isEditing));
       final result = await future;
       if (result is ScanTookLoaded && mounted) {
         Navigator.pop(context, true);
@@ -84,16 +93,35 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
     }
   }
 
+  // Pick and upload cover image
+  Future<void> _pickCover() async {
+    final picker = ImagePicker();
+    final xFile = await picker.pickImage(source: ImageSource.gallery);
+    if (xFile == null || !mounted) return;
+    final result = await getIt<UploadCover>()(xFile.path);
+    if (!mounted) return;
+    switch (result) {
+      case Ok<String>(:final value):
+        setState(() => _coverCtrl.text = value);
+      case Err(:final error):
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(error.message),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+    }
+  }
+
   // Delete chapter
   Future<void> _deleteChapter(int chapterId) async {
     if (_isSaving) return;
     setState(() => _isSaving = true);
     try {
-      final bloc = context.read<ScanChapterBloc>();
-      final future = bloc.stream.firstWhere(
+      final future = _scanChapterBloc.stream.firstWhere(
         (s) => s is ScanChapterLoaded || s is ScanChapterError,
       );
-      bloc.add(DeleteScanChapter(chapterId));
+      _scanChapterBloc.add(DeleteScanChapter(chapterId));
       final result = await future;
       if (result is ScanChapterLoaded && mounted) {
         setState(() => _chapters.removeWhere((c) => c.id == chapterId));
@@ -146,8 +174,8 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => getIt<ScanTookBloc>()),
-        BlocProvider(create: (_) => getIt<ScanChapterBloc>()),
+        BlocProvider.value(value: _scanTookBloc),
+        BlocProvider.value(value: _scanChapterBloc),
       ],
       child: Scaffold(
         appBar: AppBar(
@@ -183,10 +211,11 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
 
                 const SizedBox(height: 12),
 
-                // Cover URL
-                TextFormField(
+                // Cover
+                CoverPicker(
                   controller: _coverCtrl,
-                  decoration: const InputDecoration(labelText: 'Cover URL'),
+                  onPick: _pickCover,
+                  onClear: () => setState(() => _coverCtrl.clear()),
                 ),
 
                 // Show Chapters (always visible after first save)
@@ -210,9 +239,7 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
                     (ch) => Card(
                       child: ListTile(
                         title: Text(
-                          ch.title.isNotEmpty
-                              ? ch.title
-                              : 'Cap. ${ch.number}',
+                          ch.title.isNotEmpty ? ch.title : 'Cap. ${ch.number}',
                         ),
                         subtitle: Text('ID: ${ch.id}'),
                         trailing: Row(

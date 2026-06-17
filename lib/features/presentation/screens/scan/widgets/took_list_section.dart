@@ -39,48 +39,45 @@ class TookListSection extends StatelessWidget {
 
         const SizedBox(height: 8),
 
-        // Show message if no tooks
+        // Show tooks
         if (isEditing)
           ...tooks.map(
-            (took) => Card(
-              child: ListTile(
-                title: Text(
-                  took.title.isNotEmpty ? took.title : 'Tomo ${took.number}',
-                ),
-                subtitle: Text('${took.listChapter.length} capítulos'),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // Edit Button
-                    IconButton(
-                      icon: Icon(
-                        Icons.edit,
-                        color: Theme.of(context).colorScheme.primary,
+            (took) {
+              final bid = bookId;
+              return Card(
+                child: ListTile(
+                  title: Text(
+                    took.title.isNotEmpty ? took.title : 'Tomo ${took.number}',
+                  ),
+                  subtitle: Text('${took.listChapter.length} capítulos'),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Edit Button
+                      IconButton(
+                        icon: Icon(
+                          Icons.edit,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        onPressed:
+                            bid != null ? () => onEditTook(took, bid) : null,
                       ),
-                      onPressed: () => onEditTook(took, bookId!),
-                    ),
 
-                    // Delete Button
-                    IconButton(
-                      icon: Icon(
-                        Icons.delete,
-                        color: Theme.of(context).colorScheme.error,
+                      // Delete Button
+                      IconButton(
+                        icon: Icon(
+                          Icons.delete,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                        onPressed: () => onDeleteTook(took.id),
                       ),
-                      onPressed: () => onDeleteTook(took.id),
-                    ),
-                  ],
+                    ],
+                  ),
+                  onTap: bid != null ? () => onEditTook(took, bid) : null,
                 ),
-                onTap: () => onEditTook(took, bookId!),
-              ),
-            ),
+              );
+            },
           ),
-
-        // Add Took Button
-        ElevatedButton.icon(
-          onPressed: onAddTook,
-          icon: const Icon(Icons.add),
-          label: const Text('Añadir Tomo'),
-        ),
       ],
     );
   }

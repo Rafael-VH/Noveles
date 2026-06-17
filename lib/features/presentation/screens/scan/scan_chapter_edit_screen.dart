@@ -20,6 +20,7 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
   late TextEditingController _titleCtrl;
   late TextEditingController _contentCtrl;
   bool _isSaving = false;
+  late final ScanChapterBloc _scanChapterBloc;
 
   bool get _isEditing => widget.chapter != null;
 
@@ -30,6 +31,7 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
     _numberCtrl = TextEditingController(text: c?.number ?? '');
     _titleCtrl = TextEditingController(text: c?.title ?? '');
     _contentCtrl = TextEditingController(text: c?.content ?? '');
+    _scanChapterBloc = getIt<ScanChapterBloc>();
   }
 
   @override
@@ -37,6 +39,7 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
     _numberCtrl.dispose();
     _titleCtrl.dispose();
     _contentCtrl.dispose();
+    _scanChapterBloc.close();
     super.dispose();
   }
 
@@ -62,11 +65,10 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
     setState(() => _isSaving = true);
 
     try {
-      final bloc = context.read<ScanChapterBloc>();
-      final future = bloc.stream.firstWhere(
+      final future = _scanChapterBloc.stream.firstWhere(
         (s) => s is ScanChapterLoaded || s is ScanChapterError,
       );
-      bloc.add(SaveScanChapter(chapter, isUpdate: _isEditing));
+      _scanChapterBloc.add(SaveScanChapter(chapter, isUpdate: _isEditing));
       final result = await future;
       if (result is ScanChapterLoaded && mounted) {
         Navigator.pop(context, chapter);
@@ -85,8 +87,8 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => getIt<ScanChapterBloc>(),
+    return BlocProvider.value(
+      value: _scanChapterBloc,
       child: Scaffold(
         appBar: AppBar(
           title: Text(_isEditing ? 'Editar Capítulo' : 'Nuevo Capítulo'),
