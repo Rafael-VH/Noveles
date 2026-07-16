@@ -10,9 +10,9 @@ import 'package:noveles/features/labels/domain/delete_label.dart';
 import 'package:noveles/features/labels/domain/assign_label_to_book.dart';
 import 'package:noveles/features/labels/domain/remove_label_from_book.dart';
 import 'package:noveles/features/books/domain/get_book_labels.dart';
-import 'package:noveles/features/presentation/bloc/label/label_bloc.dart';
-import 'package:noveles/features/presentation/bloc/label/label_event.dart';
-import 'package:noveles/features/presentation/bloc/label/label_state.dart';
+import 'package:noveles/features/labels/presentation/bloc/label_bloc.dart';
+import 'package:noveles/features/labels/presentation/bloc/label_event.dart';
+import 'package:noveles/features/labels/presentation/bloc/label_state.dart';
 
 class MockGetLabels extends Mock implements GetLabels {}
 

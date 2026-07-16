@@ -5,9 +5,9 @@ import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/core/errors/failure.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 import 'package:noveles/features/chapters/domain/get_chapter_content.dart';
-import 'package:noveles/features/presentation/bloc/chapter/chapter_bloc.dart';
-import 'package:noveles/features/presentation/bloc/chapter/chapter_event.dart';
-import 'package:noveles/features/presentation/bloc/chapter/chapter_state.dart';
+import 'package:noveles/features/chapters/presentation/bloc/chapter_bloc.dart';
+import 'package:noveles/features/chapters/presentation/bloc/chapter_event.dart';
+import 'package:noveles/features/chapters/presentation/bloc/chapter_state.dart';
 
 class MockGetChapterContent extends Mock implements GetChapterContent {}
 

@@ -7,7 +7,7 @@ import 'package:noveles/features/genres/domain/get_genre.dart';
 import 'package:noveles/features/genres/domain/get_genre_by_id.dart';
 import 'package:noveles/features/genres/domain/update_genre.dart';
 import 'package:noveles/features/genres/domain/delete_genre.dart';
-import 'package:noveles/features/presentation/bloc/genre/genre_bloc.dart';
+import 'package:noveles/features/genres/presentation/bloc/genre_bloc.dart';
 
 final getIt = GetIt.instance;
 

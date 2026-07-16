@@ -7,8 +7,8 @@ import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/books/domain/upload_cover.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 import 'package:noveles/features/tooks/domain/took_entity.dart';
-import 'package:noveles/features/presentation/bloc/scan/scan_took_bloc.dart';
-import 'package:noveles/features/presentation/bloc/scan/scan_chapter_bloc.dart';
+import 'package:noveles/features/scan/presentation/bloc/scan_took_bloc.dart';
+import 'package:noveles/features/scan/presentation/bloc/scan_chapter_bloc.dart';
 import 'package:noveles/features/presentation/screens/scan/scan_chapter_edit_screen.dart';
 import 'package:noveles/features/presentation/screens/scan/widgets/cover_picker.dart';
 

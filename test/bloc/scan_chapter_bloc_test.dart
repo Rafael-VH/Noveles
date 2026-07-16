@@ -7,7 +7,7 @@ import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 import 'package:noveles/features/chapters/domain/create_chapter.dart';
 import 'package:noveles/features/chapters/domain/update_chapter.dart';
 import 'package:noveles/features/chapters/domain/delete_chapter.dart';
-import 'package:noveles/features/presentation/bloc/scan/scan_chapter_bloc.dart';
+import 'package:noveles/features/scan/presentation/bloc/scan_chapter_bloc.dart';
 
 class MockCreateChapter extends Mock implements CreateChapter {}
 

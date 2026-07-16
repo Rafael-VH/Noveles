@@ -4,9 +4,9 @@ import 'package:noveles/features/profiles/domain/get_profile.dart';
 import 'package:noveles/features/profiles/domain/update_profile.dart';
 import 'package:noveles/features/profiles/domain/upload_avatar.dart';
 import 'package:noveles/features/profiles/domain/change_password.dart';
-import 'package:noveles/features/presentation/bloc/profile/profile_event.dart'
+import 'package:noveles/features/profiles/presentation/bloc/profile_event.dart'
     as events;
-import 'package:noveles/features/presentation/bloc/profile/profile_state.dart';
+import 'package:noveles/features/profiles/presentation/bloc/profile_state.dart';
 
 class ProfileBloc extends Bloc<events.ProfileEvent, ProfileState> {
   final GetProfile getProfile;

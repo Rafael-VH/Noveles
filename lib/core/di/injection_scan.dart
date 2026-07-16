@@ -1,7 +1,7 @@
 import 'package:get_it/get_it.dart';
-import 'package:noveles/features/presentation/bloc/scan/scan_bloc.dart';
-import 'package:noveles/features/presentation/bloc/scan/scan_took_bloc.dart';
-import 'package:noveles/features/presentation/bloc/scan/scan_chapter_bloc.dart';
+import 'package:noveles/features/scan/presentation/bloc/scan_bloc.dart';
+import 'package:noveles/features/scan/presentation/bloc/scan_took_bloc.dart';
+import 'package:noveles/features/scan/presentation/bloc/scan_chapter_bloc.dart';
 
 final getIt = GetIt.instance;
 

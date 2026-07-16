@@ -8,9 +8,9 @@ import 'package:noveles/features/genres/domain/get_genre.dart';
 import 'package:noveles/features/genres/domain/create_genre.dart';
 import 'package:noveles/features/genres/domain/update_genre.dart';
 import 'package:noveles/features/genres/domain/delete_genre.dart';
-import 'package:noveles/features/presentation/bloc/genre/genre_bloc.dart';
-import 'package:noveles/features/presentation/bloc/genre/genre_event.dart';
-import 'package:noveles/features/presentation/bloc/genre/genre_state.dart';
+import 'package:noveles/features/genres/presentation/bloc/genre_bloc.dart';
+import 'package:noveles/features/genres/presentation/bloc/genre_event.dart';
+import 'package:noveles/features/genres/presentation/bloc/genre_state.dart';
 
 class MockGetGenre extends Mock implements GetGenre {}
 

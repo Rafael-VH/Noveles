@@ -9,7 +9,7 @@ import 'package:noveles/features/chapters/domain/get_chapter_content.dart';
 import 'package:noveles/features/chapters/domain/update_chapter.dart';
 import 'package:noveles/features/chapters/domain/delete_chapter.dart';
 import 'package:noveles/features/chapters/domain/upload_chapter_content.dart';
-import 'package:noveles/features/presentation/bloc/chapter/chapter_bloc.dart';
+import 'package:noveles/features/chapters/presentation/bloc/chapter_bloc.dart';
 
 final getIt = GetIt.instance;
 

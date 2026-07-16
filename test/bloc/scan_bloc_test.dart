@@ -12,9 +12,9 @@ import 'package:noveles/features/books/domain/delete_book.dart';
 import 'package:noveles/features/books/domain/upload_cover.dart';
 import 'package:noveles/features/books/domain/toggle_book_visibility.dart';
 import 'package:noveles/features/genres/domain/get_genre.dart';
-import 'package:noveles/features/presentation/bloc/scan/scan_bloc.dart';
-import 'package:noveles/features/presentation/bloc/scan/scan_event.dart';
-import 'package:noveles/features/presentation/bloc/scan/scan_state.dart';
+import 'package:noveles/features/scan/presentation/bloc/scan_bloc.dart';
+import 'package:noveles/features/scan/presentation/bloc/scan_event.dart';
+import 'package:noveles/features/scan/presentation/bloc/scan_state.dart';
 
 class MockGetBooks extends Mock implements GetBooks {}
 

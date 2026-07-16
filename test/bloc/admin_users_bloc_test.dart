@@ -5,9 +5,9 @@ import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/core/errors/failure.dart';
 import 'package:noveles/features/profiles/domain/user_entity.dart';
 import 'package:noveles/features/profiles/domain/get_all_profiles.dart';
-import 'package:noveles/features/presentation/bloc/admin_users/admin_users_bloc.dart';
-import 'package:noveles/features/presentation/bloc/admin_users/admin_users_event.dart';
-import 'package:noveles/features/presentation/bloc/admin_users/admin_users_state.dart';
+import 'package:noveles/features/admin/presentation/bloc/admin_users_bloc.dart';
+import 'package:noveles/features/admin/presentation/bloc/admin_users_event.dart';
+import 'package:noveles/features/admin/presentation/bloc/admin_users_state.dart';
 
 class MockGetAllProfiles extends Mock implements GetAllProfiles {}
 

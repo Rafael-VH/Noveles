@@ -11,7 +11,7 @@ import 'package:noveles/features/books/domain/delete_book.dart';
 import 'package:noveles/features/books/domain/toggle_book_visibility.dart';
 import 'package:noveles/features/books/domain/upload_cover.dart';
 import 'package:noveles/features/books/domain/get_book_labels.dart';
-import 'package:noveles/features/presentation/bloc/book/book_bloc.dart';
+import 'package:noveles/features/books/presentation/bloc/book_bloc.dart';
 
 final getIt = GetIt.instance;
 

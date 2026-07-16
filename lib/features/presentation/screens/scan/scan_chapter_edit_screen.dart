@@ -6,7 +6,7 @@ import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 import 'package:noveles/features/chapters/domain/upload_chapter_content.dart';
-import 'package:noveles/features/presentation/bloc/scan/scan_chapter_bloc.dart';
+import 'package:noveles/features/scan/presentation/bloc/scan_chapter_bloc.dart';
 
 class ScanChapterEditScreen extends StatefulWidget {
   final ChapterEntity? chapter;

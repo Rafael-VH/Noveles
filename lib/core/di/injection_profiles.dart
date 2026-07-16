@@ -7,7 +7,7 @@ import 'package:noveles/features/profiles/domain/update_profile.dart';
 import 'package:noveles/features/profiles/domain/upload_avatar.dart';
 import 'package:noveles/features/profiles/domain/get_all_profiles.dart';
 import 'package:noveles/features/profiles/domain/change_password.dart';
-import 'package:noveles/features/presentation/bloc/profile/profile_bloc.dart';
+import 'package:noveles/features/profiles/presentation/bloc/profile_bloc.dart';
 
 final getIt = GetIt.instance;
 

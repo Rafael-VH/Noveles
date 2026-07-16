@@ -8,7 +8,7 @@ import 'package:noveles/features/labels/domain/update_label.dart';
 import 'package:noveles/features/labels/domain/delete_label.dart';
 import 'package:noveles/features/labels/domain/assign_label_to_book.dart';
 import 'package:noveles/features/labels/domain/remove_label_from_book.dart';
-import 'package:noveles/features/presentation/bloc/label/label_bloc.dart';
+import 'package:noveles/features/labels/presentation/bloc/label_bloc.dart';
 
 final getIt = GetIt.instance;
 

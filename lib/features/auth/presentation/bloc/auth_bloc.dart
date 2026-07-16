@@ -7,8 +7,8 @@ import 'package:noveles/features/auth/domain/logout.dart';
 import 'package:noveles/features/auth/domain/get_current_user.dart';
 import 'package:noveles/features/auth/domain/listen_auth_state.dart';
 import 'package:noveles/features/auth/domain/auth_event.dart' as domain;
-import 'package:noveles/features/presentation/bloc/auth/auth_event.dart';
-import 'package:noveles/features/presentation/bloc/auth/auth_state.dart';
+import 'package:noveles/features/auth/presentation/bloc/auth_event.dart';
+import 'package:noveles/features/auth/presentation/bloc/auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final Login login;

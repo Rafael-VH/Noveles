@@ -7,7 +7,7 @@ import 'package:noveles/features/auth/domain/logout.dart';
 import 'package:noveles/features/auth/domain/register.dart';
 import 'package:noveles/features/auth/domain/get_current_user.dart';
 import 'package:noveles/features/auth/domain/listen_auth_state.dart';
-import 'package:noveles/features/presentation/bloc/auth/auth_bloc.dart';
+import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
 
 final getIt = GetIt.instance;
 

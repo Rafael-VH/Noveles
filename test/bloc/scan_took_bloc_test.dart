@@ -7,7 +7,7 @@ import 'package:noveles/features/tooks/domain/took_entity.dart';
 import 'package:noveles/features/tooks/domain/create_took.dart';
 import 'package:noveles/features/tooks/domain/update_took.dart';
 import 'package:noveles/features/tooks/domain/delete_took.dart';
-import 'package:noveles/features/presentation/bloc/scan/scan_took_bloc.dart';
+import 'package:noveles/features/scan/presentation/bloc/scan_took_bloc.dart';
 
 class MockCreateTook extends Mock implements CreateTook {}
 

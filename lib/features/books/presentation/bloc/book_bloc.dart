@@ -2,8 +2,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/books/domain/get_book.dart';
 import 'package:noveles/features/books/domain/get_book_by_id.dart';
-import 'package:noveles/features/presentation/bloc/book/book_event.dart';
-import 'package:noveles/features/presentation/bloc/book/book_state.dart';
+import 'package:noveles/features/books/presentation/bloc/book_event.dart';
+import 'package:noveles/features/books/presentation/bloc/book_state.dart';
 
 class BookBloc extends Bloc<BookEvent, BookState> {
   final GetBooks getBooks;

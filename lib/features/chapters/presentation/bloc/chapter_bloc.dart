@@ -2,8 +2,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 import 'package:noveles/features/chapters/domain/get_chapter_content.dart';
-import 'package:noveles/features/presentation/bloc/chapter/chapter_event.dart';
-import 'package:noveles/features/presentation/bloc/chapter/chapter_state.dart';
+import 'package:noveles/features/chapters/presentation/bloc/chapter_event.dart';
+import 'package:noveles/features/chapters/presentation/bloc/chapter_state.dart';
 
 class ChapterBloc extends Bloc<ChapterEvent, ChapterState> {
   final GetChapterContent getChapterContent;
