@@ -1,16 +1,46 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "mcp": {
+    "context7": {
+      "enabled": true,
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp"
+    },
+    "engram": {
+      "command": [
+        "C:\\Users\\rafae\\go\\bin\\engram.exe",
+        "mcp",
+        "--tools=agent"
+      ],
+      "type": "local"
+    },
     "supabase": {
       "type": "remote",
       "url": "https://mcp.supabase.com/mcp?project_ref=xozqqjcuuesxcqwhillr&features=docs%2Caccount%2Cdatabase%2Cdebugging%2Cfunctions%2Cdevelopment%2Cbranching%2Cstorage",
       "enabled": true
     },
-    "tabularis": {
-      "type": "command",
-      "command": "C:\\Users\\rafae\\AppData\\Local\\tabularis\\tabularis.exe",
-      "args": ["--mcp"],
-      "enabled": true
+    "obsidian-vault": {
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "C:\\Users\\rafae\\Documents\\Obsidian Vault\\Noveles"
+      ],
+      "command": "npx.cmd",
+      "enabled": true,
+      "type": "local"
+    },
+    "gh_grep": {
+      "enabled": true,
+      "type": "remote",
+      "url": "https://mcp.grep.app"
+    },
+    "github": {
+      "enabled": true,
+      "headers": {
+        "Authorization": "Bearer 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"
+      },
+      "type": "remote",
+      "url": "https://api.githubcopilot.com/mcp/"
     }
   }
 }
