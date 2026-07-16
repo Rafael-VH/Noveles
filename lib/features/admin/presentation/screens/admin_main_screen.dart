@@ -2,10 +2,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
-import 'package:noveles/features/presentation/screens/admin/analytics_tab.dart';
-import 'package:noveles/features/presentation/screens/admin/books_tab.dart';
-import 'package:noveles/features/presentation/screens/admin/genres_tab.dart';
-import 'package:noveles/features/presentation/screens/admin/users_tab.dart';
+import 'package:noveles/features/admin/presentation/screens/analytics_tab.dart';
+import 'package:noveles/features/admin/presentation/screens/books_tab.dart';
+import 'package:noveles/features/admin/presentation/screens/genres_tab.dart';
+import 'package:noveles/features/admin/presentation/screens/users_tab.dart';
 import 'package:noveles/features/presentation/widgets/app_drawer.dart';
 
 class AdminMainScreen extends StatefulWidget {

@@ -5,10 +5,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/features/profiles/domain/user_entity.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
-import 'package:noveles/features/presentation/screens/profile/widgets/avatar_section.dart';
-import 'package:noveles/features/presentation/screens/profile/widgets/profile_edit_form.dart';
-import 'package:noveles/features/presentation/screens/profile/widgets/password_change_form.dart';
-import 'package:noveles/features/presentation/screens/profile/widgets/logout_section.dart';
+import 'package:noveles/features/profiles/presentation/screens/widgets/avatar_section.dart';
+import 'package:noveles/features/profiles/presentation/screens/widgets/profile_edit_form.dart';
+import 'package:noveles/features/profiles/presentation/screens/widgets/password_change_form.dart';
+import 'package:noveles/features/profiles/presentation/screens/widgets/logout_section.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});

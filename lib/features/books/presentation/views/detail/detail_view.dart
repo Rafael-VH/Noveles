@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:noveles/features/books/domain/book_with_relations.dart';
-import 'package:noveles/features/presentation/views/detail/widgets/card_info_detail.dart';
+import 'package:noveles/features/books/presentation/views/detail/widgets/card_info_detail.dart';
 import 'package:noveles/features/presentation/widgets/widgets.dart';
 
 class DetailView extends StatefulWidget {

@@ -9,8 +9,8 @@ import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 import 'package:noveles/features/tooks/domain/took_entity.dart';
 import 'package:noveles/features/scan/presentation/bloc/scan_took_bloc.dart';
 import 'package:noveles/features/scan/presentation/bloc/scan_chapter_bloc.dart';
-import 'package:noveles/features/presentation/screens/scan/scan_chapter_edit_screen.dart';
-import 'package:noveles/features/presentation/screens/scan/widgets/cover_picker.dart';
+import 'package:noveles/features/scan/presentation/screens/scan_chapter_edit_screen.dart';
+import 'package:noveles/features/scan/presentation/screens/widgets/cover_picker.dart';
 
 class ScanTookEditScreen extends StatefulWidget {
   final TookEntity? took;

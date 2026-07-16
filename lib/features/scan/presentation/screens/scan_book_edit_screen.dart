@@ -8,10 +8,10 @@ import 'package:noveles/features/books/domain/book_with_relations.dart';
 import 'package:noveles/features/genres/domain/genre_entity.dart';
 import 'package:noveles/features/tooks/domain/took_entity.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
-import 'package:noveles/features/presentation/screens/scan/scan_took_edit_screen.dart';
-import 'package:noveles/features/presentation/screens/scan/widgets/cover_picker.dart';
-import 'package:noveles/features/presentation/screens/scan/widgets/genre_selector.dart';
-import 'package:noveles/features/presentation/screens/scan/widgets/took_list_section.dart';
+import 'package:noveles/features/scan/presentation/screens/scan_took_edit_screen.dart';
+import 'package:noveles/features/scan/presentation/screens/widgets/cover_picker.dart';
+import 'package:noveles/features/scan/presentation/screens/widgets/genre_selector.dart';
+import 'package:noveles/features/scan/presentation/screens/widgets/took_list_section.dart';
 
 class ScanBookEditScreen extends StatefulWidget {
   final BookWithRelations? book;

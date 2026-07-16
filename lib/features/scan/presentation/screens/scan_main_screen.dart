@@ -6,7 +6,7 @@ import 'package:noveles/core/cover/cover_url_service.dart';
 import 'package:noveles/features/books/domain/book_with_relations.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
 import 'package:noveles/features/presentation/widgets/app_drawer.dart';
-import 'package:noveles/features/presentation/screens/scan/scan_book_edit_screen.dart';
+import 'package:noveles/features/scan/presentation/screens/scan_book_edit_screen.dart';
 
 class ScanMainScreen extends StatefulWidget {
   const ScanMainScreen({super.key});

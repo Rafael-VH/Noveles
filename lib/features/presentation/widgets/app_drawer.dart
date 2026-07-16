@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/cover/cover_url_service.dart';
 import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
-import 'package:noveles/features/presentation/screens/admin/admin_main_screen.dart';
-import 'package:noveles/features/presentation/screens/profile/profile_screen.dart';
+import 'package:noveles/features/admin/presentation/screens/admin_main_screen.dart';
+import 'package:noveles/features/profiles/presentation/screens/profile_screen.dart';
 
 class AppDrawer extends StatelessWidget {
   final bool isScan;

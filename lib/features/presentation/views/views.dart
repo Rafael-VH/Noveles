@@ -1,3 +1,3 @@
 //
-export 'package:noveles/features/presentation/views/detail/detail_view.dart';
-export 'package:noveles/features/presentation/views/took/took_view.dart';
+export 'package:noveles/features/books/presentation/views/detail/detail_view.dart';
+export 'package:noveles/features/tooks/presentation/views/took_view.dart';
