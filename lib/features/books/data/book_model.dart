@@ -1,9 +1,11 @@
+import 'package:noveles/core/utils/parse_utils.dart';
 import 'package:noveles/features/genres/data/genre_model.dart';
 import 'package:noveles/features/labels/data/label_model.dart';
 import 'package:noveles/features/tooks/data/took_model.dart';
-import 'package:noveles/features/books/domain/book_entity.dart';
+import 'package:noveles/features/books/domain/book_with_relations.dart';
 
-class BookModel extends BookEntity {
+/// Book data model from Supabase — always has joined relation data.
+class BookModel extends BookWithRelations {
   const BookModel({
     required super.id,
     required super.createdAt,
@@ -24,10 +26,13 @@ class BookModel extends BookEntity {
     required super.link,
     required super.isFavorite,
     required super.isVisible,
+    super.listGenreIds = const [],
+    super.listTookIds = const [],
+    super.listLabelIds = const [],
+    super.createdBy,
     required super.listGenre,
     required super.listTook,
     required super.listLabel,
-    super.createdBy,
   });
 
   factory BookModel.fromJson(Map<String, dynamic> json) {
@@ -49,26 +54,29 @@ class BookModel extends BookEntity {
     }).toList();
 
     return BookModel(
-      id: json['id'] as int,
+      id: parseInt(json['id']),
       createdAt: DateTime.parse(json['created_at'] as String),
       cover: (json['cover'] as String?) ?? '',
       name: (json['name'] as String?) ?? '',
       short: (json['short'] as String?) ?? '',
       alternative: (json['alternative'] as String?) ?? '',
       description: (json['description'] as String?) ?? '',
-      authorId: (json['author_id'] as int?) ?? 0,
+      authorId: parseInt(json['author_id'], 0),
       author: (authorData['name'] as String?) ?? '',
       country: (json['country'] as String?) ?? '',
       state: (json['state'] as String?) ?? '',
       type: (json['type'] as String?) ?? '',
       release: (json['release'] as String?) ?? '',
-      tookCount: (json['took_count'] as int?) ?? 0,
-      chapterCount: (json['chapter_count'] as int?) ?? 0,
+      tookCount: parseInt(json['took_count'], 0),
+      chapterCount: parseInt(json['chapter_count'], 0),
       source: (json['source'] as String?) ?? '',
       link: (json['link'] as String?) ?? '',
       isFavorite: (json['is_favorite'] as bool?) ?? false,
       isVisible: (json['is_visible'] as bool?) ?? true,
       createdBy: json['created_by'] as String?,
+      listGenreIds: listGenre.map((g) => g.id).toList(),
+      listTookIds: listTook.map((t) => t.id).toList(),
+      listLabelIds: listLabel.map((l) => l.id).toList(),
       listGenre: listGenre,
       listTook: listTook,
       listLabel: listLabel,
@@ -95,7 +103,8 @@ class BookModel extends BookEntity {
         'created_by': createdBy,
       };
 
-  factory BookModel.fromEntity(BookEntity entity) => BookModel(
+  factory BookModel.fromBookWithRelations(BookWithRelations entity) =>
+      BookModel(
         id: entity.id,
         createdAt: entity.createdAt,
         cover: entity.cover,
@@ -115,6 +124,9 @@ class BookModel extends BookEntity {
         link: entity.link,
         isFavorite: entity.isFavorite,
         isVisible: entity.isVisible,
+        listGenreIds: entity.listGenreIds,
+        listTookIds: entity.listTookIds,
+        listLabelIds: entity.listLabelIds,
         listGenre: entity.listGenre,
         listTook: entity.listTook,
         listLabel: entity.listLabel,

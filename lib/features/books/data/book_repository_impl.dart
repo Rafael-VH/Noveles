@@ -1,10 +1,12 @@
 import 'dart:io';
 import 'package:noveles/core/errors/failure.dart';
 import 'package:noveles/core/errors/result.dart';
+import 'package:noveles/core/constants/storage_constants.dart';
 import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/books/data/book_model.dart';
 import 'package:noveles/features/books/domain/book_entity.dart';
 import 'package:noveles/features/books/domain/book_repository.dart';
+import 'package:noveles/features/books/domain/book_with_relations.dart';
 
 class BookRepositoryImpl implements BookRepository {
   final SupabaseClientProvider _supabase;
@@ -12,8 +14,14 @@ class BookRepositoryImpl implements BookRepository {
   BookRepositoryImpl(this._supabase);
 
   @override
-  Future<Result<List<BookEntity>>> getBooks({bool onlyVisible = false}) async {
+  Future<Result<List<BookWithRelations>>> getBooks({
+    bool onlyVisible = false,
+    int page = 1,
+    int pageSize = 50,
+  }) async {
     try {
+      final offset = (page - 1) * pageSize;
+
       var query = _supabase.client.from('books').select(
           '*, authors(*), books_genres(genre_id, genres(*)), books_labels(*, labels(*)), tooks(*, chapters(*))');
 
@@ -21,7 +29,11 @@ class BookRepositoryImpl implements BookRepository {
         query = query.eq('is_visible', true);
       }
 
-      final response = await query.order('id').limit(100);
+      final response = await query
+          .order('id')
+          .limit(pageSize)
+          .range(offset, offset + pageSize - 1);
+
       final books = response.map((json) => BookModel.fromJson(json)).toList();
       return Ok(books);
     } catch (e) {
@@ -30,7 +42,7 @@ class BookRepositoryImpl implements BookRepository {
   }
 
   @override
-  Future<Result<BookEntity?>> getBookById(int id) async {
+  Future<Result<BookWithRelations?>> getBookById(int id) async {
     try {
       final response = await _supabase.client
           .from('books')
@@ -91,19 +103,19 @@ class BookRepositoryImpl implements BookRepository {
           .select('id')
           .single();
       final newBookId = result['id'];
-      if (book.listGenre.isNotEmpty) {
+      if (book.listGenreIds.isNotEmpty) {
         await _supabase.client.from('books_genres').insert(
-          book.listGenre.map((genre) {
-            return {'book_id': newBookId, 'genre_id': genre.id};
-          }).toList(),
-        );
+              book.listGenreIds.map((genreId) {
+                return {'book_id': newBookId, 'genre_id': genreId};
+              }).toList(),
+            );
       }
-      if (book.listLabel.isNotEmpty) {
+      if (book.listLabelIds.isNotEmpty) {
         await _supabase.client.from('books_labels').insert(
-          book.listLabel.map((label) {
-            return {'book_id': newBookId, 'label_id': label.id};
-          }).toList(),
-        );
+              book.listLabelIds.map((labelId) {
+                return {'book_id': newBookId, 'label_id': labelId};
+              }).toList(),
+            );
       }
       return const Ok(null);
     } catch (e) {
@@ -132,21 +144,27 @@ class BookRepositoryImpl implements BookRepository {
         'is_favorite': book.isFavorite,
         'is_visible': book.isVisible,
       }).eq('id', book.id);
-      await _supabase.client.from('books_genres').delete().eq('book_id', book.id);
-      if (book.listGenre.isNotEmpty) {
+      await _supabase.client
+          .from('books_genres')
+          .delete()
+          .eq('book_id', book.id);
+      if (book.listGenreIds.isNotEmpty) {
         await _supabase.client.from('books_genres').insert(
-          book.listGenre.map((genre) {
-            return {'book_id': book.id, 'genre_id': genre.id};
-          }).toList(),
-        );
+              book.listGenreIds.map((genreId) {
+                return {'book_id': book.id, 'genre_id': genreId};
+              }).toList(),
+            );
       }
-      await _supabase.client.from('books_labels').delete().eq('book_id', book.id);
-      if (book.listLabel.isNotEmpty) {
+      await _supabase.client
+          .from('books_labels')
+          .delete()
+          .eq('book_id', book.id);
+      if (book.listLabelIds.isNotEmpty) {
         await _supabase.client.from('books_labels').insert(
-          book.listLabel.map((label) {
-            return {'book_id': book.id, 'label_id': label.id};
-          }).toList(),
-        );
+              book.listLabelIds.map((labelId) {
+                return {'book_id': book.id, 'label_id': labelId};
+              }).toList(),
+            );
       }
       return const Ok(null);
     } catch (e) {
@@ -176,13 +194,35 @@ class BookRepositoryImpl implements BookRepository {
     }
   }
 
+  static const int maxFileSizeBytes = 5 * 1024 * 1024; // 5MB
+
   @override
   Future<Result<String>> uploadCover(String filePath) async {
     try {
       final file = File(filePath);
-      final ext = filePath.split('.').last;
+
+      // Validar tamaño
+      final fileSize = await file.length();
+      if (fileSize > maxFileSizeBytes) {
+        return Err(BookFailure(
+          'El archivo es demasiado grande. Máximo: 5MB',
+        ));
+      }
+
+      // Validar extensión
+      final ext =
+          filePath.contains('.') ? filePath.split('.').last.toLowerCase() : '';
+      final allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+      if (!allowedExtensions.contains(ext)) {
+        return Err(BookFailure(
+          'Formato no permitido. Usa: JPG, PNG, o WebP',
+        ));
+      }
+
       final filename = '${DateTime.now().millisecondsSinceEpoch}.$ext';
-      await _supabase.client.storage.from('covers').upload(filename, file);
+      await _supabase.client.storage
+          .from(StorageConstants.coversBucket)
+          .upload(filename, file);
       return Ok(filename);
     } catch (e) {
       return Err(BookFailure('Error al subir cover', cause: e));
@@ -190,9 +230,15 @@ class BookRepositoryImpl implements BookRepository {
   }
 
   @override
-  Future<Result<Map<int, Set<int>>>> getBookLabels() async {
+  Future<Result<Map<int, Set<int>>>> getBookLabels(
+      List<BookEntity> books) async {
     try {
-      final rows = await _supabase.client.from('books_labels').select();
+      if (books.isEmpty) return const Ok({});
+      final ids = books.map((b) => b.id).toList();
+      final rows = await _supabase.client
+          .from('books_labels')
+          .select()
+          .filter('book_id', 'in', ids);
       final map = <int, Set<int>>{};
       for (final row in rows) {
         map.putIfAbsent(row['book_id'], () => {}).add(row['label_id']);

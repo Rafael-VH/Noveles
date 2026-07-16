@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:noveles/core/cover/cover_url_service.dart';
 import 'package:noveles/core/di/injection.dart';
-import 'package:noveles/features/books/domain/book_entity.dart';
+import 'package:noveles/features/books/domain/book_with_relations.dart';
 import 'package:noveles/features/genres/domain/genre_entity.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
 import 'package:noveles/features/presentation/screens/screens.dart';
@@ -16,33 +17,20 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  late final BookBloc _bookBloc;
-  late final GenreBloc _genreBloc;
-
-  @override
-  void initState() {
-    super.initState();
-    _bookBloc = BookBloc(
-      getBooks: getIt(),
-      getBookById: getIt(),
-      onlyVisible: true,
-    )..add(LoadBooks());
-    _genreBloc = getIt<GenreBloc>()..add(LoadGenres());
-  }
-
-  @override
-  void dispose() {
-    _bookBloc.close();
-    _genreBloc.close();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider.value(value: _bookBloc),
-        BlocProvider.value(value: _genreBloc),
+        BlocProvider(
+          create: (_) => BookBloc(
+            getBooks: getIt(),
+            getBookById: getIt(),
+            onlyVisible: true,
+          )..add(LoadBooks()),
+        ),
+        BlocProvider(
+          create: (_) => getIt<GenreBloc>()..add(LoadGenres()),
+        ),
       ],
       child: Scaffold(
         drawer: const AppDrawer(),
@@ -50,12 +38,10 @@ class _MainScreenState extends State<MainScreen> {
           builder: (context, bookState) {
             return BlocBuilder<GenreBloc, GenreState>(
               builder: (context, genreState) {
-                // Manejo de estados: muestra un indicador de carga, mensajes de error o el contenido principal según el estado actual de los blocs.
                 if (bookState is BookLoading || genreState is GenreLoading) {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                // Manejo de errores: muestra un mensaje de error y un botón para reintentar la carga de datos si ocurre un error en cualquiera de los blocs.
                 if (bookState is BookError) {
                   return Center(
                     child: Column(
@@ -73,7 +59,6 @@ class _MainScreenState extends State<MainScreen> {
                   );
                 }
 
-                // Manejo de errores: muestra un mensaje de error y un botón para reintentar la carga de datos si ocurre un error en cualquiera de los blocs.
                 if (genreState is GenreError) {
                   return Center(
                     child: Column(
@@ -91,14 +76,12 @@ class _MainScreenState extends State<MainScreen> {
                   );
                 }
 
-                // Si ambos blocs han cargado correctamente, se construye el contenido principal de la pantalla utilizando los datos de libros y géneros.
                 if (bookState is BookLoaded && genreState is GenreLoaded) {
                   final listBook = bookState.books;
                   final listGenre = genreState.genres;
                   return _buildContent(context, listBook, listGenre);
                 }
 
-                // Estado por defecto: muestra un indicador de carga mientras se espera la carga de datos.
                 return const Center(child: CircularProgressIndicator());
               },
             );
@@ -108,10 +91,9 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  // Construye el contenido principal de la pantalla, incluyendo el carrusel de libros y la lista de géneros.
   Widget _buildContent(
     BuildContext context,
-    List<BookEntity> listBook,
+    List<BookWithRelations> listBook,
     List<GenreEntity> listGenre,
   ) {
     return SafeArea(
@@ -123,7 +105,7 @@ class _MainScreenState extends State<MainScreen> {
             onBookTap: (book) => Navigator.push(
               context,
               PageRouteBuilder(
-                pageBuilder: (_, __, ___) => BookScreen(books: book),
+                pageBuilder: (_, __, ___) => BookScreen(book: book),
                 transitionDuration: const Duration(seconds: 1),
               ),
             ),
@@ -157,6 +139,7 @@ class _MainScreenState extends State<MainScreen> {
                                 builder: (context) => GenreScreen(
                                   genre: item.name,
                                   books: listBook,
+                                  coverUrlService: getIt<CoverUrlService>(),
                                 ),
                               ),
                             );

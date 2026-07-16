@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/core/errors/failure.dart';
-import 'package:noveles/features/books/domain/book_entity.dart';
+import 'package:noveles/features/books/domain/book_with_relations.dart';
 import 'package:noveles/features/books/domain/get_book.dart';
 import 'package:noveles/features/books/domain/get_book_by_id.dart';
 import 'package:noveles/features/presentation/bloc/book/book_bloc.dart';
@@ -34,7 +34,7 @@ void main() {
 
   group('BookBloc', () {
     final testBooks = [
-      BookEntity(
+      BookWithRelations(
         id: 1,
         createdAt: DateTime(2024),
         cover: 'cover1.jpg',
@@ -54,9 +54,9 @@ void main() {
         link: '',
         isFavorite: false,
         isVisible: true,
-        listGenre: const [],
-        listTook: const [],
-        listLabel: const [],
+        listGenreIds: const [],
+        listTookIds: const [],
+        listLabelIds: const [],
       ),
     ];
 
@@ -110,7 +110,7 @@ void main() {
       'emits [BookLoading, BookError] when book is null',
       build: () {
         when(() => mockGetBookById(999))
-            .thenAnswer((_) async => Ok<BookEntity?>(null));
+            .thenAnswer((_) async => Ok<BookWithRelations?>(null));
         return bookBloc;
       },
       act: (bloc) => bloc.add(LoadBookById(999)),

@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:noveles/features/books/domain/book_entity.dart';
+import 'package:noveles/features/books/domain/book_with_relations.dart';
 import 'package:noveles/features/genres/domain/genre_entity.dart';
 import 'package:noveles/features/tooks/domain/took_entity.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
@@ -11,7 +14,7 @@ import 'package:noveles/features/presentation/screens/scan/widgets/genre_selecto
 import 'package:noveles/features/presentation/screens/scan/widgets/took_list_section.dart';
 
 class ScanBookEditScreen extends StatefulWidget {
-  final BookEntity? book;
+  final BookWithRelations? book;
 
   const ScanBookEditScreen({super.key, this.book});
 
@@ -57,9 +60,9 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
     _releaseCtrl = TextEditingController(text: b?.release ?? '');
     _sourceCtrl = TextEditingController(text: b?.source ?? '');
     _linkCtrl = TextEditingController(text: b?.link ?? '');
-    _selectedGenreIds = b?.listGenre.map((g) => g.id).toSet() ?? {};
+    _selectedGenreIds = b?.listGenreIds.toSet() ?? {};
     _bookId = widget.book?.id;
-    _tooks = widget.book?.listTook ?? [];
+    _tooks = widget.book?.listTook.toList() ?? [];
     context.read<ScanBloc>().add(LoadScanGenres());
   }
 
@@ -116,23 +119,28 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
       link: _linkCtrl.text.trim(),
       isFavorite: widget.book?.isFavorite ?? false,
       isVisible: widget.book?.isVisible ?? false,
-      listLabel: widget.book?.listLabel ?? [],
-      listGenre:
-          _allGenres.where((g) => _selectedGenreIds.contains(g.id)).toList(),
-      listTook: _tooks,
+      listLabelIds: widget.book?.listLabelIds ?? [],
+      listGenreIds: _selectedGenreIds.toList(),
+      listTookIds: _tooks.map((t) => t.id).toList(),
     );
 
     // Save book
     if (mounted) setState(() => _isSaving = true);
 
     // Listen for result
+    final bloc = context.read<ScanBloc>();
+    final completer = Completer<ScanState>();
+    late StreamSubscription sub;
+    sub = bloc.stream.listen((s) {
+      if (s is ScanLoaded || s is ScanError) {
+        sub.cancel();
+        if (!completer.isCompleted) completer.complete(s);
+      }
+    });
+    bloc.add(SaveScanBook(book, isUpdate: _isEditing));
+
     try {
-      final bloc = context.read<ScanBloc>();
-      final future = bloc.stream.firstWhere(
-        (s) => s is ScanLoaded || s is ScanError,
-      );
-      bloc.add(SaveScanBook(book, isUpdate: _isEditing));
-      final result = await future;
+      final result = await completer.future.timeout(const Duration(seconds: 10));
       if (result is ScanLoaded && mounted) {
         if (_isEditing) return widget.book;
         // New book — capture the real DB-generated ID from the reloaded list
@@ -149,7 +157,18 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
               backgroundColor: Theme.of(context).colorScheme.error),
         );
       }
+    } on TimeoutException {
+      sub.cancel();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('La operación tardó demasiado'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
     } finally {
+      sub.cancel();
       if (mounted) setState(() => _isSaving = false);
     }
     return null;
@@ -374,29 +393,50 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
                       },
                       onDeleteTook: (tookId) async {
                         final bloc = context.read<ScanTookBloc>();
-                        final future = bloc.stream.firstWhere(
-                          (s) => s is ScanTookLoaded || s is ScanTookError,
-                        );
+                        final completer = Completer<ScanTookState>();
+                        late StreamSubscription sub;
+                        sub = bloc.stream.listen((s) {
+                          if (s is ScanTookLoaded || s is ScanTookError) {
+                            sub.cancel();
+                            if (!completer.isCompleted) completer.complete(s);
+                          }
+                        });
                         bloc.add(DeleteScanTook(tookId));
-                        final result = await future;
-                        if (result is ScanTookLoaded && mounted) {
-                          setState(
-                              () => _tooks.removeWhere((t) => t.id == tookId));
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(result.message ?? 'Tomo eliminado'),
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.tertiary,
-                            ),
-                          );
-                        } else if (result is ScanTookError && mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(result.message),
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.error,
-                            ),
-                          );
+                        try {
+                          final result = await completer.future
+                              .timeout(const Duration(seconds: 10));
+                          if (result is ScanTookLoaded && mounted) {
+                            setState(() =>
+                                _tooks.removeWhere((t) => t.id == tookId));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content:
+                                    Text(result.message ?? 'Tomo eliminado'),
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.tertiary,
+                              ),
+                            );
+                          } else if (result is ScanTookError && mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(result.message),
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.error,
+                              ),
+                            );
+                          }
+                        } on TimeoutException {
+                          sub.cancel();
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content:
+                                    const Text('La operación tardó demasiado'),
+                                backgroundColor:
+                                    Theme.of(context).colorScheme.error,
+                              ),
+                            );
+                          }
                         }
                       },
                     ),

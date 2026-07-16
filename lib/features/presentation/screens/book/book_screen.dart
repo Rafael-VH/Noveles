@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:noveles/features/books/domain/book_entity.dart';
+import 'package:noveles/features/books/domain/book_with_relations.dart';
 import 'package:noveles/features/presentation/screens/book/widgets/sliver_app_bar_book.dart';
 import 'package:noveles/features/presentation/screens/book/widgets/sliver_persistent_header_book.dart';
 import 'package:noveles/features/presentation/screens/screens.dart';
 import 'package:noveles/features/presentation/views/views.dart';
 
 class BookScreen extends StatefulWidget {
-  final BookEntity books;
+  final BookWithRelations book;
 
-  const BookScreen({super.key, required this.books});
+  const BookScreen({super.key, required this.book});
 
   @override
   State<BookScreen> createState() => _BookScreenState();
@@ -54,7 +54,7 @@ class _BookScreenState extends State<BookScreen>
         child: NestedScrollView(
           headerSliverBuilder: (context, _) {
             return [
-              SliverAppBarBook(books: widget.books),
+              SliverAppBarBook(books: widget.book),
               SliverPersistentHeaderBook(
                 tabController: _tabController,
                 tabs: nameTab,
@@ -64,9 +64,9 @@ class _BookScreenState extends State<BookScreen>
           body: TabBarView(
             controller: _tabController,
             children: [
-              DetailView(books: widget.books),
+              DetailView(books: widget.book),
               TookView(
-                tooks: widget.books.listTook,
+                tooks: widget.book.listTook,
                 onTookTap: (took) => Navigator.push(
                   context,
                   MaterialPageRoute(

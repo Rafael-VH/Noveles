@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:noveles/features/books/domain/book_entity.dart';
+import 'package:noveles/features/books/domain/book_with_relations.dart';
 
 abstract class AdminState extends Equatable {
   const AdminState();
@@ -17,7 +17,7 @@ class AdminLoading extends AdminState {
 }
 
 class AdminLoaded extends AdminState {
-  final List<BookEntity> books;
+  final List<BookWithRelations> books;
   final String? message;
 
   const AdminLoaded(this.books, {this.message});

@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/core/errors/failure.dart';
-import 'package:noveles/features/books/domain/book_entity.dart';
+import 'package:noveles/features/books/domain/book_with_relations.dart';
 import 'package:noveles/features/genres/domain/genre_entity.dart';
 import 'package:noveles/features/books/domain/get_book.dart';
 import 'package:noveles/features/books/domain/create_book.dart';
@@ -41,7 +41,7 @@ void main() {
   late ScanBloc scanBloc;
 
   final testBooks = [
-    BookEntity(
+    BookWithRelations(
       id: 1,
       createdAt: DateTime(2024),
       cover: 'cover.png',
@@ -61,14 +61,14 @@ void main() {
       link: '',
       isFavorite: false,
       isVisible: true,
-      listGenre: const [],
-      listTook: const [],
-      listLabel: const [],
+      listGenreIds: const [],
+      listTookIds: const [],
+      listLabelIds: const [],
     ),
   ];
 
   setUpAll(() {
-    registerFallbackValue(BookEntity(
+    registerFallbackValue(BookWithRelations(
       id: 0,
       createdAt: DateTime(2024),
       cover: '',
@@ -88,9 +88,9 @@ void main() {
       link: '',
       isFavorite: false,
       isVisible: true,
-      listGenre: const [],
-      listTook: const [],
-      listLabel: const [],
+      listGenreIds: const [],
+      listTookIds: const [],
+      listLabelIds: const [],
     ));
     registerFallbackValue(GenreEntity(
       id: 0,

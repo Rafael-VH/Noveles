@@ -1,8 +1,7 @@
 import 'package:equatable/equatable.dart';
-import 'package:noveles/features/genres/domain/genre_entity.dart';
-import 'package:noveles/features/labels/domain/label_entity.dart';
-import 'package:noveles/features/tooks/domain/took_entity.dart';
 
+/// Core book entity — contains only scalar fields and relation IDs.
+/// No imports from other features (genres, labels, tooks).
 class BookEntity extends Equatable {
   final int id;
   final DateTime createdAt;
@@ -23,9 +22,9 @@ class BookEntity extends Equatable {
   final String link;
   final bool isFavorite;
   final bool isVisible;
-  final List<GenreEntity> listGenre;
-  final List<TookEntity> listTook;
-  final List<LabelEntity> listLabel;
+  final List<int> listGenreIds;
+  final List<int> listTookIds;
+  final List<int> listLabelIds;
   final String? createdBy;
 
   const BookEntity({
@@ -48,9 +47,9 @@ class BookEntity extends Equatable {
     required this.link,
     required this.isFavorite,
     required this.isVisible,
-    required this.listGenre,
-    required this.listTook,
-    required this.listLabel,
+    this.listGenreIds = const [],
+    this.listTookIds = const [],
+    this.listLabelIds = const [],
     this.createdBy,
   });
 
@@ -74,9 +73,9 @@ class BookEntity extends Equatable {
     String? link,
     bool? isFavorite,
     bool? isVisible,
-    List<GenreEntity>? listGenre,
-    List<TookEntity>? listTook,
-    List<LabelEntity>? listLabel,
+    List<int>? listGenreIds,
+    List<int>? listTookIds,
+    List<int>? listLabelIds,
     String? createdBy,
   }) {
     return BookEntity(
@@ -99,9 +98,9 @@ class BookEntity extends Equatable {
       link: link ?? this.link,
       isFavorite: isFavorite ?? this.isFavorite,
       isVisible: isVisible ?? this.isVisible,
-      listGenre: listGenre ?? this.listGenre,
-      listTook: listTook ?? this.listTook,
-      listLabel: listLabel ?? this.listLabel,
+      listGenreIds: listGenreIds ?? this.listGenreIds,
+      listTookIds: listTookIds ?? this.listTookIds,
+      listLabelIds: listLabelIds ?? this.listLabelIds,
       createdBy: createdBy ?? this.createdBy,
     );
   }
@@ -127,9 +126,9 @@ class BookEntity extends Equatable {
         link,
         isFavorite,
         isVisible,
-        listGenre,
-        listTook,
-        listLabel,
+        listGenreIds,
+        listTookIds,
+        listLabelIds,
         createdBy,
       ];
 }

@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:noveles/features/books/domain/book_entity.dart';
+import 'package:noveles/features/books/domain/book_with_relations.dart';
 
 abstract class BookState extends Equatable {
   @override
@@ -11,7 +11,7 @@ class BookInitial extends BookState {}
 class BookLoading extends BookState {}
 
 class BookLoaded extends BookState {
-  final List<BookEntity> books;
+  final List<BookWithRelations> books;
 
   BookLoaded(this.books);
 
@@ -29,7 +29,7 @@ class BookError extends BookState {
 }
 
 class BookDetailLoaded extends BookState {
-  final BookEntity book;
+  final BookWithRelations book;
 
   BookDetailLoaded(this.book);
 

@@ -90,7 +90,7 @@ void main() {
       'emits [LabelLoading, LabelLoaded] when LoadLabels succeeds',
       build: () {
         when(() => mockGetLabels()).thenAnswer((_) async => Ok(testLabels));
-        when(() => mockGetBookLabels())
+        when(() => mockGetBookLabels(any()))
             .thenAnswer((_) async => Ok(testBookLabels));
         return LabelBloc(
           getLabels: mockGetLabels,
@@ -141,7 +141,7 @@ void main() {
         when(() => mockCreateLabel(any()))
             .thenAnswer((_) async => const Ok(null));
         when(() => mockGetLabels()).thenAnswer((_) async => Ok(testLabels));
-        when(() => mockGetBookLabels())
+        when(() => mockGetBookLabels(any()))
             .thenAnswer((_) async => Ok(testBookLabels));
         return LabelBloc(
           getLabels: mockGetLabels,
@@ -192,7 +192,7 @@ void main() {
         when(() => mockAssignLabel(any(), any()))
             .thenAnswer((_) async => const Ok(null));
         when(() => mockGetLabels()).thenAnswer((_) async => Ok(testLabels));
-        when(() => mockGetBookLabels())
+        when(() => mockGetBookLabels(any()))
             .thenAnswer((_) async => Ok(testBookLabels));
         return LabelBloc(
           getLabels: mockGetLabels,
@@ -243,7 +243,7 @@ void main() {
         when(() => mockRemoveLabel(any(), any()))
             .thenAnswer((_) async => const Ok(null));
         when(() => mockGetLabels()).thenAnswer((_) async => Ok(testLabels));
-        when(() => mockGetBookLabels())
+        when(() => mockGetBookLabels(any()))
             .thenAnswer((_) async => Ok(testBookLabels));
         return LabelBloc(
           getLabels: mockGetLabels,
@@ -270,7 +270,7 @@ void main() {
         when(() => mockDeleteLabel(any()))
             .thenAnswer((_) async => const Ok(null));
         when(() => mockGetLabels()).thenAnswer((_) async => Ok(testLabels));
-        when(() => mockGetBookLabels())
+        when(() => mockGetBookLabels(any()))
             .thenAnswer((_) async => Ok(testBookLabels));
         return LabelBloc(
           getLabels: mockGetLabels,

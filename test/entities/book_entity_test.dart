@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:noveles/features/books/domain/book_entity.dart';
-import 'package:noveles/features/labels/domain/label_entity.dart';
 
 void main() {
   group('BookEntity', () {
@@ -24,25 +23,19 @@ void main() {
       link: '',
       isFavorite: false,
       isVisible: true,
-      listGenre: const [],
-      listTook: const [],
-      listLabel: const [],
+      listGenreIds: const [],
+      listTookIds: const [],
+      listLabelIds: const [],
       createdBy: null,
     );
 
     test('creates with required values', () {
       expect(baseBook.id, 1);
       expect(baseBook.name, 'Test Book');
-      expect(baseBook.listLabel, []);
+      expect(baseBook.listLabelIds, []);
     });
 
-    test('listLabel accepts labels', () {
-      final label = LabelEntity(
-        id: 1,
-        createdAt: DateTime(2026),
-        name: 'Staff Pick',
-        color: '#71A202',
-      );
+    test('listLabelIds accepts label ids', () {
       final book = BookEntity(
         id: 1,
         createdAt: DateTime(2026),
@@ -63,13 +56,13 @@ void main() {
         link: '',
         isFavorite: false,
         isVisible: true,
-        listGenre: const [],
-        listTook: const [],
-        listLabel: [label],
+        listGenreIds: const [],
+        listTookIds: const [],
+        listLabelIds: [1],
         createdBy: null,
       );
-      expect(book.listLabel.length, 1);
-      expect(book.listLabel.first.name, 'Staff Pick');
+      expect(book.listLabelIds.length, 1);
+      expect(book.listLabelIds.first, 1);
     });
 
     test('createdBy is nullable and settable', () {
@@ -94,9 +87,9 @@ void main() {
         link: '',
         isFavorite: false,
         isVisible: true,
-        listGenre: const [],
-        listTook: const [],
-        listLabel: const [],
+        listGenreIds: const [],
+        listTookIds: const [],
+        listLabelIds: const [],
         createdBy: 'user-uuid',
       );
       expect(withCreator.createdBy, 'user-uuid');
@@ -113,7 +106,7 @@ void main() {
     });
 
     test('props includes listLabel', () {
-      expect(baseBook.props.contains(baseBook.listLabel), true);
+      expect(baseBook.props.contains(baseBook.listLabelIds), true);
     });
   });
 }

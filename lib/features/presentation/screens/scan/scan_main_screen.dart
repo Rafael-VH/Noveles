@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/core/cover/cover_url_service.dart';
-import 'package:noveles/features/books/domain/book_entity.dart';
+import 'package:noveles/features/books/domain/book_with_relations.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
 import 'package:noveles/features/presentation/widgets/app_drawer.dart';
 import 'package:noveles/features/presentation/screens/scan/scan_book_edit_screen.dart';
@@ -191,7 +191,7 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
   }
 
   // Edit Book
-  void _editBook(BuildContext context, BookEntity book) {
+  void _editBook(BuildContext context, BookWithRelations book) {
     Navigator.push(
       context,
       MaterialPageRoute(

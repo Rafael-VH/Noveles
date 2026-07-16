@@ -1,4 +1,5 @@
 export 'package:noveles/features/books/domain/book_entity.dart';
+export 'package:noveles/features/books/domain/book_with_relations.dart';
 export 'package:noveles/features/books/domain/book_repository.dart';
 export 'package:noveles/features/books/domain/text_stats.dart';
 export 'package:noveles/features/books/domain/create_book.dart';

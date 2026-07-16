@@ -3,13 +3,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:noveles/core/cover/cover_url_service.dart';
 import 'package:noveles/core/di/injection.dart';
-import 'package:noveles/features/books/domain/book_entity.dart';
+import 'package:noveles/features/books/domain/book_with_relations.dart';
 import 'package:noveles/features/presentation/widgets/label_badge.dart';
 
 class SliverAppBarHome extends StatelessWidget {
-  final List<BookEntity> listBook;
+  final List<BookWithRelations> listBook;
   final List<Widget> actions;
-  final void Function(BookEntity book) onBookTap;
+  final void Function(BookWithRelations book) onBookTap;
 
   const SliverAppBarHome({
     super.key,

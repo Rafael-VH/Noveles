@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/errors/result.dart';
-import 'package:noveles/features/books/domain/book_entity.dart';
+import 'package:noveles/features/books/domain/book_with_relations.dart';
 import 'package:noveles/features/books/domain/get_book.dart';
 import 'package:noveles/features/books/domain/create_book.dart';
 import 'package:noveles/features/books/domain/update_book.dart';
@@ -64,7 +64,7 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
         final books = switch (currentState) {
           ScanLoaded(:final books) => books,
           ScanGenresLoaded(:final books) => books,
-          _ => <BookEntity>[],
+          _ => <BookWithRelations>[],
         };
         emit(ScanGenresLoaded(books, value));
       case Err(:final error):
@@ -100,7 +100,7 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
       case Ok():
         final previousBooks = switch (state) {
           ScanLoaded(:final books) => books,
-          _ => <BookEntity>[],
+          _ => <BookWithRelations>[],
         };
         final booksResult = await getBooks();
         switch (booksResult) {
@@ -127,7 +127,7 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
       case Ok():
         final previousBooks = switch (state) {
           ScanLoaded(:final books) => books,
-          _ => <BookEntity>[],
+          _ => <BookWithRelations>[],
         };
         final booksResult = await getBooks();
         switch (booksResult) {
@@ -154,7 +154,7 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
       case Ok():
         final previousBooks = switch (state) {
           ScanLoaded(:final books) => books,
-          _ => <BookEntity>[],
+          _ => <BookWithRelations>[],
         };
         final booksResult = await getBooks();
         switch (booksResult) {

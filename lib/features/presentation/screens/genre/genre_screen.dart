@@ -1,25 +1,26 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
 import 'package:noveles/core/cover/cover_url_service.dart';
-import 'package:noveles/features/books/domain/book_entity.dart';
+import 'package:noveles/features/books/domain/book_with_relations.dart';
 
 class GenreScreen extends StatefulWidget {
   const GenreScreen({
     super.key,
     required this.genre,
     required this.books,
+    required this.coverUrlService,
   });
 
   final String genre;
-  final List<BookEntity> books;
+  final List<BookWithRelations> books;
+  final CoverUrlService coverUrlService;
 
   @override
   State<GenreScreen> createState() => _GenreScreenState();
 }
 
 class _GenreScreenState extends State<GenreScreen> {
-  late final List<BookEntity> filteredBooks;
+  late final List<BookWithRelations> filteredBooks;
 
   @override
   void initState() {
@@ -56,7 +57,7 @@ class _GenreScreenState extends State<GenreScreen> {
                       Positioned.fill(
                         child: CachedNetworkImage(
                           fit: BoxFit.cover,
-                          imageUrl: GetIt.instance<CoverUrlService>()(book.cover),
+                          imageUrl: widget.coverUrlService(book.cover),
                           errorWidget: (_, __, ___) =>
                               const Icon(Icons.book, size: 48),
                         ),
