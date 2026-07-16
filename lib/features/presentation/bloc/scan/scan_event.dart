@@ -6,22 +6,28 @@ import 'package:noveles/features/books/domain/book_entity.dart';
 // designed to trigger state changes in the ScanBloc, allowing the UI to react accordingly based on the latest data from the backend
 // and user interactions.
 abstract class ScanEvent extends Equatable {
+  const ScanEvent();
+
   @override
   List<Object> get props => [];
 }
 
 // Load the list of books and emit the loaded state with the retrieved books to update the UI with the latest data from the backend.
-class LoadScanBooks extends ScanEvent {}
+class LoadScanBooks extends ScanEvent {
+  const LoadScanBooks();
+}
 
 // Load the list of genres and emit the loaded state with the retrieved genres to update the UI with the latest data from the backend.
-class LoadScanGenres extends ScanEvent {}
+class LoadScanGenres extends ScanEvent {
+  const LoadScanGenres();
+}
 
 // Upload a cover image and emit the uploaded state with the filename to update the UI with the new cover image after a successful
 // upload, ensuring a responsive user experience.
 class UploadScanCover extends ScanEvent {
   final String filePath;
 
-  UploadScanCover(this.filePath);
+  const UploadScanCover(this.filePath);
 
   @override
   List<Object> get props => [filePath];
@@ -33,7 +39,7 @@ class SaveScanBook extends ScanEvent {
   final BookEntity book;
   final bool isUpdate;
 
-  SaveScanBook(this.book, {required this.isUpdate});
+  const SaveScanBook(this.book, {required this.isUpdate});
 
   @override
   List<Object> get props => [book, isUpdate];
@@ -44,7 +50,7 @@ class SaveScanBook extends ScanEvent {
 class DeleteScanBook extends ScanEvent {
   final int bookId;
 
-  DeleteScanBook(this.bookId);
+  const DeleteScanBook(this.bookId);
 
   @override
   List<Object> get props => [bookId];
@@ -56,7 +62,7 @@ class ToggleScanBookVisibility extends ScanEvent {
   final int bookId;
   final bool isVisible;
 
-  ToggleScanBookVisibility(this.bookId, this.isVisible);
+  const ToggleScanBookVisibility(this.bookId, this.isVisible);
 
   @override
   List<Object> get props => [bookId, isVisible];

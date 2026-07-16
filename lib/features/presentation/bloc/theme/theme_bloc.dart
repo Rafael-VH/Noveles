@@ -5,10 +5,13 @@ import 'package:noveles/features/presentation/bloc/theme/theme_event.dart';
 import 'package:noveles/features/presentation/bloc/theme/theme_state.dart';
 
 class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
-  ThemeBloc() : super(ThemeState(DarkTheme.darkTheme)) {
+  ThemeBloc() : super(ThemeState(
+          isDarkMode: true, themeData: DarkTheme.darkTheme)) {
     on<ThemeChanged>((event, emit) {
       emit(ThemeState(
-        event.isDarkMode ? DarkTheme.darkTheme : LightTheme.lightTheme,
+        isDarkMode: event.isDarkMode,
+        themeData:
+            event.isDarkMode ? DarkTheme.darkTheme : LightTheme.lightTheme,
       ));
     });
   }

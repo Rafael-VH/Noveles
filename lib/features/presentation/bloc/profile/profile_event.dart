@@ -2,17 +2,21 @@ import 'dart:io';
 import 'package:equatable/equatable.dart';
 
 abstract class ProfileEvent extends Equatable {
+  const ProfileEvent();
+
   @override
   List<Object> get props => [];
 }
 
-class LoadProfile extends ProfileEvent {}
+class LoadProfile extends ProfileEvent {
+  const LoadProfile();
+}
 
 class UpdateProfile extends ProfileEvent {
   final String? displayName;
   final String? bio;
 
-  UpdateProfile({this.displayName, this.bio});
+  const UpdateProfile({this.displayName, this.bio});
 
   @override
   List<Object> get props => [displayName ?? '', bio ?? ''];
@@ -21,7 +25,7 @@ class UpdateProfile extends ProfileEvent {
 class PickAvatar extends ProfileEvent {
   final File file;
 
-  PickAvatar(this.file);
+  const PickAvatar(this.file);
 
   @override
   List<Object> get props => [file.path];
@@ -30,7 +34,7 @@ class PickAvatar extends ProfileEvent {
 class ChangePassword extends ProfileEvent {
   final String newPassword;
 
-  ChangePassword(this.newPassword);
+  const ChangePassword(this.newPassword);
 
   @override
   List<Object> get props => [newPassword];

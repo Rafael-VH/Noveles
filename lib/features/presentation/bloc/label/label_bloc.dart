@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/errors/result.dart';
-import 'package:noveles/core/presentation/notification_service.dart';
 import 'package:noveles/features/labels/domain/label_entity.dart';
 import 'package:noveles/features/labels/domain/get_labels.dart';
 import 'package:noveles/features/labels/domain/create_label.dart';
@@ -39,17 +38,15 @@ class LabelBloc extends Bloc<LabelEvent, LabelState> {
     switch (labelsResult) {
       case Ok(:final value):
         final loadedLabels = value;
-        final bookLabelsResult = await getBookLabels();
+        final bookLabelsResult = await getBookLabels([]);
         switch (bookLabelsResult) {
           case Ok(:final value):
             emit(LabelLoaded(loadedLabels, value, message: message));
           case Err(:final error):
-            NotificationService.error(
-                'Error al actualizar las etiquetas de libros: ${error.message}');
+            emit(LabelError(error.message));
         }
       case Err(:final error):
-        NotificationService.error(
-            'Error al actualizar las etiquetas: ${error.message}');
+        emit(LabelError(error.message));
     }
   }
 
@@ -59,35 +56,41 @@ class LabelBloc extends Bloc<LabelEvent, LabelState> {
     switch (labelsResult) {
       case Ok(:final value):
         final loadedLabels = value;
-        final bookLabelsResult = await getBookLabels();
+        final bookLabelsResult = await getBookLabels([]);
         switch (bookLabelsResult) {
           case Ok(:final value):
             emit(LabelLoaded(loadedLabels, value));
           case Err(:final error):
             emit(LabelError(error.message));
-            NotificationService.error(
-                'Error al cargar etiquetas de libros: ${error.message}');
         }
       case Err(:final error):
         emit(LabelError(error.message));
-        NotificationService.error('Error al cargar etiquetas: ${error.message}');
     }
   }
 
   Future<void> _onCreateLabel(
       CreateLabelEvent event, Emitter<LabelState> emit) async {
-    final result = await createLabel(LabelEntity(
+    final entity = LabelEntity(
       id: 0,
       createdAt: DateTime.now(),
       name: event.name,
       color: event.color,
-    ));
+    );
+    final result = await createLabel(entity);
     switch (result) {
       case Ok():
-        await _emitLoaded(emit, message: 'Etiqueta creada');
+        final current = state is LabelLoaded ? state as LabelLoaded : null;
+        if (current != null) {
+          emit(LabelLoaded(
+            [...current.labels, entity],
+            current.bookLabels,
+            message: 'Etiqueta creada',
+          ));
+        } else {
+          await _emitLoaded(emit, message: 'Etiqueta creada');
+        }
       case Err(:final error):
         emit(LabelError(error.message));
-        NotificationService.error('Error al crear la etiqueta: ${error.message}');
     }
   }
 
@@ -96,11 +99,18 @@ class LabelBloc extends Bloc<LabelEvent, LabelState> {
     final result = await deleteLabel(event.id);
     switch (result) {
       case Ok():
-        await _emitLoaded(emit, message: 'Etiqueta eliminada');
+        final current = state is LabelLoaded ? state as LabelLoaded : null;
+        if (current != null) {
+          emit(LabelLoaded(
+            current.labels.where((l) => l.id != event.id).toList(),
+            current.bookLabels,
+            message: 'Etiqueta eliminada',
+          ));
+        } else {
+          await _emitLoaded(emit, message: 'Etiqueta eliminada');
+        }
       case Err(:final error):
         emit(LabelError(error.message));
-        NotificationService.error(
-            'Error al eliminar la etiqueta: ${error.message}');
     }
   }
 
@@ -112,8 +122,6 @@ class LabelBloc extends Bloc<LabelEvent, LabelState> {
         await _emitLoaded(emit, message: 'Etiqueta asignada');
       case Err(:final error):
         emit(LabelError(error.message));
-        NotificationService.error(
-            'Error al asignar la etiqueta: ${error.message}');
     }
   }
 
@@ -125,8 +133,6 @@ class LabelBloc extends Bloc<LabelEvent, LabelState> {
         await _emitLoaded(emit, message: 'Etiqueta removida');
       case Err(:final error):
         emit(LabelError(error.message));
-        NotificationService.error(
-            'Error al remover la etiqueta: ${error.message}');
     }
   }
 }

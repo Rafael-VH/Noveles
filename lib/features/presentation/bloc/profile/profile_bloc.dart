@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/errors/result.dart';
-import 'package:noveles/core/presentation/notification_service.dart';
 import 'package:noveles/features/profiles/domain/get_profile.dart';
 import 'package:noveles/features/profiles/domain/update_profile.dart';
 import 'package:noveles/features/profiles/domain/upload_avatar.dart';
@@ -38,7 +37,6 @@ class ProfileBloc extends Bloc<events.ProfileEvent, ProfileState> {
         emit(ProfileLoaded(value));
       case Err(:final error):
         emit(ProfileError(error.message));
-        NotificationService.error('Error al cargar el perfil: ${error.message}');
     }
   }
 
@@ -49,7 +47,6 @@ class ProfileBloc extends Bloc<events.ProfileEvent, ProfileState> {
     final currentState = state;
     if (currentState is! ProfileLoaded) {
       emit(ProfileError('No se puede actualizar: perfil no cargado'));
-      NotificationService.error('No se puede actualizar: perfil no cargado');
       return;
     }
     emit(ProfileSaving(currentState.user));
@@ -62,8 +59,6 @@ class ProfileBloc extends Bloc<events.ProfileEvent, ProfileState> {
           avatarUrl = value;
         case Err(:final error):
           emit(ProfileError(error.message, user: currentState.user));
-          NotificationService.error(
-              'Error al subir el avatar: ${error.message}');
           return;
       }
     }
@@ -77,8 +72,6 @@ class ProfileBloc extends Bloc<events.ProfileEvent, ProfileState> {
         emit(ProfileLoaded(value, message: 'Perfil actualizado exitosamente'));
       case Err(:final error):
         emit(ProfileError(error.message, user: currentState.user));
-        NotificationService.error(
-            'Error al actualizar el perfil: ${error.message}');
     }
   }
 
@@ -98,8 +91,6 @@ class ProfileBloc extends Bloc<events.ProfileEvent, ProfileState> {
     final currentState = state;
     if (currentState is! ProfileLoaded) {
       emit(ProfileError('No se puede cambiar la contraseña: perfil no cargado'));
-      NotificationService.error(
-          'No se puede cambiar la contraseña: perfil no cargado');
       return;
     }
     emit(ProfileSaving(currentState.user));
@@ -110,8 +101,6 @@ class ProfileBloc extends Bloc<events.ProfileEvent, ProfileState> {
             message: 'Contraseña actualizada exitosamente'));
       case Err(:final error):
         emit(ProfileError(error.message, user: currentState.user));
-        NotificationService.error(
-            'Error al cambiar la contraseña: ${error.message}');
     }
   }
 }

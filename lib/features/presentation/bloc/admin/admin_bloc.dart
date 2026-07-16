@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/errors/result.dart';
-import 'package:noveles/core/presentation/notification_service.dart';
 import 'package:noveles/features/books/domain/delete_book.dart';
 import 'package:noveles/features/books/domain/get_book.dart';
 import 'package:noveles/features/books/domain/toggle_book_visibility.dart'
@@ -34,7 +33,6 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
         emit(AdminLoaded(value));
       case Err(:final error):
         emit(AdminError(error.message));
-        NotificationService.error('Error al cargar libros: ${error.message}');
     }
   }
 
@@ -46,21 +44,30 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
         await toggleBookVisibility(event.bookId, event.isVisible);
     switch (toggleResult) {
       case Ok():
-        final booksResult = await getBooks();
-        switch (booksResult) {
-          case Ok(:final value):
-            emit(AdminLoaded(
-              value,
-              message: event.isVisible ? 'Libro publicado' : 'Libro ocultado',
-            ));
-          case Err(:final error):
-            NotificationService.error(
-                'Error al actualizar la lista: ${error.message}');
+        if (state is AdminLoaded) {
+          final current = (state as AdminLoaded).books;
+          final updated = current.map((b) =>
+              b.id == event.bookId
+                  ? b.copyWith(isVisible: event.isVisible)
+                  : b).toList();
+          emit(AdminLoaded(
+            updated,
+            message: event.isVisible ? 'Libro publicado' : 'Libro ocultado',
+          ));
+        } else {
+          final booksResult = await getBooks();
+          switch (booksResult) {
+            case Ok(:final value):
+              emit(AdminLoaded(
+                value,
+                message: event.isVisible ? 'Libro publicado' : 'Libro ocultado',
+              ));
+            case Err(:final error):
+              emit(AdminError(error.message));
+          }
         }
       case Err(:final error):
         emit(AdminError(error.message));
-        NotificationService.error(
-            'Error al cambiar visibilidad: ${error.message}');
     }
   }
 
@@ -71,20 +78,21 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     final deleteResult = await deleteBook(event.bookId);
     switch (deleteResult) {
       case Ok():
-        final booksResult = await getBooks();
-        switch (booksResult) {
-          case Ok(:final value):
-            emit(AdminLoaded(
-              value,
-              message: 'Libro eliminado',
-            ));
-          case Err(:final error):
-            NotificationService.error(
-                'Error al actualizar la lista: ${error.message}');
+        if (state is AdminLoaded) {
+          final current = (state as AdminLoaded).books;
+          final filtered = current.where((b) => b.id != event.bookId).toList();
+          emit(AdminLoaded(filtered, message: 'Libro eliminado'));
+        } else {
+          final booksResult = await getBooks();
+          switch (booksResult) {
+            case Ok(:final value):
+              emit(AdminLoaded(value, message: 'Libro eliminado'));
+            case Err(:final error):
+              emit(AdminError(error.message));
+          }
         }
       case Err(:final error):
         emit(AdminError(error.message));
-        NotificationService.error('Error al eliminar el libro: ${error.message}');
     }
   }
 }

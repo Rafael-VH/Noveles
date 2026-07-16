@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/errors/result.dart';
-import 'package:noveles/core/presentation/notification_service.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 import 'package:noveles/features/chapters/domain/get_chapter_content.dart';
 import 'package:noveles/features/presentation/bloc/chapter/chapter_event.dart';
@@ -18,9 +17,17 @@ class ChapterBloc extends Bloc<ChapterEvent, ChapterState> {
     Emitter<ChapterState> emit,
   ) async {
     emit(ChapterLoading());
+
+    // Cargar todos los contenidos en paralelo
+    final contentResults = await Future.wait(
+      event.chapters.map((ch) => getChapterContent(ch.content)),
+    );
+
     final resolved = <ChapterEntity>[];
-    for (final ch in event.chapters) {
-      final result = await getChapterContent(ch.content);
+    for (var i = 0; i < event.chapters.length; i++) {
+      final ch = event.chapters[i];
+      final result = contentResults[i];
+
       switch (result) {
         case Ok(:final value):
           resolved.add(ChapterEntity(
@@ -33,11 +40,10 @@ class ChapterBloc extends Bloc<ChapterEvent, ChapterState> {
           ));
         case Err(:final error):
           emit(ChapterError('Error al cargar capítulos: ${error.message}'));
-          NotificationService.error(
-              'Error al cargar capítulos: ${error.message}');
           return;
       }
     }
+
     if (emit.isDone) return;
     emit(ChapterLoaded(resolved, initialIndex: event.initialIndex));
   }
