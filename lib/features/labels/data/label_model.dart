@@ -1,3 +1,4 @@
+import 'package:noveles/core/utils/parse_utils.dart';
 import 'package:noveles/features/labels/domain/label_entity.dart';
 
 class LabelModel extends LabelEntity {
@@ -9,7 +10,7 @@ class LabelModel extends LabelEntity {
   });
 
   factory LabelModel.fromJson(Map<String, dynamic> json) => LabelModel(
-        id: json['id'] as int,
+        id: parseInt(json['id']),
         createdAt: DateTime.parse(json['created_at'] as String),
         name: (json['name'] as String?) ?? '',
         color: (json['color'] as String?) ?? '#71A202',

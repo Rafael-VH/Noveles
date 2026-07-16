@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:noveles/core/errors/failure.dart';
 import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/core/supabase/chapter_cache.dart';
+import 'package:noveles/core/constants/storage_constants.dart';
 import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/chapters/data/chapter_model.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
@@ -15,10 +16,15 @@ class ChapterRepositoryImpl implements ChapterRepository {
   ChapterRepositoryImpl(this._supabase);
 
   @override
-  Future<Result<List<ChapterEntity>>> getChapters() async {
+  Future<Result<List<ChapterEntity>>> getChapters({int page = 1, int pageSize = 50}) async {
     try {
-      final response =
-          await _supabase.client.from('chapters').select('*').order('id').limit(100);
+      final offset = (page - 1) * pageSize;
+      final response = await _supabase.client
+          .from('chapters')
+          .select('*')
+          .order('id')
+          .limit(pageSize)
+          .range(offset, offset + pageSize - 1);
       final chapters = response.map((json) => ChapterModel.fromJson(json)).toList();
       return Ok(chapters);
     } catch (e) {
@@ -89,8 +95,8 @@ class ChapterRepositoryImpl implements ChapterRepository {
       final file = File(filePath);
       final ext = filePath.split('.').last;
       final filename = '${DateTime.now().millisecondsSinceEpoch}.$ext';
-      await _supabase.client.storage.from('chapters').upload(filename, file);
-      final url = _supabase.client.storage.from('chapters').getPublicUrl(filename);
+      await _supabase.client.storage.from(StorageConstants.chaptersBucket).upload(filename, file);
+      final url = _supabase.client.storage.from(StorageConstants.chaptersBucket).getPublicUrl(filename);
       return Ok(url);
     } catch (e) {
       return Err(ChapterFailure('Error al subir contenido: $e', cause: e));
@@ -106,7 +112,7 @@ class ChapterRepositoryImpl implements ChapterRepository {
       if (!_isStoragePath(path)) return Ok(path);
       final cached = await ChapterCache.read(path);
       if (cached != null) return Ok(cached);
-      final bytes = await _supabase.client.storage.from('chapters').download(path);
+      final bytes = await _supabase.client.storage.from(StorageConstants.chaptersBucket).download(path);
       final content = utf8.decode(bytes);
       await ChapterCache.save(path, bytes);
       return Ok(content);

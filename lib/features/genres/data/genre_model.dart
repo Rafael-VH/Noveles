@@ -1,3 +1,4 @@
+import 'package:noveles/core/utils/parse_utils.dart';
 import 'package:noveles/features/genres/domain/genre_entity.dart';
 
 class GenreModel extends GenreEntity {
@@ -9,7 +10,7 @@ class GenreModel extends GenreEntity {
   });
 
   factory GenreModel.fromJson(Map<String, dynamic> json) => GenreModel(
-        id: json['id'] as int,
+        id: parseInt(json['id']),
         createdAt: DateTime.parse(json['created_at'] as String),
         name: (json['name'] as String?) ?? '',
         description: (json['description'] as String?) ?? '',

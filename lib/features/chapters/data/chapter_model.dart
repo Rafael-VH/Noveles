@@ -1,3 +1,4 @@
+import 'package:noveles/core/utils/parse_utils.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 
 class ChapterModel extends ChapterEntity {
@@ -12,12 +13,12 @@ class ChapterModel extends ChapterEntity {
   });
 
   factory ChapterModel.fromJson(Map<String, dynamic> json) => ChapterModel(
-        id: json['id'] as int,
+        id: parseInt(json['id']),
         createdAt: DateTime.parse(json['created_at'] as String),
         number: (json['number'] as String?) ?? '',
         title: (json['title'] as String?) ?? '',
         content: (json['content'] as String?) ?? '',
-        tookId: (json['took_id'] as int?) ?? 0,
+        tookId: parseInt(json['took_id'], 0),
         createdBy: json['created_by'] as String?,
       );
 

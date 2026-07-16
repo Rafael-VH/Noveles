@@ -130,13 +130,25 @@ class AuthRepositoryImpl implements AuthRepository {
             'id': userId,
             'role': 'user',
           });
+
+          // Verificar que se creó correctamente
+          final verify = await _supabase.client
+              .from('profiles')
+              .select('role')
+              .eq('id', userId)
+              .maybeSingle();
+
+          if (verify == null) {
+            return Err(ProfileFailure('Perfil no encontrado después de crear'));
+          }
+
+          return Ok(Map<String, dynamic>.from(verify));
         } catch (e) {
           return Err(ProfileFailure(
             'No se pudo crear el perfil automáticamente',
             cause: e,
           ));
         }
-        return Ok({'role': 'user'});
       }
 
       return Ok(Map<String, dynamic>.from(response));

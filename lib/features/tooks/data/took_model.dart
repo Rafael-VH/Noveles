@@ -1,3 +1,4 @@
+import 'package:noveles/core/utils/parse_utils.dart';
 import 'package:noveles/features/chapters/data/chapter_model.dart';
 import 'package:noveles/features/tooks/domain/took_entity.dart';
 
@@ -20,13 +21,13 @@ class TookModel extends TookEntity {
     }).toList();
 
     return TookModel(
-      id: json['id'] as int,
+      id: parseInt(json['id']),
       createdAt: DateTime.parse(json['created_at'] as String),
       cover: (json['cover'] as String?) ?? '',
       number: (json['number'] as String?) ?? '',
       title: (json['title'] as String?) ?? '',
-      chapterCount: (json['chapter_count'] as int?) ?? 0,
-      bookId: (json['book_id'] as int?) ?? 0,
+      chapterCount: parseInt(json['chapter_count'], 0),
+      bookId: parseInt(json['book_id'], 0),
       createdBy: json['created_by'] as String?,
       listChapter: chapters,
     );
