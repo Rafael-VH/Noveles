@@ -1,4 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+export 'package:noveles/features/admin/presentation/bloc/admin_event.dart';
+export 'package:noveles/features/admin/presentation/bloc/admin_state.dart';
 import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/books/domain/delete_book.dart';
 import 'package:noveles/features/books/domain/get_book.dart';

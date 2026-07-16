@@ -1,4 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+export 'package:noveles/features/books/presentation/bloc/book_event.dart';
+export 'package:noveles/features/books/presentation/bloc/book_state.dart';
 import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/books/domain/get_book.dart';
 import 'package:noveles/features/books/domain/get_book_by_id.dart';

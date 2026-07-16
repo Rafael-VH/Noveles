@@ -1,4 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+export 'package:noveles/features/genres/presentation/bloc/genre_event.dart';
+export 'package:noveles/features/genres/presentation/bloc/genre_state.dart';
 import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/genres/domain/genre_entity.dart';
 import 'package:noveles/features/genres/domain/get_genre.dart';

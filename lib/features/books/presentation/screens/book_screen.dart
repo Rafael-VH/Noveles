@@ -3,8 +3,9 @@ import 'package:flutter/rendering.dart';
 import 'package:noveles/features/books/domain/book_with_relations.dart';
 import 'package:noveles/features/books/presentation/screens/widgets/sliver_app_bar_book.dart';
 import 'package:noveles/features/books/presentation/screens/widgets/sliver_persistent_header_book.dart';
-import 'package:noveles/features/presentation/screens/screens.dart';
-import 'package:noveles/features/presentation/views/views.dart';
+import 'package:noveles/features/tooks/presentation/screens/took_screen.dart';
+import 'package:noveles/features/books/presentation/views/detail/detail_view.dart';
+import 'package:noveles/features/tooks/presentation/views/took_view.dart';
 
 class BookScreen extends StatefulWidget {
   final BookWithRelations book;

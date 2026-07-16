@@ -1,4 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+export 'package:noveles/features/profiles/presentation/bloc/profile_event.dart';
+export 'package:noveles/features/profiles/presentation/bloc/profile_state.dart';
 import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/profiles/domain/get_profile.dart';
 import 'package:noveles/features/profiles/domain/update_profile.dart';

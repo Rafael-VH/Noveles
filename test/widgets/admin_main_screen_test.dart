@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:noveles/features/profiles/domain/user_entity.dart';
-import 'package:noveles/features/presentation/bloc/bloc.dart';
+import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:noveles/features/presentation/widgets/app_drawer.dart';
 
 class MockAuthBloc extends Mock implements AuthBloc {}

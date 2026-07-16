@@ -1,4 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+export 'package:noveles/features/chapters/presentation/bloc/chapter_event.dart';
+export 'package:noveles/features/chapters/presentation/bloc/chapter_state.dart';
 import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 import 'package:noveles/features/chapters/domain/get_chapter_content.dart';

@@ -1,7 +1,8 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/di/injection.dart';
-import 'package:noveles/features/presentation/bloc/bloc.dart';
+import 'package:noveles/features/admin/presentation/bloc/admin_bloc.dart';
+import 'package:noveles/features/admin/presentation/bloc/admin_users_bloc.dart';
 import 'package:noveles/features/admin/presentation/screens/analytics_tab.dart';
 import 'package:noveles/features/admin/presentation/screens/books_tab.dart';
 import 'package:noveles/features/admin/presentation/screens/genres_tab.dart';

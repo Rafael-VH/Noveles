@@ -1,4 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+export 'package:noveles/features/labels/presentation/bloc/label_event.dart';
+export 'package:noveles/features/labels/presentation/bloc/label_state.dart';
 import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/labels/domain/label_entity.dart';
 import 'package:noveles/features/labels/domain/get_labels.dart';

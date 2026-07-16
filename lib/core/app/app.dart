@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/core/presentation/notification_listener.dart';
-import 'package:noveles/features/presentation/bloc/bloc.dart';
-import 'package:noveles/features/presentation/screens/screens.dart';
+import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:noveles/core/presentation/bloc/theme_bloc.dart';
+import 'package:noveles/features/admin/presentation/screens/admin_main_screen.dart';
+import 'package:noveles/features/scan/presentation/screens/scan_main_screen.dart';
+import 'package:noveles/core/app/main_screen.dart';
+import 'package:noveles/features/auth/presentation/screens/login_screen.dart';
 
 class App extends StatelessWidget {
   const App({super.key});

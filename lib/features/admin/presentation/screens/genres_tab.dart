@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/features/genres/domain/genre_entity.dart';
-import 'package:noveles/features/presentation/bloc/bloc.dart';
+import 'package:noveles/features/genres/presentation/bloc/genre_bloc.dart';
 
 class GenresTab extends StatefulWidget {
   const GenresTab({super.key});

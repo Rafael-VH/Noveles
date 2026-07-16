@@ -4,8 +4,10 @@ import 'package:noveles/core/cover/cover_url_service.dart';
 import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/features/books/domain/book_with_relations.dart';
 import 'package:noveles/features/genres/domain/genre_entity.dart';
-import 'package:noveles/features/presentation/bloc/bloc.dart';
-import 'package:noveles/features/presentation/screens/screens.dart';
+import 'package:noveles/features/books/presentation/bloc/book_bloc.dart';
+import 'package:noveles/features/genres/presentation/bloc/genre_bloc.dart';
+import 'package:noveles/features/books/presentation/screens/book_screen.dart';
+import 'package:noveles/features/genres/presentation/screens/genre_screen.dart';
 import 'package:noveles/features/presentation/widgets/app_drawer.dart';
 import 'package:noveles/features/presentation/widgets/carousel_appbar_sliver.dart';
 

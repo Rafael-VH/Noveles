@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/presentation/notification_service.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 import 'package:noveles/features/books/domain/text_stats.dart';
-import 'package:noveles/features/presentation/bloc/bloc.dart';
+import 'package:noveles/features/chapters/presentation/bloc/chapter_bloc.dart';
 
 class ChapterScreen extends StatefulWidget {
   final List<ChapterEntity> chapters;

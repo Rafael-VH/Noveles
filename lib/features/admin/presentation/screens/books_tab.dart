@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/core/cover/cover_url_service.dart';
-import 'package:noveles/features/presentation/bloc/bloc.dart';
-import 'package:noveles/features/presentation/screens/screens.dart';
+import 'package:noveles/features/admin/presentation/bloc/admin_bloc.dart';
+import 'package:noveles/features/labels/presentation/screens/label_management_screen.dart';
 
 class BooksTab extends StatelessWidget {
   final AdminState state;
