@@ -8,10 +8,10 @@ class GenresTab extends StatefulWidget {
   const GenresTab({super.key});
 
   @override
-  State<GenresTab> createState() => GenresTabState();
+  State<GenresTab> createState() => _GenresTabState();
 }
 
-class GenresTabState extends State<GenresTab> {
+class _GenresTabState extends State<GenresTab> {
   late final GenreBloc _genreBloc;
 
   @override

@@ -1,6 +1,7 @@
+import 'dart:async';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
@@ -24,7 +25,6 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
   late TextEditingController _contentCtrl;
   String _uploadedFileName = '';
   bool _isSaving = false;
-  late final ScanChapterBloc _scanChapterBloc;
 
   bool get _isEditing => widget.chapter != null;
 
@@ -36,7 +36,6 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
     _titleCtrl = TextEditingController(text: c?.title ?? '');
     _contentCtrl = TextEditingController(text: c?.content ?? '');
     _uploadedFileName = _extractFileName(c?.content ?? '');
-    _scanChapterBloc = getIt<ScanChapterBloc>();
   }
 
   @override
@@ -44,7 +43,6 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
     _numberCtrl.dispose();
     _titleCtrl.dispose();
     _contentCtrl.dispose();
-    _scanChapterBloc.close();
     super.dispose();
   }
 
@@ -132,14 +130,20 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
     );
 
     // Save chapter
+    final bloc = getIt<ScanChapterBloc>();
     setState(() => _isSaving = true);
 
+    final completer = Completer<ScanChapterState>();
+    late StreamSubscription sub;
+    sub = bloc.stream.listen((s) {
+      if (s is ScanChapterLoaded || s is ScanChapterError) {
+        sub.cancel();
+        if (!completer.isCompleted) completer.complete(s);
+      }
+    });
+    bloc.add(SaveScanChapter(chapter, isUpdate: _isEditing));
     try {
-      final future = _scanChapterBloc.stream.firstWhere(
-        (s) => s is ScanChapterLoaded || s is ScanChapterError,
-      );
-      _scanChapterBloc.add(SaveScanChapter(chapter, isUpdate: _isEditing));
-      final result = await future;
+      final result = await completer.future.timeout(const Duration(seconds: 10));
       if (result is ScanChapterLoaded && mounted) {
         Navigator.pop(context, chapter);
       } else if (result is ScanChapterError && mounted) {
@@ -150,7 +154,19 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
           ),
         );
       }
+    } on TimeoutException {
+      sub.cancel();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('La operación tardó demasiado'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
     } finally {
+      sub.cancel();
+      bloc.close();
       if (mounted) setState(() => _isSaving = false);
     }
   }
@@ -159,100 +175,97 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
   Widget build(BuildContext context) {
     final hasContent = _contentCtrl.text.isNotEmpty;
 
-    return BlocProvider.value(
-      value: _scanChapterBloc,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(_isEditing ? 'Editar Capítulo' : 'Nuevo Capítulo'),
-          actions: [
-            TextButton(onPressed: _save, child: const Text('Guardar')),
-          ],
-        ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Number
-                TextFormField(
-                  controller: _numberCtrl,
-                  decoration: const InputDecoration(labelText: 'Número'),
-                  validator: (v) =>
-                      v?.trim().isEmpty == true ? 'Requerido' : null,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_isEditing ? 'Editar Capítulo' : 'Nuevo Capítulo'),
+        actions: [
+          TextButton(onPressed: _save, child: const Text('Guardar')),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Number
+              TextFormField(
+                controller: _numberCtrl,
+                decoration: const InputDecoration(labelText: 'Número'),
+                validator: (v) =>
+                    v?.trim().isEmpty == true ? 'Requerido' : null,
+              ),
+
+              const SizedBox(height: 12),
+
+              // Title
+              TextFormField(
+                controller: _titleCtrl,
+                decoration: const InputDecoration(labelText: 'Título'),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Content file
+              const Text(
+                'Archivo de contenido',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
                 ),
+              ),
 
-                const SizedBox(height: 12),
+              const SizedBox(height: 8),
 
-                // Title
-                TextFormField(
-                  controller: _titleCtrl,
-                  decoration: const InputDecoration(labelText: 'Título'),
-                ),
-
-                const SizedBox(height: 24),
-
-                // Content file
-                const Text(
-                  'Archivo de contenido',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-
-                const SizedBox(height: 8),
-
-                if (hasContent)
-                  Card(
-                    child: ListTile(
-                      leading: const Icon(Icons.description),
-                      title: Text(
-                        _uploadedFileName.isNotEmpty
-                            ? _uploadedFileName
-                            : _contentCtrl.text,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      trailing: TextButton(
-                        onPressed: _pickContentFile,
-                        child: const Text('Reemplazar'),
-                      ),
+              if (hasContent)
+                Card(
+                  child: ListTile(
+                    leading: const Icon(Icons.description),
+                    title: Text(
+                      _uploadedFileName.isNotEmpty
+                          ? _uploadedFileName
+                          : _contentCtrl.text,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  )
-                else
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Ningún archivo seleccionado',
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                    ],
+                    trailing: TextButton(
+                      onPressed: _pickContentFile,
+                      child: const Text('Reemplazar'),
+                    ),
                   ),
-
-                ElevatedButton.icon(
-                  onPressed: _pickContentFile,
-                  icon: const Icon(Icons.upload_file),
-                  label: const Text('Seleccionar archivo .md o .txt'),
-                ),
-
-                if (!hasContent)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Text(
-                      'El contenido se subirá a Supabase Storage',
+                )
+              else
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Ningún archivo seleccionado',
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        fontSize: 12,
                       ),
                     ),
+                    const SizedBox(height: 8),
+                  ],
+                ),
+
+              ElevatedButton.icon(
+                onPressed: _pickContentFile,
+                icon: const Icon(Icons.upload_file),
+                label: const Text('Seleccionar archivo .md o .txt'),
+              ),
+
+              if (!hasContent)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Text(
+                    'El contenido se subirá a Supabase Storage',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 12,
+                    ),
                   ),
-              ],
-            ),
+                ),
+            ],
           ),
         ),
       ),

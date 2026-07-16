@@ -13,24 +13,10 @@ class LabelManagementScreen extends StatefulWidget {
 }
 
 class _LabelManagementScreenState extends State<LabelManagementScreen> {
-  late final LabelBloc _labelBloc;
-
-  @override
-  void initState() {
-    super.initState();
-    _labelBloc = getIt<LabelBloc>()..add(const LoadLabels());
-  }
-
-  @override
-  void dispose() {
-    _labelBloc.close();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: _labelBloc,
+    return BlocProvider(
+      create: (_) => getIt<LabelBloc>()..add(const LoadLabels()),
       child: Scaffold(
         appBar: AppBar(title: const Text('Gestionar Etiquetas')),
         body: BlocConsumer<LabelBloc, LabelState>(

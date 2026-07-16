@@ -18,23 +18,6 @@ class AdminMainScreen extends StatefulWidget {
 class _AdminMainScreenState extends State<AdminMainScreen> {
   int _currentIndex = 0;
 
-  late final AdminBloc _adminBloc;
-  late final AdminUsersBloc _adminUsersBloc;
-
-  @override
-  void initState() {
-    super.initState();
-    _adminBloc = getIt<AdminBloc>()..add(const LoadAdminBooks());
-    _adminUsersBloc = getIt<AdminUsersBloc>()..add(const LoadAdminUsers());
-  }
-
-  @override
-  void dispose() {
-    _adminBloc.close();
-    _adminUsersBloc.close();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,10 +25,25 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
       appBar: AppBar(title: const Text('Panel Admin')),
       body: MultiBlocProvider(
         providers: [
-          BlocProvider.value(value: _adminBloc),
-          BlocProvider.value(value: _adminUsersBloc),
+          BlocProvider(
+            create: (_) => getIt<AdminBloc>()..add(const LoadAdminBooks()),
+          ),
+          BlocProvider(
+            create: (_) => getIt<AdminUsersBloc>()..add(const LoadAdminUsers()),
+          ),
         ],
-        child: BlocConsumer<AdminBloc, AdminState>(
+        child: BlocListener<AdminUsersBloc, AdminUsersState>(
+          listener: (context, state) {
+            if (state is AdminUsersError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                ),
+              );
+            }
+          },
+          child: BlocConsumer<AdminBloc, AdminState>(
           listener: (context, state) {
             if (state is AdminLoaded && state.message != null) {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -74,6 +72,7 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
             ],
           ),
         ),
+      ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,

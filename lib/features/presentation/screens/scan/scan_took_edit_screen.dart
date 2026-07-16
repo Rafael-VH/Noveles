@@ -1,5 +1,6 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/core/errors/result.dart';
@@ -28,8 +29,6 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
   late TextEditingController _coverCtrl;
   bool _isSaving = false;
   List<ChapterEntity> _chapters = [];
-  late final ScanTookBloc _scanTookBloc;
-  late final ScanChapterBloc _scanChapterBloc;
 
   bool get _isEditing => widget.took != null;
 
@@ -41,8 +40,6 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
     _numberCtrl = TextEditingController(text: t?.number ?? '');
     _titleCtrl = TextEditingController(text: t?.title ?? '');
     _coverCtrl = TextEditingController(text: t?.cover ?? '');
-    _scanTookBloc = getIt<ScanTookBloc>();
-    _scanChapterBloc = getIt<ScanChapterBloc>();
   }
 
   @override
@@ -50,8 +47,6 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
     _numberCtrl.dispose();
     _titleCtrl.dispose();
     _coverCtrl.dispose();
-    _scanTookBloc.close();
-    _scanChapterBloc.close();
     super.dispose();
   }
 
@@ -71,13 +66,19 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
       listChapter: _chapters,
     );
 
+    final bloc = getIt<ScanTookBloc>();
     setState(() => _isSaving = true);
+    final completer = Completer<ScanTookState>();
+    late StreamSubscription sub;
+    sub = bloc.stream.listen((s) {
+      if (s is ScanTookLoaded || s is ScanTookError) {
+        sub.cancel();
+        if (!completer.isCompleted) completer.complete(s);
+      }
+    });
+    bloc.add(SaveScanTook(took, isUpdate: _isEditing));
     try {
-      final future = _scanTookBloc.stream.firstWhere(
-        (s) => s is ScanTookLoaded || s is ScanTookError,
-      );
-      _scanTookBloc.add(SaveScanTook(took, isUpdate: _isEditing));
-      final result = await future;
+      final result = await completer.future.timeout(const Duration(seconds: 10));
       if (result is ScanTookLoaded && mounted) {
         Navigator.pop(context, true);
       } else if (result is ScanTookError && mounted) {
@@ -88,7 +89,19 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
           ),
         );
       }
+    } on TimeoutException {
+      sub.cancel();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('La operación tardó demasiado'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
     } finally {
+      sub.cancel();
+      bloc.close();
       if (mounted) setState(() => _isSaving = false);
     }
   }
@@ -116,13 +129,19 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
   // Delete chapter
   Future<void> _deleteChapter(int chapterId) async {
     if (_isSaving) return;
+    final bloc = getIt<ScanChapterBloc>();
     setState(() => _isSaving = true);
+    final completer = Completer<ScanChapterState>();
+    late StreamSubscription sub;
+    sub = bloc.stream.listen((s) {
+      if (s is ScanChapterLoaded || s is ScanChapterError) {
+        sub.cancel();
+        if (!completer.isCompleted) completer.complete(s);
+      }
+    });
+    bloc.add(DeleteScanChapter(chapterId));
     try {
-      final future = _scanChapterBloc.stream.firstWhere(
-        (s) => s is ScanChapterLoaded || s is ScanChapterError,
-      );
-      _scanChapterBloc.add(DeleteScanChapter(chapterId));
-      final result = await future;
+      final result = await completer.future.timeout(const Duration(seconds: 10));
       if (result is ScanChapterLoaded && mounted) {
         setState(() => _chapters.removeWhere((c) => c.id == chapterId));
         ScaffoldMessenger.of(context).showSnackBar(
@@ -139,7 +158,19 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
           ),
         );
       }
+    } on TimeoutException {
+      sub.cancel();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('La operación tardó demasiado'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
     } finally {
+      sub.cancel();
+      bloc.close();
       if (mounted) setState(() => _isSaving = false);
     }
   }
@@ -172,120 +203,114 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider.value(value: _scanTookBloc),
-        BlocProvider.value(value: _scanChapterBloc),
-      ],
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(_isEditing ? 'Editar Tomo' : 'Nuevo Tomo'),
-          actions: [
-            TextButton(
-              onPressed: _save,
-              child: const Text('Guardar'),
-            ),
-          ],
-        ),
-        floatingActionButton: _isEditing
-            ? FloatingActionButton(
-                onPressed: () => _navigateToChapterEdit(
-                  tookId: widget.took!.id,
-                ),
-                child: const Icon(Icons.add),
-              )
-            : null,
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                // Number
-                TextFormField(
-                  controller: _numberCtrl,
-                  decoration: const InputDecoration(labelText: 'Número'),
-                  validator: (v) =>
-                      v?.trim().isEmpty == true ? 'Requerido' : null,
-                ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_isEditing ? 'Editar Tomo' : 'Nuevo Tomo'),
+        actions: [
+          TextButton(
+            onPressed: _save,
+            child: const Text('Guardar'),
+          ),
+        ],
+      ),
+      floatingActionButton: _isEditing
+          ? FloatingActionButton(
+              onPressed: () => _navigateToChapterEdit(
+                tookId: widget.took!.id,
+              ),
+              child: const Icon(Icons.add),
+            )
+          : null,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              // Number
+              TextFormField(
+                controller: _numberCtrl,
+                decoration: const InputDecoration(labelText: 'Número'),
+                validator: (v) =>
+                    v?.trim().isEmpty == true ? 'Requerido' : null,
+              ),
 
-                const SizedBox(height: 12),
+              const SizedBox(height: 12),
 
-                // Title
-                TextFormField(
-                  controller: _titleCtrl,
-                  decoration: const InputDecoration(labelText: 'Título'),
-                ),
+              // Title
+              TextFormField(
+                controller: _titleCtrl,
+                decoration: const InputDecoration(labelText: 'Título'),
+              ),
 
-                const SizedBox(height: 12),
+              const SizedBox(height: 12),
 
-                // Cover
-                CoverPicker(
-                  controller: _coverCtrl,
-                  onPick: _pickCover,
-                  onClear: () => setState(() => _coverCtrl.clear()),
-                ),
+              // Cover
+              CoverPicker(
+                controller: _coverCtrl,
+                onPick: _pickCover,
+                onClear: () => setState(() => _coverCtrl.clear()),
+              ),
 
-                // Show Chapters (always visible after first save)
-                if (_isEditing) ...[
-                  const SizedBox(height: 24),
+              // Show Chapters (always visible after first save)
+              if (_isEditing) ...[
+                const SizedBox(height: 24),
 
-                  const Divider(),
+                const Divider(),
 
-                  const Text(
-                    'Capítulos',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                const Text(
+                  'Capítulos',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
+                ),
 
-                  const SizedBox(height: 12),
+                const SizedBox(height: 12),
 
-                  // List of Chapters
-                  ..._chapters.map(
-                    (ch) => Card(
-                      child: ListTile(
-                        title: Text(
-                          ch.title.isNotEmpty ? ch.title : 'Cap. ${ch.number}',
-                        ),
-                        subtitle: Text('ID: ${ch.id}'),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            // Edit Button
-                            IconButton(
-                              icon: Icon(
-                                Icons.edit,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                              onPressed: () => _navigateToChapterEdit(
-                                chapter: ch,
-                                tookId: widget.took!.id,
-                              ),
+                // List of Chapters
+                ..._chapters.map(
+                  (ch) => Card(
+                    child: ListTile(
+                      title: Text(
+                        ch.title.isNotEmpty ? ch.title : 'Cap. ${ch.number}',
+                      ),
+                      subtitle: Text('ID: ${ch.id}'),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Edit Button
+                          IconButton(
+                            icon: Icon(
+                              Icons.edit,
+                              color: Theme.of(context).colorScheme.primary,
                             ),
-
-                            // Delete Button
-                            IconButton(
-                              icon: Icon(
-                                Icons.delete,
-                                color: Theme.of(context).colorScheme.error,
-                              ),
-                              onPressed: () => _deleteChapter(ch.id),
+                            onPressed: () => _navigateToChapterEdit(
+                              chapter: ch,
+                              tookId: widget.took!.id,
                             ),
-                          ],
-                        ),
-                        onTap: () => _navigateToChapterEdit(
-                          chapter: ch,
-                          tookId: widget.took!.id,
-                        ),
+                          ),
+
+                          // Delete Button
+                          IconButton(
+                            icon: Icon(
+                              Icons.delete,
+                              color: Theme.of(context).colorScheme.error,
+                            ),
+                            onPressed: () => _deleteChapter(ch.id),
+                          ),
+                        ],
+                      ),
+                      onTap: () => _navigateToChapterEdit(
+                        chapter: ch,
+                        tookId: widget.took!.id,
                       ),
                     ),
                   ),
+                ),
 
-                ],
               ],
-            ),
+            ],
           ),
         ),
       ),

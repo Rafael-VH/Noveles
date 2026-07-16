@@ -6,10 +6,10 @@ class UsersTab extends StatefulWidget {
   const UsersTab({super.key});
 
   @override
-  State<UsersTab> createState() => UsersTabState();
+  State<UsersTab> createState() => _UsersTabState();
 }
 
-class UsersTabState extends State<UsersTab> {
+class _UsersTabState extends State<UsersTab> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AdminUsersBloc, AdminUsersState>(

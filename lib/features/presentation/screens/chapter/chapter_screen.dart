@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:noveles/core/presentation/notification_service.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 import 'package:noveles/features/books/domain/text_stats.dart';
 import 'package:noveles/features/presentation/bloc/bloc.dart';
@@ -69,8 +70,14 @@ class _ChapterScreenState extends State<ChapterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocBuilder<ChapterBloc, ChapterState>(
-        builder: (context, state) {
+      body: BlocListener<ChapterBloc, ChapterState>(
+        listener: (context, state) {
+          if (state is ChapterError) {
+            NotificationService.error(state.message);
+          }
+        },
+        child: BlocBuilder<ChapterBloc, ChapterState>(
+          builder: (context, state) {
           if (state is ChapterLoading || state is ChapterInitial) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -171,6 +178,7 @@ class _ChapterScreenState extends State<ChapterScreen> {
           }
           return const SizedBox.shrink();
         },
+      ),
       ),
     );
   }

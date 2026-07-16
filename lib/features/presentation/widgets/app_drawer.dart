@@ -14,91 +14,96 @@ class AppDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authState = context.read<AuthBloc>().state;
-    if (authState is! AuthAuthenticated) {
-      return const Drawer(child: SizedBox.shrink());
-    }
-    final user = authState.user;
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, authState) {
+        if (authState is! AuthAuthenticated) {
+          return const Drawer(child: SizedBox.shrink());
+        }
+        final user = authState.user;
 
-    return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          DrawerHeader(
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CircleAvatar(
-                  radius: 32,
-                  backgroundImage:
-                      user.avatarUrl != null && user.avatarUrl!.isNotEmpty
-                          ? NetworkImage(getIt<CoverUrlService>()(user.avatarUrl!))
+        return Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CircleAvatar(
+                      radius: 32,
+                      backgroundImage: (user.avatarUrl?.isNotEmpty ?? false)
+                          ? NetworkImage(
+                              getIt<CoverUrlService>()(user.avatarUrl!))
                           : null,
-                  child: user.avatarUrl == null || user.avatarUrl!.isEmpty
-                      ? const Icon(Icons.person, size: 32)
-                      : null,
+                      child: (user.avatarUrl?.isEmpty ?? true)
+                          ? const Icon(Icons.person, size: 32)
+                          : null,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      user.displayName ?? user.email,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    Text(
+                      user.email,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color:
+                              Theme.of(context).colorScheme.onSurfaceVariant),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 12),
-                Text(
-                  user.displayName ?? user.email,
-                  style: Theme.of(context).textTheme.titleMedium,
+              ),
+              if (isAdmin)
+                ListTile(
+                  leading: const Icon(Icons.admin_panel_settings),
+                  title: const Text('Panel Admin'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const AdminMainScreen(),
+                      ),
+                    );
+                  },
                 ),
-                Text(
-                  user.email,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant),
+              if (!isAdmin)
+                ListTile(
+                  leading:
+                      Icon(isScan ? Icons.admin_panel_settings : Icons.home),
+                  title: Text(isScan ? 'Panel Scan' : 'Inicio'),
+                  onTap: () => Navigator.pop(context),
                 ),
-              ],
-            ),
+              ListTile(
+                leading: const Icon(Icons.person),
+                title: const Text('Editar Perfil'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ProfileScreen()),
+                  );
+                },
+              ),
+              const Divider(),
+              ListTile(
+                leading: Icon(
+                  Icons.logout,
+                  color: Theme.of(context).colorScheme.error,
+                ),
+                title: Text(
+                  'Cerrar Sesión',
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
+                onTap: () => _confirmLogout(context),
+              ),
+            ],
           ),
-          if (isAdmin)
-            ListTile(
-              leading: const Icon(Icons.admin_panel_settings),
-              title: const Text('Panel Admin'),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const AdminMainScreen(),
-                  ),
-                );
-              },
-            ),
-          if (!isAdmin)
-            ListTile(
-              leading: Icon(isScan ? Icons.admin_panel_settings : Icons.home),
-              title: Text(isScan ? 'Panel Scan' : 'Inicio'),
-              onTap: () => Navigator.pop(context),
-            ),
-          ListTile(
-            leading: const Icon(Icons.person),
-            title: const Text('Editar Perfil'),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const ProfileScreen()),
-              );
-            },
-          ),
-          const Divider(),
-          ListTile(
-            leading: Icon(
-              Icons.logout,
-              color: Theme.of(context).colorScheme.error,
-            ),
-            title: Text(
-              'Cerrar Sesión',
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
-            onTap: () => _confirmLogout(context),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
