@@ -23,7 +23,7 @@ class ChapterCache {
       final dir = await _cacheDir();
       final file = File('${dir.path}/$filename');
       if (!await file.exists()) return null;
-      return utf8.decode(await file.readAsBytes());
+      return utf8.decode(await file.readAsBytes(), allowMalformed: true);
     } catch (e) {
       AppLogger.warning('ChapterCache.read error for $filename: $e');
       return null;

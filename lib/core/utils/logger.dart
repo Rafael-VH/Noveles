@@ -6,16 +6,23 @@ import 'package:flutter/foundation.dart';
 /// with a more robust solution like Sentry, Firebase Crashlytics, etc.
 class AppLogger {
   static void error(String message, [Object? error, StackTrace? stackTrace]) {
-    debugPrint('❌ ERROR: $message');
-    if (error != null) debugPrint('   Cause: $error');
-    if (stackTrace != null) debugPrint('   Stack: $stackTrace');
+    if (kDebugMode) {
+      debugPrint('❌ ERROR: $message');
+      if (error != null) debugPrint('   Cause: $error');
+      if (stackTrace != null) debugPrint('   Stack: $stackTrace');
+    }
+    // TODO: Integrar Sentry/Firebase Crashlytics
   }
 
   static void warning(String message) {
-    debugPrint('⚠️  WARNING: $message');
+    if (kDebugMode) {
+      debugPrint('⚠️  WARNING: $message');
+    }
   }
 
   static void info(String message) {
-    debugPrint('ℹ️  INFO: $message');
+    if (kDebugMode) {
+      debugPrint('ℹ️  INFO: $message');
+    }
   }
 }
