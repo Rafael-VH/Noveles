@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/core/utils/color_utils.dart';
 import 'package:noveles/features/labels/presentation/bloc/label_bloc.dart';
-import 'package:noveles/features/presentation/widgets/label_badge.dart';
+import 'package:noveles/core/presentation/widgets/label_badge.dart';
 
 class LabelManagementScreen extends StatefulWidget {
   const LabelManagementScreen({super.key});

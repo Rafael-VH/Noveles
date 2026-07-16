@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:noveles/features/presentation/delegates/sliver_app_bar_delegate.dart';
+import 'package:noveles/core/presentation/delegates/sliver_app_bar_delegate.dart';
 
 class SliverPersistentHeaderBook extends StatelessWidget {
   const SliverPersistentHeaderBook({

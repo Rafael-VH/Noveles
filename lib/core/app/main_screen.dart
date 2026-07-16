@@ -8,8 +8,8 @@ import 'package:noveles/features/books/presentation/bloc/book_bloc.dart';
 import 'package:noveles/features/genres/presentation/bloc/genre_bloc.dart';
 import 'package:noveles/features/books/presentation/screens/book_screen.dart';
 import 'package:noveles/features/genres/presentation/screens/genre_screen.dart';
-import 'package:noveles/features/presentation/widgets/app_drawer.dart';
-import 'package:noveles/features/presentation/widgets/carousel_appbar_sliver.dart';
+import 'package:noveles/core/presentation/widgets/app_drawer.dart';
+import 'package:noveles/core/presentation/widgets/carousel_appbar_sliver.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
