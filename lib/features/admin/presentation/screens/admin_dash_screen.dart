@@ -9,14 +9,14 @@ import 'package:noveles/features/admin/presentation/screens/genres_tab.dart';
 import 'package:noveles/features/admin/presentation/screens/users_tab.dart';
 import 'package:noveles/features/app/presentation/widgets/app_drawer.dart';
 
-class AdminMainScreen extends StatefulWidget {
-  const AdminMainScreen({super.key});
+class AdminDashScreen extends StatefulWidget {
+  const AdminDashScreen({super.key});
 
   @override
-  State<AdminMainScreen> createState() => _AdminMainScreenState();
+  State<AdminDashScreen> createState() => _AdminDashScreenState();
 }
 
-class _AdminMainScreenState extends State<AdminMainScreen> {
+class _AdminDashScreenState extends State<AdminDashScreen> {
   int _currentIndex = 0;
 
   @override
@@ -85,7 +85,7 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.category),
-            label: 'Géneros',
+            label: 'Gï¿½neros',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.people),
@@ -93,7 +93,7 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.analytics),
-            label: 'Analíticas',
+            label: 'Analï¿½ticas',
           ),
         ],
       ),

@@ -4,7 +4,7 @@ import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/core/presentation/notification_listener.dart';
 import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:noveles/core/presentation/bloc/theme_bloc.dart';
-import 'package:noveles/features/admin/presentation/screens/admin_main_screen.dart';
+import 'package:noveles/features/admin/presentation/screens/admin_dash_screen.dart';
 import 'package:noveles/features/scan/presentation/screens/scan_main_screen.dart';
 import 'package:noveles/features/app/presentation/screens/main_screen.dart';
 import 'package:noveles/features/auth/presentation/screens/login_screen.dart';
@@ -30,7 +30,7 @@ class App extends StatelessWidget {
             theme: state.themeData,
             routes: {
               '/label-management': (_) => const LabelManagementScreen(),
-              '/admin': (_) => const AdminMainScreen(),
+              '/admin': (_) => const AdminDashScreen(),
             },
             home: NotificationListenerWidget(
               child: BlocListener<AuthBloc, AuthState>(
@@ -53,7 +53,7 @@ class App extends StatelessWidget {
                     }
                     if (authState is AuthAuthenticated) {
                       if (authState.user.isAdmin) {
-                        return const AdminMainScreen();
+                        return const AdminDashScreen();
                       }
                       if (authState.user.isScan) {
                         return const ScanMainScreen();
