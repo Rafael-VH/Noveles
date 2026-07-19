@@ -6,7 +6,7 @@ import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/books/data/book_model.dart';
 import 'package:noveles/features/books/domain/book_entity.dart';
 import 'package:noveles/features/books/domain/book_repository.dart';
-import 'package:noveles/features/books/domain/book_with_relations.dart';
+import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 
 class BookRepositoryImpl implements BookRepository {
   final SupabaseClientProvider _supabase;

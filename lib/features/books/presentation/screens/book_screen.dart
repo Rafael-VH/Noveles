@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:noveles/features/books/domain/book_with_relations.dart';
+import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 import 'package:noveles/features/books/presentation/screens/widgets/sliver_app_bar_book.dart';
 import 'package:noveles/features/books/presentation/screens/widgets/sliver_persistent_header_book.dart';
 import 'package:noveles/features/tooks/presentation/screens/took_screen.dart';

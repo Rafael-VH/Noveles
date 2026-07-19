@@ -1,4 +1,4 @@
-import 'package:noveles/features/books/domain/book_with_relations.dart';
+import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 
 class GetBooksByGenre {
   List<BookWithRelations> call(List<BookWithRelations> books, String genre) {

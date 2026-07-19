@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 export 'package:noveles/features/scan/presentation/bloc/scan_event.dart';
 export 'package:noveles/features/scan/presentation/bloc/scan_state.dart';
 import 'package:noveles/core/errors/result.dart';
-import 'package:noveles/features/books/domain/book_with_relations.dart';
+import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 import 'package:noveles/features/books/domain/get_book.dart';
 import 'package:noveles/features/books/domain/create_book.dart';
 import 'package:noveles/features/books/domain/update_book.dart';

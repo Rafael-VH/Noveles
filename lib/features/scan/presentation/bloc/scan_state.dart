@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:noveles/features/books/domain/book_with_relations.dart';
+import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 import 'package:noveles/features/genres/domain/genre_entity.dart';
 
 abstract class ScanState extends Equatable {

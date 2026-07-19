@@ -1,4 +1,4 @@
-ï»¿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/features/admin/presentation/bloc/admin_bloc.dart';
@@ -85,7 +85,7 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.category),
-            label: 'GÃ©neros',
+            label: 'Géneros',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.people),
@@ -93,7 +93,7 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.analytics),
-            label: 'AnalÃ­ticas',
+            label: 'Analíticas',
           ),
         ],
       ),

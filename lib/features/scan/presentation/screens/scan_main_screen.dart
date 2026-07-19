@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/core/cover/cover_url_service.dart';
-import 'package:noveles/features/books/domain/book_with_relations.dart';
+import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 import 'package:noveles/features/scan/presentation/bloc/scan_bloc.dart';
 import 'package:noveles/features/scan/presentation/bloc/scan_took_bloc.dart';
 import 'package:noveles/features/app/presentation/widgets/app_drawer.dart';

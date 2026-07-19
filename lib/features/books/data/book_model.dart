@@ -2,7 +2,7 @@ import 'package:noveles/core/utils/parse_utils.dart';
 import 'package:noveles/features/genres/data/genre_model.dart';
 import 'package:noveles/features/labels/data/label_model.dart';
 import 'package:noveles/features/tooks/data/took_model.dart';
-import 'package:noveles/features/books/domain/book_with_relations.dart';
+import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 
 /// Book data model from Supabase — always has joined relation data.
 class BookModel extends BookWithRelations {

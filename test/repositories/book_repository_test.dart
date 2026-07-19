@@ -6,7 +6,7 @@ import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/books/data/book_repository_impl.dart';
 import 'package:noveles/features/books/domain/book_entity.dart';
-import 'package:noveles/features/books/domain/book_with_relations.dart';
+import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MockSupabaseClientProvider extends Mock implements SupabaseClientProvider {}

@@ -1,6 +1,6 @@
 import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/books/domain/book_entity.dart';
-import 'package:noveles/features/books/domain/book_with_relations.dart';
+import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 
 abstract class BookRepository {
   Future<Result<List<BookWithRelations>>> getBooks({
