@@ -8,5 +8,5 @@ class ThemeState extends Equatable {
   const ThemeState({required this.isDarkMode, required this.themeData});
 
   @override
-  List<Object> get props => [isDarkMode];
+  List<Object> get props => [isDarkMode, themeData];
 }
