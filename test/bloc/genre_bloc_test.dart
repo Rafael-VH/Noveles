@@ -9,8 +9,6 @@ import 'package:noveles/features/genres/domain/create_genre.dart';
 import 'package:noveles/features/genres/domain/update_genre.dart';
 import 'package:noveles/features/genres/domain/delete_genre.dart';
 import 'package:noveles/features/genres/presentation/bloc/genre_bloc.dart';
-import 'package:noveles/features/genres/presentation/bloc/genre_event.dart';
-import 'package:noveles/features/genres/presentation/bloc/genre_state.dart';
 
 class MockGetGenre extends Mock implements GetGenre {}
 
@@ -103,7 +101,7 @@ void main() {
     );
 
     blocTest<GenreBloc, GenreState>(
-      'emits GenreLoaded with message when CreateGenreEvent succeeds',
+      'emits GenreLoaded with message when CreateGenre succeeds',
       build: () {
         when(() => mockCreateGenre(any()))
             .thenAnswer((_) async => const Ok(null));
@@ -122,7 +120,7 @@ void main() {
     );
 
     blocTest<GenreBloc, GenreState>(
-      'emits GenreError when CreateGenreEvent fails',
+      'emits GenreError when CreateGenre fails',
       build: () {
         when(() => mockCreateGenre(any()))
             .thenAnswer((_) async => Err(GenreFailure('Create error')));
@@ -140,7 +138,7 @@ void main() {
     );
 
     blocTest<GenreBloc, GenreState>(
-      'emits GenreLoaded with message when UpdateGenreEvent succeeds',
+      'emits GenreLoaded with message when UpdateGenre succeeds',
       build: () {
         when(() => mockUpdateGenre(any()))
             .thenAnswer((_) async => const Ok(null));
@@ -159,7 +157,7 @@ void main() {
     );
 
     blocTest<GenreBloc, GenreState>(
-      'emits GenreError when UpdateGenreEvent fails',
+      'emits GenreError when UpdateGenre fails',
       build: () {
         when(() => mockUpdateGenre(any()))
             .thenAnswer((_) async => Err(GenreFailure('Update error')));
@@ -177,7 +175,7 @@ void main() {
     );
 
     blocTest<GenreBloc, GenreState>(
-      'emits GenreLoaded with message when DeleteGenreEvent succeeds',
+      'emits GenreLoaded with message when DeleteGenre succeeds',
       build: () {
         when(() => mockDeleteGenre(any()))
             .thenAnswer((_) async => const Ok(null));
@@ -196,7 +194,7 @@ void main() {
     );
 
     blocTest<GenreBloc, GenreState>(
-      'emits GenreError when DeleteGenreEvent fails',
+      'emits GenreError when DeleteGenre fails',
       build: () {
         when(() => mockDeleteGenre(any()))
             .thenAnswer((_) async => Err(GenreFailure('Delete error')));
