@@ -47,16 +47,21 @@ class GenreBloc extends Bloc<GenreEvent, GenreState> {
     CreateGenreEvent event,
     Emitter<GenreState> emit,
   ) async {
+    final previousState = state;
     emit(GenreLoading());
     final createResult = await createGenre(event.genre);
     switch (createResult) {
       case Ok():
-        final current = state is GenreLoaded
-            ? (state as GenreLoaded).genres
+        final current = previousState is GenreLoaded
+            ? previousState.genres
             : <GenreEntity>[];
         emit(GenreLoaded([...current, event.genre], message: 'Género creado'));
       case Err(:final error):
-        emit(GenreError(error.message));
+        if (previousState is GenreLoaded) {
+          emit(GenreLoaded(previousState.genres, message: error.message));
+        } else {
+          emit(GenreError(error.message));
+        }
     }
   }
 
@@ -64,18 +69,23 @@ class GenreBloc extends Bloc<GenreEvent, GenreState> {
     UpdateGenreEvent event,
     Emitter<GenreState> emit,
   ) async {
+    final previousState = state;
     emit(GenreLoading());
     final updateResult = await updateGenre(event.genre);
     switch (updateResult) {
       case Ok():
-        final current = state is GenreLoaded
-            ? (state as GenreLoaded).genres
+        final current = previousState is GenreLoaded
+            ? previousState.genres
             : <GenreEntity>[];
         final updated =
             current.map((g) => g.id == event.genre.id ? event.genre : g).toList();
         emit(GenreLoaded(updated, message: 'Género actualizado'));
       case Err(:final error):
-        emit(GenreError(error.message));
+        if (previousState is GenreLoaded) {
+          emit(GenreLoaded(previousState.genres, message: error.message));
+        } else {
+          emit(GenreError(error.message));
+        }
     }
   }
 
@@ -83,17 +93,22 @@ class GenreBloc extends Bloc<GenreEvent, GenreState> {
     DeleteGenreEvent event,
     Emitter<GenreState> emit,
   ) async {
+    final previousState = state;
     emit(GenreLoading());
     final deleteResult = await deleteGenre(event.id);
     switch (deleteResult) {
       case Ok():
-        final current = state is GenreLoaded
-            ? (state as GenreLoaded).genres
+        final current = previousState is GenreLoaded
+            ? previousState.genres
             : <GenreEntity>[];
         final filtered = current.where((g) => g.id != event.id).toList();
         emit(GenreLoaded(filtered, message: 'Género eliminado'));
       case Err(:final error):
-        emit(GenreError(error.message));
+        if (previousState is GenreLoaded) {
+          emit(GenreLoaded(previousState.genres, message: error.message));
+        } else {
+          emit(GenreError(error.message));
+        }
     }
   }
 }

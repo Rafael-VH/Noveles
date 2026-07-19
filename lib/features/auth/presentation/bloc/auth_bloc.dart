@@ -100,6 +100,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     LogoutRequested event,
     Emitter<AuthState> emit,
   ) async {
+    if (_manualLogoutInProgress) return;
     _manualLogoutInProgress = true;
     emit(AuthLoading());
     final result = await logout();
