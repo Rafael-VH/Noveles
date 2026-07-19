@@ -110,7 +110,6 @@ void main() {
       },
       act: (bloc) => bloc.add(CreateGenreEvent(testGenre)),
       expect: () => [
-        isA<GenreLoading>(),
         isA<GenreLoaded>().having(
           (s) => s.message,
           'message',
@@ -128,7 +127,6 @@ void main() {
       },
       act: (bloc) => bloc.add(CreateGenreEvent(testGenre)),
       expect: () => [
-        isA<GenreLoading>(),
         isA<GenreError>().having(
           (s) => s.message,
           'message',
@@ -147,7 +145,6 @@ void main() {
       },
       act: (bloc) => bloc.add(UpdateGenreEvent(testGenre)),
       expect: () => [
-        isA<GenreLoading>(),
         isA<GenreLoaded>().having(
           (s) => s.message,
           'message',
@@ -165,7 +162,6 @@ void main() {
       },
       act: (bloc) => bloc.add(UpdateGenreEvent(testGenre)),
       expect: () => [
-        isA<GenreLoading>(),
         isA<GenreError>().having(
           (s) => s.message,
           'message',
@@ -184,7 +180,6 @@ void main() {
       },
       act: (bloc) => bloc.add(DeleteGenreEvent(1)),
       expect: () => [
-        isA<GenreLoading>(),
         isA<GenreLoaded>().having(
           (s) => s.message,
           'message',
@@ -202,7 +197,6 @@ void main() {
       },
       act: (bloc) => bloc.add(DeleteGenreEvent(1)),
       expect: () => [
-        isA<GenreLoading>(),
         isA<GenreError>().having(
           (s) => s.message,
           'message',

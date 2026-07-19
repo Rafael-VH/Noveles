@@ -23,11 +23,12 @@ class ScanLoaded extends ScanState {
 
 class ScanCoverUploaded extends ScanState {
   final String filename;
+  final List<BookWithRelations> books;
 
-  ScanCoverUploaded(this.filename);
+  ScanCoverUploaded(this.filename, {this.books = const []});
 
   @override
-  List<Object> get props => [filename];
+  List<Object> get props => [filename, books];
 }
 
 class ScanGenresLoaded extends ScanState {

@@ -48,7 +48,6 @@ class GenreBloc extends Bloc<GenreEvent, GenreState> {
     Emitter<GenreState> emit,
   ) async {
     final previousState = state;
-    emit(GenreLoading());
     final createResult = await createGenre(event.genre);
     switch (createResult) {
       case Ok():
@@ -70,7 +69,6 @@ class GenreBloc extends Bloc<GenreEvent, GenreState> {
     Emitter<GenreState> emit,
   ) async {
     final previousState = state;
-    emit(GenreLoading());
     final updateResult = await updateGenre(event.genre);
     switch (updateResult) {
       case Ok():
@@ -94,7 +92,6 @@ class GenreBloc extends Bloc<GenreEvent, GenreState> {
     Emitter<GenreState> emit,
   ) async {
     final previousState = state;
-    emit(GenreLoading());
     final deleteResult = await deleteGenre(event.id);
     switch (deleteResult) {
       case Ok():

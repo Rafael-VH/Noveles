@@ -46,10 +46,16 @@ class ScanBloc extends Bloc<ScanEvent, ScanState> {
     UploadScanCover event,
     Emitter<ScanState> emit,
   ) async {
+    final currentState = state;
+    final books = switch (currentState) {
+      ScanLoaded(:final books) => books,
+      ScanGenresLoaded(:final books) => books,
+      _ => <BookWithRelations>[],
+    };
     final result = await uploadCover(event.filePath);
     switch (result) {
       case Ok(:final value):
-        emit(ScanCoverUploaded(value));
+        emit(ScanCoverUploaded(value, books: books));
       case Err(:final error):
         emit(ScanError(error.message));
     }
