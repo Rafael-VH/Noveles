@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -274,7 +273,7 @@ void main() {
         );
       },
       seed: () => ProfileLoaded(testUser),
-      act: (bloc) => bloc.add(PickAvatar(File('/tmp/avatar.png'))),
+      act: (bloc) => bloc.add(PickAvatar('/tmp/avatar.png')),
       expect: () => [
         isA<ProfileLoaded>()
             .having(
@@ -283,8 +282,8 @@ void main() {
               'Test User',
             )
             .having(
-              (s) => s.pendingAvatar?.path,
-              'pendingAvatar path',
+              (s) => s.pendingAvatarPath,
+              'pendingAvatarPath',
               '/tmp/avatar.png',
             ),
       ],
@@ -300,7 +299,7 @@ void main() {
           changePassword: mockChangePassword,
         );
       },
-      act: (bloc) => bloc.add(PickAvatar(File('/tmp/avatar.png'))),
+      act: (bloc) => bloc.add(PickAvatar('/tmp/avatar.png')),
       expect: () => [],
     );
 

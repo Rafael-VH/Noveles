@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -40,7 +39,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final picker = ImagePicker();
     final xFile = await picker.pickImage(source: ImageSource.gallery);
     if (xFile != null && mounted) {
-      context.read<ProfileBloc>().add(PickAvatar(File(xFile.path)));
+      context.read<ProfileBloc>().add(PickAvatar(xFile.path));
     }
   }
 
@@ -108,25 +107,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             UserEntity user;
             bool isSaving;
-            File? pendingAvatar;
+            String? pendingAvatarPath;
 
             if (state is ProfileLoaded) {
               user = state.user;
               isSaving = false;
-              pendingAvatar = state.pendingAvatar;
+              pendingAvatarPath = state.pendingAvatarPath;
             } else if (state is ProfileSaving) {
               user = state.user;
               isSaving = true;
-              pendingAvatar = null;
+              pendingAvatarPath = null;
             } else if (state is ProfileError && state.user != null) {
               user = state.user!;
               isSaving = false;
-              pendingAvatar = null;
+              pendingAvatarPath = null;
             } else {
               return const Center(child: Text('Error al cargar perfil'));
             }
 
-            return _buildForm(context, user, isSaving, pendingAvatar);
+            return _buildForm(context, user, isSaving, pendingAvatarPath);
           },
         ),
       ),
@@ -137,14 +136,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     BuildContext context,
     UserEntity user,
     bool isSaving,
-    File? pendingAvatar,
+    String? pendingAvatarPath,
   ) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24.0),
       child: Column(
         children: [
           AvatarSection(
-            pendingAvatar: pendingAvatar,
+            pendingAvatarPath: pendingAvatarPath,
             avatarUrl: user.avatarUrl,
             isSaving: isSaving,
             onPickImage: _pickImage,

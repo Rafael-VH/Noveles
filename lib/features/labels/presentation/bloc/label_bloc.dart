@@ -9,7 +9,7 @@ import 'package:noveles/features/labels/domain/create_label.dart';
 import 'package:noveles/features/labels/domain/delete_label.dart';
 import 'package:noveles/features/labels/domain/assign_label_to_book.dart';
 import 'package:noveles/features/labels/domain/remove_label_from_book.dart';
-import 'package:noveles/features/books/domain/get_book_labels.dart';
+import 'package:noveles/features/labels/domain/get_labels_for_books.dart';
 import 'package:noveles/features/labels/presentation/bloc/label_event.dart';
 import 'package:noveles/features/labels/presentation/bloc/label_state.dart';
 
@@ -19,7 +19,7 @@ class LabelBloc extends Bloc<LabelEvent, LabelState> {
   final DeleteLabel deleteLabel;
   final AssignLabelToBook assignLabel;
   final RemoveLabelFromBook removeLabel;
-  final GetBookLabels getBookLabels;
+  final GetLabelsForBooks getLabelsForBooks;
 
   LabelBloc({
     required this.getLabels,
@@ -27,7 +27,7 @@ class LabelBloc extends Bloc<LabelEvent, LabelState> {
     required this.deleteLabel,
     required this.assignLabel,
     required this.removeLabel,
-    required this.getBookLabels,
+    required this.getLabelsForBooks,
   }) : super(const LabelInitial()) {
     on<LoadLabels>(_onLoadLabels);
     on<CreateLabelEvent>(_onCreateLabel);
@@ -41,7 +41,7 @@ class LabelBloc extends Bloc<LabelEvent, LabelState> {
     switch (labelsResult) {
       case Ok(:final value):
         final loadedLabels = value;
-        final bookLabelsResult = await getBookLabels([]);
+        final bookLabelsResult = await getLabelsForBooks([]);
         switch (bookLabelsResult) {
           case Ok(:final value):
             emit(LabelLoaded(loadedLabels, value, message: message));
@@ -59,7 +59,7 @@ class LabelBloc extends Bloc<LabelEvent, LabelState> {
     switch (labelsResult) {
       case Ok(:final value):
         final loadedLabels = value;
-        final bookLabelsResult = await getBookLabels([]);
+        final bookLabelsResult = await getLabelsForBooks([]);
         switch (bookLabelsResult) {
           case Ok(:final value):
             emit(LabelLoaded(loadedLabels, value));

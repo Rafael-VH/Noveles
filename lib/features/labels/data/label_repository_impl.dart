@@ -82,4 +82,22 @@ class LabelRepositoryImpl implements LabelRepository {
       return Err(LabelFailure('Error al quitar etiqueta', cause: e));
     }
   }
+
+  @override
+  Future<Result<Map<int, Set<int>>>> getBookLabels(List<int> bookIds) async {
+    try {
+      if (bookIds.isEmpty) return const Ok({});
+      final rows = await _supabase.client
+          .from('books_labels')
+          .select()
+          .filter('book_id', 'in', bookIds);
+      final map = <int, Set<int>>{};
+      for (final row in rows) {
+        map.putIfAbsent(row['book_id'], () => {}).add(row['label_id']);
+      }
+      return Ok(map);
+    } catch (e) {
+      return Err(LabelFailure('Error al obtener etiquetas de libros', cause: e));
+    }
+  }
 }

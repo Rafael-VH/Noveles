@@ -6,3 +6,4 @@ export 'package:noveles/features/labels/domain/update_label.dart';
 export 'package:noveles/features/labels/domain/delete_label.dart';
 export 'package:noveles/features/labels/domain/assign_label_to_book.dart';
 export 'package:noveles/features/labels/domain/remove_label_from_book.dart';
+export 'package:noveles/features/labels/domain/get_labels_for_books.dart';

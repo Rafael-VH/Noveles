@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:equatable/equatable.dart';
 
 abstract class ProfileEvent extends Equatable {
@@ -23,12 +22,12 @@ class UpdateProfile extends ProfileEvent {
 }
 
 class PickAvatar extends ProfileEvent {
-  final File file;
+  final String filePath;
 
-  const PickAvatar(this.file);
+  const PickAvatar(this.filePath);
 
   @override
-  List<Object> get props => [file.path];
+  List<Object> get props => [filePath];
 }
 
 class ChangePassword extends ProfileEvent {

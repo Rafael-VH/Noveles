@@ -8,4 +8,5 @@ abstract class LabelRepository {
   Future<Result<void>> deleteLabel(int id);
   Future<Result<void>> assignLabel(int bookId, int labelId);
   Future<Result<void>> removeLabel(int bookId, int labelId);
+  Future<Result<Map<int, Set<int>>>> getBookLabels(List<int> bookIds);
 }

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/features/books/domain/book_entity.dart';
 import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 import 'package:noveles/features/genres/domain/genre_entity.dart';
@@ -195,7 +196,10 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
     final refreshed = await Navigator.push<bool>(
       context,
       MaterialPageRoute(
-        builder: (_) => ScanTookEditScreen(bookId: bookId),
+        builder: (_) => BlocProvider(
+          create: (_) => getIt<ScanTookBloc>(),
+          child: ScanTookEditScreen(bookId: bookId),
+        ),
       ),
     );
     if (refreshed == true && mounted) {
@@ -382,9 +386,12 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
                         final refreshed = await Navigator.push<bool>(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => ScanTookEditScreen(
-                              took: took,
-                              bookId: bookId,
+                            builder: (_) => BlocProvider(
+                              create: (_) => getIt<ScanTookBloc>(),
+                              child: ScanTookEditScreen(
+                                took: took,
+                                bookId: bookId,
+                              ),
                             ),
                           ),
                         );

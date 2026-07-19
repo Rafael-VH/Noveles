@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:equatable/equatable.dart';
 import 'package:noveles/features/profiles/domain/user_entity.dart';
 
@@ -13,13 +12,13 @@ class ProfileLoading extends ProfileState {}
 
 class ProfileLoaded extends ProfileState {
   final UserEntity user;
-  final File? pendingAvatar;
+  final String? pendingAvatarPath;
   final String? message;
 
-  ProfileLoaded(this.user, {this.pendingAvatar, this.message});
+  ProfileLoaded(this.user, {this.pendingAvatarPath, this.message});
 
   @override
-  List<Object> get props => [user, pendingAvatar ?? '', message ?? ''];
+  List<Object> get props => [user, pendingAvatarPath ?? '', message ?? ''];
 }
 
 class ProfileSaving extends ProfileState {

@@ -8,6 +8,7 @@ import 'package:noveles/features/labels/domain/update_label.dart';
 import 'package:noveles/features/labels/domain/delete_label.dart';
 import 'package:noveles/features/labels/domain/assign_label_to_book.dart';
 import 'package:noveles/features/labels/domain/remove_label_from_book.dart';
+import 'package:noveles/features/labels/domain/get_labels_for_books.dart';
 import 'package:noveles/features/labels/presentation/bloc/label_bloc.dart';
 
 final getIt = GetIt.instance;
@@ -37,6 +38,9 @@ void initLabelsDependencies() {
   getIt.registerLazySingleton(
     () => UpdateLabel(getIt()),
   );
+  getIt.registerLazySingleton(
+    () => GetLabelsForBooks(getIt()),
+  );
 
   getIt.registerFactory(
     () => LabelBloc(
@@ -45,7 +49,7 @@ void initLabelsDependencies() {
       deleteLabel: getIt(),
       assignLabel: getIt(),
       removeLabel: getIt(),
-      getBookLabels: getIt(),
+      getLabelsForBooks: getIt(),
     ),
   );
 }

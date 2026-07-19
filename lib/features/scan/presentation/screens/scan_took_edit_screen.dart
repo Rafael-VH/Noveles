@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
@@ -65,7 +66,7 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
       listChapterIds: _chapters.map((c) => c.id).toList(),
     );
 
-    final bloc = getIt<ScanTookBloc>();
+    final bloc = context.read<ScanTookBloc>();
     setState(() => _isSaving = true);
     final completer = Completer<ScanTookState>();
     late StreamSubscription sub;
@@ -100,7 +101,6 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
       }
     } finally {
       sub.cancel();
-      bloc.close();
       if (mounted) setState(() => _isSaving = false);
     }
   }
@@ -111,7 +111,7 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
     final xFile = await picker.pickImage(source: ImageSource.gallery);
     if (xFile == null || !mounted) return;
 
-    final bloc = getIt<ScanTookBloc>();
+    final bloc = context.read<ScanTookBloc>();
     final completer = Completer<ScanTookState>();
     late StreamSubscription sub;
     sub = bloc.stream.listen((s) {
@@ -151,7 +151,7 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
   // Delete chapter
   Future<void> _deleteChapter(int chapterId) async {
     if (_isSaving) return;
-    final bloc = getIt<ScanChapterBloc>();
+    final bloc = context.read<ScanChapterBloc>();
     setState(() => _isSaving = true);
     final completer = Completer<ScanChapterState>();
     late StreamSubscription sub;
@@ -192,7 +192,6 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
       }
     } finally {
       sub.cancel();
-      bloc.close();
       if (mounted) setState(() => _isSaving = false);
     }
   }
@@ -205,9 +204,12 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
     final result = await Navigator.push<ChapterEntity>(
       context,
       MaterialPageRoute(
-        builder: (_) => ScanChapterEditScreen(
-          chapter: chapter,
-          tookId: tookId,
+        builder: (_) => BlocProvider(
+          create: (_) => getIt<ScanChapterBloc>(),
+          child: ScanChapterEditScreen(
+            chapter: chapter,
+            tookId: tookId,
+          ),
         ),
       ),
     );

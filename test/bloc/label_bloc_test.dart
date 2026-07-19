@@ -9,7 +9,7 @@ import 'package:noveles/features/labels/domain/create_label.dart';
 import 'package:noveles/features/labels/domain/delete_label.dart';
 import 'package:noveles/features/labels/domain/assign_label_to_book.dart';
 import 'package:noveles/features/labels/domain/remove_label_from_book.dart';
-import 'package:noveles/features/books/domain/get_book_labels.dart';
+import 'package:noveles/features/labels/domain/get_labels_for_books.dart';
 import 'package:noveles/features/labels/presentation/bloc/label_bloc.dart';
 import 'package:noveles/features/labels/presentation/bloc/label_event.dart';
 import 'package:noveles/features/labels/presentation/bloc/label_state.dart';
@@ -24,7 +24,7 @@ class MockAssignLabelToBook extends Mock implements AssignLabelToBook {}
 
 class MockRemoveLabelFromBook extends Mock implements RemoveLabelFromBook {}
 
-class MockGetBookLabels extends Mock implements GetBookLabels {}
+class MockGetLabelsForBooks extends Mock implements GetLabelsForBooks {}
 
 void main() {
   late MockGetLabels mockGetLabels;
@@ -32,7 +32,7 @@ void main() {
   late MockDeleteLabel mockDeleteLabel;
   late MockAssignLabelToBook mockAssignLabel;
   late MockRemoveLabelFromBook mockRemoveLabel;
-  late MockGetBookLabels mockGetBookLabels;
+  late MockGetLabelsForBooks mockGetLabelsForBooks;
 
   final testLabels = [
     LabelEntity(
@@ -69,7 +69,7 @@ void main() {
     mockDeleteLabel = MockDeleteLabel();
     mockAssignLabel = MockAssignLabelToBook();
     mockRemoveLabel = MockRemoveLabelFromBook();
-    mockGetBookLabels = MockGetBookLabels();
+    mockGetLabelsForBooks = MockGetLabelsForBooks();
   });
 
   group('LabelBloc', () {
@@ -80,7 +80,7 @@ void main() {
         deleteLabel: mockDeleteLabel,
         assignLabel: mockAssignLabel,
         removeLabel: mockRemoveLabel,
-        getBookLabels: mockGetBookLabels,
+        getLabelsForBooks: mockGetLabelsForBooks,
       );
       expect(bloc.state, const LabelInitial());
       bloc.close();
@@ -90,7 +90,7 @@ void main() {
       'emits [LabelLoading, LabelLoaded] when LoadLabels succeeds',
       build: () {
         when(() => mockGetLabels()).thenAnswer((_) async => Ok(testLabels));
-        when(() => mockGetBookLabels(any()))
+        when(() => mockGetLabelsForBooks(any()))
             .thenAnswer((_) async => Ok(testBookLabels));
         return LabelBloc(
           getLabels: mockGetLabels,
@@ -98,7 +98,7 @@ void main() {
           deleteLabel: mockDeleteLabel,
           assignLabel: mockAssignLabel,
           removeLabel: mockRemoveLabel,
-          getBookLabels: mockGetBookLabels,
+          getLabelsForBooks: mockGetLabelsForBooks,
         );
       },
       act: (bloc) => bloc.add(const LoadLabels()),
@@ -121,7 +121,7 @@ void main() {
           deleteLabel: mockDeleteLabel,
           assignLabel: mockAssignLabel,
           removeLabel: mockRemoveLabel,
-          getBookLabels: mockGetBookLabels,
+          getLabelsForBooks: mockGetLabelsForBooks,
         );
       },
       act: (bloc) => bloc.add(const LoadLabels()),
@@ -141,7 +141,7 @@ void main() {
         when(() => mockCreateLabel(any()))
             .thenAnswer((_) async => const Ok(null));
         when(() => mockGetLabels()).thenAnswer((_) async => Ok(testLabels));
-        when(() => mockGetBookLabels(any()))
+        when(() => mockGetLabelsForBooks(any()))
             .thenAnswer((_) async => Ok(testBookLabels));
         return LabelBloc(
           getLabels: mockGetLabels,
@@ -149,7 +149,7 @@ void main() {
           deleteLabel: mockDeleteLabel,
           assignLabel: mockAssignLabel,
           removeLabel: mockRemoveLabel,
-          getBookLabels: mockGetBookLabels,
+          getLabelsForBooks: mockGetLabelsForBooks,
         );
       },
       act: (bloc) => bloc.add(const CreateLabelEvent('New', '#fff')),
@@ -173,7 +173,7 @@ void main() {
           deleteLabel: mockDeleteLabel,
           assignLabel: mockAssignLabel,
           removeLabel: mockRemoveLabel,
-          getBookLabels: mockGetBookLabels,
+          getLabelsForBooks: mockGetLabelsForBooks,
         );
       },
       act: (bloc) => bloc.add(const CreateLabelEvent('New', '#fff')),
@@ -192,7 +192,7 @@ void main() {
         when(() => mockAssignLabel(any(), any()))
             .thenAnswer((_) async => const Ok(null));
         when(() => mockGetLabels()).thenAnswer((_) async => Ok(testLabels));
-        when(() => mockGetBookLabels(any()))
+        when(() => mockGetLabelsForBooks(any()))
             .thenAnswer((_) async => Ok(testBookLabels));
         return LabelBloc(
           getLabels: mockGetLabels,
@@ -200,7 +200,7 @@ void main() {
           deleteLabel: mockDeleteLabel,
           assignLabel: mockAssignLabel,
           removeLabel: mockRemoveLabel,
-          getBookLabels: mockGetBookLabels,
+          getLabelsForBooks: mockGetLabelsForBooks,
         );
       },
       act: (bloc) => bloc.add(const AssignLabelEvent(1, 2)),
@@ -224,7 +224,7 @@ void main() {
           deleteLabel: mockDeleteLabel,
           assignLabel: mockAssignLabel,
           removeLabel: mockRemoveLabel,
-          getBookLabels: mockGetBookLabels,
+          getLabelsForBooks: mockGetLabelsForBooks,
         );
       },
       act: (bloc) => bloc.add(const AssignLabelEvent(1, 2)),
@@ -243,7 +243,7 @@ void main() {
         when(() => mockRemoveLabel(any(), any()))
             .thenAnswer((_) async => const Ok(null));
         when(() => mockGetLabels()).thenAnswer((_) async => Ok(testLabels));
-        when(() => mockGetBookLabels(any()))
+        when(() => mockGetLabelsForBooks(any()))
             .thenAnswer((_) async => Ok(testBookLabels));
         return LabelBloc(
           getLabels: mockGetLabels,
@@ -251,7 +251,7 @@ void main() {
           deleteLabel: mockDeleteLabel,
           assignLabel: mockAssignLabel,
           removeLabel: mockRemoveLabel,
-          getBookLabels: mockGetBookLabels,
+          getLabelsForBooks: mockGetLabelsForBooks,
         );
       },
       act: (bloc) => bloc.add(const RemoveLabelEvent(1, 1)),
@@ -270,7 +270,7 @@ void main() {
         when(() => mockDeleteLabel(any()))
             .thenAnswer((_) async => const Ok(null));
         when(() => mockGetLabels()).thenAnswer((_) async => Ok(testLabels));
-        when(() => mockGetBookLabels(any()))
+        when(() => mockGetLabelsForBooks(any()))
             .thenAnswer((_) async => Ok(testBookLabels));
         return LabelBloc(
           getLabels: mockGetLabels,
@@ -278,7 +278,7 @@ void main() {
           deleteLabel: mockDeleteLabel,
           assignLabel: mockAssignLabel,
           removeLabel: mockRemoveLabel,
-          getBookLabels: mockGetBookLabels,
+          getLabelsForBooks: mockGetLabelsForBooks,
         );
       },
       act: (bloc) => bloc.add(const DeleteLabelEvent(1)),
@@ -302,7 +302,7 @@ void main() {
           deleteLabel: mockDeleteLabel,
           assignLabel: mockAssignLabel,
           removeLabel: mockRemoveLabel,
-          getBookLabels: mockGetBookLabels,
+          getLabelsForBooks: mockGetLabelsForBooks,
         );
       },
       act: (bloc) => bloc.add(const DeleteLabelEvent(1)),
@@ -326,7 +326,7 @@ void main() {
           deleteLabel: mockDeleteLabel,
           assignLabel: mockAssignLabel,
           removeLabel: mockRemoveLabel,
-          getBookLabels: mockGetBookLabels,
+          getLabelsForBooks: mockGetLabelsForBooks,
         );
       },
       act: (bloc) => bloc.add(const RemoveLabelEvent(1, 1)),

@@ -2,21 +2,21 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 class AvatarSection extends StatelessWidget {
-  final File? pendingAvatar;
+  final String? pendingAvatarPath;
   final String? avatarUrl;
   final bool isSaving;
   final VoidCallback onPickImage;
 
   const AvatarSection({
     super.key,
-    required this.pendingAvatar,
+    required this.pendingAvatarPath,
     required this.avatarUrl,
     required this.isSaving,
     required this.onPickImage,
   });
 
   ImageProvider<Object>? _avatarImage() {
-    if (pendingAvatar != null) return FileImage(pendingAvatar!);
+    if (pendingAvatarPath != null) return FileImage(File(pendingAvatarPath!));
     if (avatarUrl != null) return NetworkImage(avatarUrl!);
     return null;
   }
@@ -30,7 +30,7 @@ class AvatarSection extends StatelessWidget {
           child: CircleAvatar(
             radius: 50,
             backgroundImage: _avatarImage(),
-            child: (pendingAvatar == null && avatarUrl == null)
+            child: (pendingAvatarPath == null && avatarUrl == null)
                 ? const Icon(Icons.person, size: 50)
                 : null,
           ),

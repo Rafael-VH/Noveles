@@ -54,9 +54,9 @@ class ProfileBloc extends Bloc<events.ProfileEvent, ProfileState> {
     }
     emit(ProfileSaving(currentState.user));
     String? avatarUrl = currentState.user.avatarUrl;
-    if (currentState.pendingAvatar != null) {
+    if (currentState.pendingAvatarPath != null) {
       final avatarResult =
-          await uploadAvatar(currentState.pendingAvatar!.path);
+          await uploadAvatar(currentState.pendingAvatarPath!);
       switch (avatarResult) {
         case Ok(:final value):
           avatarUrl = value;
@@ -84,7 +84,7 @@ class ProfileBloc extends Bloc<events.ProfileEvent, ProfileState> {
   ) async {
     final currentState = state;
     if (currentState is! ProfileLoaded) return;
-    emit(ProfileLoaded(currentState.user, pendingAvatar: event.file));
+    emit(ProfileLoaded(currentState.user, pendingAvatarPath: event.filePath));
   }
 
   Future<void> _onChangePassword(

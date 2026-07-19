@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/core/cover/cover_url_service.dart';
 import 'package:noveles/features/admin/presentation/bloc/admin_bloc.dart';
-import 'package:noveles/features/labels/presentation/screens/label_management_screen.dart';
 
 class BooksTab extends StatelessWidget {
   final AdminState state;
@@ -81,9 +80,9 @@ class BooksContent extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: ElevatedButton.icon(
-            onPressed: () => Navigator.push(
+            onPressed: () => Navigator.pushNamed(
               context,
-              MaterialPageRoute(builder: (_) => const LabelManagementScreen()),
+              '/label-management',
             ),
             icon: const Icon(Icons.label),
             label: const Text('Gestionar Etiquetas'),

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:noveles/core/di/injection.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 import 'package:noveles/features/scan/presentation/bloc/scan_chapter_bloc.dart';
 
@@ -82,7 +82,7 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
       }
 
       final fileName = result.files.single.name;
-      final bloc = getIt<ScanChapterBloc>();
+      final bloc = context.read<ScanChapterBloc>();
       final completer = Completer<ScanChapterState>();
       late StreamSubscription sub;
       sub = bloc.stream.listen((s) {
@@ -150,7 +150,7 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
     );
 
     // Save chapter
-    final bloc = getIt<ScanChapterBloc>();
+    final bloc = context.read<ScanChapterBloc>();
     setState(() => _isSaving = true);
 
     final completer = Completer<ScanChapterState>();
@@ -186,7 +186,6 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
       }
     } finally {
       sub.cancel();
-      bloc.close();
       if (mounted) setState(() => _isSaving = false);
     }
   }
