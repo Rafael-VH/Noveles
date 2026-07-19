@@ -30,6 +30,7 @@ class App extends StatelessWidget {
             theme: state.themeData,
             routes: {
               '/label-management': (_) => const LabelManagementScreen(),
+              '/admin': (_) => const AdminMainScreen(),
             },
             home: NotificationListenerWidget(
               child: BlocListener<AuthBloc, AuthState>(

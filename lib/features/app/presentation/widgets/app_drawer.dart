@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/cover/cover_url_service.dart';
 import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:noveles/features/admin/presentation/screens/admin_main_screen.dart';
 import 'package:noveles/features/profiles/presentation/screens/profile_screen.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -62,12 +61,7 @@ class AppDrawer extends StatelessWidget {
                   title: const Text('Panel Admin'),
                   onTap: () {
                     Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const AdminMainScreen(),
-                      ),
-                    );
+                    Navigator.pushNamed(context, '/admin');
                   },
                 ),
               if (!isAdmin)
