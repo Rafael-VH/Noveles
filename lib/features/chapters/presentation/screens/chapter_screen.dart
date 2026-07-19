@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/presentation/notification_service.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
+import 'package:noveles/features/chapters/domain/chapter_ref.dart';
 import 'package:noveles/core/utils/text_stats.dart';
 import 'package:noveles/features/chapters/presentation/bloc/chapter_bloc.dart';
 
@@ -54,7 +55,7 @@ class _ChapterScreenState extends State<ChapterScreen> {
     context.read<ChapterBloc>().add(
           LoadChapterContent(
             initialIndex: widget.i,
-            chapters: widget.chapters,
+            chapters: widget.chapters.map(ChapterRef.fromEntity).toList(),
           ),
         );
   }
@@ -92,7 +93,7 @@ class _ChapterScreenState extends State<ChapterScreen> {
                     onPressed: () => context.read<ChapterBloc>().add(
                           LoadChapterContent(
                             initialIndex: widget.i,
-                            chapters: widget.chapters,
+                            chapters: widget.chapters.map(ChapterRef.fromEntity).toList(),
                           ),
                         ),
                     child: const Text('Reintentar'),

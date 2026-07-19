@@ -35,7 +35,7 @@ class ChapterBloc extends Bloc<ChapterEvent, ChapterState> {
         case Ok(:final value):
           resolved.add(ChapterEntity(
             id: ch.id,
-            createdAt: ch.createdAt,
+            createdAt: DateTime(0), // Not needed for display
             number: ch.number,
             title: ch.title,
             content: value,

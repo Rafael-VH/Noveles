@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:noveles/features/chapters/domain/chapter_entity.dart';
+import 'package:noveles/features/chapters/domain/chapter_ref.dart';
 
 abstract class ChapterEvent extends Equatable {
   const ChapterEvent();
@@ -10,7 +10,7 @@ abstract class ChapterEvent extends Equatable {
 
 class LoadChapterContent extends ChapterEvent {
   final int initialIndex;
-  final List<ChapterEntity> chapters;
+  final List<ChapterRef> chapters;
 
   const LoadChapterContent({required this.initialIndex, required this.chapters});
 

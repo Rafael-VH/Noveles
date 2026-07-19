@@ -1,3 +1,7 @@
+// TODO(tech-debt): Split ScanBloc into ScanBookBloc, ScanCoverBloc, ScanGenreBloc.
+// Currently handles book CRUD, cover upload, genre loading, and visibility toggling
+// — 7 use cases and 6 event types in one class. Requires provider changes across
+// scan_main_screen.dart, scan_book_edit_screen.dart, and injection_scan.dart.
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 export 'package:noveles/features/scan/presentation/bloc/scan_event.dart';

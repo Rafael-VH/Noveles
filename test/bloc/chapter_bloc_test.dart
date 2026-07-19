@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/core/errors/failure.dart';
-import 'package:noveles/features/chapters/domain/chapter_entity.dart';
+import 'package:noveles/features/chapters/domain/chapter_ref.dart';
 import 'package:noveles/features/chapters/domain/get_chapter_content.dart';
 import 'package:noveles/features/chapters/presentation/bloc/chapter_bloc.dart';
 import 'package:noveles/features/chapters/presentation/bloc/chapter_event.dart';
@@ -15,17 +15,15 @@ void main() {
   late MockGetChapterContent mockGetChapterContent;
 
   final testChapters = [
-    ChapterEntity(
+    const ChapterRef(
       id: 1,
-      createdAt: DateTime(2024),
       number: '1',
       title: 'Chapter 1',
       content: 'ch1.txt',
       tookId: 1,
     ),
-    ChapterEntity(
+    const ChapterRef(
       id: 2,
-      createdAt: DateTime(2024),
       number: '2',
       title: 'Chapter 2',
       content: 'ch2.txt',
