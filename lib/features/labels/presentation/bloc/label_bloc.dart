@@ -37,6 +37,7 @@ class LabelBloc extends Bloc<LabelEvent, LabelState> {
   }
 
   Future<void> _emitLoaded(Emitter<LabelState> emit, {String? message}) async {
+    final previousState = state;
     final labelsResult = await getLabels();
     switch (labelsResult) {
       case Ok(:final value):
@@ -46,10 +47,20 @@ class LabelBloc extends Bloc<LabelEvent, LabelState> {
           case Ok(:final value):
             emit(LabelLoaded(loadedLabels, value, message: message));
           case Err(:final error):
-            emit(LabelError(error.message));
+            if (previousState is LabelLoaded) {
+              emit(LabelLoaded(previousState.labels, previousState.bookLabels,
+                  message: error.message));
+            } else {
+              emit(LabelError(error.message));
+            }
         }
       case Err(:final error):
-        emit(LabelError(error.message));
+        if (previousState is LabelLoaded) {
+          emit(LabelLoaded(previousState.labels, previousState.bookLabels,
+              message: error.message));
+        } else {
+          emit(LabelError(error.message));
+        }
     }
   }
 
@@ -73,6 +84,7 @@ class LabelBloc extends Bloc<LabelEvent, LabelState> {
 
   Future<void> _onCreateLabel(
       CreateLabelEvent event, Emitter<LabelState> emit) async {
+    final previousState = state;
     final entity = LabelEntity(
       id: 0,
       createdAt: DateTime.now(),
@@ -93,12 +105,18 @@ class LabelBloc extends Bloc<LabelEvent, LabelState> {
           await _emitLoaded(emit, message: 'Etiqueta creada');
         }
       case Err(:final error):
-        emit(LabelError(error.message));
+        if (previousState is LabelLoaded) {
+          emit(LabelLoaded(previousState.labels, previousState.bookLabels,
+              message: error.message));
+        } else {
+          emit(LabelError(error.message));
+        }
     }
   }
 
   Future<void> _onDeleteLabel(
       DeleteLabelEvent event, Emitter<LabelState> emit) async {
+    final previousState = state;
     final result = await deleteLabel(event.id);
     switch (result) {
       case Ok():
@@ -113,29 +131,46 @@ class LabelBloc extends Bloc<LabelEvent, LabelState> {
           await _emitLoaded(emit, message: 'Etiqueta eliminada');
         }
       case Err(:final error):
-        emit(LabelError(error.message));
+        if (previousState is LabelLoaded) {
+          emit(LabelLoaded(previousState.labels, previousState.bookLabels,
+              message: error.message));
+        } else {
+          emit(LabelError(error.message));
+        }
     }
   }
 
   Future<void> _onAssignLabel(
       AssignLabelEvent event, Emitter<LabelState> emit) async {
+    final previousState = state;
     final result = await assignLabel(event.bookId, event.labelId);
     switch (result) {
       case Ok():
         await _emitLoaded(emit, message: 'Etiqueta asignada');
       case Err(:final error):
-        emit(LabelError(error.message));
+        if (previousState is LabelLoaded) {
+          emit(LabelLoaded(previousState.labels, previousState.bookLabels,
+              message: error.message));
+        } else {
+          emit(LabelError(error.message));
+        }
     }
   }
 
   Future<void> _onRemoveLabel(
       RemoveLabelEvent event, Emitter<LabelState> emit) async {
+    final previousState = state;
     final result = await removeLabel(event.bookId, event.labelId);
     switch (result) {
       case Ok():
         await _emitLoaded(emit, message: 'Etiqueta removida');
       case Err(:final error):
-        emit(LabelError(error.message));
+        if (previousState is LabelLoaded) {
+          emit(LabelLoaded(previousState.labels, previousState.bookLabels,
+              message: error.message));
+        } else {
+          emit(LabelError(error.message));
+        }
     }
   }
 }
