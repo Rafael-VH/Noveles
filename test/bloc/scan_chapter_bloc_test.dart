@@ -7,6 +7,7 @@ import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 import 'package:noveles/features/chapters/domain/create_chapter.dart';
 import 'package:noveles/features/chapters/domain/update_chapter.dart';
 import 'package:noveles/features/chapters/domain/delete_chapter.dart';
+import 'package:noveles/features/chapters/domain/upload_chapter_content.dart';
 import 'package:noveles/features/scan/presentation/bloc/scan_chapter_bloc.dart';
 
 class MockCreateChapter extends Mock implements CreateChapter {}
@@ -15,10 +16,13 @@ class MockUpdateChapter extends Mock implements UpdateChapter {}
 
 class MockDeleteChapter extends Mock implements DeleteChapter {}
 
+class MockUploadChapterContent extends Mock implements UploadChapterContent {}
+
 void main() {
   late MockCreateChapter mockCreateChapter;
   late MockUpdateChapter mockUpdateChapter;
   late MockDeleteChapter mockDeleteChapter;
+  late MockUploadChapterContent mockUploadContent;
   late ScanChapterBloc scanChapterBloc;
 
   final testChapter = ChapterEntity(
@@ -45,10 +49,12 @@ void main() {
     mockCreateChapter = MockCreateChapter();
     mockUpdateChapter = MockUpdateChapter();
     mockDeleteChapter = MockDeleteChapter();
+    mockUploadContent = MockUploadChapterContent();
     scanChapterBloc = ScanChapterBloc(
       createChapter: mockCreateChapter,
       updateChapter: mockUpdateChapter,
       deleteChapter: mockDeleteChapter,
+      uploadContent: mockUploadContent,
     );
   });
 

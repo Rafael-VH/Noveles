@@ -5,6 +5,7 @@ import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 import 'package:noveles/features/chapters/domain/create_chapter.dart';
 import 'package:noveles/features/chapters/domain/update_chapter.dart';
 import 'package:noveles/features/chapters/domain/delete_chapter.dart';
+import 'package:noveles/features/chapters/domain/upload_chapter_content.dart';
 
 // Events
 abstract class ScanChapterEvent extends Equatable {
@@ -25,6 +26,13 @@ class DeleteScanChapter extends ScanChapterEvent {
   DeleteScanChapter(this.chapterId);
   @override
   List<Object> get props => [chapterId];
+}
+
+class UploadChapterFile extends ScanChapterEvent {
+  final String filePath;
+  UploadChapterFile(this.filePath);
+  @override
+  List<Object> get props => [filePath];
 }
 
 // States
@@ -51,19 +59,30 @@ class ScanChapterError extends ScanChapterState {
   List<Object> get props => [message];
 }
 
+class ScanChapterContentUploaded extends ScanChapterState {
+  final String url;
+  final String fileName;
+  ScanChapterContentUploaded(this.url, {this.fileName = ''});
+  @override
+  List<Object> get props => [url, fileName];
+}
+
 // BLoC
 class ScanChapterBloc extends Bloc<ScanChapterEvent, ScanChapterState> {
   final CreateChapter createChapter;
   final UpdateChapter updateChapter;
   final DeleteChapter deleteChapter;
+  final UploadChapterContent uploadContent;
 
   ScanChapterBloc({
     required this.createChapter,
     required this.updateChapter,
     required this.deleteChapter,
+    required this.uploadContent,
   }) : super(ScanChapterInitial()) {
     on<SaveScanChapter>(_onSaveChapter);
     on<DeleteScanChapter>(_onDeleteChapter);
+    on<UploadChapterFile>(_onUploadContent);
   }
 
   Future<void> _onSaveChapter(SaveScanChapter event, Emitter<ScanChapterState> emit) async {
@@ -83,6 +102,16 @@ class ScanChapterBloc extends Bloc<ScanChapterEvent, ScanChapterState> {
     switch (result) {
       case Ok():
         emit(ScanChapterLoaded(message: 'Capítulo eliminado'));
+      case Err(:final error):
+        emit(ScanChapterError(error.message));
+    }
+  }
+
+  Future<void> _onUploadContent(UploadChapterFile event, Emitter<ScanChapterState> emit) async {
+    final result = await uploadContent(event.filePath);
+    switch (result) {
+      case Ok(:final value):
+        emit(ScanChapterContentUploaded(value));
       case Err(:final error):
         emit(ScanChapterError(error.message));
     }

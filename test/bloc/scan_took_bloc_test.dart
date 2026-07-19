@@ -7,6 +7,7 @@ import 'package:noveles/features/tooks/domain/took_entity.dart';
 import 'package:noveles/features/tooks/domain/create_took.dart';
 import 'package:noveles/features/tooks/domain/update_took.dart';
 import 'package:noveles/features/tooks/domain/delete_took.dart';
+import 'package:noveles/features/books/domain/upload_cover.dart';
 import 'package:noveles/features/scan/presentation/bloc/scan_took_bloc.dart';
 
 class MockCreateTook extends Mock implements CreateTook {}
@@ -15,10 +16,13 @@ class MockUpdateTook extends Mock implements UpdateTook {}
 
 class MockDeleteTook extends Mock implements DeleteTook {}
 
+class MockUploadCover extends Mock implements UploadCover {}
+
 void main() {
   late MockCreateTook mockCreateTook;
   late MockUpdateTook mockUpdateTook;
   late MockDeleteTook mockDeleteTook;
+  late MockUploadCover mockUploadCover;
   late ScanTookBloc scanTookBloc;
 
   final testTook = TookEntity(
@@ -49,10 +53,12 @@ void main() {
     mockCreateTook = MockCreateTook();
     mockUpdateTook = MockUpdateTook();
     mockDeleteTook = MockDeleteTook();
+    mockUploadCover = MockUploadCover();
     scanTookBloc = ScanTookBloc(
       createTook: mockCreateTook,
       updateTook: mockUpdateTook,
       deleteTook: mockDeleteTook,
+      uploadCover: mockUploadCover,
     );
   });
 

@@ -3,8 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:noveles/core/di/injection.dart';
-import 'package:noveles/core/errors/result.dart';
-import 'package:noveles/features/books/domain/upload_cover.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 import 'package:noveles/features/tooks/domain/took_entity.dart';
 import 'package:noveles/features/scan/presentation/bloc/scan_took_bloc.dart';
@@ -106,23 +104,46 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
     }
   }
 
-  // Pick and upload cover image
+  // Pick and upload cover image via BLoC
   Future<void> _pickCover() async {
     final picker = ImagePicker();
     final xFile = await picker.pickImage(source: ImageSource.gallery);
     if (xFile == null || !mounted) return;
-    final result = await getIt<UploadCover>()(xFile.path);
-    if (!mounted) return;
-    switch (result) {
-      case Ok<String>(:final value):
-        setState(() => _coverCtrl.text = value);
-      case Err(:final error):
+
+    final bloc = getIt<ScanTookBloc>();
+    final completer = Completer<ScanTookState>();
+    late StreamSubscription sub;
+    sub = bloc.stream.listen((s) {
+      if (s is ScanTookCoverUploaded || s is ScanTookError) {
+        sub.cancel();
+        if (!completer.isCompleted) completer.complete(s);
+      }
+    });
+    bloc.add(UploadTookCover(xFile.path));
+    try {
+      final result = await completer.future.timeout(const Duration(seconds: 10));
+      if (result is ScanTookCoverUploaded && mounted) {
+        setState(() => _coverCtrl.text = result.url);
+      } else if (result is ScanTookError && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(error.message),
+            content: Text(result.message),
             backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
+      }
+    } on TimeoutException {
+      sub.cancel();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('La operación tardó demasiado'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+          ),
+        );
+      }
+    } finally {
+      sub.cancel();
     }
   }
 

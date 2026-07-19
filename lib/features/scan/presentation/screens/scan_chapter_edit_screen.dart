@@ -3,9 +3,7 @@ import 'dart:async';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:noveles/core/di/injection.dart';
-import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
-import 'package:noveles/features/chapters/domain/upload_chapter_content.dart';
 import 'package:noveles/features/scan/presentation/bloc/scan_chapter_bloc.dart';
 
 class ScanChapterEditScreen extends StatefulWidget {
@@ -59,7 +57,7 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
     return '';
   }
 
-  // Pick and upload content file
+  // Pick and upload content file via BLoC
   Future<void> _pickContentFile() async {
     try {
       final result = await FilePicker.platform.pickFiles(
@@ -83,22 +81,44 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
         return;
       }
 
-      final uploadResult = await getIt<UploadChapterContent>()(filePath);
-
-      if (!mounted) return;
-      switch (uploadResult) {
-        case Ok<String>(:final value):
+      final fileName = result.files.single.name;
+      final bloc = getIt<ScanChapterBloc>();
+      final completer = Completer<ScanChapterState>();
+      late StreamSubscription sub;
+      sub = bloc.stream.listen((s) {
+        if (s is ScanChapterContentUploaded || s is ScanChapterError) {
+          sub.cancel();
+          if (!completer.isCompleted) completer.complete(s);
+        }
+      });
+      bloc.add(UploadChapterFile(filePath));
+      try {
+        final uploadResult = await completer.future.timeout(const Duration(seconds: 10));
+        if (uploadResult is ScanChapterContentUploaded && mounted) {
           setState(() {
-            _contentCtrl.text = value;
-            _uploadedFileName = result.files.single.name;
+            _contentCtrl.text = uploadResult.url;
+            _uploadedFileName = fileName;
           });
-        case Err(:final error):
+        } else if (uploadResult is ScanChapterError && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(error.message),
+              content: Text(uploadResult.message),
               backgroundColor: Theme.of(context).colorScheme.error,
             ),
           );
+        }
+      } on TimeoutException {
+        sub.cancel();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('La operación tardó demasiado'),
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+          );
+        }
+      } finally {
+        sub.cancel();
       }
     } catch (e) {
       if (!mounted) return;

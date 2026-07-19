@@ -25,6 +25,7 @@ void initScanDependencies() {
       createTook: getIt(),
       updateTook: getIt(),
       deleteTook: getIt(),
+      uploadCover: getIt(),
     ),
   );
 
@@ -34,6 +35,7 @@ void initScanDependencies() {
       createChapter: getIt(),
       updateChapter: getIt(),
       deleteChapter: getIt(),
+      uploadContent: getIt(),
     ),
   );
 }
