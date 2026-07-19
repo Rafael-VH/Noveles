@@ -33,7 +33,7 @@ void main() {
     title: 'Tomo 1',
     chapterCount: 5,
     bookId: 1,
-    listChapter: const [],
+    listChapterIds: const [],
   );
 
   setUpAll(() {
@@ -45,7 +45,7 @@ void main() {
       title: '',
       chapterCount: 0,
       bookId: 0,
-      listChapter: const [],
+      listChapterIds: const [],
     ));
   });
 

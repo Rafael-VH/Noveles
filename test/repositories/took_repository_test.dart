@@ -73,7 +73,7 @@ void main() {
       title: '',
       chapterCount: 0,
       bookId: 0,
-      listChapter: const [],
+      listChapterIds: const [],
     ));
   });
 
@@ -213,7 +213,7 @@ void main() {
             title: 'New Took',
             chapterCount: 0,
             bookId: 1,
-            listChapter: const [],
+            listChapterIds: const [],
             createdBy: null,
           ),
         );
@@ -240,7 +240,7 @@ void main() {
             title: '',
             chapterCount: 0,
             bookId: 1,
-            listChapter: const [],
+            listChapterIds: const [],
             createdBy: null,
           ),
         );
@@ -263,7 +263,7 @@ void main() {
             title: 'Updated',
             chapterCount: 0,
             bookId: 1,
-            listChapter: const [],
+            listChapterIds: const [],
             createdBy: null,
           ),
         );
@@ -285,7 +285,7 @@ void main() {
             title: '',
             chapterCount: 0,
             bookId: 1,
-            listChapter: const [],
+            listChapterIds: const [],
             createdBy: null,
           ),
         );

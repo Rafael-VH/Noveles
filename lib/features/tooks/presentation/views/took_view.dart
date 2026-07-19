@@ -59,7 +59,7 @@ class _TookViewState extends State<TookView> {
                             ),
                       ),
                       Text(
-                        '${item.listChapter.length}',
+                        '${item.listChapterIds.length}',
                         style: Theme.of(context)
                             .textTheme
                             .labelMedium

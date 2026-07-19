@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
+import 'package:noveles/features/tooks/data/took_model.dart';
 import 'package:noveles/features/tooks/domain/took_entity.dart';
 import 'package:noveles/features/scan/presentation/bloc/scan_took_bloc.dart';
 import 'package:noveles/features/scan/presentation/bloc/scan_chapter_bloc.dart';
@@ -34,7 +35,7 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
   void initState() {
     super.initState();
     final t = widget.took;
-    _chapters = t?.listChapter.toList() ?? [];
+    _chapters = (t is TookModel) ? t.chapters.toList() : [];
     _numberCtrl = TextEditingController(text: t?.number ?? '');
     _titleCtrl = TextEditingController(text: t?.title ?? '');
     _coverCtrl = TextEditingController(text: t?.cover ?? '');
@@ -61,7 +62,7 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
       title: _titleCtrl.text.trim(),
       chapterCount: _chapters.length,
       bookId: widget.bookId,
-      listChapter: _chapters,
+      listChapterIds: _chapters.map((c) => c.id).toList(),
     );
 
     final bloc = getIt<ScanTookBloc>();

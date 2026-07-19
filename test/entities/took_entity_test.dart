@@ -11,7 +11,7 @@ void main() {
       title: 'Tomo 1',
       chapterCount: 10,
       bookId: 1,
-      listChapter: const [],
+      listChapterIds: const [],
       createdBy: null,
     );
 
@@ -30,7 +30,7 @@ void main() {
         title: 'Tomo 2',
         chapterCount: 5,
         bookId: 1,
-        listChapter: const [],
+        listChapterIds: const [],
         createdBy: 'user-uuid',
       );
       expect(withCreator.createdBy, 'user-uuid');

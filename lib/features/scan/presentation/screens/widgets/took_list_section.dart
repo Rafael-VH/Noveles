@@ -49,7 +49,7 @@ class TookListSection extends StatelessWidget {
                   title: Text(
                     took.title.isNotEmpty ? took.title : 'Tomo ${took.number}',
                   ),
-                  subtitle: Text('${took.listChapter.length} capítulos'),
+                  subtitle: Text('${took.listChapterIds.length} capítulos'),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [

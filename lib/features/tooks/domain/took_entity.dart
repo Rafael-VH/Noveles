@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 
 class TookEntity extends Equatable {
   final int id;
@@ -9,7 +8,7 @@ class TookEntity extends Equatable {
   final String title;
   final int chapterCount;
   final int bookId;
-  final List<ChapterEntity> listChapter;
+  final List<int> listChapterIds;
   final String? createdBy;
 
   const TookEntity({
@@ -20,7 +19,7 @@ class TookEntity extends Equatable {
     required this.title,
     required this.chapterCount,
     required this.bookId,
-    required this.listChapter,
+    this.listChapterIds = const [],
     this.createdBy,
   });
 
@@ -32,7 +31,7 @@ class TookEntity extends Equatable {
     String? title,
     int? chapterCount,
     int? bookId,
-    List<ChapterEntity>? listChapter,
+    List<int>? listChapterIds,
     String? createdBy,
   }) {
     return TookEntity(
@@ -43,7 +42,7 @@ class TookEntity extends Equatable {
       title: title ?? this.title,
       chapterCount: chapterCount ?? this.chapterCount,
       bookId: bookId ?? this.bookId,
-      listChapter: listChapter ?? this.listChapter,
+      listChapterIds: listChapterIds ?? this.listChapterIds,
       createdBy: createdBy ?? this.createdBy,
     );
   }
@@ -57,7 +56,7 @@ class TookEntity extends Equatable {
         title,
         chapterCount,
         bookId,
-        listChapter,
+        listChapterIds,
         createdBy,
       ];
 }

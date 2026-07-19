@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/di/injection.dart';
+import 'package:noveles/features/tooks/data/took_model.dart';
 import 'package:noveles/features/tooks/domain/took_entity.dart';
+import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 import 'package:noveles/features/chapters/presentation/bloc/chapter_bloc.dart';
 import 'package:noveles/features/chapters/presentation/screens/chapter_screen.dart';
 
@@ -15,22 +17,26 @@ class TookScreen extends StatefulWidget {
 }
 
 class _TookScreenState extends State<TookScreen> {
+  /// Runtime cast: data layer hydrates TookModel with full chapters.
+  List<ChapterEntity> get _chapters =>
+      (widget.tooks is TookModel) ? (widget.tooks as TookModel).chapters : [];
+
   @override
   Widget build(BuildContext context) {
+    final chapters = _chapters;
+
     return Scaffold(
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
-            // Construye un SliverAppBar que muestra el número del "took" como título.
             SliverAppBar(
               title: Text(widget.tooks.number),
             ),
 
-            // Construye una lista de capítulos utilizando SliverList, donde cada elemento de la lista es un ListTile que muestra el título y número del capítulo. Al hacer clic en un capítulo, se navega a la pantalla de detalles del capítulo correspondiente.
             SliverList.builder(
-              itemCount: widget.tooks.listChapter.length,
+              itemCount: chapters.length,
               itemBuilder: (context, index) {
-                var item = widget.tooks.listChapter[index];
+                final item = chapters[index];
 
                 return ListTile(
                   onTap: () => Navigator.push(
@@ -40,7 +46,7 @@ class _TookScreenState extends State<TookScreen> {
                         create: (_) => getIt<ChapterBloc>(),
                         child: ChapterScreen(
                           i: index,
-                          chapters: widget.tooks.listChapter,
+                          chapters: chapters,
                         ),
                       ),
                     ),
