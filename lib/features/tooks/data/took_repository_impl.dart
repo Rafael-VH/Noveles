@@ -27,6 +27,23 @@ class TookRepositoryImpl implements TookRepository {
   }
 
   @override
+  Future<Result<List<TookEntity>>> getTooksByBook(int bookId) async {
+    try {
+      final response = await _supabase.client
+          .from('tooks')
+          .select('*, chapters(*)')
+          .eq('book_id', bookId)
+          .order('id')
+          .limit(100);
+
+      final tooks = response.map((json) => TookModel.fromJson(json)).toList();
+      return Ok(tooks);
+    } catch (e) {
+      return Err(TookFailure('Error al obtener tomos del libro', cause: e));
+    }
+  }
+
+  @override
   Future<Result<TookEntity?>> getTookById(int id) async {
     try {
       final response = await _supabase.client

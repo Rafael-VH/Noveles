@@ -5,6 +5,7 @@ import 'package:noveles/features/tooks/domain/took_repository.dart';
 import 'package:noveles/features/tooks/domain/create_took.dart';
 import 'package:noveles/features/tooks/domain/get_took.dart';
 import 'package:noveles/features/tooks/domain/get_took_by_id.dart';
+import 'package:noveles/features/tooks/domain/get_tooks_by_book.dart';
 import 'package:noveles/features/tooks/domain/update_took.dart';
 import 'package:noveles/features/tooks/domain/delete_took.dart';
 
@@ -22,6 +23,9 @@ void initTooksDependencies() {
   );
   getIt.registerLazySingleton(
     () => GetTookById(getIt()),
+  );
+  getIt.registerLazySingleton(
+    () => GetTooksByBook(getIt()),
   );
   getIt.registerLazySingleton(
     () => CreateTook(getIt()),

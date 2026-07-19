@@ -4,7 +4,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/auth/data/auth_repository_impl.dart';
-import 'package:noveles/features/auth/domain/auth_event.dart';
+import 'package:noveles/features/auth/domain/entities/auth_event.dart';
 import 'package:noveles/features/profiles/domain/user_entity.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 

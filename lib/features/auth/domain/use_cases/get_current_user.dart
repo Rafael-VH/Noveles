@@ -1,5 +1,5 @@
 import 'package:noveles/core/errors/result.dart';
-import 'package:noveles/features/auth/domain/auth_repository.dart';
+import 'package:noveles/features/auth/domain/repositories/auth_repository.dart';
 import 'package:noveles/features/profiles/domain/user_entity.dart';
 
 class GetCurrentUser {

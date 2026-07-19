@@ -4,12 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 export 'package:noveles/features/auth/presentation/bloc/auth_event.dart';
 export 'package:noveles/features/auth/presentation/bloc/auth_state.dart';
 import 'package:noveles/core/errors/result.dart';
-import 'package:noveles/features/auth/domain/login.dart';
-import 'package:noveles/features/auth/domain/register.dart';
-import 'package:noveles/features/auth/domain/logout.dart';
-import 'package:noveles/features/auth/domain/get_current_user.dart';
-import 'package:noveles/features/auth/domain/listen_auth_state.dart';
-import 'package:noveles/features/auth/domain/auth_event.dart' as domain;
+import 'package:noveles/features/auth/domain/use_cases/login.dart';
+import 'package:noveles/features/auth/domain/use_cases/register.dart';
+import 'package:noveles/features/auth/domain/use_cases/logout.dart';
+import 'package:noveles/features/auth/domain/use_cases/get_current_user.dart';
+import 'package:noveles/features/auth/domain/use_cases/listen_auth_state.dart';
+import 'package:noveles/features/auth/domain/entities/auth_event.dart' as domain;
 import 'package:noveles/features/auth/presentation/bloc/auth_event.dart';
 import 'package:noveles/features/auth/presentation/bloc/auth_state.dart';
 

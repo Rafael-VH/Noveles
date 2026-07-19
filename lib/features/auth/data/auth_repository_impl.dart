@@ -5,8 +5,8 @@ import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/profiles/data/user_model.dart';
 import 'package:noveles/features/profiles/domain/user_entity.dart';
-import 'package:noveles/features/auth/domain/auth_event.dart';
-import 'package:noveles/features/auth/domain/auth_repository.dart';
+import 'package:noveles/features/auth/domain/entities/auth_event.dart';
+import 'package:noveles/features/auth/domain/repositories/auth_repository.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final SupabaseClientProvider _supabase;

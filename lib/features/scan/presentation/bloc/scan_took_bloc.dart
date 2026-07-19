@@ -1,72 +1,15 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:equatable/equatable.dart';
 import 'package:noveles/core/errors/result.dart';
-import 'package:noveles/features/tooks/domain/took_entity.dart';
 import 'package:noveles/features/tooks/domain/create_took.dart';
 import 'package:noveles/features/tooks/domain/update_took.dart';
 import 'package:noveles/features/tooks/domain/delete_took.dart';
 import 'package:noveles/features/books/domain/upload_cover.dart';
+import 'package:noveles/features/scan/presentation/bloc/scan_took_event.dart';
+import 'package:noveles/features/scan/presentation/bloc/scan_took_state.dart';
 
-// Events
-abstract class ScanTookEvent extends Equatable {
-  @override
-  List<Object> get props => [];
-}
+export 'package:noveles/features/scan/presentation/bloc/scan_took_event.dart';
+export 'package:noveles/features/scan/presentation/bloc/scan_took_state.dart';
 
-class SaveScanTook extends ScanTookEvent {
-  final TookEntity took;
-  final bool isUpdate;
-  SaveScanTook(this.took, {required this.isUpdate});
-  @override
-  List<Object> get props => [took, isUpdate];
-}
-
-class DeleteScanTook extends ScanTookEvent {
-  final int tookId;
-  DeleteScanTook(this.tookId);
-  @override
-  List<Object> get props => [tookId];
-}
-
-class UploadTookCover extends ScanTookEvent {
-  final String filePath;
-  UploadTookCover(this.filePath);
-  @override
-  List<Object> get props => [filePath];
-}
-
-// States
-abstract class ScanTookState extends Equatable {
-  @override
-  List<Object> get props => [];
-}
-
-class ScanTookInitial extends ScanTookState {}
-
-class ScanTookLoading extends ScanTookState {}
-
-class ScanTookLoaded extends ScanTookState {
-  final String? message;
-  ScanTookLoaded({this.message});
-  @override
-  List<Object> get props => [message ?? ''];
-}
-
-class ScanTookError extends ScanTookState {
-  final String message;
-  ScanTookError(this.message);
-  @override
-  List<Object> get props => [message];
-}
-
-class ScanTookCoverUploaded extends ScanTookState {
-  final String url;
-  ScanTookCoverUploaded(this.url);
-  @override
-  List<Object> get props => [url];
-}
-
-// BLoC
 class ScanTookBloc extends Bloc<ScanTookEvent, ScanTookState> {
   final CreateTook createTook;
   final UpdateTook updateTook;

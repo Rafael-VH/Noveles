@@ -1,12 +1,12 @@
 import 'package:get_it/get_it.dart';
 import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/auth/data/auth_repository_impl.dart';
-import 'package:noveles/features/auth/domain/auth_repository.dart';
-import 'package:noveles/features/auth/domain/login.dart';
-import 'package:noveles/features/auth/domain/logout.dart';
-import 'package:noveles/features/auth/domain/register.dart';
-import 'package:noveles/features/auth/domain/get_current_user.dart';
-import 'package:noveles/features/auth/domain/listen_auth_state.dart';
+import 'package:noveles/features/auth/domain/repositories/auth_repository.dart';
+import 'package:noveles/features/auth/domain/use_cases/login.dart';
+import 'package:noveles/features/auth/domain/use_cases/logout.dart';
+import 'package:noveles/features/auth/domain/use_cases/register.dart';
+import 'package:noveles/features/auth/domain/use_cases/get_current_user.dart';
+import 'package:noveles/features/auth/domain/use_cases/listen_auth_state.dart';
 import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
 
 final getIt = GetIt.instance;
