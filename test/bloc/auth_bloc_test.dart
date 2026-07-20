@@ -272,5 +272,41 @@ void main() {
         ),
       ],
     );
+
+    // --- P0: C2 race condition guard ---
+
+    test('second LogoutRequested during active logout is a no-op', () async {
+      final completer = Completer<void>();
+      when(() => mockLogout()).thenAnswer((_) async {
+        await completer.future;
+        return const Ok(null);
+      });
+
+      final bloc = AuthBloc(
+        login: mockLogin,
+        register: mockRegister,
+        logout: mockLogout,
+        getCurrentUser: mockGetCurrentUser,
+        listenAuthState: mockListenAuthState,
+      );
+
+      // Start manual logout — sets _manualLogoutInProgress = true
+      bloc.add(const LogoutRequested());
+      await Future<void>.delayed(Duration.zero);
+
+      // Stream fires signedOut while logout is in progress
+      authStateController.add(domain.AuthEvent.signedOut);
+      await Future<void>.delayed(Duration.zero);
+
+      // Complete the slow logout
+      completer.complete();
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+
+      // Only one logout call — the stream event was guarded
+      expect(bloc.state, isA<AuthUnauthenticated>());
+      verify(() => mockLogout()).called(1);
+
+      await bloc.close();
+    });
   });
 }

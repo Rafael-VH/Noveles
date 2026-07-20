@@ -204,5 +204,41 @@ void main() {
         ),
       ],
     );
+
+    // --- P0: mutation from GenreLoaded ---
+
+    blocTest<GenreBloc, GenreState>(
+      'CreateGenre success from GenreLoaded appends to existing genres',
+      seed: () => GenreLoaded(testGenres),
+      build: () {
+        when(() => mockCreateGenre(any()))
+            .thenAnswer((_) async => const Ok(null));
+        return genreBloc;
+      },
+      act: (bloc) => bloc.add(CreateGenreEvent(testGenre)),
+      expect: () => [
+        isA<GenreLoaded>()
+            .having((s) => s.genres.length, 'genre count', 2)
+            .having((s) => s.genres.first.id, 'first genre id', 1)
+            .having((s) => s.genres.last.id, 'new genre id', 2)
+            .having((s) => s.message, 'message', 'Género creado'),
+      ],
+    );
+
+    blocTest<GenreBloc, GenreState>(
+      'CreateGenre error from GenreLoaded preserves genres with error',
+      seed: () => GenreLoaded(testGenres),
+      build: () {
+        when(() => mockCreateGenre(any()))
+            .thenAnswer((_) async => Err(GenreFailure('Create error')));
+        return genreBloc;
+      },
+      act: (bloc) => bloc.add(CreateGenreEvent(testGenre)),
+      expect: () => [
+        isA<GenreLoaded>()
+            .having((s) => s.genres, 'genres preserved', testGenres)
+            .having((s) => s.message, 'message', contains('Create error')),
+      ],
+    );
   });
 }

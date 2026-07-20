@@ -178,5 +178,38 @@ void main() {
         ),
       ],
     );
+
+    // --- P0: UploadTookCover coverage ---
+
+    blocTest<ScanTookBloc, ScanTookState>(
+      'emits ScanTookCoverUploaded when UploadTookCover succeeds',
+      build: () {
+        when(() => mockUploadCover(any()))
+            .thenAnswer((_) async => const Ok('https://storage.example.com/cover.png'));
+        return scanTookBloc;
+      },
+      act: (bloc) => bloc.add(const UploadTookCover('/local/path/cover.png')),
+      expect: () => [
+        isA<ScanTookCoverUploaded>()
+            .having((s) => s.url, 'url', 'https://storage.example.com/cover.png'),
+      ],
+    );
+
+    blocTest<ScanTookBloc, ScanTookState>(
+      'emits ScanTookError when UploadTookCover fails',
+      build: () {
+        when(() => mockUploadCover(any()))
+            .thenAnswer((_) async => Err(TookFailure('Upload failed')));
+        return scanTookBloc;
+      },
+      act: (bloc) => bloc.add(const UploadTookCover('/local/path/cover.png')),
+      expect: () => [
+        isA<ScanTookError>().having(
+          (s) => s.message,
+          'message',
+          contains('Upload failed'),
+        ),
+      ],
+    );
   });
 }

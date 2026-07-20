@@ -174,5 +174,38 @@ void main() {
         ),
       ],
     );
+
+    // --- P0: UploadChapterFile coverage ---
+
+    blocTest<ScanChapterBloc, ScanChapterState>(
+      'emits ScanChapterContentUploaded when UploadChapterFile succeeds',
+      build: () {
+        when(() => mockUploadContent(any()))
+            .thenAnswer((_) async => const Ok('https://storage.example.com/ch1.txt'));
+        return scanChapterBloc;
+      },
+      act: (bloc) => bloc.add(const UploadChapterFile('/local/path/ch1.txt')),
+      expect: () => [
+        isA<ScanChapterContentUploaded>()
+            .having((s) => s.url, 'url', 'https://storage.example.com/ch1.txt'),
+      ],
+    );
+
+    blocTest<ScanChapterBloc, ScanChapterState>(
+      'emits ScanChapterError when UploadChapterFile fails',
+      build: () {
+        when(() => mockUploadContent(any()))
+            .thenAnswer((_) async => Err(ChapterFailure('Upload failed')));
+        return scanChapterBloc;
+      },
+      act: (bloc) => bloc.add(const UploadChapterFile('/local/path/ch1.txt')),
+      expect: () => [
+        isA<ScanChapterError>().having(
+          (s) => s.message,
+          'message',
+          contains('Upload failed'),
+        ),
+      ],
+    );
   });
 }
