@@ -71,14 +71,42 @@ class ProfilesRepositoryImpl implements ProfilesRepository {
   }
 
   @override
-  Future<Result<List<UserEntity>>> getAllProfiles() async {
+  Future<Result<List<UserEntity>>> getAllProfiles({
+    int limit = 50,
+    String? afterEmail,
+  }) async {
     try {
-      final response =
-          await _supabase.client.from('profiles').select('*').order('email').limit(100);
-      final profiles = response.map((json) => UserModel.fromJson(json)).toList();
+      var query = _supabase.client.from('profiles').select('*');
+      if (afterEmail != null) {
+        query = query.gt('email', afterEmail);
+      }
+      final response = await query.order('email').limit(limit + 1);
+      final hasMore = response.length > limit;
+      final profiles = response
+          .take(limit)
+          .map((json) => UserModel.fromJson(json))
+          .toList();
       return Ok(profiles);
     } catch (e) {
       return Err(ProfileFailure('Error al obtener perfiles', cause: e));
+    }
+  }
+
+  @override
+  Future<Result<UserEntity>> updateUserRole({
+    required String userId,
+    required String role,
+  }) async {
+    try {
+      final response = await _supabase.client
+          .from('profiles')
+          .update({'role': role})
+          .eq('id', userId)
+          .select()
+          .single();
+      return Ok(UserModel.fromJson(response));
+    } catch (e) {
+      return Err(ProfileFailure('Error al cambiar rol', cause: e));
     }
   }
 

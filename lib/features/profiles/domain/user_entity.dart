@@ -20,6 +20,7 @@ class UserEntity extends Equatable {
   bool get isScan => role == 'scan';
   bool get isAdmin => role == 'admin';
   bool get isUser => role == 'user';
+  bool get isSuspended => role == 'suspended';
 
   @override
   List<Object> get props => [

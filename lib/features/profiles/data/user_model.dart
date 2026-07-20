@@ -20,7 +20,7 @@ class UserModel extends UserEntity {
       );
 
   static String _validateRole(String? role) {
-    const validRoles = {'user', 'admin', 'scan'};
+    const validRoles = {'user', 'admin', 'scan', 'suspended'};
     final r = role ?? 'user';
     if (!validRoles.contains(r)) return 'user';
     return r;

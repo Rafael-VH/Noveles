@@ -7,6 +7,7 @@ import 'package:noveles/features/profiles/domain/update_profile.dart';
 import 'package:noveles/features/profiles/domain/upload_avatar.dart';
 import 'package:noveles/features/profiles/domain/get_all_profiles.dart';
 import 'package:noveles/features/profiles/domain/change_password.dart';
+import 'package:noveles/features/profiles/domain/update_user_role.dart';
 import 'package:noveles/features/profiles/presentation/bloc/profile_bloc.dart'
     hide UpdateProfile, ChangePassword;
 
@@ -30,6 +31,9 @@ void initProfilesDependencies() {
   );
   getIt.registerLazySingleton(
     () => GetAllProfiles(getIt()),
+  );
+  getIt.registerLazySingleton(
+    () => UpdateUserRole(getIt()),
   );
   getIt.registerLazySingleton(
     () => ChangePassword(getIt()),

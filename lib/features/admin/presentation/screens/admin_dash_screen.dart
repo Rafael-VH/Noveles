@@ -38,6 +38,7 @@ class _AdminDashScreenState extends State<AdminDashScreen> {
           BlocProvider(
             create: (_) => AdminUsersBloc(
               getAllProfiles: getIt(),
+              updateUserRole: getIt(),
               currentUserId: currentUserId,
             )..add(const LoadAdminUsers()),
           ),

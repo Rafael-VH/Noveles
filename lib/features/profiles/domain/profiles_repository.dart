@@ -7,5 +7,12 @@ abstract class ProfilesRepository {
       {String? displayName, String? bio, String? avatarUrl});
   Future<Result<String>> uploadAvatar(String filePath);
   Future<Result<void>> changePassword(String newPassword);
-  Future<Result<List<UserEntity>>> getAllProfiles();
+  Future<Result<List<UserEntity>>> getAllProfiles({
+    int limit = 50,
+    String? afterEmail,
+  });
+  Future<Result<UserEntity>> updateUserRole({
+    required String userId,
+    required String role,
+  });
 }

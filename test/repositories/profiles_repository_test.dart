@@ -82,6 +82,28 @@ class MockSelectBuilder extends Mock
   }
 }
 
+/// Mock for PostgrestTransformBuilder<Map<String, dynamic>> — used by
+/// .select().single() in updateUserRole.
+// ignore: must_be_immutable
+class MockSingleBuilder extends Mock
+    implements PostgrestTransformBuilder<Map<String, dynamic>> {
+  Map<String, dynamic>? _data;
+
+  void thenReturns(Map<String, dynamic> data) {
+    _data = data;
+  }
+
+  @override
+  Future<U> then<U>(
+    FutureOr<U> Function(Map<String, dynamic> value) onValue, {
+    Function? onError,
+  }) async {
+    final result = onValue(_data!);
+    if (result is Future<U>) return result;
+    return result;
+  }
+}
+
 void main() {
   late MockSupabaseClientProvider mockProvider;
   late MockSupabaseClient mockClient;
@@ -90,6 +112,7 @@ void main() {
   late MockFilterBuilder mockFilter;
   late MockTransformBuilder mockTransform;
   late MockSelectBuilder mockSelectBuilder;
+  late MockSingleBuilder mockSingleBuilder;
   late MockSupabaseStorageClient mockStorage;
   late MockStorageFileApi mockStorageFileApi;
   late ProfilesRepositoryImpl repository;
@@ -108,6 +131,7 @@ void main() {
     mockFilter = MockFilterBuilder();
     mockTransform = MockTransformBuilder();
     mockSelectBuilder = MockSelectBuilder();
+    mockSingleBuilder = MockSingleBuilder();
     mockStorage = MockSupabaseStorageClient();
     mockStorageFileApi = MockStorageFileApi();
 
@@ -126,6 +150,7 @@ void main() {
     when(() => mockQueryBuilder.update(any())).thenAnswer((_) => mockFilter);
     when(() => mockQueryBuilder.delete()).thenAnswer((_) => mockFilter);
     when(() => mockFilter.eq(any(), any())).thenAnswer((_) => mockFilter);
+    when(() => mockFilter.gt(any(), any())).thenAnswer((_) => mockFilter);
     when(() => mockFilter.order(
           any(),
           ascending: any(named: 'ascending'),
@@ -139,6 +164,7 @@ void main() {
     when(() => mockFilter.maybeSingle()).thenAnswer((_) => mockTransform);
     when(() => mockFilter.select(any())).thenAnswer((_) => mockSelectBuilder);
     when(() => mockSelectBuilder.maybeSingle()).thenAnswer((_) => mockTransform);
+    when(() => mockSelectBuilder.single()).thenAnswer((_) => mockSingleBuilder);
   });
 
   tearDown(() {
@@ -381,6 +407,96 @@ void main() {
         expect(result, isA<Err<List<UserEntity>>>());
         final error = (result as Err<List<UserEntity>>).error;
         expect(error.message, contains('Error al obtener perfiles'));
+      });
+
+      test('paginates with afterEmail parameter', () async {
+        mockFilter.thenReturns([
+          {
+            'id': 'user-3',
+            'email': 'user3@example.com',
+            'role': 'user',
+            'display_name': 'User 3',
+            'bio': null,
+            'avatar_url': null,
+          },
+        ]);
+
+        final result = await repository.getAllProfiles(
+          limit: 1,
+          afterEmail: 'user2@example.com',
+        );
+
+        expect(result, isA<Ok<List<UserEntity>>>());
+        final value = (result as Ok<List<UserEntity>>).value;
+        expect(value.length, 1);
+        expect(value[0].email, 'user3@example.com');
+        verify(() => mockFilter.gt('email', 'user2@example.com')).called(1);
+      });
+
+      test('hasMore is true when extra record fetched', () async {
+        mockFilter.thenReturns([
+          {
+            'id': 'user-3',
+            'email': 'user3@example.com',
+            'role': 'user',
+            'display_name': 'User 3',
+            'bio': null,
+            'avatar_url': null,
+          },
+          {
+            'id': 'user-4',
+            'email': 'user4@example.com',
+            'role': 'scan',
+            'display_name': 'User 4',
+            'bio': null,
+            'avatar_url': null,
+          },
+        ]);
+
+        final result = await repository.getAllProfiles(limit: 1);
+
+        expect(result, isA<Ok<List<UserEntity>>>());
+        final value = (result as Ok<List<UserEntity>>).value;
+        // limit=1 but got 2 records, so only 1 returned
+        expect(value.length, 1);
+      });
+    });
+
+    group('updateUserRole', () {
+      test('returns updated UserEntity on success', () async {
+        mockSingleBuilder.thenReturns({
+          'id': 'user-2',
+          'email': 'scan@test.com',
+          'role': 'admin',
+          'display_name': 'Scanner',
+          'bio': null,
+          'avatar_url': null,
+        });
+
+        final result = await repository.updateUserRole(
+          userId: 'user-2',
+          role: 'admin',
+        );
+
+        expect(result, isA<Ok<UserEntity>>());
+        final value = (result as Ok<UserEntity>).value;
+        expect(value.id, 'user-2');
+        expect(value.role, 'admin');
+        verify(() => mockFilter.eq('id', 'user-2')).called(1);
+      });
+
+      test('returns Err on database error', () async {
+        when(() => mockSelectBuilder.single())
+            .thenThrow(Exception('DB error'));
+
+        final result = await repository.updateUserRole(
+          userId: 'user-2',
+          role: 'admin',
+        );
+
+        expect(result, isA<Err<UserEntity>>());
+        final error = (result as Err<UserEntity>).error;
+        expect(error.message, contains('Error al cambiar rol'));
       });
     });
   });
