@@ -39,3 +39,7 @@ class ProfileFailure extends Failure {
 class StorageFailure extends Failure {
   const StorageFailure(super.message, {super.cause});
 }
+
+class FavoriteFailure extends Failure {
+  const FavoriteFailure(super.message, {super.cause});
+}

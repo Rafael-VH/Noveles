@@ -4,6 +4,7 @@ import 'package:noveles/core/cover/cover_url_service.dart';
 import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 import 'package:noveles/features/genres/domain/genre_entity.dart';
+import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:noveles/features/books/presentation/bloc/book_bloc.dart';
 import 'package:noveles/features/genres/presentation/bloc/genre_bloc.dart';
 import 'package:noveles/features/books/presentation/screens/book_screen.dart';
@@ -35,7 +36,16 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ],
       child: Scaffold(
-        drawer: const AppDrawer(),
+        drawer: Builder(
+          builder: (context) {
+            final authState = context.read<AuthBloc>().state;
+            final user = authState is AuthAuthenticated ? authState.user : null;
+            return AppDrawer(
+              isScan: user?.isScan ?? false,
+              isAdmin: user?.isAdmin ?? false,
+            );
+          },
+        ),
         body: BlocBuilder<BookBloc, BookState>(
           builder: (context, bookState) {
             return BlocBuilder<GenreBloc, GenreState>(

@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/presentation/notification_service.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 import 'package:noveles/features/chapters/domain/chapter_ref.dart';
-import 'package:noveles/core/utils/text_stats.dart';
 import 'package:noveles/features/chapters/presentation/bloc/chapter_bloc.dart';
 
 class ChapterScreen extends StatefulWidget {
@@ -24,23 +23,13 @@ class ChapterScreen extends StatefulWidget {
 
 class _ChapterScreenState extends State<ChapterScreen> {
   int currentPageIndex = 0;
-  int caracteres = 0;
-  int palabras = 0;
-  int frases = 0;
-  int parrafos = 0;
   bool isVisible = true;
-  double textSize = 14.0;
-  String selectedFont = 'Arial';
-  FontStyle selectedStyle = FontStyle.normal;
-  FontWeight selectedWeight = FontWeight.normal;
   ScrollController scrollController = ScrollController();
-  TextEditingController textEditingController = TextEditingController();
 
   @override
   void initState() {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
     super.initState();
-    textEditingController.text = textSize.toString();
     scrollController.addListener(() {
       setState(() {
         if (scrollController.position.userScrollDirection ==
@@ -63,7 +52,6 @@ class _ChapterScreenState extends State<ChapterScreen> {
   @override
   void dispose() {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    textEditingController.dispose();
     scrollController.dispose();
     super.dispose();
   }
@@ -113,10 +101,6 @@ class _ChapterScreenState extends State<ChapterScreen> {
                 }),
                 itemBuilder: (context, index) {
                   final ch = state.chapters[index];
-                  caracteres = TextStats.characters(ch.content);
-                  palabras = TextStats.words(ch.content);
-                  frases = TextStats.sentences(ch.content);
-                  parrafos = TextStats.paragraphs(ch.content);
 
                   return CustomScrollView(
                     controller: scrollController,
@@ -157,14 +141,11 @@ class _ChapterScreenState extends State<ChapterScreen> {
                               width: MediaQuery.of(context).size.width,
                               child: Text(
                                 ch.content,
-                                style: TextStyle(
-                                  fontFamily: selectedFont,
-                                  fontSize: textSize,
-                                  fontWeight: selectedWeight,
-                                  fontStyle: selectedStyle,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
+                                style: const TextStyle(
+                                  fontFamily: 'Arial',
+                                  fontSize: 14.0,
+                                  fontWeight: FontWeight.normal,
+                                  fontStyle: FontStyle.normal,
                                 ),
                               ),
                             ),
