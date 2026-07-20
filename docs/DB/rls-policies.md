@@ -97,7 +97,7 @@ is_admin_or_scan() -- returns true if admin OR scan
 ## books_genres (7 policies)
 
 | Operation | Policy Name | Role | Condition |
-|-----------|-------------|------|-----------|
+| --------- | ------------|------|-----------|
 | SELECT | Enable read for all users | public | `true` |
 | INSERT | Enable insert for admin only | public | `is_admin()` |
 | INSERT | Enable insert for scan only | public | `is_scan()` |
@@ -113,7 +113,7 @@ is_admin_or_scan() -- returns true if admin OR scan
 ## books_labels (3 policies)
 
 | Operation | Policy Name | Role | Condition |
-|-----------|-------------|------|-----------|
+| --------- | ----------- | ---- | --------- |
 | SELECT | Enable read for all users | public | `true` |
 | INSERT | Enable insert for scan and admin | public | `is_scan() OR is_admin()` |
 | DELETE | Enable delete for scan and admin | public | `is_scan() OR is_admin()` |
@@ -125,7 +125,7 @@ is_admin_or_scan() -- returns true if admin OR scan
 ## tooks (8 policies)
 
 | Operation | Policy Name | Role | Condition |
-|-----------|-------------|------|-----------|
+| --------- | ----------- | ---- | --------- |
 | SELECT | Enable read for all users | public | `true` |
 | INSERT | Enable insert for admin only | public | `is_admin()` |
 | INSERT | Enable insert for scan only | public | `is_scan() AND created_by = auth.uid()` |
@@ -141,7 +141,7 @@ is_admin_or_scan() -- returns true if admin OR scan
 ## chapters (8 policies)
 
 | Operation | Policy Name | Role | Condition |
-|-----------|-------------|------|-----------|
+| --------- | ----------- | ---- | --------- |
 | SELECT | Enable read for all users | public | `true` |
 | INSERT | Enable insert for admin only | public | `is_admin()` |
 | INSERT | Enable insert for scan only | public | `is_scan() AND created_by = auth.uid()` |
@@ -156,8 +156,8 @@ is_admin_or_scan() -- returns true if admin OR scan
 
 ## book_views (2 policies)
 
-| Operation | Policy Name                 | Role          | Condition |
-| --------- | --------------------------- | ------------- | -----------|
+| Operation | Policy Name                 | Role          | Condition    |
+| --------- | --------------------------- | ------------- | ------------ |
 | SELECT    | Admin can read book views   | authenticated | `is_admin()` |
 | INSERT    | Users can insert book views | authenticated | `true`       |
 
@@ -168,7 +168,7 @@ is_admin_or_scan() -- returns true if admin OR scan
 ## user_favorites (3 policies)
 
 | Operation | Policy Name | Role | Condition |
-|-----------|-------------|------|-----------|
+| --------- | ----------- | ---- | --------- |
 | SELECT | Users can read own favorites | public | `auth.uid() = user_id` |
 | INSERT | Users can insert own favorites | public | `auth.uid() = user_id` |
 | DELETE | Users can delete own favorites | public | `auth.uid() = user_id` |

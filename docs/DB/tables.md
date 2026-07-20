@@ -436,6 +436,7 @@ labels ──M:N──> books (via books_labels)
 ## Summary: Policy Requirements by Role
 
 ### Admin
+
 - **profiles**: SELECT all, UPDATE all (role changes)
 - **books**: Full CRUD all
 - **authors**: Full CRUD
@@ -449,6 +450,7 @@ labels ──M:N──> books (via books_labels)
 - **user_favorites**: No access (user-only)
 
 ### Scan
+
 - **profiles**: SELECT all (author names)
 - **books**: CRUD own (created_by = auth.uid())
 - **authors**: Full CRUD (shared resource)
@@ -462,6 +464,7 @@ labels ──M:N──> books (via books_labels)
 - **user_favorites**: No access (user-only)
 
 ### User
+
 - **profiles**: SELECT/UPDATE own
 - **books**: SELECT visible only
 - **authors**: SELECT only
@@ -475,4 +478,5 @@ labels ──M:N──> books (via books_labels)
 - **user_favorites**: Full CRUD own
 
 ### Suspended
+
 - **All tables**: No access (blocked at app routing level, not RLS)
