@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/core/cover/cover_url_service.dart';
+import 'package:noveles/shared/presentation/widgets/confirmation_dialog.dart';
 import 'package:noveles/features/admin/presentation/bloc/admin_bloc.dart';
 
 class BooksTab extends StatelessWidget {
@@ -199,28 +200,17 @@ class BooksContent extends StatelessWidget {
   }
 
   void _confirmDeleteBook(BuildContext context, int bookId) {
-    showDialog(
+    final bloc = context.read<AdminBloc>();
+    showConfirmationDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Eliminar libro'),
-        content: const Text('¿Estás seguro de que deseas eliminar este libro?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              context.read<AdminBloc>().add(DeleteAdminBook(bookId));
-            },
-            child: Text(
-              'Eliminar',
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
-          ),
-        ],
-      ),
-    );
+      title: 'Eliminar libro',
+      message: '¿Estás seguro de que deseas eliminar este libro?',
+      confirmLabel: 'Eliminar',
+      isDestructive: true,
+    ).then((confirmed) {
+      if (confirmed == true) {
+        bloc.add(DeleteAdminBook(bookId));
+      }
+    });
   }
 }

@@ -5,6 +5,7 @@ export 'package:noveles/features/admin/presentation/bloc/admin_users_state.dart'
 import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/profiles/domain/get_all_profiles.dart';
 import 'package:noveles/features/profiles/domain/update_user_role.dart';
+import 'package:noveles/features/profiles/domain/user_role.dart';
 import 'package:noveles/features/admin/presentation/bloc/admin_users_event.dart';
 import 'package:noveles/features/admin/presentation/bloc/admin_users_state.dart';
 
@@ -73,24 +74,24 @@ class AdminUsersBloc extends Bloc<AdminUsersEvent, AdminUsersState> {
     }
 
     // Determine current suspension status from loaded state
-    String targetRole = 'user';
+    UserRole targetRole = UserRole.user;
     final currentState = state;
     if (currentState is AdminUsersLoaded) {
       final user = currentState.users
           .where((u) => u.id == event.targetUserId)
           .firstOrNull;
       if (user != null) {
-        targetRole = user.isSuspended ? 'user' : 'suspended';
+        targetRole = user.isSuspended ? UserRole.user : UserRole.suspended;
       }
     }
 
-    final result = await updateUserRole(event.targetUserId, targetRole);
+    final result = await updateUserRole(event.targetUserId, targetRole.name);
     switch (result) {
       case Ok():
         final reloadResult = await getAllProfiles();
         switch (reloadResult) {
           case Ok(:final value):
-            final message = targetRole == 'suspended'
+            final message = targetRole == UserRole.suspended
                 ? 'Usuario suspendido'
                 : 'Usuario reactivado';
             emit(AdminUsersLoaded(value, message: message));

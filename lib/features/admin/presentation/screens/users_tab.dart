@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/features/admin/presentation/bloc/admin_users_bloc.dart';
 import 'package:noveles/features/profiles/domain/user_entity.dart';
+import 'package:noveles/features/profiles/domain/user_role.dart';
 
 class UsersTab extends StatefulWidget {
   const UsersTab({super.key});
@@ -83,7 +84,7 @@ class _UsersTabState extends State<UsersTab> {
                       leading: CircleAvatar(
                         backgroundColor: user.isSuspended
                             ? Theme.of(context).colorScheme.errorContainer
-                            : user.role == 'admin'
+                            : user.role == UserRole.admin
                                 ? Theme.of(context).colorScheme.primary
                                 : Theme.of(context)
                                     .colorScheme
@@ -151,8 +152,12 @@ class _UsersTabState extends State<UsersTab> {
   }
 
   void _showRoleDialog(BuildContext context, UserEntity user) {
-    final roles = ['user', 'scan', 'admin'];
-    final roleLabels = {'user': 'Usuario', 'scan': 'Scanner', 'admin': 'Admin'};
+    final roles = [UserRole.user, UserRole.scan, UserRole.admin];
+    final roleLabels = {
+      UserRole.user: 'Usuario',
+      UserRole.scan: 'Scanner',
+      UserRole.admin: 'Admin',
+    };
 
     showDialog(
       context: context,
@@ -166,7 +171,7 @@ class _UsersTabState extends State<UsersTab> {
                   context.read<AdminUsersBloc>().add(
                         ChangeUserRole(
                           targetUserId: user.id,
-                          newRole: role,
+                          newRole: role.name,
                         ),
                       );
                 },
@@ -177,7 +182,7 @@ class _UsersTabState extends State<UsersTab> {
                       size: 20,
                     ),
                     const SizedBox(width: 12),
-                    Text(roleLabels[role] ?? role),
+                    Text(roleLabels[role] ?? role.name),
                     if (user.role == role) ...[
                       const SizedBox(width: 8),
                       const Chip(
@@ -197,13 +202,13 @@ class _UsersTabState extends State<UsersTab> {
 }
 
 class RoleBadge extends StatelessWidget {
-  final String role;
+  final UserRole role;
   const RoleBadge({super.key, required this.role});
 
   @override
   Widget build(BuildContext context) {
-    final isAdmin = role == 'admin';
-    final isSuspended = role == 'suspended';
+    final isAdmin = role == UserRole.admin;
+    final isSuspended = role == UserRole.suspended;
 
     Color bgColor;
     Color fgColor;
@@ -220,7 +225,7 @@ class RoleBadge extends StatelessWidget {
     } else {
       bgColor = Theme.of(context).colorScheme.surfaceContainerHighest;
       fgColor = Theme.of(context).colorScheme.onSurfaceVariant;
-      label = role;
+      label = role.name;
     }
 
     return Container(

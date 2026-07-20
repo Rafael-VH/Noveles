@@ -3,7 +3,7 @@ import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/tooks/domain/create_took.dart';
 import 'package:noveles/features/tooks/domain/update_took.dart';
 import 'package:noveles/features/tooks/domain/delete_took.dart';
-import 'package:noveles/features/books/domain/upload_cover.dart';
+import 'package:noveles/features/books/domain/upload_image.dart';
 import 'package:noveles/features/scan/presentation/bloc/scan_took_event.dart';
 import 'package:noveles/features/scan/presentation/bloc/scan_took_state.dart';
 
@@ -14,13 +14,13 @@ class ScanTookBloc extends Bloc<ScanTookEvent, ScanTookState> {
   final CreateTook createTook;
   final UpdateTook updateTook;
   final DeleteTook deleteTook;
-  final UploadCover uploadCover;
+  final UploadImage uploadImage;
 
   ScanTookBloc({
     required this.createTook,
     required this.updateTook,
     required this.deleteTook,
-    required this.uploadCover,
+    required this.uploadImage,
   }) : super(ScanTookInitial()) {
     on<SaveScanTook>(_onSaveTook);
     on<DeleteScanTook>(_onDeleteTook);
@@ -50,7 +50,7 @@ class ScanTookBloc extends Bloc<ScanTookEvent, ScanTookState> {
   }
 
   Future<void> _onUploadCover(UploadTookCover event, Emitter<ScanTookState> emit) async {
-    final result = await uploadCover(event.filePath);
+    final result = await uploadImage(event.filePath);
     switch (result) {
       case Ok(:final value):
         emit(ScanTookCoverUploaded(value));

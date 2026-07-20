@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/core/cover/cover_url_service.dart';
 import 'package:noveles/shared/domain/entities/book_with_relations.dart';
+import 'package:noveles/shared/presentation/widgets/confirmation_dialog.dart';
+import 'package:noveles/shared/presentation/widgets/snackbar_helper.dart';
 import 'package:noveles/features/scan/presentation/bloc/scan_book_bloc.dart';
 import 'package:noveles/features/scan/presentation/bloc/scan_cover_bloc.dart';
 import 'package:noveles/features/scan/presentation/bloc/scan_took_bloc.dart';
@@ -38,24 +40,12 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
       value: _scanBookBloc,
       child: BlocListener<ScanBookBloc, ScanBookState>(
         listener: (context, state) {
-          // Show error message on error state
           if (state is ScanBookError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Theme.of(context).colorScheme.error,
-              ),
-            );
+            showErrorSnack(context, state.message);
           }
 
-          // Show success message on load or save
           if (state is ScanBookLoaded && state.message != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message!),
-                backgroundColor: Theme.of(context).colorScheme.tertiary,
-              ),
-            );
+            showSuccessSnack(context, state.message!);
           }
         },
         child: Scaffold(
@@ -227,31 +217,17 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
 
   // Delete Book
   void _deleteBook(BuildContext context, int bookId, String bookName) {
-    showDialog(
+    final bloc = context.read<ScanBookBloc>();
+    showConfirmationDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Eliminar libro'),
-        content: Text('¿Eliminar "$bookName"?'),
-        actions: [
-          // Cancel Button
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancelar'),
-          ),
-
-          // Confirm Delete Button
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              context.read<ScanBookBloc>().add(DeleteScanBook(bookId));
-            },
-            child: Text(
-              'Eliminar',
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
-          ),
-        ],
-      ),
-    );
+      title: 'Eliminar libro',
+      message: '¿Eliminar "$bookName"?',
+      confirmLabel: 'Eliminar',
+      isDestructive: true,
+    ).then((confirmed) {
+      if (confirmed == true) {
+        bloc.add(DeleteScanBook(bookId));
+      }
+    });
   }
 }

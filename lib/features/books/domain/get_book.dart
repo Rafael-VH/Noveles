@@ -7,7 +7,15 @@ class GetBooks {
 
   GetBooks(this.repository);
 
-  Future<Result<List<BookWithRelations>>> call({bool onlyVisible = false}) async {
-    return repository.getBooks(onlyVisible: onlyVisible);
+  Future<Result<List<BookWithRelations>>> call({
+    bool onlyVisible = false,
+    int page = 1,
+    int pageSize = 50,
+  }) async {
+    return repository.getBooks(
+      onlyVisible: onlyVisible,
+      page: page,
+      pageSize: pageSize,
+    );
   }
 }
