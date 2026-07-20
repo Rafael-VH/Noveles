@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/di/injection.dart';
+import 'package:noveles/shared/presentation/widgets/snackbar_helper.dart';
 import 'package:noveles/features/admin/presentation/bloc/admin_bloc.dart';
 import 'package:noveles/features/admin/presentation/bloc/admin_users_bloc.dart';
 import 'package:noveles/features/admin/presentation/screens/analytics_tab.dart';
@@ -46,31 +47,16 @@ class _AdminDashScreenState extends State<AdminDashScreen> {
         child: BlocListener<AdminUsersBloc, AdminUsersState>(
           listener: (context, state) {
             if (state is AdminUsersError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Theme.of(context).colorScheme.error,
-                ),
-              );
+              showErrorSnack(context, state.message);
             }
           },
           child: BlocConsumer<AdminBloc, AdminState>(
           listener: (context, state) {
             if (state is AdminLoaded && state.message != null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message!),
-                  backgroundColor: Theme.of(context).colorScheme.tertiary,
-                ),
-              );
+              showSuccessSnack(context, state.message!);
             }
             if (state is AdminError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Theme.of(context).colorScheme.error,
-                ),
-              );
+              showErrorSnack(context, state.message);
             }
           },
           builder: (context, state) => IndexedStack(
