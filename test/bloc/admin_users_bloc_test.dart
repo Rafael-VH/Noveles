@@ -4,6 +4,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/core/errors/failure.dart';
 import 'package:noveles/features/profiles/domain/user_entity.dart';
+import 'package:noveles/features/profiles/domain/user_role.dart';
 import 'package:noveles/features/profiles/domain/get_all_profiles.dart';
 import 'package:noveles/features/profiles/domain/update_user_role.dart';
 import 'package:noveles/features/admin/presentation/bloc/admin_users_bloc.dart';
@@ -22,19 +23,19 @@ void main() {
     const UserEntity(
       id: '1',
       email: 'admin@test.com',
-      role: 'admin',
+      role: UserRole.admin,
       displayName: 'Admin',
     ),
     const UserEntity(
       id: '2',
       email: 'scan@test.com',
-      role: 'scan',
+      role: UserRole.scan,
       displayName: 'Scanner',
     ),
     const UserEntity(
       id: '3',
       email: 'user@test.com',
-      role: 'user',
+      role: UserRole.user,
       displayName: 'User',
     ),
   ];
@@ -42,7 +43,7 @@ void main() {
   final updatedUser = const UserEntity(
     id: '2',
     email: 'scan@test.com',
-    role: 'admin',
+    role: UserRole.admin,
     displayName: 'Scanner',
   );
 
@@ -196,7 +197,7 @@ void main() {
         'emits AdminUsersLoaded with suspend message when suspending a user',
         build: () {
           when(() => mockUpdateUserRole('3', 'suspended'))
-              .thenAnswer((_) async => Ok(testUsers[2].copyWith(role: 'suspended')));
+              .thenAnswer((_) async => Ok(testUsers[2].copyWith(role: UserRole.suspended)));
           when(() => mockGetAllProfiles())
               .thenAnswer((_) async => Ok(testUsers));
           return AdminUsersBloc(
@@ -232,7 +233,7 @@ void main() {
         seed: () => AdminUsersLoaded([
           testUsers[0],
           testUsers[1],
-          testUsers[2].copyWith(role: 'suspended'),
+          testUsers[2].copyWith(role: UserRole.suspended),
         ]),
         act: (bloc) => bloc.add(const SuspendUser(targetUserId: '3')),
         expect: () => [

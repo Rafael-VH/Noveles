@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/di/injection.dart';
+import 'package:noveles/shared/presentation/widgets/snackbar_helper.dart';
 import 'package:noveles/features/genres/domain/genre_entity.dart';
 import 'package:noveles/features/genres/presentation/bloc/genre_bloc.dart';
 
@@ -33,20 +34,10 @@ class _GenresTabState extends State<GenresTab> {
       child: BlocConsumer<GenreBloc, GenreState>(
         listener: (context, state) {
           if (state is GenreLoaded && state.message != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message!),
-                backgroundColor: Theme.of(context).colorScheme.tertiary,
-              ),
-            );
+            showSuccessSnack(context, state.message!);
           }
           if (state is GenreError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Theme.of(context).colorScheme.error,
-              ),
-            );
+            showErrorSnack(context, state.message);
           }
         },
         builder: (context, state) {
