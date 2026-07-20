@@ -58,7 +58,10 @@ class App extends StatelessWidget {
                       if (authState.user.isScan) {
                         return const ScanMainScreen();
                       }
-                      return const MainScreen();
+                      if (authState.user.isUser) {
+                        return const MainScreen();
+                      }
+                      return const LoginScreen();
                     }
                     return const LoginScreen();
                   },

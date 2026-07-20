@@ -8,6 +8,7 @@ import 'package:noveles/features/admin/presentation/screens/books_tab.dart';
 import 'package:noveles/features/admin/presentation/screens/genres_tab.dart';
 import 'package:noveles/features/admin/presentation/screens/users_tab.dart';
 import 'package:noveles/features/app/presentation/widgets/app_drawer.dart';
+import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
 
 class AdminDashScreen extends StatefulWidget {
   const AdminDashScreen({super.key});
@@ -21,6 +22,11 @@ class _AdminDashScreenState extends State<AdminDashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authState = context.read<AuthBloc>().state;
+    final currentUserId = authState is AuthAuthenticated
+        ? authState.user.id
+        : '';
+
     return Scaffold(
       drawer: const AppDrawer(isAdmin: true),
       appBar: AppBar(title: const Text('Panel Admin')),
@@ -30,7 +36,10 @@ class _AdminDashScreenState extends State<AdminDashScreen> {
             create: (_) => getIt<AdminBloc>()..add(const LoadAdminBooks()),
           ),
           BlocProvider(
-            create: (_) => getIt<AdminUsersBloc>()..add(const LoadAdminUsers()),
+            create: (_) => AdminUsersBloc(
+              getAllProfiles: getIt(),
+              currentUserId: currentUserId,
+            )..add(const LoadAdminUsers()),
           ),
         ],
         child: BlocListener<AdminUsersBloc, AdminUsersState>(

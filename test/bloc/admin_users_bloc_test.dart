@@ -35,7 +35,10 @@ void main() {
 
   group('AdminUsersBloc', () {
     test('initial state is AdminUsersInitial', () {
-      final bloc = AdminUsersBloc(getAllProfiles: mockGetAllProfiles);
+      final bloc = AdminUsersBloc(
+        getAllProfiles: mockGetAllProfiles,
+        currentUserId: '1',
+      );
       expect(bloc.state, const AdminUsersInitial());
       bloc.close();
     });
@@ -44,7 +47,10 @@ void main() {
       'emits [AdminUsersLoading, AdminUsersLoaded] when LoadAdminUsers succeeds',
       build: () {
         when(() => mockGetAllProfiles()).thenAnswer((_) async => Ok(testUsers));
-        return AdminUsersBloc(getAllProfiles: mockGetAllProfiles);
+        return AdminUsersBloc(
+          getAllProfiles: mockGetAllProfiles,
+          currentUserId: '1',
+        );
       },
       act: (bloc) => bloc.add(const LoadAdminUsers()),
       expect: () => [
@@ -62,7 +68,10 @@ void main() {
       build: () {
         when(() => mockGetAllProfiles())
             .thenAnswer((_) async => Err(ProfileFailure('Error de red')));
-        return AdminUsersBloc(getAllProfiles: mockGetAllProfiles);
+        return AdminUsersBloc(
+          getAllProfiles: mockGetAllProfiles,
+          currentUserId: '1',
+        );
       },
       act: (bloc) => bloc.add(const LoadAdminUsers()),
       expect: () => [

@@ -14,6 +14,8 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
   final GetBooks getBooks;
   final usecases.ToggleBookVisibility toggleBookVisibility;
   final DeleteBook deleteBook;
+  DateTime? _lastDeleteTime;
+  static const _deleteCooldown = Duration(seconds: 2);
 
   AdminBloc({
     required this.getBooks,
@@ -78,6 +80,12 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     DeleteAdminBook event,
     Emitter<AdminState> emit,
   ) async {
+    if (_lastDeleteTime != null &&
+        DateTime.now().difference(_lastDeleteTime!) < _deleteCooldown) {
+      emit(const AdminError('Espera un momento antes de eliminar otro libro'));
+      return;
+    }
+    _lastDeleteTime = DateTime.now();
     final deleteResult = await deleteBook(event.bookId);
     switch (deleteResult) {
       case Ok():
