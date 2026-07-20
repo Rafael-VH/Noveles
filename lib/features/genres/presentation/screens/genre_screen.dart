@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:noveles/core/cover/cover_url_service.dart';
 import 'package:noveles/shared/domain/entities/book_with_relations.dart';
+import 'package:noveles/shared/presentation/widgets/empty_state.dart';
 
 class GenreScreen extends StatefulWidget {
   const GenreScreen({
@@ -37,8 +38,10 @@ class _GenreScreenState extends State<GenreScreen> {
         title: Text('Género: ${widget.genre}'),
       ),
       body: filteredBooks.isEmpty
-          ? const Center(
-              child: Text('No hay libros disponibles para este género'))
+          ? const EmptyState(
+              icon: Icons.menu_book_outlined,
+              message: 'No hay libros disponibles para este género',
+            )
           : GridView.builder(
               padding: const EdgeInsets.all(8),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(

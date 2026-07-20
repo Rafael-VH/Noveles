@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/cover/cover_url_service.dart';
 import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/shared/domain/entities/book_with_relations.dart';
+import 'package:noveles/shared/presentation/widgets/empty_state.dart';
 import 'package:noveles/features/genres/domain/genre_entity.dart';
 import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:noveles/features/books/presentation/bloc/book_bloc.dart';
@@ -20,6 +21,33 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  final ScrollController _scrollController = ScrollController();
+  int _currentPage = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      final bookState = context.read<BookBloc>().state;
+      if (bookState is BookLoaded && bookState.hasMore) {
+        _currentPage++;
+        context.read<BookBloc>().add(LoadMoreBooks(_currentPage));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -91,7 +119,12 @@ class _MainScreenState extends State<MainScreen> {
                 if (bookState is BookLoaded && genreState is GenreLoaded) {
                   final listBook = bookState.books;
                   final listGenre = genreState.genres;
-                  return _buildContent(context, listBook, listGenre);
+                  return _buildContent(
+                    context,
+                    listBook,
+                    listGenre,
+                    hasMore: bookState.hasMore,
+                  );
                 }
 
                 return const Center(child: CircularProgressIndicator());
@@ -106,10 +139,36 @@ class _MainScreenState extends State<MainScreen> {
   Widget _buildContent(
     BuildContext context,
     List<BookWithRelations> listBook,
-    List<GenreEntity> listGenre,
-  ) {
+    List<GenreEntity> listGenre, {
+    bool hasMore = false,
+  }) {
+    if (listBook.isEmpty) {
+      return SafeArea(
+        child: Column(
+          children: [
+            AppBar(
+              title: const Text('Noveles'),
+              leading: Builder(
+                builder: (ctx) => IconButton(
+                  icon: const Icon(Icons.menu),
+                  onPressed: () => Scaffold.of(ctx).openDrawer(),
+                ),
+              ),
+            ),
+            const Expanded(
+              child: EmptyState(
+                icon: Icons.menu_book_outlined,
+                message: 'No hay libros disponibles',
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return SafeArea(
       child: CustomScrollView(
+        controller: _scrollController,
         slivers: [
           // Carousel
           SliverAppBarHome(
@@ -166,6 +225,14 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ),
           ),
+
+          if (hasMore)
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 16),
+                child: Center(child: CircularProgressIndicator()),
+              ),
+            ),
         ],
       ),
     );

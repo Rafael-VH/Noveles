@@ -67,7 +67,11 @@ void main() {
     blocTest<BookBloc, BookState>(
       'emits [BookLoading, BookLoaded] when LoadBooks is added',
       build: () {
-        when(() => mockGetBooks()).thenAnswer((_) async => Ok(testBooks));
+        when(() => mockGetBooks(
+          onlyVisible: any(named: 'onlyVisible'),
+          page: any(named: 'page'),
+          pageSize: any(named: 'pageSize'),
+        )).thenAnswer((_) async => Ok(testBooks));
         return bookBloc;
       },
       act: (bloc) => bloc.add(LoadBooks()),
@@ -80,8 +84,11 @@ void main() {
     blocTest<BookBloc, BookState>(
       'emits [BookLoading, BookError] when GetBooks fails',
       build: () {
-        when(() => mockGetBooks())
-            .thenAnswer((_) async => Err(BookFailure('API error')));
+        when(() => mockGetBooks(
+          onlyVisible: any(named: 'onlyVisible'),
+          page: any(named: 'page'),
+          pageSize: any(named: 'pageSize'),
+        )).thenAnswer((_) async => Err(BookFailure('API error')));
         return bookBloc;
       },
       act: (bloc) => bloc.add(LoadBooks()),
@@ -121,8 +128,6 @@ void main() {
       ],
     );
 
-    // --- P1: LoadBookById error ---
-
     blocTest<BookBloc, BookState>(
       'emits [BookLoading, BookError] when GetBookById fails',
       build: () {
@@ -136,6 +141,86 @@ void main() {
         isA<BookError>()
             .having((s) => s.message, 'message', contains('Server error')),
       ],
+    );
+
+    // --- Pagination tests ---
+
+    blocTest<BookBloc, BookState>(
+      'LoadBooks sets hasMore to false when result is shorter than pageSize',
+      build: () {
+        when(() => mockGetBooks(
+          onlyVisible: any(named: 'onlyVisible'),
+          page: any(named: 'page'),
+          pageSize: any(named: 'pageSize'),
+        )).thenAnswer((_) async => Ok(testBooks));
+        return bookBloc;
+      },
+      act: (bloc) => bloc.add(LoadBooks()),
+      expect: () => [
+        isA<BookLoading>(),
+        isA<BookLoaded>().having((s) => s.hasMore, 'hasMore', false),
+      ],
+    );
+
+    final secondBook = BookWithRelations(
+      id: 2,
+      createdAt: DateTime(2024),
+      cover: 'cover2.jpg',
+      name: 'Second Book',
+      short: 'Short',
+      alternative: '',
+      description: 'Desc',
+      authorId: 1,
+      author: 'Author',
+      country: 'KR',
+      state: 'completed',
+      type: 'novel',
+      release: '2024',
+      tookCount: 10,
+      chapterCount: 100,
+      source: 'src',
+      link: '',
+      isFavorite: false,
+      isVisible: true,
+      listGenreIds: const [],
+      listTookIds: const [],
+      listLabelIds: const [],
+    );
+
+    blocTest<BookBloc, BookState>(
+      'LoadMoreBooks appends new books to existing list',
+      build: () {
+        when(() => mockGetBooks(
+          onlyVisible: any(named: 'onlyVisible'),
+          page: any(named: 'page'),
+          pageSize: any(named: 'pageSize'),
+        )).thenAnswer((invocation) async {
+          final page = invocation.namedArguments[#page] as int;
+          if (page == 2) return Ok([secondBook]);
+          return Ok(testBooks);
+        });
+        return bookBloc;
+      },
+      act: (bloc) {
+        bloc.add(LoadBooks());
+        bloc.add(const LoadMoreBooks(2));
+      },
+      verify: (bloc) {
+        final loaded = bloc.state as BookLoaded;
+        expect(loaded.books.length, 2);
+        expect(loaded.books.first.name, 'Test Book');
+        expect(loaded.books.last.name, 'Second Book');
+        expect(loaded.hasMore, isFalse);
+      },
+    );
+
+    blocTest<BookBloc, BookState>(
+      'LoadMoreBooks does nothing when state is not BookLoaded',
+      build: () {
+        return bookBloc;
+      },
+      act: (bloc) => bloc.add(const LoadMoreBooks(2)),
+      expect: () => <BookState>[],
     );
   });
 }

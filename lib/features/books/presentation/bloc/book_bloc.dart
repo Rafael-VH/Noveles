@@ -12,6 +12,7 @@ class BookBloc extends Bloc<BookEvent, BookState> {
   final GetBooks getBooks;
   final GetBookById getBookById;
   final bool onlyVisible;
+  static const int pageSize = 50;
 
   BookBloc({
     required this.getBooks,
@@ -19,6 +20,7 @@ class BookBloc extends Bloc<BookEvent, BookState> {
     this.onlyVisible = false,
   }) : super(BookInitial()) {
     on<LoadBooks>(_onLoadBooks);
+    on<LoadMoreBooks>(_onLoadMoreBooks);
     on<LoadBookById>(_onLoadBookById);
   }
 
@@ -27,10 +29,40 @@ class BookBloc extends Bloc<BookEvent, BookState> {
     Emitter<BookState> emit,
   ) async {
     emit(BookLoading());
-    final result = await getBooks(onlyVisible: onlyVisible);
+    final result = await getBooks(
+      onlyVisible: onlyVisible,
+      page: 1,
+      pageSize: pageSize,
+    );
     switch (result) {
       case Ok(:final value):
-        emit(BookLoaded(value));
+        emit(BookLoaded(
+          value,
+          hasMore: value.length >= pageSize,
+        ));
+      case Err(:final error):
+        emit(BookError(error.message));
+    }
+  }
+
+  Future<void> _onLoadMoreBooks(
+    LoadMoreBooks event,
+    Emitter<BookState> emit,
+  ) async {
+    final currentState = state;
+    if (currentState is! BookLoaded) return;
+
+    final result = await getBooks(
+      onlyVisible: onlyVisible,
+      page: event.page,
+      pageSize: pageSize,
+    );
+    switch (result) {
+      case Ok(:final value):
+        emit(BookLoaded(
+          [...currentState.books, ...value],
+          hasMore: value.length >= pageSize,
+        ));
       case Err(:final error):
         emit(BookError(error.message));
     }

@@ -12,11 +12,12 @@ class BookLoading extends BookState {}
 
 class BookLoaded extends BookState {
   final List<BookWithRelations> books;
+  final bool hasMore;
 
-  BookLoaded(this.books);
+  BookLoaded(this.books, {this.hasMore = true});
 
   @override
-  List<Object> get props => [books];
+  List<Object> get props => [books, hasMore];
 }
 
 class BookError extends BookState {

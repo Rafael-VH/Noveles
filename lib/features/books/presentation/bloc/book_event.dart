@@ -11,6 +11,15 @@ class LoadBooks extends BookEvent {
   const LoadBooks();
 }
 
+class LoadMoreBooks extends BookEvent {
+  final int page;
+
+  const LoadMoreBooks(this.page);
+
+  @override
+  List<Object> get props => [page];
+}
+
 class LoadBookById extends BookEvent {
   final int id;
 
