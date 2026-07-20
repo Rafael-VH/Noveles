@@ -14,10 +14,10 @@
 
 ## Quick Links
 
-- [Tables & Schema](tables.md)
-- [RLS Policies](rls-policies.md)
-- [SQL Functions](sql-functions.md)
-- [Storage](storage.md)
+- [Tables & Schema](tables.md) — columns, types, code mapping, required policies
+- [RLS Policies](rls-policies.md) — all 63 policies with conditions
+- [SQL Functions](sql-functions.md) — 9 SECURITY DEFINER functions
+- [Storage](storage.md) — 3 buckets, folder structure, RLS
 
 ## Role Model
 

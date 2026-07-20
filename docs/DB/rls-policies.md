@@ -156,10 +156,10 @@ is_admin_or_scan() -- returns true if admin OR scan
 
 ## book_views (2 policies)
 
-| Operation | Policy Name | Role | Condition |
-|-----------|-------------|------|-----------|
-| SELECT | Admin can read book views | authenticated | `is_admin()` |
-| INSERT | Users can insert book views | authenticated | `true` |
+| Operation | Policy Name                 | Role          | Condition |
+| --------- | --------------------------- | ------------- | -----------|
+| SELECT    | Admin can read book views   | authenticated | `is_admin()` |
+| INSERT    | Users can insert book views | authenticated | `true`       |
 
 **Notes**: Any authenticated user can track views. Only admin can read analytics.
 
@@ -182,7 +182,7 @@ is_admin_or_scan() -- returns true if admin OR scan
 ### covers bucket
 
 | Operation | Policy | Condition |
-|-----------|--------|-----------|
+| --------- | ------ | --------- |
 | INSERT | Covers: authenticated insert own folder | `bucket_id = 'covers' AND auth.role() = 'authenticated' AND (storage.foldername(name))[1] = auth.uid()::text` |
 | UPDATE | Covers: authenticated update own folder | Same as INSERT |
 | DELETE | Covers: authenticated delete own folder | Same as INSERT |
@@ -190,7 +190,7 @@ is_admin_or_scan() -- returns true if admin OR scan
 ### chapters bucket
 
 | Operation | Policy | Condition |
-|-----------|--------|-----------|
+| --------- | ------ | --------- |
 | INSERT | Chapters: authenticated insert own folder | `bucket_id = 'chapters' AND auth.role() = 'authenticated' AND (storage.foldername(name))[1] = auth.uid()::text` |
 | UPDATE | Chapters: authenticated update own folder | Same as INSERT |
 | DELETE | Chapters: authenticated delete own folder | Same as INSERT |
@@ -202,6 +202,7 @@ is_admin_or_scan() -- returns true if admin OR scan
 ## Security Observations
 
 ### ✅ Strong
+
 - RLS enabled on ALL tables
 - SECURITY DEFINER functions prevent RLS bypass
 - Content ownership enforced (`created_by = auth.uid()`)
@@ -209,6 +210,7 @@ is_admin_or_scan() -- returns true if admin OR scan
 - Storage restricted to user folders
 
 ### ⚠️ Monitor
+
 - `book_views` INSERT has no rate limiting (any authenticated user)
 - `profiles` SELECT for scan shows all users (intentional for author display)
 - Storage buckets are public (URLs are readable by anyone)
