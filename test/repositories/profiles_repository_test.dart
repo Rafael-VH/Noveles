@@ -6,6 +6,7 @@ import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/profiles/data/profiles_repository_impl.dart';
 import 'package:noveles/features/profiles/domain/user_entity.dart';
+import 'package:noveles/features/profiles/domain/user_role.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MockSupabaseClientProvider extends Mock implements SupabaseClientProvider {}
@@ -391,7 +392,7 @@ void main() {
         final value = (result as Ok<List<UserEntity>>).value;
         expect(value.length, 2);
         expect(value[0].email, 'user1@example.com');
-        expect(value[1].role, 'admin');
+        expect(value[1].role, UserRole.admin);
         verify(() => mockClient.from('profiles')).called(1);
       });
 
@@ -481,7 +482,7 @@ void main() {
         expect(result, isA<Ok<UserEntity>>());
         final value = (result as Ok<UserEntity>).value;
         expect(value.id, 'user-2');
-        expect(value.role, 'admin');
+        expect(value.role, UserRole.admin);
         verify(() => mockFilter.eq('id', 'user-2')).called(1);
       });
 

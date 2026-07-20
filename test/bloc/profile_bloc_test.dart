@@ -4,6 +4,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/core/errors/failure.dart';
 import 'package:noveles/features/profiles/domain/user_entity.dart';
+import 'package:noveles/features/profiles/domain/user_role.dart';
 import 'package:noveles/features/profiles/domain/get_profile.dart';
 import 'package:noveles/features/profiles/domain/update_profile.dart'
     as usecases;
@@ -31,7 +32,7 @@ void main() {
   const testUser = UserEntity(
     id: '1',
     email: 'test@example.com',
-    role: 'user',
+    role: UserRole.user,
     displayName: 'Test User',
     bio: 'Bio text',
     avatarUrl: null,
@@ -40,7 +41,7 @@ void main() {
   const updatedUser = UserEntity(
     id: '1',
     email: 'test@example.com',
-    role: 'user',
+    role: UserRole.user,
     displayName: 'Updated Name',
     bio: 'Updated bio',
     avatarUrl: null,

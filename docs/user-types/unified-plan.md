@@ -979,7 +979,7 @@ switch (result) {
 
 ## Fase 5: Admin Management (P1) — ~4-6 días
 
-**Objetivo**: Completar la gestión de usuarios con escritura real (cambio de rol, suspensión), habilitar creación de libros desde admin, y mejorar la UX del panel.
+**Objetivo**: Completar la gestión de usuarios con escritura real (cambio de rol, suspensión), búsqueda, paginación, y mejorar la UX del panel.
 
 **Dependencias**: Fase 1 completa (auto-democión protection, rate limiting).
 
@@ -1178,40 +1178,6 @@ Future<Result<List<UserEntity>>> getAllProfiles({
 - Scroll infinito carga más
 - Loading indicator al cargar más
 - No hay límite hardcoded
-
----
-
-### 5.5 Creación de libros desde admin
-
-**Why**: Actualmente solo scan puede crear libros. La RLS ya permite admin (`INSERT books: is_admin()`), pero la UI no lo soporta.
-
-**Qué hacer**:
-1. FAB en `BooksTab`
-2. `CreateBookScreen` con formulario completo:
-   - Campo nombre
-   - Campo autor (buscar existente o crear nuevo)
-   - Selección de géneros (multi-select)
-   - Upload de portada
-   - Botón "Crear"
-3. `CreateAdminBook` event + handler en `AdminBloc`
-
-**Archivos afectados**:
-- `lib/features/admin/presentation/screens/books_tab.dart` — FAB
-- `lib/features/admin/presentation/screens/create_book_screen.dart` — NUEVO
-- `lib/features/admin/presentation/bloc/admin_event.dart`
-- `lib/features/admin/presentation/bloc/admin_bloc.dart`
-- `lib/features/books/domain/create_book.dart` — NUEVO use case
-- `lib/features/books/data/book_repository_impl.dart`
-- `lib/core/di/injection_books.dart`
-
-**Risk**: MEDIO. Creación de libros implica upload de cover y manejo de relaciones. Debe reutilizar la infraestructura existente de scan.
-
-**Verification**:
-- FAB visible en el tab de Libros
-- Formulario con todos los campos
-- Libro se crea con `is_visible = false` por defecto
-- Después de crear, admin puede hacer toggle para publicar
-- La lista se actualiza
 
 ---
 

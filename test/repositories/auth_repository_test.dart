@@ -6,6 +6,7 @@ import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/auth/data/auth_repository_impl.dart';
 import 'package:noveles/features/auth/domain/entities/auth_event.dart';
 import 'package:noveles/features/profiles/domain/user_entity.dart';
+import 'package:noveles/features/profiles/domain/user_role.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MockSupabaseClientProvider extends Mock implements SupabaseClientProvider {}
@@ -141,7 +142,7 @@ void main() {
         final value = (result as Ok<UserEntity>).value;
         expect(value.id, 'user-1');
         expect(value.email, 'test@example.com');
-        expect(value.role, 'user');
+        expect(value.role, UserRole.user);
       });
 
       test('returns Err when user is null', () async {
@@ -177,7 +178,7 @@ void main() {
         expect(result, isA<Ok<UserEntity>>());
         final value = (result as Ok<UserEntity>).value;
         expect(value.id, 'user-1');
-        expect(value.role, 'user');
+        expect(value.role, UserRole.user);
         // Profile insert should have been called
         verify(() => mockQueryBuilder.insert(
               any(),

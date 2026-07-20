@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:noveles/features/profiles/domain/user_entity.dart';
+import 'package:noveles/features/profiles/domain/user_role.dart';
 import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:noveles/features/app/presentation/widgets/app_drawer.dart';
 
@@ -15,7 +16,7 @@ void main() {
     authBloc = MockAuthBloc();
     when(() => authBloc.state).thenReturn(
       AuthAuthenticated(
-        const UserEntity(id: '1', email: 'admin@test.com', role: 'admin'),
+        const UserEntity(id: '1', email: 'admin@test.com', role: UserRole.admin),
       ),
     );
     when(() => authBloc.stream).thenAnswer((_) => const Stream.empty());
@@ -40,7 +41,7 @@ void main() {
     testWidgets('shows Inicio for non-admin users', (tester) async {
       when(() => authBloc.state).thenReturn(
         AuthAuthenticated(
-          const UserEntity(id: '1', email: 'scan@test.com', role: 'scan'),
+          const UserEntity(id: '1', email: 'scan@test.com', role: UserRole.scan),
         ),
       );
 

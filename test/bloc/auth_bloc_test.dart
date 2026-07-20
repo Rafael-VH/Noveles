@@ -11,6 +11,7 @@ import 'package:noveles/features/auth/domain/use_cases/logout.dart';
 import 'package:noveles/features/auth/domain/use_cases/get_current_user.dart';
 import 'package:noveles/features/auth/domain/use_cases/listen_auth_state.dart';
 import 'package:noveles/features/profiles/domain/user_entity.dart';
+import 'package:noveles/features/profiles/domain/user_role.dart';
 import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:noveles/features/auth/presentation/bloc/auth_event.dart';
 import 'package:noveles/features/auth/presentation/bloc/auth_state.dart';
@@ -36,7 +37,7 @@ void main() {
   const testUser = UserEntity(
     id: '1',
     email: 'test@example.com',
-    role: 'user',
+    role: UserRole.user,
     displayName: 'Test User',
     bio: 'Bio',
     avatarUrl: null,

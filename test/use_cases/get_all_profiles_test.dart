@@ -3,6 +3,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/core/errors/failure.dart';
 import 'package:noveles/features/profiles/domain/user_entity.dart';
+import 'package:noveles/features/profiles/domain/user_role.dart';
 import 'package:noveles/features/profiles/domain/profiles_repository.dart';
 import 'package:noveles/features/profiles/domain/get_all_profiles.dart';
 
@@ -21,7 +22,7 @@ void main() {
         const UserEntity(
           id: '1',
           email: 'admin@test.com',
-          role: 'admin',
+          role: UserRole.admin,
           displayName: 'Admin',
         ),
       ];
