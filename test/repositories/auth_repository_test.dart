@@ -39,10 +39,11 @@ class MockFilterBuilder extends Mock
 // ignore: must_be_immutable
 class MockTransformBuilder extends Mock
     implements PostgrestTransformBuilder<Map<String, dynamic>?> {
-  Map<String, dynamic>? _data;
+  final _queue = <Map<String, dynamic>?>[];
+  int _callIndex = 0;
 
   void thenReturns(Map<String, dynamic>? data) {
-    _data = data;
+    _queue.add(data);
   }
 
   @override
@@ -50,7 +51,10 @@ class MockTransformBuilder extends Mock
     FutureOr<U> Function(Map<String, dynamic>? value) onValue, {
     Function? onError,
   }) async {
-    final result = onValue(_data);
+    final data =
+        _callIndex < _queue.length ? _queue[_callIndex] : _queue.last;
+    _callIndex++;
+    final result = onValue(data);
     if (result is Future<U>) return result;
     return result;
   }
@@ -158,8 +162,13 @@ void main() {
               email: any(named: 'email'),
               password: any(named: 'password'),
             )).thenAnswer((_) async => AuthResponse(user: gotrueUser));
-        // First maybeSingle returns null (no profile)
+        // Call 1 maybeSingle: no profile exists
         mockTransform.thenReturns(null);
+        // Call 3 maybeSingle: verification after insert returns new profile
+        mockTransform.thenReturns({
+          'id': 'user-1',
+          'role': 'user',
+        });
         // insert() returns mockFilter; resolve the await with empty list
         mockFilter.thenReturns(<Map<String, dynamic>>[]);
 
@@ -168,6 +177,7 @@ void main() {
         expect(result, isA<Ok<UserEntity>>());
         final value = (result as Ok<UserEntity>).value;
         expect(value.id, 'user-1');
+        expect(value.role, 'user');
         // Profile insert should have been called
         verify(() => mockQueryBuilder.insert(
               any(),

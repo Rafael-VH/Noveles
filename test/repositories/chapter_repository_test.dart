@@ -126,6 +126,10 @@ void main() {
           any(),
           referencedTable: any(named: 'referencedTable'),
         )).thenAnswer((_) => mockFilter);
+    when(() => mockFilter.range(
+          any(),
+          any(),
+        )).thenAnswer((_) => mockFilter);
     when(() => mockFilter.maybeSingle()).thenAnswer((_) => mockTransform);
   });
 
