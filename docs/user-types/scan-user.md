@@ -1,6 +1,6 @@
 # Usuario Scan (`role = 'scan'`) — Auditoría Completa
 
-> **Fecha de auditoría**: 2026-07-19  
+> **Fecha de auditoría**: 2026-07-19
 > **Versión del proyecto**: Noveles (Flutter + Supabase)
 
 ---
@@ -44,6 +44,7 @@ class UserEntity extends Equatable {
 ```
 
 **Getters de rol**:
+
 - `isScan` → `role == 'scan'` (L20)
 - `isAdmin` → `role == 'admin'` (L21)
 - No hay getter `isUser` — el usuario regular es el "default" (no matchea ninguno de los dos)
@@ -68,11 +69,13 @@ factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
 ### 1.3 Roles en Supabase
 
 **Tabla `profiles`** — CHECK constraint (migración final):
+
 ```sql
 CHECK (role IN ('user', 'scan', 'admin'))
 ```
 
 **Función helper `is_scan()`** (migración `20260520000000`):
+
 ```sql
 CREATE OR REPLACE FUNCTION public.is_scan()
 RETURNS BOOLEAN
@@ -129,12 +132,14 @@ if (authState is AuthAuthenticated) {
 **Archivo**: `lib/features/scan/presentation/screens/scan_main_screen.dart` (255 líneas)
 
 **Componentes**:
+
 - `AppBar`: título "Panel Scan"
 - `Drawer`: `AppDrawer(isScan: true)`
 - `Body`: Lista de libros (RefreshIndicator + ListView.builder)
 - `FAB`: "+" para crear libro nuevo
 
 **Lo que ve el scan en esta pantalla**:
+
 - Lista de libros que **él creó** (RLS: `created_by = auth.uid()`)
 - Para cada libro:
   - Cover thumbnail (CachedNetworkImage)
@@ -150,8 +155,9 @@ if (authState is AuthAuthenticated) {
 **Archivo**: `lib/features/scan/presentation/screens/scan_book_edit_screen.dart` (463 líneas)
 
 **Campos del formulario**:
+
 | Campo | Tipo | Validación |
-|-------|------|------------|
+| ------ | ------ | ------------ |
 | Nombre | TextFormField | **Requerido** |
 | Cover | CoverPicker (image) | Opcional |
 | Nombre corto | TextFormField | Opcional |
@@ -168,6 +174,7 @@ if (authState is AuthAuthenticated) {
 | Tomos | TookListSection | Solo en modo edición |
 
 **Comportamiento**:
+
 - **Crear**: Crea libro → recarga lista → captura el ID real de la DB → permite agregar tomos
 - **Editar**: Actualiza libro → recarga lista
 - **Agregar tomo**: Si el libro es nuevo, lo guarda primero → navega a `ScanTookEditScreen`
@@ -180,13 +187,15 @@ if (authState is AuthAuthenticated) {
 **Archivo**: `lib/features/scan/presentation/screens/scan_took_edit_screen.dart` (343 líneas)
 
 **Campos**:
+
 | Campo | Tipo | Validación |
-|-------|------|------------|
+| ------ | ------ | ------------ |
 | Número | TextFormField | **Requerido** |
 | Título | TextFormField | Opcional |
 | Cover | CoverPicker (image) | Opcional |
 
 **Comportamiento**:
+
 - **Crear/Actualizar tomo**: `SaveScanTook` event
 - **Cover upload**: `UploadTookCover` → `ImagePicker` (galería) → `ScanTookBloc`
 - **Listado de capítulos**: Solo visible en modo edición
@@ -202,13 +211,15 @@ if (authState is AuthAuthenticated) {
 **Archivo**: `lib/features/scan/presentation/screens/scan_chapter_edit_screen.dart` (293 líneas)
 
 **Campos**:
+
 | Campo | Tipo | Validación |
-|-------|------|------------|
+| ------ | ------ | ------------ |
 | Número | TextFormField | **Requerido** |
 | Título | TextFormField | Opcional |
 | Archivo de contenido | FilePicker (.md, .txt) | Opcional |
 
 **Comportamiento de upload**:
+
 1. Usuario selecciona archivo `.md` o `.txt` via `FilePicker`
 2. Se emite `UploadChapterFile` → `ScanChapterBloc`
 3. El archivo se sube al bucket `chapters` de Supabase Storage
@@ -220,6 +231,7 @@ if (authState is AuthAuthenticated) {
 ### 3.5 Widgets Reutilizables
 
 #### CoverPicker
+
 **Archivo**: `lib/features/scan/presentation/screens/widgets/cover_picker.dart` (83 líneas)
 
 - Muestra preview de imagen si `controller.text` no está vacío
@@ -228,6 +240,7 @@ if (authState is AuthAuthenticated) {
 - Muestra la URL/filename del cover
 
 #### GenreSelector
+
 **Archivo**: `lib/features/scan/presentation/screens/widgets/genre_selector.dart` (59 líneas)
 
 - Renderiza géneros como `FilterChip` en un `Wrap`
@@ -235,6 +248,7 @@ if (authState is AuthAuthenticated) {
 - Carga géneros desde `ScanBloc` via `LoadScanGenres`
 
 #### TookListSection
+
 **Archivo**: `lib/features/scan/presentation/screens/widgets/took_list_section.dart` (84 líneas)
 
 - Lista de tomos con botones editar/eliminar
@@ -246,7 +260,8 @@ if (authState is AuthAuthenticated) {
 **Archivo**: `lib/features/app/presentation/widgets/app_drawer.dart` (129 líneas)
 
 **Para scan** (`isScan: true`, `isAdmin: false`):
-```
+
+```text
 ┌─────────────────────────┐
 │  Avatar + Nombre        │
 │  Email                  │
@@ -259,6 +274,7 @@ if (authState is AuthAuthenticated) {
 ```
 
 **No tiene** acceso a:
+
 - "Panel Admin" (solo visible si `isAdmin = true`)
 - Navegación a home de lectura
 
@@ -268,7 +284,7 @@ if (authState is AuthAuthenticated) {
 
 ### 4.1 Flujo Completo
 
-```
+```text
 ScanMainScreen
   │
   ├── FAB (+) ──→ ScanBookEditScreen(nuevo)
@@ -294,7 +310,7 @@ ScanMainScreen
 ### 4.2 Operaciones Supabase (Books)
 
 | Operación | Tabla | SQL | RLS Policy |
-|-----------|-------|-----|------------|
+| --------- | ----- | --- | ---------- |
 | SELECT | `books` | `select('*, authors(*), books_genres(...), books_labels(...), tooks(*, chapters(*))')` | "Scan can read all books" (`is_scan() AND created_by = auth.uid()`) |
 | INSERT | `books` | `insert({...})` | "Enable insert for scan only" (`is_scan() AND created_by = auth.uid()`) |
 | UPDATE | `books` | `update({...}).eq('id', id)` | "Enable update for scan only" (`is_scan() AND created_by = auth.uid()`) |
@@ -339,6 +355,7 @@ BookEntity({
 ### 4.4 Auto-creación de Author
 
 En `BookRepositoryImpl.createBook()` (L62-84):
+
 1. Si `authorId == 0` y `author` no está vacío
 2. Busca author existente por nombre
 3. Si no existe, lo crea
@@ -353,21 +370,24 @@ En `BookRepositoryImpl.createBook()` (L62-84):
 **Archivo**: `lib/features/scan/presentation/bloc/scan_chapter_bloc.dart` (61 líneas)
 
 **4 casos de uso inyectados**:
+
 - `CreateChapter` → `ChapterRepository.createChapter()`
 - `UpdateChapter` → `ChapterRepository.updateChapter()`
 - `DeleteChapter` → `ChapterRepository.deleteChapter()`
 - `UploadChapterContent` → `ChapterRepository.uploadContent()`
 
 **3 eventos**:
+
 | Evento | Acción | Estado resultante |
-|--------|--------|-------------------|
+| ------ | ------ | ----------------- |
 | `SaveScanChapter(chapter, isUpdate)` | Create o Update | `ScanChapterLoaded(message)` |
 | `DeleteScanChapter(chapterId)` | Delete | `ScanChapterLoaded(message)` |
 | `UploadChapterFile(filePath)` | Upload a Storage | `ScanChapterContentUploaded(url)` |
 
 **5 estados**:
+
 | Estado | Datos |
-|--------|-------|
+| ------ | ----- |
 | `ScanChapterInitial` | — |
 | `ScanChapterLoading` | — |
 | `ScanChapterLoaded` | `message?` |
@@ -376,7 +396,7 @@ En `BookRepositoryImpl.createBook()` (L62-84):
 
 ### 5.2 Flujo de Upload de Contenido
 
-```
+```text
 ScanChapterEditScreen
   │
   ├── FilePicker.pickFiles(allowedExtensions: ['md', 'txt'])
@@ -396,7 +416,7 @@ ScanChapterEditScreen
 ### 5.3 Operaciones Supabase (Chapters)
 
 | Operación | Tabla | RLS Policy |
-|-----------|-------|------------|
+| --------- | ----- | ---------- |
 | SELECT | `chapters` | "Enable read for all users" (`true`) |
 | INSERT | `chapters` | "Enable insert for scan only" (`is_scan()`) — **SIN ownership check** |
 | UPDATE | `chapters` | "Enable update for scan only" (`is_scan()`) — **SIN ownership check** |
@@ -427,21 +447,24 @@ ChapterEntity({
 **Archivo**: `lib/features/scan/presentation/bloc/scan_took_bloc.dart` (61 líneas)
 
 **4 casos de uso inyectados**:
+
 - `CreateTook` → `TookRepository.createTook()`
 - `UpdateTook` → `TookRepository.updateTook()`
 - `DeleteTook` → `TookRepository.deleteTook()`
 - `UploadCover` → `BookRepository.uploadCover()` (reutiliza el mismo de libros)
 
 **3 eventos**:
+
 | Evento | Acción | Estado resultante |
-|--------|--------|-------------------|
+| ------ | ------ | ----------------- |
 | `SaveScanTook(took, isUpdate)` | Create o Update | `ScanTookLoaded(message)` |
 | `DeleteScanTook(tookId)` | Delete | `ScanTookLoaded(message)` |
 | `UploadTookCover(filePath)` | Upload cover a Storage | `ScanTookCoverUploaded(url)` |
 
 **5 estados**:
+
 | Estado | Datos |
-|--------|-------|
+| ------ | ----- |
 | `ScanTookInitial` | — |
 | `ScanTookLoading` | — |
 | `ScanTookLoaded` | `message?` |
@@ -451,7 +474,7 @@ ChapterEntity({
 ### 6.2 Operaciones Supabase (Tooks)
 
 | Operación | Tabla | RLS Policy |
-|-----------|-------|------------|
+| --------- | ----- | ---------- |
 | SELECT | `tooks` | "Enable read for all users" (`true`) |
 | INSERT | `tooks` | "Enable insert for scan only" (`is_scan()`) — **SIN ownership check** |
 | UPDATE | `tooks` | "Enable update for scan only" (`is_scan()`) — **SIN ownership check** |
@@ -482,6 +505,7 @@ TookEntity({
 ### 7.1 Géneros — Solo Lectura para Scan
 
 El scan interactúa con géneros de **lectura sola**:
+
 - `LoadScanGenres` en `ScanBloc` → llama `GetGenre()` → `GenreRepository.getGenres()`
 - Los géneros se cargan al abrir `ScanBookEditScreen` (L68)
 - Se renderizan como `FilterChip` en `GenreSelector`
@@ -489,12 +513,14 @@ El scan interactúa con géneros de **lectura sola**:
 - **NO puede crear, editar ni eliminar géneros** — eso es exclusivo del admin
 
 **RLS de géneros**:
+
 - SELECT: `"Enable read for all users"` (`true`) — todos leen
 - INSERT/UPDATE/DELETE: `"Enable insert/update/delete for admin only"` (`is_admin()`) — solo admin escribe
 
 ### 7.2 Etiquetas (Labels) — Lectura y Asociación
 
 El scan puede:
+
 - **Leer etiquetas**: RLS `"Enable read for all users"` (`true`)
 - **Crear/Editar/Eliminar etiquetas**: RLS `"Enable insert/update/delete for scan and admin"` (`is_scan() OR is_admin()`)
 - **Asociar etiquetas a libros**: Via `books_labels` — INSERT/DELETE permitido para scan y admin
@@ -520,7 +546,7 @@ class StorageConstants {
 
 **Caso de uso**: `UploadCover` → `BookRepository.uploadCover()`
 
-```
+```text
 ImagePicker.pickImage(source: ImageSource.gallery)
   │
   ├── Validación de tamaño: máximo 5MB (L197-210 de book_repository_impl.dart)
@@ -531,8 +557,9 @@ ImagePicker.pickImage(source: ImageSource.gallery)
 ```
 
 **Covers bucket RLS** (consolidado):
+
 | Política | Operación | Condición |
-|----------|-----------|-----------|
+| -------- | --------- | --------- |
 | "Covers public read" | SELECT | `bucket_id = 'covers'` |
 | "Covers authenticated insert" | INSERT | `bucket_id = 'covers' AND auth.role() = 'authenticated'` |
 | "Covers authenticated update" | UPDATE | `bucket_id = 'covers' AND auth.role() = 'authenticated'` |
@@ -545,7 +572,7 @@ ImagePicker.pickImage(source: ImageSource.gallery)
 
 **Caso de uso**: `UploadChapterContent` → `ChapterRepository.uploadContent()`
 
-```
+```text
 FilePicker.pickFiles(type: FileType.custom, allowedExtensions: ['md', 'txt'])
   │
   ├── Filename: "{timestamp}.{ext}"
@@ -555,8 +582,9 @@ FilePicker.pickFiles(type: FileType.custom, allowedExtensions: ['md', 'txt'])
 ```
 
 **Chapters bucket RLS** (consolidado):
+
 | Política | Operación | Condición |
-|----------|-----------|-----------|
+| -------- | --------- | --------- |
 | "Chapters public read" | SELECT | `bucket_id = 'chapters'` |
 | "Chapters authenticated insert" | INSERT | `bucket_id = 'chapters' AND auth.role() = 'authenticated'` |
 | "Chapters authenticated update" | UPDATE | `bucket_id = 'chapters' AND auth.role() = 'authenticated'` |
@@ -589,7 +617,7 @@ Se usa en: `scan_main_screen.dart` (L133), `cover_picker.dart` (L38), `app_drawe
 #### Tabla `books`
 
 | Política | Operación | Condición Final |
-|----------|-----------|-----------------|
+| -------- | --------- | --------------- |
 | "Scan can read all books" | SELECT | `is_scan() AND created_by = auth.uid()` |
 | "Users can read visible books" | SELECT | `is_visible = true AND NOT is_scan()` |
 | "Enable insert for scan only" | INSERT | `is_scan() AND created_by = auth.uid()` |
@@ -604,7 +632,7 @@ Se usa en: `scan_main_screen.dart` (L133), `cover_picker.dart` (L38), `app_drawe
 #### Tabla `tooks`
 
 | Política | Operación | Condición Final |
-|----------|-----------|-----------------|
+| -------- | --------- | --------------- |
 | "Enable read for all users" | SELECT | `true` |
 | "Enable insert for scan only" | INSERT | `is_scan()` — **sin ownership** |
 | "Enable update for scan only" | UPDATE | `is_scan()` — **sin ownership** |
@@ -616,7 +644,7 @@ Se usa en: `scan_main_screen.dart` (L133), `cover_picker.dart` (L38), `app_drawe
 #### Tabla `chapters`
 
 | Política | Operación | Condición Final |
-|----------|-----------|-----------------|
+| -------- | --------- | --------------- |
 | "Enable read for all users" | SELECT | `true` |
 | "Enable insert for scan only" | INSERT | `is_scan()` — **sin ownership** |
 | "Enable update for scan only" | UPDATE | `is_scan()` — **sin ownership** |
@@ -628,7 +656,7 @@ Se usa en: `scan_main_screen.dart` (L133), `cover_picker.dart` (L38), `app_drawe
 #### Tabla `genres`
 
 | Política | Operación | Condición Final |
-|----------|-----------|-----------------|
+| -------- | --------- | --------------- |
 | "Enable read for all users" | SELECT | `true` |
 | "Enable insert for admin only" | INSERT | `is_admin()` |
 | "Enable update for admin only" | UPDATE | `is_admin()` |
@@ -639,7 +667,7 @@ Se usa en: `scan_main_screen.dart` (L133), `cover_picker.dart` (L38), `app_drawe
 #### Tabla `labels`
 
 | Política | Operación | Condición Final |
-|----------|-----------|-----------------|
+| -------- | --------- | --------------- |
 | "Enable read for all users" | SELECT | `true` |
 | "Enable insert for scan and admin" | INSERT | `is_scan() OR is_admin()` |
 | "Enable update for scan and admin" | UPDATE | `is_scan() OR is_admin()` |
@@ -650,7 +678,7 @@ Se usa en: `scan_main_screen.dart` (L133), `cover_picker.dart` (L38), `app_drawe
 #### Tabla `books_genres`
 
 | Política | Operación | Condición Final |
-|----------|-----------|-----------------|
+| -------- | --------- | --------------- |
 | "Enable read for all users" | SELECT | `true` |
 | "Enable insert for scan only" | INSERT | `is_scan()` |
 | "Enable delete for scan only" | DELETE | `is_scan()` |
@@ -661,7 +689,7 @@ Se usa en: `scan_main_screen.dart` (L133), `cover_picker.dart` (L38), `app_drawe
 #### Tabla `books_labels`
 
 | Política | Operación | Condición Final |
-|----------|-----------|-----------------|
+| -------- | --------- | --------------- |
 | "Enable read for all users" | SELECT | `true` |
 | "Enable insert for scan and admin" | INSERT | `is_scan() OR is_admin()` |
 | "Enable delete for scan and admin" | DELETE | `is_scan() OR is_admin()` |
@@ -669,7 +697,7 @@ Se usa en: `scan_main_screen.dart` (L133), `cover_picker.dart` (L38), `app_drawe
 #### Tabla `authors`
 
 | Política | Operación | Condición Final |
-|----------|-----------|-----------------|
+| -------- | --------- | --------------- |
 | "Enable read for all users" | SELECT | `true` |
 | "Enable insert for scan only" | INSERT | `is_scan()` |
 | "Enable update for scan only" | UPDATE | `is_scan()` |
@@ -678,7 +706,7 @@ Se usa en: `scan_main_screen.dart` (L133), `cover_picker.dart` (L38), `app_drawe
 #### Tabla `profiles`
 
 | Política | Operación | Condición Final |
-|----------|-----------|-----------------|
+| -------- | --------- | --------------- |
 | "Users can read own profile" | SELECT | `auth.uid() = id` |
 | "Scan can read all profiles" | SELECT | `is_scan()` |
 | "Admin can read all profiles" | SELECT | `is_admin()` |
@@ -690,17 +718,17 @@ Se usa en: `scan_main_screen.dart` (L133), `cover_picker.dart` (L38), `app_drawe
 
 #### Tabla `book_views`
 
-| Política | Operación | Condición Final |
-|----------|-----------|-----------------|
-| "Admin can insert book views" | INSERT | `is_admin()` |
-| "Admin can read book views" | SELECT | `is_admin()` |
+| Política                      | Operación   | Condición Final |
+| ----------------------------- | ----------- | --------------- |
+| "Admin can insert book views" | INSERT      | `is_admin()`    |
+| "Admin can read book views"   | SELECT      | `is_admin()`    |
 
 **Scan: sin acceso a analytics.**
 
 #### Storage (`storage.objects`)
 
 | Bucket | Operación | Scan puede |
-|--------|-----------|------------|
+| ------ | --------- | ---------- |
 | `covers` | SELECT | ✅ (public read) |
 | `covers` | INSERT | ✅ (authenticated) |
 | `covers` | UPDATE | ✅ (authenticated) |
@@ -721,7 +749,8 @@ Se usa en: `scan_main_screen.dart` (L133), `cover_picker.dart` (L38), `app_drawe
 
 **Archivo**: `lib/features/scan/presentation/bloc/scan_bloc.dart` (187 líneas)
 
-**Nota del developer** (L1-4): 
+**Nota del developer** (L1-4):
+
 ```dart
 // TODO(tech-debt): Split ScanBloc into ScanBookBloc, ScanCoverBloc, ScanGenreBloc.
 // Currently handles book CRUD, cover upload, genre loading, and visibility toggling
@@ -729,8 +758,9 @@ Se usa en: `scan_main_screen.dart` (L133), `cover_picker.dart` (L38), `app_drawe
 ```
 
 **7 casos de uso**:
+
 | Caso de uso | Tipo | Descripción |
-|-------------|------|-------------|
+| ----------- | ---- | ----------- |
 | `GetBooks` | Lectura | Lista todos los libros del scan (own) |
 | `CreateBook` | Escritura | Crea libro nuevo |
 | `UpdateBook` | Escritura | Actualiza libro existente |
@@ -740,6 +770,7 @@ Se usa en: `scan_main_screen.dart` (L133), `cover_picker.dart` (L38), `app_drawe
 | `ToggleBookVisibility` | Escritura | Cambia is_visible del libro |
 
 **6 tipos de evento**:
+
 1. `LoadScanBooks` → carga libros
 2. `LoadScanGenres` → carga géneros
 3. `UploadScanCover(filePath)` → sube cover
@@ -748,6 +779,7 @@ Se usa en: `scan_main_screen.dart` (L133), `cover_picker.dart` (L38), `app_drawe
 6. `ToggleScanBookVisibility(bookId, isVisible)` → toggle visibilidad
 
 **5 estados**:
+
 1. `ScanInitial`
 2. `ScanLoading`
 3. `ScanLoaded(books, message?)`
@@ -762,8 +794,9 @@ Se usa en: `scan_main_screen.dart` (L133), `cover_picker.dart` (L38), `app_drawe
 **Archivo**: `lib/features/scan/presentation/bloc/scan_took_bloc.dart` (61 líneas)
 
 **4 casos de uso**:
+
 | Caso de uso | Tipo |
-|-------------|------|
+| ----------- | ------ |
 | `CreateTook` | Escritura |
 | `UpdateTook` | Escritura |
 | `DeleteTook` | Escritura |
@@ -774,8 +807,9 @@ Se usa en: `scan_main_screen.dart` (L133), `cover_picker.dart` (L38), `app_drawe
 **Archivo**: `lib/features/scan/presentation/bloc/scan_chapter_bloc.dart` (61 líneas)
 
 **4 casos de uso**:
+
 | Caso de uso | Tipo |
-|-------------|------|
+| ----------- | ---- |
 | `CreateChapter` | Escritura |
 | `UpdateChapter` | Escritura |
 | `DeleteChapter` | Escritura |
@@ -790,7 +824,7 @@ Se usa en: `scan_main_screen.dart` (L133), `cover_picker.dart` (L38), `app_drawe
 **Directorio**: `lib/features/books/domain/`
 
 | Caso de uso | Archivo | Usado por scan |
-|-------------|---------|----------------|
+| ----------- | ------- | -------------- |
 | `GetBooks` | `get_book.dart` | ✅ (LoadScanBooks) |
 | `GetBookById` | `get_book_by_id.dart` | ❌ |
 | `GetBooksByGenre` | `get_books_by_genre.dart` | ❌ |
@@ -806,7 +840,7 @@ Se usa en: `scan_main_screen.dart` (L133), `cover_picker.dart` (L38), `app_drawe
 **Directorio**: `lib/features/chapters/domain/`
 
 | Caso de uso | Archivo | Usado por scan |
-|-------------|---------|----------------|
+| ----------- | ------- | -------------- |
 | `GetChapters` | `get_chapter.dart` | ❌ |
 | `GetChapterById` | `get_chapter_by_id.dart` | ❌ |
 | `GetChapterContent` | `get_chapter_content.dart` | ❌ |
@@ -820,7 +854,7 @@ Se usa en: `scan_main_screen.dart` (L133), `cover_picker.dart` (L38), `app_drawe
 **Directorio**: `lib/features/tooks/domain/`
 
 | Caso de uso | Archivo | Usado por scan |
-|-------------|---------|----------------|
+| ----------- | ------- | -------------- |
 | `GetTooks` | `get_took.dart` | ❌ |
 | `GetTookById` | `get_took_by_id.dart` | ❌ |
 | `GetTooksByBook` | `get_tooks_by_book.dart` | ❌ |
@@ -837,7 +871,7 @@ Se usa en: `scan_main_screen.dart` (L133), `cover_picker.dart` (L38), `app_drawe
 ### 12.1 Scan vs Admin
 
 | Capacidades | Scan | Admin |
-|-------------|------|-------|
+| ----------- | ---- | ----- |
 | **Pantalla principal** | ScanMainScreen (lista propia) | AdminDashScreen (dashboard con tabs) |
 | **Ver libros** | Solo propios (`created_by = auth.uid()`) | Todos |
 | **Crear/Eliminar libros** | ✅ (propios) | ✅ (todos) |
@@ -855,7 +889,7 @@ Se usa en: `scan_main_screen.dart` (L133), `cover_picker.dart` (L38), `app_drawe
 ### 12.2 Scan vs User (regular)
 
 | Capacidades | Scan | User |
-|-------------|------|------|
+| ----------- | ---- | ---- |
 | **Pantalla principal** | ScanMainScreen (panel de contenido) | MainScreen (home de lectura) |
 | **Ver libros** | Solo propios | Solo `is_visible = true` |
 | **Crear contenido** | ✅ (libros, tomos, capítulos) | ❌ |
@@ -869,6 +903,7 @@ Se usa en: `scan_main_screen.dart` (L133), `cover_picker.dart` (L38), `app_drawe
 ### 12.3 Resumen de Acciones del Scan
 
 **✅ PUEDE hacer**:
+
 1. Ver/editar/eliminar libros que **él creó**
 2. Subir covers (libros y tomos) a Supabase Storage
 3. Crear/editar/eliminar tomos
@@ -881,6 +916,7 @@ Se usa en: `scan_main_screen.dart` (L133), `cover_picker.dart` (L38), `app_drawe
 10. Crear/editar/eliminar etiquetas (RLS lo permite, pero no hay UI)
 
 **❌ NO PUEDE hacer**:
+
 1. Ver libros de otros scans (solo los propios)
 2. Crear/editar/eliminar géneros
 3. Gestionar usuarios (promover, editar roles)
@@ -895,7 +931,7 @@ Se usa en: `scan_main_screen.dart` (L133), `cover_picker.dart` (L38), `app_drawe
 ### 13.1 Feature Scan (presentation)
 
 | Archivo | Líneas | Descripción |
-|---------|--------|-------------|
+| ------- | ------ | ----------- |
 | `lib/features/scan/presentation/bloc/scan_bloc.dart` | 187 | BLoC principal de libros |
 | `lib/features/scan/presentation/bloc/scan_event.dart` | 69 | 6 eventos de scan |
 | `lib/features/scan/presentation/bloc/scan_state.dart` | 51 | 6 estados de scan |
@@ -916,7 +952,7 @@ Se usa en: `scan_main_screen.dart` (L133), `cover_picker.dart` (L38), `app_drawe
 ### 13.2 Domain Layer (use cases)
 
 | Archivo | Líneas | Usado por scan |
-|---------|--------|----------------|
+| ------- | ------ | -------------- |
 | `lib/features/books/domain/create_book.dart` | 13 | ✅ |
 | `lib/features/books/domain/update_book.dart` | 13 | ✅ |
 | `lib/features/books/domain/delete_book.dart` | 12 | ✅ |
@@ -934,7 +970,7 @@ Se usa en: `scan_main_screen.dart` (L133), `cover_picker.dart` (L38), `app_drawe
 ### 13.3 Data Layer (repositories + models)
 
 | Archivo | Líneas | Descripción |
-|---------|--------|-------------|
+| ------- | ------ | ----------- |
 | `lib/features/books/data/book_repository_impl.dart` | 251 | CRUD + cover upload + labels |
 | `lib/features/books/data/book_model.dart` | — | Modelo de libro con relaciones |
 | `lib/features/chapters/data/chapter_repository_impl.dart` | 123 | CRUD + content upload/download |
@@ -945,7 +981,7 @@ Se usa en: `scan_main_screen.dart` (L133), `cover_picker.dart` (L38), `app_drawe
 ### 13.4 Core / Infraestructura
 
 | Archivo | Líneas | Descripción |
-|---------|--------|-------------|
+| ------- | ------ | ----------- |
 | `lib/core/app/app.dart` | 73 | Routing por rol |
 | `lib/core/di/injection.dart` | 36 | DI principal |
 | `lib/core/di/injection_scan.dart` | 41 | DI de scan (3 BLoCs) |
@@ -960,7 +996,7 @@ Se usa en: `scan_main_screen.dart` (L133), `cover_picker.dart` (L38), `app_drawe
 ### 13.5 Migraciones Supabase (orden cronológico)
 
 | Migración | Descripción relevante para scan |
-|-----------|-------------------------------|
+| --------- | ------------------------------- |
 | `20260514220000_initial_schema.sql` | Schema inicial |
 | `20260515161849_profiles_and_auth.sql` | Tabla profiles + RLS books/tooks/chapters |
 | `20260515170000_profiles_extended.sql` | display_name, bio, avatar_url |
