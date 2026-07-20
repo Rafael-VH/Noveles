@@ -4,7 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/core/cover/cover_url_service.dart';
 import 'package:noveles/shared/domain/entities/book_with_relations.dart';
-import 'package:noveles/features/scan/presentation/bloc/scan_bloc.dart';
+import 'package:noveles/features/scan/presentation/bloc/scan_book_bloc.dart';
+import 'package:noveles/features/scan/presentation/bloc/scan_cover_bloc.dart';
 import 'package:noveles/features/scan/presentation/bloc/scan_took_bloc.dart';
 import 'package:noveles/features/app/presentation/widgets/app_drawer.dart';
 import 'package:noveles/features/scan/presentation/screens/scan_book_edit_screen.dart';
@@ -17,28 +18,28 @@ class ScanMainScreen extends StatefulWidget {
 }
 
 class _ScanMainScreenState extends State<ScanMainScreen> {
-  late final ScanBloc _scanBloc;
+  late final ScanBookBloc _scanBookBloc;
 
   @override
   void initState() {
     super.initState();
-    _scanBloc = getIt<ScanBloc>()..add(LoadScanBooks());
+    _scanBookBloc = getIt<ScanBookBloc>()..add(LoadScanBooks());
   }
 
   @override
   void dispose() {
-    _scanBloc.close();
+    _scanBookBloc.close();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
-      value: _scanBloc,
-      child: BlocListener<ScanBloc, ScanState>(
+      value: _scanBookBloc,
+      child: BlocListener<ScanBookBloc, ScanBookState>(
         listener: (context, state) {
           // Show error message on error state
-          if (state is ScanError) {
+          if (state is ScanBookError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message),
@@ -48,7 +49,7 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
           }
 
           // Show success message on load or save
-          if (state is ScanLoaded && state.message != null) {
+          if (state is ScanBookLoaded && state.message != null) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message!),
@@ -62,17 +63,17 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
           appBar: AppBar(
             title: const Text('Panel Scan'),
           ),
-          body: BlocBuilder<ScanBloc, ScanState>(
+          body: BlocBuilder<ScanBookBloc, ScanBookState>(
             builder: (context, state) {
               // Loading State
-              if (state is ScanLoading || state is ScanInitial) {
+              if (state is ScanBookLoading || state is ScanBookInitial) {
                 return const Center(
                   child: CircularProgressIndicator(),
                 );
               }
 
               // Error State
-              if (state is ScanError) {
+              if (state is ScanBookError) {
                 return Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -80,7 +81,7 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
                       Text(state.message),
                       const SizedBox(height: 16),
                       ElevatedButton(
-                        onPressed: () => context.read<ScanBloc>().add(
+                        onPressed: () => context.read<ScanBookBloc>().add(
                               LoadScanBooks(),
                             ),
                         child: const Text('Reintentar'),
@@ -92,8 +93,7 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
 
               // Loaded State
               final books = switch (state) {
-                ScanLoaded(:final books) => books,
-                ScanGenresLoaded(:final books) => books,
+                ScanBookLoaded(:final books) => books,
                 _ => null,
               };
 
@@ -110,9 +110,9 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
               // Books List
               return RefreshIndicator(
                 onRefresh: () async {
-                  context.read<ScanBloc>().add(LoadScanBooks());
-                  await context.read<ScanBloc>().stream.firstWhere(
-                        (s) => s is ScanLoaded || s is ScanError,
+                  context.read<ScanBookBloc>().add(LoadScanBooks());
+                  await context.read<ScanBookBloc>().stream.firstWhere(
+                        (s) => s is ScanBookLoaded || s is ScanBookError,
                       );
                 },
                 child: ListView.builder(
@@ -151,7 +151,7 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
                             Switch(
                               value: book.isVisible,
                               onChanged: (value) {
-                                context.read<ScanBloc>().add(
+                                context.read<ScanBookBloc>().add(
                                     ToggleScanBookVisibility(book.id, value));
                               },
                             ),
@@ -198,7 +198,8 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
       MaterialPageRoute(
         builder: (_) => MultiBlocProvider(
           providers: [
-            BlocProvider.value(value: _scanBloc),
+            BlocProvider.value(value: _scanBookBloc),
+            BlocProvider(create: (_) => getIt<ScanCoverBloc>()),
             BlocProvider(create: (_) => getIt<ScanTookBloc>()),
           ],
           child: ScanBookEditScreen(book: book),
@@ -214,7 +215,8 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
       MaterialPageRoute(
         builder: (_) => MultiBlocProvider(
           providers: [
-            BlocProvider.value(value: _scanBloc),
+            BlocProvider.value(value: _scanBookBloc),
+            BlocProvider(create: (_) => getIt<ScanCoverBloc>()),
             BlocProvider(create: (_) => getIt<ScanTookBloc>()),
           ],
           child: const ScanBookEditScreen(),
@@ -241,7 +243,7 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
-              context.read<ScanBloc>().add(DeleteScanBook(bookId));
+              context.read<ScanBookBloc>().add(DeleteScanBook(bookId));
             },
             child: Text(
               'Eliminar',

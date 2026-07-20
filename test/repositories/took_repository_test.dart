@@ -55,6 +55,50 @@ class MockFilterBuilder extends Mock
   }
 }
 
+/// Mock for PostgrestTransformBuilder<List<Map<String, dynamic>>> — returned
+/// by filterBuilder.select() before .single() is called.
+// ignore: must_be_immutable
+class MockSelectBuilder extends Mock
+    implements PostgrestTransformBuilder<List<Map<String, dynamic>>> {
+  List<Map<String, dynamic>>? _data;
+
+  void thenReturns(List<Map<String, dynamic>> data) {
+    _data = data;
+  }
+
+  @override
+  Future<U> then<U>(
+    FutureOr<U> Function(List<Map<String, dynamic>> value) onValue, {
+    Function? onError,
+  }) async {
+    final result = onValue(_data!);
+    if (result is Future<U>) return result;
+    return result;
+  }
+}
+
+/// Mock for PostgrestTransformBuilder<Map<String, dynamic>> — returned by
+/// .select('id').single() chain in createTook.
+// ignore: must_be_immutable
+class MockMapResultBuilder extends Mock
+    implements PostgrestTransformBuilder<Map<String, dynamic>> {
+  Map<String, dynamic>? _data;
+
+  void thenReturns(Map<String, dynamic> data) {
+    _data = data;
+  }
+
+  @override
+  Future<U> then<U>(
+    FutureOr<U> Function(Map<String, dynamic> value) onValue, {
+    Function? onError,
+  }) async {
+    final result = onValue(_data!);
+    if (result is Future<U>) return result;
+    return result;
+  }
+}
+
 void main() {
   late MockSupabaseClientProvider mockProvider;
   late MockSupabaseClient mockClient;
@@ -62,6 +106,8 @@ void main() {
   late MockSupabaseQueryBuilder mockQueryBuilder;
   late MockFilterBuilder mockFilter;
   late MockTransformBuilder mockTransform;
+  late MockSelectBuilder mockSelectBuilder;
+  late MockMapResultBuilder mockMapResult;
   late TookRepositoryImpl repository;
 
   setUpAll(() {
@@ -84,6 +130,8 @@ void main() {
     mockQueryBuilder = MockSupabaseQueryBuilder();
     mockFilter = MockFilterBuilder();
     mockTransform = MockTransformBuilder();
+    mockSelectBuilder = MockSelectBuilder();
+    mockMapResult = MockMapResultBuilder();
 
     when(() => mockProvider.client).thenReturn(mockClient);
     when(() => mockClient.auth).thenReturn(mockAuth);
@@ -111,6 +159,9 @@ void main() {
           referencedTable: any(named: 'referencedTable'),
         )).thenAnswer((_) => mockFilter);
     when(() => mockFilter.maybeSingle()).thenAnswer((_) => mockTransform);
+    // Mock the .select('id').single() chain for createTook
+    when(() => mockFilter.select(any())).thenAnswer((_) => mockSelectBuilder);
+    when(() => mockSelectBuilder.single()).thenAnswer((_) => mockMapResult);
   });
 
   tearDown(() {
@@ -201,8 +252,9 @@ void main() {
     });
 
     group('createTook', () {
-      test('returns Ok on success', () async {
-        mockFilter.thenReturns(<Map<String, dynamic>>[]);
+      test('returns Ok with new ID on success', () async {
+        // Mock the .select('id').single() chain
+        mockMapResult.thenReturns({'id': 99});
 
         final result = await repository.createTook(
           TookEntity(
@@ -218,7 +270,8 @@ void main() {
           ),
         );
 
-        expect(result, isA<Ok<void>>());
+        expect(result, isA<Ok<int>>());
+        expect((result as Ok<int>).value, 99);
         verify(() => mockQueryBuilder.insert(
               any(),
               defaultToNull: any(named: 'defaultToNull'),

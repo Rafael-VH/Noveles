@@ -66,12 +66,58 @@ class MockSupabaseStorageClient extends Mock implements SupabaseStorageClient {}
 
 class MockStorageFileApi extends Mock implements StorageFileApi {}
 
+/// Mock for PostgrestTransformBuilder<List<Map<String, dynamic>>> — returned
+/// by filterBuilder.select() before .single() is called.
+// ignore: must_be_immutable
+class MockSelectBuilder extends Mock
+    implements PostgrestTransformBuilder<List<Map<String, dynamic>>> {
+  List<Map<String, dynamic>>? _data;
+
+  void thenReturns(List<Map<String, dynamic>> data) {
+    _data = data;
+  }
+
+  @override
+  Future<U> then<U>(
+    FutureOr<U> Function(List<Map<String, dynamic>> value) onValue, {
+    Function? onError,
+  }) async {
+    final result = onValue(_data!);
+    if (result is Future<U>) return result;
+    return result;
+  }
+}
+
+/// Mock for PostgrestTransformBuilder<Map<String, dynamic>> — returned by
+/// .select('id').single() chain in createBook.
+// ignore: must_be_immutable
+class MockMapResultBuilder extends Mock
+    implements PostgrestTransformBuilder<Map<String, dynamic>> {
+  Map<String, dynamic>? _data;
+
+  void thenReturns(Map<String, dynamic> data) {
+    _data = data;
+  }
+
+  @override
+  Future<U> then<U>(
+    FutureOr<U> Function(Map<String, dynamic> value) onValue, {
+    Function? onError,
+  }) async {
+    final result = onValue(_data!);
+    if (result is Future<U>) return result;
+    return result;
+  }
+}
+
 void main() {
   late MockSupabaseClientProvider mockProvider;
   late MockSupabaseClient mockClient;
   late MockSupabaseQueryBuilder mockQueryBuilder;
   late MockFilterBuilder mockFilter;
   late MockTransformBuilder mockTransform;
+  late MockSelectBuilder mockSelectBuilder;
+  late MockMapResultBuilder mockMapResult;
   late MockGoTrueClient mockAuth;
   late MockSupabaseStorageClient mockStorage;
   late MockStorageFileApi mockStorageFileApi;
@@ -95,6 +141,8 @@ void main() {
     mockQueryBuilder = MockSupabaseQueryBuilder();
     mockFilter = MockFilterBuilder();
     mockTransform = MockTransformBuilder();
+    mockSelectBuilder = MockSelectBuilder();
+    mockMapResult = MockMapResultBuilder();
     mockAuth = MockGoTrueClient();
     mockStorage = MockSupabaseStorageClient();
     mockStorageFileApi = MockStorageFileApi();
@@ -131,6 +179,9 @@ void main() {
           any(),
         )).thenAnswer((_) => mockFilter);
     when(() => mockFilter.maybeSingle()).thenAnswer((_) => mockTransform);
+    // Mock the .select('id').single() chain for createChapter
+    when(() => mockFilter.select(any())).thenAnswer((_) => mockSelectBuilder);
+    when(() => mockSelectBuilder.single()).thenAnswer((_) => mockMapResult);
   });
 
   tearDown(() {
@@ -216,8 +267,9 @@ void main() {
     });
 
     group('createChapter', () {
-      test('returns Ok on success', () async {
-        mockFilter.thenReturns(<Map<String, dynamic>>[]);
+      test('returns Ok with new ID on success', () async {
+        // Mock the .select('id').single() chain
+        mockMapResult.thenReturns({'id': 42});
 
         final result = await repository.createChapter(
           ChapterEntity(
@@ -231,7 +283,8 @@ void main() {
           ),
         );
 
-        expect(result, isA<Ok<void>>());
+        expect(result, isA<Ok<int>>());
+        expect((result as Ok<int>).value, 42);
         verify(() => mockQueryBuilder.insert(
               any(),
               defaultToNull: any(named: 'defaultToNull'),

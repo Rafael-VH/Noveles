@@ -366,7 +366,9 @@ void main() {
           createdBy: null,
         ));
 
-        expect(result, isA<Ok<void>>());
+        expect(result, isA<Ok<int>>());
+        final value = (result as Ok<int>).value;
+        expect(value, 1);
         verify(() => mockClient.from('books')).called(1);
       });
 
@@ -401,7 +403,7 @@ void main() {
           listLabelIds: const [],
           createdBy: null,
         ));
-        expect(result, isA<Err<void>>());
+        expect(result, isA<Err<int>>());
       });
     });
 
@@ -569,7 +571,7 @@ void main() {
       });
     });
 
-    group('uploadCover', () {
+    group('uploadImage', () {
       late File tempFile;
 
       setUp(() async {
@@ -589,7 +591,7 @@ void main() {
         when(() => mockStorageFileApi.getPublicUrl(any()))
             .thenReturn('https://example.com/covers/test.jpg');
 
-        final result = await repository.uploadCover(tempFile.path);
+        final result = await repository.uploadImage(tempFile.path);
 
         expect(result, isA<Ok<String>>());
         final value = (result as Ok<String>).value;
@@ -602,7 +604,7 @@ void main() {
               any(),
             )).thenThrow(Exception('Upload failed'));
 
-        final result = await repository.uploadCover(tempFile.path);
+        final result = await repository.uploadImage(tempFile.path);
         expect(result, isA<Err<String>>());
         final error = (result as Err<String>).error;
         expect(error.message, contains('Error al subir cover'));

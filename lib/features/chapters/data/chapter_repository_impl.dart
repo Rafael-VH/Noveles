@@ -48,17 +48,18 @@ class ChapterRepositoryImpl implements ChapterRepository {
   }
 
   @override
-  Future<Result<void>> createChapter(ChapterEntity chapter) async {
+  Future<Result<int>> createChapter(ChapterEntity chapter) async {
     try {
-      await _supabase.client.from('chapters').insert({
+      final result = await _supabase.client.from('chapters').insert({
         'created_at': chapter.createdAt.toIso8601String(),
         'number': chapter.number,
         'title': chapter.title,
         'content': chapter.content,
         'took_id': chapter.tookId,
         'created_by': _supabase.client.auth.currentUser?.id,
-      });
-      return const Ok(null);
+      }).select('id').single();
+      final newChapterId = result['id'] as int;
+      return Ok(newChapterId);
     } catch (e) {
       return Err(ChapterFailure('Error al crear capítulo', cause: e));
     }

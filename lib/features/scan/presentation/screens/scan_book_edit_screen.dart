@@ -8,7 +8,10 @@ import 'package:noveles/features/books/domain/book_entity.dart';
 import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 import 'package:noveles/features/genres/domain/genre_entity.dart';
 import 'package:noveles/features/tooks/domain/took_entity.dart';
-import 'package:noveles/features/scan/presentation/bloc/scan_bloc.dart';
+import 'package:noveles/features/scan/presentation/bloc/scan_book_bloc.dart';
+import 'package:noveles/features/scan/presentation/bloc/scan_cover_bloc.dart';
+import 'package:noveles/features/genres/presentation/genre_cubit.dart';
+import 'package:noveles/features/genres/presentation/genre_state.dart';
 import 'package:noveles/features/scan/presentation/bloc/scan_took_bloc.dart';
 import 'package:noveles/features/scan/presentation/screens/scan_took_edit_screen.dart';
 import 'package:noveles/features/scan/presentation/screens/widgets/cover_picker.dart';
@@ -65,7 +68,7 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
     _selectedGenreIds = b?.listGenreIds.toSet() ?? {};
     _bookId = widget.book?.id;
     _tooks = widget.book?.listTook.toList() ?? [];
-    context.read<ScanBloc>().add(LoadScanGenres());
+    context.read<GenreCubit>().loadGenres();
   }
 
   @override
@@ -88,7 +91,7 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
     final picker = ImagePicker();
     final xFile = await picker.pickImage(source: ImageSource.gallery);
     if (xFile != null && mounted) {
-      context.read<ScanBloc>().add(UploadScanCover(xFile.path));
+      context.read<ScanCoverBloc>().add(UploadScanCover(xFile.path));
     }
   }
 
@@ -100,9 +103,9 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
     // Validate form
     if (!(_formKey.currentState?.validate() ?? false)) return null;
 
-    // Create book entity
+    // Create book entity (ID=0 is a placeholder; Supabase returns the real ID)
     final book = BookEntity(
-      id: widget.book?.id ?? DateTime.now().millisecondsSinceEpoch,
+      id: widget.book?.id ?? 0,
       createdAt: widget.book?.createdAt ?? DateTime.now(),
       cover: _coverCtrl.text.trim(),
       name: _nameCtrl.text.trim(),
@@ -130,11 +133,11 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
     if (mounted) setState(() => _isSaving = true);
 
     // Listen for result
-    final bloc = context.read<ScanBloc>();
-    final completer = Completer<ScanState>();
+    final bloc = context.read<ScanBookBloc>();
+    final completer = Completer<ScanBookState>();
     late StreamSubscription sub;
     sub = bloc.stream.listen((s) {
-      if (s is ScanLoaded || s is ScanError) {
+      if (s is ScanBookLoaded || s is ScanBookError) {
         sub.cancel();
         if (!completer.isCompleted) completer.complete(s);
       }
@@ -143,7 +146,7 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
 
     try {
       final result = await completer.future.timeout(const Duration(seconds: 10));
-      if (result is ScanLoaded && mounted) {
+      if (result is ScanBookLoaded && mounted) {
         if (_isEditing) return widget.book;
         // New book — capture the real DB-generated ID from the reloaded list
         final match = result.books.firstWhere(
@@ -152,7 +155,7 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
         );
         _bookId = match.id;
         return match;
-      } else if (result is ScanError && mounted) {
+      } else if (result is ScanBookError && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text(result.message),
@@ -203,261 +206,283 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
       ),
     );
     if (refreshed == true && mounted) {
-      context.read<ScanBloc>().add(LoadScanBooks());
+      context.read<ScanBookBloc>().add(LoadScanBooks());
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<ScanBloc, ScanState>(
-        listener: (context, state) {
-          if (state is ScanGenresLoaded) {
-            setState(() => _allGenres = state.genres);
-          } else if (state is ScanCoverUploaded) {
-            _coverCtrl.text = state.filename;
-          } else if (state is ScanLoaded && !_isSaving) {
-            if (state.books.isEmpty) return;
-            final match = state.books.firstWhere(
-              (b) =>
-                  b.id == _bookId ||
-                  (b.name == _nameCtrl.text.trim() &&
-                      b.author == _authorCtrl.text.trim()),
-              orElse: () => state.books.last,
-            );
-            _tooks = match.listTook;
-          }
-        },
-        child: Scaffold(
-          appBar: AppBar(
-            title: Text(_isEditing ? 'Editar Libro' : 'Nuevo Libro'),
-            actions: [
-              TextButton(onPressed: _save, child: const Text('Guardar')),
-            ],
-          ),
-          body: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  // Name
-                  TextFormField(
-                    controller: _nameCtrl,
-                    decoration: const InputDecoration(labelText: 'Nombre'),
-                    validator: (v) =>
-                        v?.trim().isEmpty == true ? 'Requerido' : null,
-                  ),
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<GenreCubit, GenreState>(
+          listener: (context, state) {
+            if (state is GenreLoaded) {
+              setState(() => _allGenres = state.genres);
+            }
+          },
+        ),
+        BlocListener<ScanCoverBloc, ScanCoverState>(
+          listener: (context, state) {
+            if (state is ScanCoverUploaded) {
+              _coverCtrl.text = state.filename;
+            } else if (state is ScanCoverError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                ),
+              );
+            }
+          },
+        ),
+        BlocListener<ScanBookBloc, ScanBookState>(
+          listener: (context, state) {
+            if (state is ScanBookLoaded && !_isSaving) {
+              if (state.books.isEmpty) return;
+              final match = state.books.firstWhere(
+                (b) =>
+                    b.id == _bookId ||
+                    (b.name == _nameCtrl.text.trim() &&
+                        b.author == _authorCtrl.text.trim()),
+                orElse: () => state.books.last,
+              );
+              _tooks = match.listTook;
+            }
+          },
+        ),
+      ],
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(_isEditing ? 'Editar Libro' : 'Nuevo Libro'),
+          actions: [
+            TextButton(onPressed: _save, child: const Text('Guardar')),
+          ],
+        ),
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                // Name
+                TextFormField(
+                  controller: _nameCtrl,
+                  decoration: const InputDecoration(labelText: 'Nombre'),
+                  validator: (v) =>
+                      v?.trim().isEmpty == true ? 'Requerido' : null,
+                ),
 
-                  const SizedBox(height: 12),
+                const SizedBox(height: 12),
 
-                  // Cover
-                  CoverPicker(
-                    controller: _coverCtrl,
-                    onPick: _pickCover,
-                    onClear: () => setState(() => _coverCtrl.clear()),
-                  ),
+                // Cover
+                CoverPicker(
+                  controller: _coverCtrl,
+                  onPick: _pickCover,
+                  onClear: () => setState(() => _coverCtrl.clear()),
+                ),
 
-                  const SizedBox(height: 12),
+                const SizedBox(height: 12),
 
-                  // Short Name
-                  TextFormField(
-                    controller: _shortCtrl,
-                    decoration:
-                        const InputDecoration(labelText: 'Nombre corto'),
-                  ),
+                // Short Name
+                TextFormField(
+                  controller: _shortCtrl,
+                  decoration:
+                      const InputDecoration(labelText: 'Nombre corto'),
+                ),
 
-                  const SizedBox(height: 12),
+                const SizedBox(height: 12),
 
-                  // Alternative Name
-                  TextFormField(
-                    controller: _alternativeCtrl,
-                    decoration:
-                        const InputDecoration(labelText: 'Nombre alternativo'),
-                  ),
+                // Alternative Name
+                TextFormField(
+                  controller: _alternativeCtrl,
+                  decoration:
+                      const InputDecoration(labelText: 'Nombre alternativo'),
+                ),
 
-                  const SizedBox(height: 12),
+                const SizedBox(height: 12),
 
-                  // Description
-                  TextFormField(
-                    maxLines: 3,
-                    controller: _descriptionCtrl,
-                    decoration: const InputDecoration(labelText: 'Descripción'),
-                  ),
+                // Description
+                TextFormField(
+                  maxLines: 3,
+                  controller: _descriptionCtrl,
+                  decoration: const InputDecoration(labelText: 'Descripción'),
+                ),
 
-                  const SizedBox(height: 12),
+                const SizedBox(height: 12),
 
-                  // Author
-                  TextFormField(
-                    controller: _authorCtrl,
-                    decoration: const InputDecoration(labelText: 'Autor'),
-                  ),
+                // Author
+                TextFormField(
+                  controller: _authorCtrl,
+                  decoration: const InputDecoration(labelText: 'Autor'),
+                ),
 
-                  const SizedBox(height: 12),
+                const SizedBox(height: 12),
 
-                  // Country
-                  TextFormField(
-                    controller: _countryCtrl,
-                    decoration: const InputDecoration(labelText: 'País'),
-                  ),
+                // Country
+                TextFormField(
+                  controller: _countryCtrl,
+                  decoration: const InputDecoration(labelText: 'País'),
+                ),
 
-                  const SizedBox(height: 12),
+                const SizedBox(height: 12),
 
-                  // State
-                  DropdownButtonFormField<String>(
-                    initialValue: _state,
-                    decoration: const InputDecoration(labelText: 'Estado'),
-                    items: const [
-                      DropdownMenuItem(value: '', child: Text('Seleccioná...')),
-                      DropdownMenuItem(
-                          value: 'Emisión', child: Text('Emisión')),
-                      DropdownMenuItem(
-                          value: 'Finalizado', child: Text('Finalizado')),
-                      DropdownMenuItem(
-                          value: 'Pausado', child: Text('Pausado')),
-                      DropdownMenuItem(
-                          value: 'Abandonado', child: Text('Abandonado')),
-                    ],
-                    onChanged: (v) => setState(() => _state = v ?? ''),
-                  ),
+                // State
+                DropdownButtonFormField<String>(
+                  initialValue: _state,
+                  decoration: const InputDecoration(labelText: 'Estado'),
+                  items: const [
+                    DropdownMenuItem(value: '', child: Text('Seleccioná...')),
+                    DropdownMenuItem(
+                        value: 'Emisión', child: Text('Emisión')),
+                    DropdownMenuItem(
+                        value: 'Finalizado', child: Text('Finalizado')),
+                    DropdownMenuItem(
+                        value: 'Pausado', child: Text('Pausado')),
+                    DropdownMenuItem(
+                        value: 'Abandonado', child: Text('Abandonado')),
+                  ],
+                  onChanged: (v) => setState(() => _state = v ?? ''),
+                ),
 
-                  const SizedBox(height: 12),
+                const SizedBox(height: 12),
 
-                  // Type
-                  DropdownButtonFormField<String>(
-                    initialValue: _type,
-                    decoration: const InputDecoration(labelText: 'Tipo'),
-                    items: const [
-                      DropdownMenuItem(value: '', child: Text('Seleccioná...')),
-                      DropdownMenuItem(value: 'Web', child: Text('Web Novel')),
-                      DropdownMenuItem(
-                          value: 'Ligera', child: Text('Light Novel')),
-                    ],
-                    onChanged: (v) => setState(() => _type = v ?? ''),
-                  ),
+                // Type
+                DropdownButtonFormField<String>(
+                  initialValue: _type,
+                  decoration: const InputDecoration(labelText: 'Tipo'),
+                  items: const [
+                    DropdownMenuItem(value: '', child: Text('Seleccioná...')),
+                    DropdownMenuItem(value: 'Web', child: Text('Web Novel')),
+                    DropdownMenuItem(
+                        value: 'Ligera', child: Text('Light Novel')),
+                  ],
+                  onChanged: (v) => setState(() => _type = v ?? ''),
+                ),
 
-                  const SizedBox(height: 12),
+                const SizedBox(height: 12),
 
-                  // Release
-                  TextFormField(
-                    controller: _releaseCtrl,
-                    decoration: const InputDecoration(labelText: 'Lanzamiento'),
-                  ),
+                // Release
+                TextFormField(
+                  controller: _releaseCtrl,
+                  decoration: const InputDecoration(labelText: 'Lanzamiento'),
+                ),
 
-                  const SizedBox(height: 12),
+                const SizedBox(height: 12),
 
-                  // Source
-                  TextFormField(
-                    controller: _sourceCtrl,
-                    decoration: const InputDecoration(labelText: 'Fuente'),
-                  ),
+                // Source
+                TextFormField(
+                  controller: _sourceCtrl,
+                  decoration: const InputDecoration(labelText: 'Fuente'),
+                ),
 
-                  const SizedBox(height: 12),
+                const SizedBox(height: 12),
 
-                  // Link
-                  TextFormField(
-                    controller: _linkCtrl,
-                    decoration: const InputDecoration(labelText: 'Link'),
-                  ),
+                // Link
+                TextFormField(
+                  controller: _linkCtrl,
+                  decoration: const InputDecoration(labelText: 'Link'),
+                ),
 
-                  const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-                  // Genres
-                  GenreSelector(
-                    genres: _allGenres,
-                    selectedIds: _selectedGenreIds,
-                    onToggle: (id, selected) {
-                      setState(() {
-                        if (selected) {
-                          _selectedGenreIds.add(id);
-                        } else {
-                          _selectedGenreIds.remove(id);
-                        }
-                      });
-                    },
-                  ),
+                // Genres
+                GenreSelector(
+                  genres: _allGenres,
+                  selectedIds: _selectedGenreIds,
+                  onToggle: (id, selected) {
+                    setState(() {
+                      if (selected) {
+                        _selectedGenreIds.add(id);
+                      } else {
+                        _selectedGenreIds.remove(id);
+                      }
+                    });
+                  },
+                ),
 
-                  if (_isEditing)
-                    TookListSection(
-                      isEditing: true,
-                      tooks: _tooks,
-                      bookId: _bookId,
-                      onAddTook: _addTook,
-                      onEditTook: (took, bookId) async {
-                        final refreshed = await Navigator.push<bool>(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => BlocProvider(
-                              create: (_) => getIt<ScanTookBloc>(),
-                              child: ScanTookEditScreen(
-                                took: took,
-                                bookId: bookId,
-                              ),
+                if (_isEditing)
+                  TookListSection(
+                    isEditing: true,
+                    tooks: _tooks,
+                    bookId: _bookId,
+                    onAddTook: _addTook,
+                    onEditTook: (took, bookId) async {
+                      final refreshed = await Navigator.push<bool>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => BlocProvider(
+                            create: (_) => getIt<ScanTookBloc>(),
+                            child: ScanTookEditScreen(
+                              took: took,
+                              bookId: bookId,
                             ),
                           ),
-                        );
-                        if (refreshed == true && mounted) {
-                          context.read<ScanBloc>().add(LoadScanBooks());
-                        }
-                      },
-                      onDeleteTook: (tookId) async {
-                        final bloc = context.read<ScanTookBloc>();
-                        final completer = Completer<ScanTookState>();
-                        late StreamSubscription sub;
-                        sub = bloc.stream.listen((s) {
-                          if (s is ScanTookLoaded || s is ScanTookError) {
-                            sub.cancel();
-                            if (!completer.isCompleted) completer.complete(s);
-                          }
-                        });
-                        bloc.add(DeleteScanTook(tookId));
-                        try {
-                          final result = await completer.future
-                              .timeout(const Duration(seconds: 10));
-                          if (result is ScanTookLoaded && mounted) {
-                            setState(() =>
-                                _tooks.removeWhere((t) => t.id == tookId));
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content:
-                                    Text(result.message ?? 'Tomo eliminado'),
-                                backgroundColor:
-                                    Theme.of(context).colorScheme.tertiary,
-                              ),
-                            );
-                          } else if (result is ScanTookError && mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(result.message),
-                                backgroundColor:
-                                    Theme.of(context).colorScheme.error,
-                              ),
-                            );
-                          }
-                        } on TimeoutException {
+                        ),
+                      );
+                      if (refreshed == true && mounted) {
+                        context.read<ScanBookBloc>().add(LoadScanBooks());
+                      }
+                    },
+                    onDeleteTook: (tookId) async {
+                      final bloc = context.read<ScanTookBloc>();
+                      final completer = Completer<ScanTookState>();
+                      late StreamSubscription sub;
+                      sub = bloc.stream.listen((s) {
+                        if (s is ScanTookLoaded || s is ScanTookError) {
                           sub.cancel();
-                          if (mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content:
-                                    const Text('La operación tardó demasiado'),
-                                backgroundColor:
-                                    Theme.of(context).colorScheme.error,
-                              ),
-                            );
-                          }
+                          if (!completer.isCompleted) completer.complete(s);
                         }
-                      },
-                    ),
-                ],
-              ),
+                      });
+                      bloc.add(DeleteScanTook(tookId));
+                      try {
+                        final result = await completer.future
+                            .timeout(const Duration(seconds: 10));
+                        if (result is ScanTookLoaded && mounted) {
+                          setState(() =>
+                              _tooks.removeWhere((t) => t.id == tookId));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content:
+                                  Text(result.message ?? 'Tomo eliminado'),
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.tertiary,
+                            ),
+                          );
+                        } else if (result is ScanTookError && mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(result.message),
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.error,
+                            ),
+                          );
+                        }
+                      } on TimeoutException {
+                        sub.cancel();
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content:
+                                  const Text('La operación tardó demasiado'),
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.error,
+                            ),
+                          );
+                        }
+                      }
+                    },
+                  ),
+              ],
             ),
           ),
-          floatingActionButton: _isEditing
-              ? FloatingActionButton(
-                  onPressed: _addTook,
-                  child: const Icon(Icons.add),
-                )
-              : null,
-        ));
+        ),
+        floatingActionButton: _isEditing
+            ? FloatingActionButton(
+                onPressed: _addTook,
+                child: const Icon(Icons.add),
+              )
+            : null,
+      ),
+    );
   }
 }

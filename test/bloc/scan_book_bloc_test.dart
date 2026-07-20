@@ -4,17 +4,14 @@ import 'package:mocktail/mocktail.dart';
 import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/core/errors/failure.dart';
 import 'package:noveles/shared/domain/entities/book_with_relations.dart';
-import 'package:noveles/features/genres/domain/genre_entity.dart';
 import 'package:noveles/features/books/domain/get_book.dart';
 import 'package:noveles/features/books/domain/create_book.dart';
 import 'package:noveles/features/books/domain/update_book.dart';
 import 'package:noveles/features/books/domain/delete_book.dart';
-import 'package:noveles/features/books/domain/upload_cover.dart';
 import 'package:noveles/features/books/domain/toggle_book_visibility.dart';
-import 'package:noveles/features/genres/domain/get_genre.dart';
-import 'package:noveles/features/scan/presentation/bloc/scan_bloc.dart';
-import 'package:noveles/features/scan/presentation/bloc/scan_event.dart';
-import 'package:noveles/features/scan/presentation/bloc/scan_state.dart';
+import 'package:noveles/features/scan/presentation/bloc/scan_book_bloc.dart';
+import 'package:noveles/features/scan/presentation/bloc/scan_book_event.dart';
+import 'package:noveles/features/scan/presentation/bloc/scan_book_state.dart';
 
 class MockGetBooks extends Mock implements GetBooks {}
 
@@ -24,10 +21,6 @@ class MockUpdateBook extends Mock implements UpdateBook {}
 
 class MockDeleteBook extends Mock implements DeleteBook {}
 
-class MockGetGenre extends Mock implements GetGenre {}
-
-class MockUploadCover extends Mock implements UploadCover {}
-
 class MockToggleBookVisibility extends Mock implements ToggleBookVisibility {}
 
 void main() {
@@ -35,10 +28,8 @@ void main() {
   late MockCreateBook mockCreateBook;
   late MockUpdateBook mockUpdateBook;
   late MockDeleteBook mockDeleteBook;
-  late MockGetGenre mockGetGenre;
-  late MockUploadCover mockUploadCover;
   late MockToggleBookVisibility mockToggleVisibility;
-  late ScanBloc scanBloc;
+  late ScanBookBloc scanBookBloc;
 
   final testBooks = [
     BookWithRelations(
@@ -92,12 +83,6 @@ void main() {
       listTookIds: const [],
       listLabelIds: const [],
     ));
-    registerFallbackValue(GenreEntity(
-      id: 0,
-      createdAt: DateTime(2024),
-      name: '',
-      description: '',
-    ));
   });
 
   setUp(() {
@@ -105,217 +90,138 @@ void main() {
     mockCreateBook = MockCreateBook();
     mockUpdateBook = MockUpdateBook();
     mockDeleteBook = MockDeleteBook();
-    mockGetGenre = MockGetGenre();
-    mockUploadCover = MockUploadCover();
     mockToggleVisibility = MockToggleBookVisibility();
-    scanBloc = ScanBloc(
+    scanBookBloc = ScanBookBloc(
       getBooks: mockGetBooks,
       createBook: mockCreateBook,
       updateBook: mockUpdateBook,
       deleteBook: mockDeleteBook,
-      getGenres: mockGetGenre,
-      uploadCover: mockUploadCover,
       toggleBookVisibility: mockToggleVisibility,
     );
   });
 
   tearDown(() {
-    scanBloc.close();
+    scanBookBloc.close();
   });
 
-  group('ScanBloc', () {
-    test('initial state is ScanInitial', () {
-      expect(scanBloc.state, equals(ScanInitial()));
+  group('ScanBookBloc', () {
+    test('initial state is ScanBookInitial', () {
+      expect(scanBookBloc.state, equals(ScanBookInitial()));
     });
 
-    blocTest<ScanBloc, ScanState>(
-      'emits [ScanLoading, ScanLoaded] when LoadScanBooks succeeds',
+    blocTest<ScanBookBloc, ScanBookState>(
+      'emits [ScanBookLoading, ScanBookLoaded] when LoadScanBooks succeeds',
       build: () {
         when(() => mockGetBooks()).thenAnswer((_) async => Ok(testBooks));
-        return scanBloc;
+        return scanBookBloc;
       },
       act: (bloc) => bloc.add(LoadScanBooks()),
       expect: () => [
-        isA<ScanLoading>(),
-        isA<ScanLoaded>().having((s) => s.books, 'books', testBooks),
+        isA<ScanBookLoading>(),
+        isA<ScanBookLoaded>().having((s) => s.books, 'books', testBooks),
       ],
     );
 
-    blocTest<ScanBloc, ScanState>(
-      'emits [ScanLoading, ScanError] when LoadScanBooks fails',
+    blocTest<ScanBookBloc, ScanBookState>(
+      'emits [ScanBookLoading, ScanBookError] when LoadScanBooks fails',
       build: () {
         when(() => mockGetBooks())
             .thenAnswer((_) async => Err(BookFailure('Error de red')));
-        return scanBloc;
+        return scanBookBloc;
       },
       act: (bloc) => bloc.add(LoadScanBooks()),
       expect: () => [
-        isA<ScanLoading>(),
-        isA<ScanError>()
+        isA<ScanBookLoading>(),
+        isA<ScanBookError>()
             .having((s) => s.message, 'message', contains('Error de red')),
       ],
     );
 
-    blocTest<ScanBloc, ScanState>(
-      'emits ScanGenresLoaded when LoadScanGenres succeeds',
-      build: () {
-        final genres = [
-          GenreEntity(
-              id: 1,
-              createdAt: DateTime(2024),
-              name: 'Acción',
-              description: ''),
-          GenreEntity(
-              id: 2,
-              createdAt: DateTime(2024),
-              name: 'Romance',
-              description: ''),
-        ];
-        when(() => mockGetGenre()).thenAnswer((_) async => Ok(genres));
-        return scanBloc;
-      },
-      act: (bloc) => bloc.add(LoadScanGenres()),
-      expect: () => [
-        isA<ScanGenresLoaded>()
-            .having((s) => s.genres.length, 'genre count', 2)
-            .having((s) => s.genres.first.name, 'first genre name', 'Acción'),
-      ],
-    );
-
-    blocTest<ScanBloc, ScanState>(
-      'emits ScanCoverUploaded when UploadScanCover succeeds',
-      build: () {
-        when(() => mockUploadCover(any()))
-            .thenAnswer((_) async => Ok('uploaded_cover.png'));
-        return scanBloc;
-      },
-      act: (bloc) => bloc.add(UploadScanCover('/path/to/cover.png')),
-      expect: () => [
-        isA<ScanCoverUploaded>().having(
-          (s) => s.filename,
-          'filename',
-          'uploaded_cover.png',
-        ),
-      ],
-    );
-
-    blocTest<ScanBloc, ScanState>(
-      'emits ScanError when UploadScanCover fails',
-      build: () {
-        when(() => mockUploadCover(any()))
-            .thenAnswer((_) async => Err(BookFailure('Error al subir')));
-        return scanBloc;
-      },
-      act: (bloc) => bloc.add(UploadScanCover('/path/to/cover.png')),
-      expect: () => [
-        isA<ScanError>().having(
-          (s) => s.message,
-          'message',
-          contains('Error al subir'),
-        ),
-      ],
-    );
-
-    blocTest<ScanBloc, ScanState>(
-      'emits ScanError when LoadScanGenres fails',
-      build: () {
-        when(() => mockGetGenre())
-            .thenAnswer((_) async => Err(GenreFailure('Error de red')));
-        return scanBloc;
-      },
-      act: (bloc) => bloc.add(LoadScanGenres()),
-      expect: () => [
-        isA<ScanError>().having(
-          (s) => s.message,
-          'message',
-          contains('Error de red'),
-        ),
-      ],
-    );
-
-    blocTest<ScanBloc, ScanState>(
-      'emits [ScanLoaded] when SaveScanBook succeeds',
+    blocTest<ScanBookBloc, ScanBookState>(
+      'emits [ScanBookLoaded] when SaveScanBook succeeds',
       build: () {
         when(() => mockUpdateBook(any()))
             .thenAnswer((_) async => const Ok(null));
         when(() => mockGetBooks()).thenAnswer((_) async => Ok(testBooks));
-        return scanBloc;
+        return scanBookBloc;
       },
       act: (bloc) => bloc.add(SaveScanBook(testBooks.first, isUpdate: true)),
       expect: () => [
-        isA<ScanLoaded>().having((s) => s.message, 'message', 'Libro guardado'),
+        isA<ScanBookLoaded>()
+            .having((s) => s.message, 'message', 'Libro guardado'),
       ],
     );
 
-    blocTest<ScanBloc, ScanState>(
-      'emits [ScanError] when DeleteScanBook fails',
+    blocTest<ScanBookBloc, ScanBookState>(
+      'emits [ScanBookError] when DeleteScanBook fails',
       build: () {
         when(() => mockDeleteBook(any()))
             .thenAnswer((_) async => Err(BookFailure('Error')));
         when(() => mockGetBooks()).thenAnswer((_) async => Ok(testBooks));
-        return scanBloc;
+        return scanBookBloc;
       },
       act: (bloc) => bloc.add(DeleteScanBook(999)),
       expect: () => [
-        isA<ScanError>(),
+        isA<ScanBookError>(),
       ],
     );
 
-    blocTest<ScanBloc, ScanState>(
-      'emits [ScanLoaded] when DeleteScanBook succeeds',
+    blocTest<ScanBookBloc, ScanBookState>(
+      'emits [ScanBookLoaded] when DeleteScanBook succeeds',
       build: () {
         when(() => mockDeleteBook(any()))
             .thenAnswer((_) async => const Ok(null));
         when(() => mockGetBooks()).thenAnswer((_) async => Ok(testBooks));
-        return scanBloc;
+        return scanBookBloc;
       },
       act: (bloc) => bloc.add(DeleteScanBook(1)),
       expect: () => [
-        isA<ScanLoaded>()
+        isA<ScanBookLoaded>()
             .having((s) => s.message, 'message', 'Libro eliminado'),
       ],
     );
 
-    blocTest<ScanBloc, ScanState>(
-      'emits [ScanLoaded] when SaveScanBook creates new book',
+    blocTest<ScanBookBloc, ScanBookState>(
+      'emits [ScanBookLoaded] when SaveScanBook creates new book',
       build: () {
         when(() => mockCreateBook(any()))
-            .thenAnswer((_) async => const Ok(null));
+            .thenAnswer((_) async => const Ok(1));
         when(() => mockGetBooks()).thenAnswer((_) async => Ok(testBooks));
-        return scanBloc;
+        return scanBookBloc;
       },
       act: (bloc) => bloc.add(SaveScanBook(testBooks.first, isUpdate: false)),
       expect: () => [
-        isA<ScanLoaded>().having((s) => s.message, 'message', 'Libro creado'),
+        isA<ScanBookLoaded>()
+            .having((s) => s.message, 'message', 'Libro creado'),
       ],
     );
 
-    blocTest<ScanBloc, ScanState>(
-      'emits [ScanError] when SaveScanBook create fails',
+    blocTest<ScanBookBloc, ScanBookState>(
+      'emits [ScanBookError] when SaveScanBook create fails',
       build: () {
         when(() => mockCreateBook(any()))
             .thenAnswer((_) async => Err(BookFailure('Error al crear')));
         when(() => mockGetBooks()).thenAnswer((_) async => Ok(testBooks));
-        return scanBloc;
+        return scanBookBloc;
       },
       act: (bloc) => bloc.add(SaveScanBook(testBooks.first, isUpdate: false)),
       expect: () => [
-        isA<ScanError>()
+        isA<ScanBookError>()
             .having((s) => s.message, 'message', contains('Error al crear')),
       ],
     );
 
-    blocTest<ScanBloc, ScanState>(
-      'emits [ScanError] when SaveScanBook update fails',
+    blocTest<ScanBookBloc, ScanBookState>(
+      'emits [ScanBookError] when SaveScanBook update fails',
       build: () {
         when(() => mockUpdateBook(any()))
             .thenAnswer((_) async => Err(BookFailure('Error al actualizar')));
         when(() => mockGetBooks()).thenAnswer((_) async => Ok(testBooks));
-        return scanBloc;
+        return scanBookBloc;
       },
       act: (bloc) => bloc.add(SaveScanBook(testBooks.first, isUpdate: true)),
       expect: () => [
-        isA<ScanError>().having(
+        isA<ScanBookError>().having(
           (s) => s.message,
           'message',
           contains('Error al actualizar'),
@@ -323,67 +229,44 @@ void main() {
       ],
     );
 
-    blocTest<ScanBloc, ScanState>(
-      'emits [ScanLoaded] when ToggleScanBookVisibility hides',
+    blocTest<ScanBookBloc, ScanBookState>(
+      'emits [ScanBookLoaded] when ToggleScanBookVisibility hides',
       build: () {
         when(() => mockToggleVisibility(any(), any()))
             .thenAnswer((_) async => const Ok(null));
         when(() => mockGetBooks()).thenAnswer((_) async => Ok(testBooks));
-        return scanBloc;
+        return scanBookBloc;
       },
       act: (bloc) => bloc.add(ToggleScanBookVisibility(1, false)),
       expect: () => [
-        isA<ScanLoaded>().having((s) => s.message, 'message', 'Novela oculta'),
+        isA<ScanBookLoaded>()
+            .having((s) => s.message, 'message', 'Novela oculta'),
       ],
     );
 
-    blocTest<ScanBloc, ScanState>(
-      'emits [ScanError] when ToggleScanBookVisibility fails',
+    blocTest<ScanBookBloc, ScanBookState>(
+      'emits [ScanBookError] when ToggleScanBookVisibility fails',
       build: () {
         when(() => mockToggleVisibility(any(), any()))
             .thenAnswer((_) async => Err(BookFailure('Error')));
-        return scanBloc;
+        return scanBookBloc;
       },
       act: (bloc) => bloc.add(ToggleScanBookVisibility(1, true)),
       expect: () => [
-        isA<ScanError>(),
-      ],
-    );
-
-    // --- P1: M2 books forwarding on cover upload ---
-
-    blocTest<ScanBloc, ScanState>(
-      'ScanCoverUploaded carries books from previous ScanLoaded state',
-      build: () {
-        when(() => mockGetBooks()).thenAnswer((_) async => Ok(testBooks));
-        when(() => mockUploadCover(any()))
-            .thenAnswer((_) async => Ok('new_cover.png'));
-        return scanBloc;
-      },
-      act: (bloc) async {
-        bloc.add(LoadScanBooks());
-        await Future<void>.delayed(Duration.zero);
-        bloc.add(const UploadScanCover('/path/to/cover.png'));
-      },
-      expect: () => [
-        isA<ScanLoading>(),
-        isA<ScanLoaded>(),
-        isA<ScanCoverUploaded>()
-            .having((s) => s.filename, 'filename', 'new_cover.png')
-            .having((s) => s.books.length, 'books forwarded', 1),
+        isA<ScanBookError>(),
       ],
     );
 
     // --- P1: refresh fallback when getBooks fails after successful save ---
 
-    blocTest<ScanBloc, ScanState>(
+    blocTest<ScanBookBloc, ScanBookState>(
       'SaveScanBook falls back to previous books when refresh fails',
       build: () {
         // First call: load books successfully
         when(() => mockGetBooks()).thenAnswer((_) async => Ok(testBooks));
         when(() => mockUpdateBook(any()))
             .thenAnswer((_) async => const Ok(null));
-        return scanBloc;
+        return scanBookBloc;
       },
       act: (bloc) async {
         bloc.add(LoadScanBooks());
@@ -394,10 +277,10 @@ void main() {
         bloc.add(SaveScanBook(testBooks.first, isUpdate: true));
       },
       expect: () => [
-        isA<ScanLoading>(),
-        isA<ScanLoaded>(),
+        isA<ScanBookLoading>(),
+        isA<ScanBookLoaded>(),
         // Save succeeds but refresh fails → fallback with previous books
-        isA<ScanLoaded>()
+        isA<ScanBookLoaded>()
             .having((s) => s.books.length, 'previous books count', 1)
             .having(
               (s) => s.message,

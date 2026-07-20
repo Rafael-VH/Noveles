@@ -59,7 +59,7 @@ class BookRepositoryImpl implements BookRepository {
   }
 
   @override
-  Future<Result<void>> createBook(BookEntity book) async {
+  Future<Result<int>> createBook(BookEntity book) async {
     try {
       int authorId = book.authorId;
       if (authorId == 0 && book.author.isNotEmpty) {
@@ -102,7 +102,7 @@ class BookRepositoryImpl implements BookRepository {
           })
           .select('id')
           .single();
-      final newBookId = result['id'];
+      final newBookId = result['id'] as int;
       if (book.listGenreIds.isNotEmpty) {
         await _supabase.client.from('books_genres').insert(
               book.listGenreIds.map((genreId) {
@@ -117,7 +117,7 @@ class BookRepositoryImpl implements BookRepository {
               }).toList(),
             );
       }
-      return const Ok(null);
+      return Ok(newBookId);
     } catch (e) {
       return Err(BookFailure('Error al crear libro', cause: e));
     }
@@ -247,7 +247,7 @@ class BookRepositoryImpl implements BookRepository {
   static const int maxFileSizeBytes = 5 * 1024 * 1024; // 5MB
 
   @override
-  Future<Result<String>> uploadCover(String filePath) async {
+  Future<Result<String>> uploadImage(String filePath) async {
     try {
       final file = File(filePath);
 

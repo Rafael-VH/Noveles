@@ -55,8 +55,9 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
     if (_isSaving) return;
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
+    // Create took entity (ID=0 is a placeholder; Supabase returns the real ID)
     final took = TookEntity(
-      id: widget.took?.id ?? DateTime.now().millisecondsSinceEpoch,
+      id: widget.took?.id ?? 0,
       createdAt: widget.took?.createdAt ?? DateTime.now(),
       cover: _coverCtrl.text.trim(),
       number: _numberCtrl.text.trim(),

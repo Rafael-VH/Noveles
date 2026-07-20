@@ -4,7 +4,7 @@ import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 abstract class ChapterRepository {
   Future<Result<List<ChapterEntity>>> getChapters({int page = 1, int pageSize = 50});
   Future<Result<ChapterEntity?>> getChapterById(int id);
-  Future<Result<void>> createChapter(ChapterEntity chapter);
+  Future<Result<int>> createChapter(ChapterEntity chapter);
   Future<Result<void>> updateChapter(ChapterEntity chapter);
   Future<Result<void>> deleteChapter(int id);
   /// Downloads content from a storage path, or returns inline content as-is.

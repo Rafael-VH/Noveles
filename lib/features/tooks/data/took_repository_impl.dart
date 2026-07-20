@@ -60,9 +60,9 @@ class TookRepositoryImpl implements TookRepository {
   }
 
   @override
-  Future<Result<void>> createTook(TookEntity took) async {
+  Future<Result<int>> createTook(TookEntity took) async {
     try {
-      await _supabase.client.from('tooks').insert({
+      final result = await _supabase.client.from('tooks').insert({
         'created_at': took.createdAt.toIso8601String(),
         'cover': took.cover,
         'number': took.number,
@@ -70,8 +70,9 @@ class TookRepositoryImpl implements TookRepository {
         'chapter_count': took.chapterCount,
         'book_id': took.bookId,
         'created_by': _supabase.client.auth.currentUser?.id,
-      });
-      return const Ok(null);
+      }).select('id').single();
+      final newTookId = result['id'] as int;
+      return Ok(newTookId);
     } catch (e) {
       return Err(TookFailure('Error al crear tomo', cause: e));
     }

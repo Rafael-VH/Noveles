@@ -7,7 +7,7 @@ class CreateBook {
 
   CreateBook(this.repository);
 
-  Future<Result<void>> call(BookEntity book) async {
+  Future<Result<int>> call(BookEntity book) async {
     return repository.createBook(book);
   }
 }

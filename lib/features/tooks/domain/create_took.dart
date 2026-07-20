@@ -7,7 +7,7 @@ class CreateTook {
 
   CreateTook(this.repository);
 
-  Future<Result<void>> call(TookEntity took) async {
+  Future<Result<int>> call(TookEntity took) async {
     return repository.createTook(took);
   }
 }

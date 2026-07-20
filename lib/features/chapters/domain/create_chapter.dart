@@ -7,7 +7,7 @@ class CreateChapter {
 
   CreateChapter(this.repository);
 
-  Future<Result<void>> call(ChapterEntity chapter) async {
+  Future<Result<int>> call(ChapterEntity chapter) async {
     return repository.createChapter(chapter);
   }
 }

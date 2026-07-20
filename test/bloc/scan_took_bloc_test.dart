@@ -7,7 +7,7 @@ import 'package:noveles/features/tooks/domain/took_entity.dart';
 import 'package:noveles/features/tooks/domain/create_took.dart';
 import 'package:noveles/features/tooks/domain/update_took.dart';
 import 'package:noveles/features/tooks/domain/delete_took.dart';
-import 'package:noveles/features/books/domain/upload_cover.dart';
+import 'package:noveles/features/books/domain/upload_image.dart';
 import 'package:noveles/features/scan/presentation/bloc/scan_took_bloc.dart';
 
 class MockCreateTook extends Mock implements CreateTook {}
@@ -16,13 +16,13 @@ class MockUpdateTook extends Mock implements UpdateTook {}
 
 class MockDeleteTook extends Mock implements DeleteTook {}
 
-class MockUploadCover extends Mock implements UploadCover {}
+class MockUploadImage extends Mock implements UploadImage {}
 
 void main() {
   late MockCreateTook mockCreateTook;
   late MockUpdateTook mockUpdateTook;
   late MockDeleteTook mockDeleteTook;
-  late MockUploadCover mockUploadCover;
+  late MockUploadImage mockUploadImage;
   late ScanTookBloc scanTookBloc;
 
   final testTook = TookEntity(
@@ -53,12 +53,12 @@ void main() {
     mockCreateTook = MockCreateTook();
     mockUpdateTook = MockUpdateTook();
     mockDeleteTook = MockDeleteTook();
-    mockUploadCover = MockUploadCover();
+    mockUploadImage = MockUploadImage();
     scanTookBloc = ScanTookBloc(
       createTook: mockCreateTook,
       updateTook: mockUpdateTook,
       deleteTook: mockDeleteTook,
-      uploadCover: mockUploadCover,
+      uploadImage: mockUploadImage,
     );
   });
 
@@ -75,7 +75,7 @@ void main() {
       'emits [ScanTookLoading, ScanTookLoaded] when SaveScanTook create succeeds',
       build: () {
         when(() => mockCreateTook(any()))
-            .thenAnswer((_) async => const Ok(null));
+            .thenAnswer((_) async => const Ok(1));
         return scanTookBloc;
       },
       act: (bloc) => bloc.add(SaveScanTook(testTook, isUpdate: false)),
@@ -184,7 +184,7 @@ void main() {
     blocTest<ScanTookBloc, ScanTookState>(
       'emits ScanTookCoverUploaded when UploadTookCover succeeds',
       build: () {
-        when(() => mockUploadCover(any()))
+        when(() => mockUploadImage(any()))
             .thenAnswer((_) async => const Ok('https://storage.example.com/cover.png'));
         return scanTookBloc;
       },
@@ -198,7 +198,7 @@ void main() {
     blocTest<ScanTookBloc, ScanTookState>(
       'emits ScanTookError when UploadTookCover fails',
       build: () {
-        when(() => mockUploadCover(any()))
+        when(() => mockUploadImage(any()))
             .thenAnswer((_) async => Err(TookFailure('Upload failed')));
         return scanTookBloc;
       },

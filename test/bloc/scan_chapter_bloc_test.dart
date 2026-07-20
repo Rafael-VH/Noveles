@@ -71,7 +71,7 @@ void main() {
       'emits [ScanChapterLoading, ScanChapterLoaded] when SaveScanChapter create succeeds',
       build: () {
         when(() => mockCreateChapter(any()))
-            .thenAnswer((_) async => const Ok(null));
+            .thenAnswer((_) async => const Ok(1));
         return scanChapterBloc;
       },
       act: (bloc) => bloc.add(SaveScanChapter(testChapter, isUpdate: false)),

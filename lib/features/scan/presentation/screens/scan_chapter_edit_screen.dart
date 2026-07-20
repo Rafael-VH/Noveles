@@ -139,9 +139,9 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
     // Validate form
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
-    // Create chapter entity
+    // Create chapter entity (ID=0 is a placeholder; Supabase returns the real ID)
     final chapter = ChapterEntity(
-      id: widget.chapter?.id ?? DateTime.now().millisecondsSinceEpoch,
+      id: widget.chapter?.id ?? 0,
       createdAt: widget.chapter?.createdAt ?? DateTime.now(),
       number: _numberCtrl.text.trim(),
       title: _titleCtrl.text.trim(),

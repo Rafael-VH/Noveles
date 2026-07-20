@@ -5,6 +5,7 @@ import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:noveles/features/favorites/presentation/bloc/favorite_bloc.dart';
 import 'package:noveles/features/favorites/presentation/screens/favorites_screen.dart';
+import 'package:noveles/features/labels/presentation/screens/label_management_screen.dart';
 import 'package:noveles/features/profiles/presentation/screens/profile_screen.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -100,6 +101,20 @@ class AppDrawer extends StatelessWidget {
                   );
                 },
               ),
+              if (isScan)
+                ListTile(
+                  leading: const Icon(Icons.label),
+                  title: const Text('Etiquetas'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const LabelManagementScreen(),
+                      ),
+                    );
+                  },
+                ),
               const Divider(),
               ListTile(
                 leading: Icon(
