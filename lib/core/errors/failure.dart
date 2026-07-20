@@ -43,3 +43,7 @@ class StorageFailure extends Failure {
 class FavoriteFailure extends Failure {
   const FavoriteFailure(super.message, {super.cause});
 }
+
+class AnalyticsFailure extends Failure {
+  const AnalyticsFailure(super.message, {super.cause});
+}

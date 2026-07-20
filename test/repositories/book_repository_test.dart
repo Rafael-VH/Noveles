@@ -661,5 +661,27 @@ void main() {
         expect(error.message, contains('Error al obtener etiquetas de libros'));
       });
     });
+
+    group('trackBookView', () {
+      test('returns Ok on success', () async {
+        mockFilter.thenReturns(<Map<String, dynamic>>[]);
+        final result = await repository.trackBookView(42);
+
+        expect(result, isA<Ok<void>>());
+        verify(() => mockClient.from('book_views')).called(1);
+      });
+
+      test('returns Err on error', () async {
+        when(() => mockQueryBuilder.insert(
+              any(),
+              defaultToNull: any(named: 'defaultToNull'),
+            )).thenThrow(Exception('Insert failed'));
+
+        final result = await repository.trackBookView(1);
+        expect(result, isA<Err<void>>());
+        final error = (result as Err<void>).error;
+        expect(error.message, contains('Error tracking view'));
+      });
+    });
   });
 }

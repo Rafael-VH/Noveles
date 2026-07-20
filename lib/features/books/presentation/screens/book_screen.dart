@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:get_it/get_it.dart';
+import 'package:noveles/features/books/domain/track_book_view.dart';
 import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 import 'package:noveles/features/books/presentation/screens/widgets/sliver_app_bar_book.dart';
 import 'package:noveles/features/books/presentation/screens/widgets/sliver_persistent_header_book.dart';
@@ -38,6 +40,12 @@ class _BookScreenState extends State<BookScreen>
           isVisible = true;
         }
       });
+    });
+
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        GetIt.instance<TrackBookView>()(widget.book.id);
+      }
     });
   }
 

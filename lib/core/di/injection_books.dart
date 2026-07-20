@@ -11,6 +11,7 @@ import 'package:noveles/features/books/domain/delete_book.dart';
 import 'package:noveles/features/books/domain/toggle_book_visibility.dart';
 import 'package:noveles/features/books/domain/upload_image.dart';
 import 'package:noveles/features/books/domain/get_book_labels.dart';
+import 'package:noveles/features/books/domain/track_book_view.dart';
 import 'package:noveles/features/books/presentation/bloc/book_bloc.dart';
 
 final getIt = GetIt.instance;
@@ -48,6 +49,9 @@ void initBooksDependencies() {
   );
   getIt.registerLazySingleton(
     () => GetBookLabels(getIt()),
+  );
+  getIt.registerLazySingleton(
+    () => TrackBookView(getIt()),
   );
 
   getIt.registerFactory(

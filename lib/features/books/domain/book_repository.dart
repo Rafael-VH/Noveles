@@ -15,4 +15,5 @@ abstract class BookRepository {
   Future<Result<void>> deleteBook(int id);
   Future<Result<String>> uploadImage(String filePath);
   Future<Result<Map<int, Set<int>>>> getBookLabels(List<BookEntity> books);
+  Future<Result<void>> trackBookView(int bookId);
 }

@@ -299,4 +299,18 @@ class BookRepositoryImpl implements BookRepository {
       return Err(BookFailure('Error al obtener etiquetas de libros', cause: e));
     }
   }
+
+  @override
+  Future<Result<void>> trackBookView(int bookId) async {
+    try {
+      await _supabase.client.from('book_views').insert({
+        'book_id': bookId,
+        'viewed_at': DateTime.now().toUtc().toIso8601String(),
+        'user_id': _supabase.client.auth.currentUser?.id,
+      });
+      return const Ok(null);
+    } catch (e) {
+      return Err(BookFailure('Error tracking view', cause: e));
+    }
+  }
 }
