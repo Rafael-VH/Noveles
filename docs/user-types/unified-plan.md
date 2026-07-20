@@ -1670,18 +1670,16 @@ Fase 1 (3-5d) → Fase 2 (2-3d) → Fase 4 (4-5d) → Fase 7 (5-7d) = 14-20d
 
 ---
 
-## Decisiones Pendientes
+## Decisiones Resueltas (2026-07-20)
 
-Estas decisiones DEBEN tomarse antes de iniciar las fases correspondientes:
-
-| # | Decisión | Afecta | Opciones | Recomendación |
-|---|----------|--------|----------|---------------|
-| 1 | **¿`is_favorite` es personal o global?** | Fase 3 (favoritos) | A: tabla `user_favorites` personal / B: renombrar a `is_featured` | A si se quiere favoritos real |
-| 2 | **¿Eliminar usuarios desde la app?** | Fase 5.2 | SÍ: Edge Function con service_role / NO: solo suspensión | NO — solo suspender |
-| 3 | **¿Admin puede crear libros?** | Fase 5.5 | SÍ / NO | SÍ — la RLS ya lo permite |
-| 4 | **¿Gráficos en analytics?** | Fase 6.2 | `fl_chart` / solo números | Empezar con números, gráficos después |
-| 5 | **¿Nuevo rol "editor"?** | Ninguna (futuro) | SÍ / NO / Definir después | Después — no es urgente |
-| 6 | **¿`url_launcher` en pubspec?** | Fase 3.3 | Agregar / No agregar | Agregar — es una dependencia estándar |
+| # | Decisión | Resolución |
+|---|----------|------------|
+| 1 | **¿`is_favorite` es personal o global?** | **A** — tabla `user_favorites` personal por usuario |
+| 2 | **¿Eliminar usuarios desde la app?** | **NO** — solo suspender, no eliminar |
+| 3 | **¿Admin puede crear libros?** | **NO** — admin solo administra, no crea contenido |
+| 4 | **¿Gráficos en analytics?** | **Números primero**, gráficos en futuro |
+| 5 | **¿Nuevo rol "editor"?** | **Después** — no es urgente |
+| 6 | **¿`url_launcher` en pubspec?** | **Agregar** — dependencia estándar y liviana |
 
 ---
 
