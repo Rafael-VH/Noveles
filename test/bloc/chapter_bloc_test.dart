@@ -104,5 +104,30 @@ void main() {
         ),
       ],
     );
+
+    // --- P1: partial failure ---
+
+    blocTest<ChapterBloc, ChapterState>(
+      'emits ChapterError when one chapter fails among multiple',
+      build: () {
+        when(() => mockGetChapterContent('ch1.txt'))
+            .thenAnswer((_) async => Ok('Content 1'));
+        when(() => mockGetChapterContent('ch2.txt'))
+            .thenAnswer((_) async => Err(ChapterFailure('Network timeout')));
+        return ChapterBloc(getChapterContent: mockGetChapterContent);
+      },
+      act: (bloc) => bloc.add(LoadChapterContent(
+        initialIndex: 0,
+        chapters: testChapters,
+      )),
+      expect: () => [
+        isA<ChapterLoading>(),
+        isA<ChapterError>().having(
+          (s) => s.message,
+          'message',
+          contains('Network timeout'),
+        ),
+      ],
+    );
   });
 }

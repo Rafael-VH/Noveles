@@ -120,5 +120,22 @@ void main() {
             .having((s) => s.message, 'message', 'Libro no encontrado'),
       ],
     );
+
+    // --- P1: LoadBookById error ---
+
+    blocTest<BookBloc, BookState>(
+      'emits [BookLoading, BookError] when GetBookById fails',
+      build: () {
+        when(() => mockGetBookById(999))
+            .thenAnswer((_) async => Err(BookFailure('Server error')));
+        return bookBloc;
+      },
+      act: (bloc) => bloc.add(LoadBookById(999)),
+      expect: () => [
+        isA<BookLoading>(),
+        isA<BookError>()
+            .having((s) => s.message, 'message', contains('Server error')),
+      ],
+    );
   });
 }

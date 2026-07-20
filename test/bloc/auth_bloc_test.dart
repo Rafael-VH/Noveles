@@ -308,5 +308,35 @@ void main() {
 
       await bloc.close();
     });
+
+    // --- P1: stream auto-logout ---
+
+    blocTest<AuthBloc, AuthState>(
+      'Stream signedOut event triggers automatic LogoutRequested',
+      build: () {
+        when(() => mockLogout()).thenAnswer((_) async => const Ok(null));
+        return AuthBloc(
+          login: mockLogin,
+          register: mockRegister,
+          logout: mockLogout,
+          getCurrentUser: mockGetCurrentUser,
+          listenAuthState: mockListenAuthState,
+        );
+      },
+      act: (bloc) async {
+        // Let the subscription activate
+        await Future<void>.delayed(Duration.zero);
+        // Fire signedOut from the stream
+        authStateController.add(domain.AuthEvent.signedOut);
+        await Future<void>.delayed(const Duration(milliseconds: 100));
+      },
+      expect: () => [
+        isA<AuthLoading>(),
+        isA<AuthUnauthenticated>(),
+      ],
+      verify: (bloc) {
+        verify(() => mockLogout()).called(1);
+      },
+    );
   });
 }

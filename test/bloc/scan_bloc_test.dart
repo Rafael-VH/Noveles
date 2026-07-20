@@ -349,5 +349,62 @@ void main() {
         isA<ScanError>(),
       ],
     );
+
+    // --- P1: M2 books forwarding on cover upload ---
+
+    blocTest<ScanBloc, ScanState>(
+      'ScanCoverUploaded carries books from previous ScanLoaded state',
+      build: () {
+        when(() => mockGetBooks()).thenAnswer((_) async => Ok(testBooks));
+        when(() => mockUploadCover(any()))
+            .thenAnswer((_) async => Ok('new_cover.png'));
+        return scanBloc;
+      },
+      act: (bloc) async {
+        bloc.add(LoadScanBooks());
+        await Future<void>.delayed(Duration.zero);
+        bloc.add(const UploadScanCover('/path/to/cover.png'));
+      },
+      expect: () => [
+        isA<ScanLoading>(),
+        isA<ScanLoaded>(),
+        isA<ScanCoverUploaded>()
+            .having((s) => s.filename, 'filename', 'new_cover.png')
+            .having((s) => s.books.length, 'books forwarded', 1),
+      ],
+    );
+
+    // --- P1: refresh fallback when getBooks fails after successful save ---
+
+    blocTest<ScanBloc, ScanState>(
+      'SaveScanBook falls back to previous books when refresh fails',
+      build: () {
+        // First call: load books successfully
+        when(() => mockGetBooks()).thenAnswer((_) async => Ok(testBooks));
+        when(() => mockUpdateBook(any()))
+            .thenAnswer((_) async => const Ok(null));
+        return scanBloc;
+      },
+      act: (bloc) async {
+        bloc.add(LoadScanBooks());
+        await Future<void>.delayed(Duration.zero);
+        // Second call: refresh fails after save
+        when(() => mockGetBooks())
+            .thenAnswer((_) async => Err(BookFailure('Network')));
+        bloc.add(SaveScanBook(testBooks.first, isUpdate: true));
+      },
+      expect: () => [
+        isA<ScanLoading>(),
+        isA<ScanLoaded>(),
+        // Save succeeds but refresh fails → fallback with previous books
+        isA<ScanLoaded>()
+            .having((s) => s.books.length, 'previous books count', 1)
+            .having(
+              (s) => s.message,
+              'message',
+              contains('Error al refrescar'),
+            ),
+      ],
+    );
   });
 }

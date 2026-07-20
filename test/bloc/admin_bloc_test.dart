@@ -218,5 +218,79 @@ void main() {
         ),
       ],
     );
+
+    // --- P1: in-place toggle updates book without refetching ---
+
+    blocTest<AdminBloc, AdminState>(
+      'ToggleBookVisibility updates book in-place without refetching when state is AdminLoaded',
+      build: () {
+        when(() => mockToggleVisibility(any(), any()))
+            .thenAnswer((_) async => const Ok(null));
+        when(() => mockGetBooks()).thenAnswer((_) async => Ok(testBooks));
+        return AdminBloc(
+          getBooks: mockGetBooks,
+          toggleBookVisibility: mockToggleVisibility,
+          deleteBook: mockDeleteBook,
+        );
+      },
+      act: (bloc) async {
+        // First load books so state is AdminLoaded
+        bloc.add(const LoadAdminBooks());
+        await Future<void>.delayed(Duration.zero);
+        // Now toggle — should update in-place without getBooks()
+        bloc.add(const ToggleBookVisibility(1, false));
+      },
+      expect: () => [
+        const AdminLoading(),
+        isA<AdminLoaded>(),
+        // In-place update: book isVisible toggled, no getBooks refetch
+        isA<AdminLoaded>()
+            .having(
+              (s) => s.books.first.isVisible,
+              'toggled isVisible',
+              false,
+            )
+            .having((s) => s.message, 'message', 'Libro ocultado'),
+      ],
+      verify: (bloc) {
+        // getBooks called only once (initial load), not again for toggle
+        verify(() => mockGetBooks()).called(1);
+      },
+    );
+
+    // --- P1: in-place delete removes book without refetching ---
+
+    blocTest<AdminBloc, AdminState>(
+      'DeleteAdminBook removes book in-place without refetching when state is AdminLoaded',
+      build: () {
+        when(() => mockDeleteBook(any()))
+            .thenAnswer((_) async => const Ok(null));
+        when(() => mockGetBooks()).thenAnswer((_) async => Ok(testBooks));
+        return AdminBloc(
+          getBooks: mockGetBooks,
+          toggleBookVisibility: mockToggleVisibility,
+          deleteBook: mockDeleteBook,
+        );
+      },
+      act: (bloc) async {
+        // First load books so state is AdminLoaded
+        bloc.add(const LoadAdminBooks());
+        await Future<void>.delayed(Duration.zero);
+        // Now delete — should remove in-place without getBooks()
+        bloc.add(const DeleteAdminBook(1));
+      },
+      expect: () => [
+        const AdminLoading(),
+        isA<AdminLoaded>(),
+        // In-place delete: book removed from list, no getBooks refetch
+        isA<AdminLoaded>()
+            .having((s) => s.books.length, 'remaining books', 0)
+            .having((s) => s.message, 'message', 'Libro eliminado'),
+      ],
+      verify: (bloc) {
+        // getBooks called only once (initial load), not again for delete
+        verify(() => mockGetBooks()).called(1);
+      },
+    );
   });
 }
