@@ -1,4 +1,5 @@
 import 'package:noveles/features/profiles/domain/user_entity.dart';
+import 'package:noveles/features/profiles/domain/user_role.dart';
 
 class UserModel extends UserEntity {
   const UserModel({
@@ -13,23 +14,16 @@ class UserModel extends UserEntity {
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
         id: json['id'] as String,
         email: (json['email'] as String?) ?? '',
-        role: _validateRole(json['role'] as String?),
+        role: UserRole.fromString(json['role'] as String?),
         displayName: json['display_name'] as String?,
         bio: json['bio'] as String?,
         avatarUrl: json['avatar_url'] as String?,
       );
 
-  static String _validateRole(String? role) {
-    const validRoles = {'user', 'admin', 'scan', 'suspended'};
-    final r = role ?? 'user';
-    if (!validRoles.contains(r)) return 'user';
-    return r;
-  }
-
   Map<String, dynamic> toJson() => {
         'id': id,
         'email': email,
-        'role': role,
+        'role': role.name,
         'display_name': displayName,
         'bio': bio,
         'avatar_url': avatarUrl,

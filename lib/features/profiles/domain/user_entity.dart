@@ -1,9 +1,10 @@
 import 'package:equatable/equatable.dart';
+import 'package:noveles/features/profiles/domain/user_role.dart';
 
 class UserEntity extends Equatable {
   final String id;
   final String email;
-  final String role;
+  final UserRole role;
   final String? displayName;
   final String? bio;
   final String? avatarUrl;
@@ -17,10 +18,10 @@ class UserEntity extends Equatable {
     this.avatarUrl,
   });
 
-  bool get isScan => role == 'scan';
-  bool get isAdmin => role == 'admin';
-  bool get isUser => role == 'user';
-  bool get isSuspended => role == 'suspended';
+  bool get isScan => role == UserRole.scan;
+  bool get isAdmin => role == UserRole.admin;
+  bool get isUser => role == UserRole.user;
+  bool get isSuspended => role == UserRole.suspended;
 
   @override
   List<Object> get props => [
@@ -35,7 +36,7 @@ class UserEntity extends Equatable {
   UserEntity copyWith({
     String? id,
     String? email,
-    String? role,
+    UserRole? role,
     String? displayName,
     String? bio,
     String? avatarUrl,
