@@ -478,11 +478,64 @@ void main() {
 
     group('deleteBook', () {
       test('returns Ok on success', () async {
+        // Mock maybeSingle() for the pre-delete book data fetch
+        final mockMaybeSingle = MockTransformBuilder();
+        when(() => mockFilter.maybeSingle())
+            .thenAnswer((_) => mockMaybeSingle);
+        mockMaybeSingle.thenReturns({
+          'cover': 'covers/test.jpg',
+          'tooks': [
+            {
+              'cover': 'covers/took.jpg',
+              'chapters': [
+                {'content': 'https://supabase.example.com/storage/v1/object/public/chapters/content/1/ch1.pdf'},
+              ],
+            },
+          ],
+        });
+        // The delete chain also goes through mockFilter.then()
         mockFilter.thenReturns(<Map<String, dynamic>>[]);
+        // Mock storage remove for each file cleanup call
+        when(() => mockStorageFileApi.remove(any()))
+            .thenAnswer((_) async => []);
+
         final result = await repository.deleteBook(1);
 
         expect(result, isA<Ok<void>>());
-        verify(() => mockFilter.eq('id', 1)).called(1);
+        // First call: maybeSingle for book data
+        verify(() => mockFilter.maybeSingle()).called(1);
+        // Storage cleanup: took cover + chapter content + book cover
+        verify(() => mockStorage.from('covers')).called(greaterThanOrEqualTo(1));
+        verify(() => mockStorage.from('chapters')).called(1);
+      });
+
+      test('returns Ok even when book has no cover or tooks', () async {
+        final mockMaybeSingle = MockTransformBuilder();
+        when(() => mockFilter.maybeSingle())
+            .thenAnswer((_) => mockMaybeSingle);
+        mockMaybeSingle.thenReturns({
+          'cover': '',
+          'tooks': <Map<String, dynamic>>[],
+        });
+        mockFilter.thenReturns(<Map<String, dynamic>>[]);
+        when(() => mockStorageFileApi.remove(any()))
+            .thenAnswer((_) async => []);
+
+        final result = await repository.deleteBook(1);
+
+        expect(result, isA<Ok<void>>());
+      });
+
+      test('returns Ok even when maybeSingle returns null', () async {
+        final mockMaybeSingle = MockTransformBuilder();
+        when(() => mockFilter.maybeSingle())
+            .thenAnswer((_) => mockMaybeSingle);
+        mockMaybeSingle.thenReturns(null);
+        mockFilter.thenReturns(<Map<String, dynamic>>[]);
+
+        final result = await repository.deleteBook(1);
+
+        expect(result, isA<Ok<void>>());
       });
 
       test('returns Err on error', () async {

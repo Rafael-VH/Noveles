@@ -94,7 +94,8 @@ class ChapterRepositoryImpl implements ChapterRepository {
     try {
       final file = File(filePath);
       final ext = filePath.split('.').last;
-      final filename = '${DateTime.now().millisecondsSinceEpoch}.$ext';
+      final userId = _supabase.client.auth.currentUser?.id ?? 'unknown';
+      final filename = '$userId/${DateTime.now().millisecondsSinceEpoch}.$ext';
       await _supabase.client.storage.from(StorageConstants.chaptersBucket).upload(filename, file);
       final url = _supabase.client.storage.from(StorageConstants.chaptersBucket).getPublicUrl(filename);
       return Ok(url);

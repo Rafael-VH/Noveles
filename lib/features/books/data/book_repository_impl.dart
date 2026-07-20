@@ -175,11 +175,61 @@ class BookRepositoryImpl implements BookRepository {
   @override
   Future<Result<void>> deleteBook(int id) async {
     try {
+      // 1. Get book data to know cover and tooks/chapters
+      final bookData = await _supabase.client
+          .from('books')
+          .select('cover, tooks(chapters(content), cover)')
+          .eq('id', id)
+          .maybeSingle();
+
+      // 2. Clean up storage files
+      if (bookData != null) {
+        // Clean took covers
+        for (final took in (bookData['tooks'] as List? ?? [])) {
+          if (took['cover'] != null && (took['cover'] as String).isNotEmpty) {
+            await _safeDeleteStorage(StorageConstants.coversBucket, took['cover'] as String);
+          }
+          // Clean chapter content files
+          for (final chapter in (took['chapters'] as List? ?? [])) {
+            final content = chapter['content'] as String?;
+            if (content != null && content.startsWith('http')) {
+              await _safeDeleteStorageFromUrl(StorageConstants.chaptersBucket, content);
+            }
+          }
+        }
+        // Clean book cover
+        final cover = bookData['cover'] as String?;
+        if (cover != null && cover.isNotEmpty) {
+          await _safeDeleteStorage(StorageConstants.coversBucket, cover);
+        }
+      }
+
+      // 3. Delete book record (CASCADE deletes tooks, chapters, etc.)
       await _supabase.client.from('books').delete().eq('id', id);
       return const Ok(null);
     } catch (e) {
       return Err(BookFailure('Error al eliminar libro', cause: e));
     }
+  }
+
+  Future<void> _safeDeleteStorage(String bucket, String path) async {
+    try {
+      await _supabase.client.storage.from(bucket).remove([path]);
+    } catch (_) {
+      // Log but don't fail — file may not exist
+    }
+  }
+
+  Future<void> _safeDeleteStorageFromUrl(String bucket, String url) async {
+    try {
+      final uri = Uri.parse(url);
+      final pathSegments = uri.pathSegments;
+      final bucketIndex = pathSegments.indexOf(bucket);
+      if (bucketIndex != -1) {
+        final filePath = pathSegments.sublist(bucketIndex + 1).join('/');
+        await _safeDeleteStorage(bucket, filePath);
+      }
+    } catch (_) {}
   }
 
   @override
@@ -219,7 +269,8 @@ class BookRepositoryImpl implements BookRepository {
         ));
       }
 
-      final filename = '${DateTime.now().millisecondsSinceEpoch}.$ext';
+      final userId = _supabase.client.auth.currentUser?.id ?? 'unknown';
+      final filename = '$userId/${DateTime.now().millisecondsSinceEpoch}.$ext';
       await _supabase.client.storage
           .from(StorageConstants.coversBucket)
           .upload(filename, file);
