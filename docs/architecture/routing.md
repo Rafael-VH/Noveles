@@ -4,12 +4,15 @@
 
 ## Overview
 
-Noveles uses a **role-based routing** pattern rather than a traditional route table. The `App` widget (`lib/core/app/app.dart`) listens to `AuthBloc` state and renders the appropriate home screen based on the authenticated user's role. There are only two named routes; all other navigation is imperative.
+Noveles uses a **role-based routing** pattern rather than a traditional route
+table. The `App` widget (`lib/core/app/app.dart`) listens to `AuthBloc` state
+and renders the appropriate home screen based on the authenticated user's role.
+There are only two named routes; all other navigation is imperative.
 
 ## Routing Table
 
 | Route | Widget | Access | Type |
-|-------|--------|--------|------|
+| ------- | -------- | -------- | ------ |
 | `/admin` | `AdminDashScreen` | Admin only | Named route |
 | `/label-management` | `LabelManagementScreen` | Scan + Admin | Named route |
 | Home (default) | Role-dependent | All roles | `home:` parameter |
@@ -18,22 +21,26 @@ All other screens use imperative `Navigator.push(MaterialPageRoute(...))`.
 
 ## Auth Guard
 
-The app does **not** use a middleware-based auth guard. Instead, the `BlocBuilder<AuthBloc, AuthState>` in `App.build()` acts as the guard:
+The app does **not** use a middleware-based auth guard. Instead, the
+`BlocBuilder<AuthBloc, AuthState>` in `App.build()` acts as the guard:
 
-```
+```text
 AuthLoading → CircularProgressIndicator
 AuthAuthenticated → Role-based home screen
 AuthUnauthenticated → LoginScreen
 AuthError → LoginScreen (with snackbar)
-```
+```text
 
-**Suspended users**: A user with `role == UserRole.suspended` does not match `isAdmin`, `isScan`, or `isUser`, so they fall through to the `return const LoginScreen()` fallback. The auth error snackbar displays the failure message. This effectively blocks suspended users from accessing any screen.
+**Suspended users**: A user with `role == UserRole.suspended` does not match
+`isAdmin`, `isScan`, or `isUser`, so they fall through to the `return const
+LoginScreen()` fallback. The auth error snackbar displays the failure message.
+This effectively blocks suspended users from accessing any screen.
 
 ## Role Routing Logic
 
 The routing decision tree in `app.dart`:
 
-```
+```dart
 if (authState is AuthAuthenticated)
   ├── user.isAdmin    → AdminDashScreen
   ├── user.isScan     → ScanMainScreen
@@ -41,9 +48,11 @@ if (authState is AuthAuthenticated)
   └── else            → LoginScreen  (suspended / unknown role)
 else
   └── LoginScreen
-```
+```text
 
-**Order matters**: `isAdmin` is checked first, then `isScan`, then `isUser`. This means an admin always gets the admin panel even if they somehow also have other role flags.
+**Order matters**: `isAdmin` is checked first, then `isScan`, then `isUser`.
+This means an admin always gets the admin panel even if they somehow also have
+other role flags.
 
 ## Named Route Registration
 
@@ -54,7 +63,7 @@ routes: {
   '/label-management': (_) => const LabelManagementScreen(),
   '/admin': (_) => const AdminDashScreen(),
 },
-```
+```text
 
 Navigated via `Navigator.pushNamed(context, '/admin')` from the drawer.
 
@@ -63,15 +72,18 @@ Navigated via `Navigator.pushNamed(context, '/admin')` from the drawer.
 `App` provides two root-level BLoCs:
 
 | BLoC | Scope | Purpose |
-|------|-------|---------|
+| ------ | ------- | --------- |
 | `ThemeBloc` | Global | Theme state (light/dark) |
 | `AuthBloc` | Global | Auth session + role routing |
 
-The `AuthBloc` is created from GetIt (`getIt<AuthBloc>()`) and dispatched `CheckAuthSession` immediately.
+The `AuthBloc` is created from GetIt (`getIt<AuthBloc>()`) and dispatched
+`CheckAuthSession` immediately.
 
 ## Error Handling
 
-`BlocListener<AuthBloc, AuthState>` in `App` listens for `AuthError` states and shows a `SnackBar` with the error message and error color scheme. This provides feedback for failed session checks without leaving the current screen.
+`BlocListener<AuthBloc, AuthState>` in `App` listens for `AuthError` states and
+shows a `SnackBar` with the error message and error color scheme. This provides
+feedback for failed session checks without leaving the current screen.
 
 ## Related
 

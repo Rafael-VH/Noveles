@@ -13,7 +13,7 @@ is_admin()      -- returns true if current user has role = 'admin'
 is_scan()       -- returns true if current user has role = 'scan'
 is_user()       -- returns true if current user has role = 'user'
 is_admin_or_scan() -- returns true if admin OR scan
-```
+```text
 
 ---
 
@@ -38,14 +38,14 @@ delete profiles.
 | Operation | Policy Name | Role | Condition |
 | ----------- | ------------- | ------ | ----------- |
 | SELECT | Admin can read all books | public | `is_admin()` |
-| SELECT | Scan can read all books | public | `is_scan() AND created_by = auth.uid()` |
-| SELECT | Users can read visible books | public | `is_visible = true AND NOT is_scan()` |
+| SELECT | Scan can read all books | public | is_scan() AND created_by = au... |
+| SELECT | Users can read visible books | public | is_visible = true AND NO... |
 | INSERT | Enable insert for admin only | public | `is_admin()` |
-| INSERT | Enable insert for scan only | public | `is_scan() AND created_by = auth.uid()` |
+| INSERT | Enable insert for scan only | public | is_scan() AND created_by ... |
 | UPDATE | Enable update for admin only | public | `is_admin()` |
-| UPDATE | Enable update for scan only | public | `is_scan() AND created_by = auth.uid()` |
+| UPDATE | Enable update for scan only | public | is_scan() AND created_by ... |
 | DELETE | Enable delete for admin only | public | `is_admin()` |
-| DELETE | Enable delete for scan only | public | `is_scan() AND created_by = auth.uid()` |
+| DELETE | Enable delete for scan only | public | is_scan() AND created_by ... |
 
 **Notes**: Scan can only CRUD their own books. Users only see visible books.
 
@@ -88,9 +88,9 @@ delete profiles.
 | Operation | Policy Name | Role | Condition |
 | ----------- | ------------- | ------ | ----------- |
 | SELECT | Enable read for all users | public | `true` |
-| INSERT | Enable insert for scan and admin | public | `is_scan() OR is_admin()` |
-| UPDATE | Enable update for scan and admin | public | `is_scan() OR is_admin()` |
-| DELETE | Enable delete for scan and admin | public | `is_scan() OR is_admin()` |
+| INSERT | Enable insert for scan and admin | public | is_scan() OR is_admin() |
+| UPDATE | Enable update for scan and admin | public | is_scan() OR is_admin() |
+| DELETE | Enable delete for scan and admin | public | is_scan() OR is_admin() |
 
 **Notes**: Labels are shared — scan and admin can manage.
 
@@ -117,8 +117,8 @@ delete profiles.
 | Operation | Policy Name | Role | Condition |
 | --------- | ----------- | ---- | --------- |
 | SELECT | Enable read for all users | public | `true` |
-| INSERT | Enable insert for scan and admin | public | `is_scan() OR is_admin()` |
-| DELETE | Enable delete for scan and admin | public | `is_scan() OR is_admin()` |
+| INSERT | Enable insert for scan and admin | public | is_scan() OR is_admin() |
+| DELETE | Enable delete for scan and admin | public | is_scan() OR is_admin() |
 
 **Notes**: Junction table — scan and admin can manage labels on books.
 
@@ -130,11 +130,11 @@ delete profiles.
 | --------- | ----------- | ---- | --------- |
 | SELECT | Enable read for all users | public | `true` |
 | INSERT | Enable insert for admin only | public | `is_admin()` |
-| INSERT | Enable insert for scan only | public | `is_scan() AND created_by = auth.uid()` |
+| INSERT | Enable insert for scan only | public | is_scan() AND created_by ... |
 | UPDATE | Enable update for admin only | public | `is_admin()` |
-| UPDATE | Enable update for scan only | public | `is_scan() AND created_by = auth.uid()` |
+| UPDATE | Enable update for scan only | public | is_scan() AND created_by ... |
 | DELETE | Enable delete for admin only | public | `is_admin()` |
-| DELETE | Enable delete for scan only | public | `is_scan() AND created_by = auth.uid()` |
+| DELETE | Enable delete for scan only | public | is_scan() AND created_by ... |
 
 **Notes**: Scan can only CRUD their own tooks.
 
@@ -146,11 +146,11 @@ delete profiles.
 | --------- | ----------- | ---- | --------- |
 | SELECT | Enable read for all users | public | `true` |
 | INSERT | Enable insert for admin only | public | `is_admin()` |
-| INSERT | Enable insert for scan only | public | `is_scan() AND created_by = auth.uid()` |
+| INSERT | Enable insert for scan only | public | is_scan() AND created_by ... |
 | UPDATE | Enable update for admin only | public | `is_admin()` |
-| UPDATE | Enable update for scan only | public | `is_scan() AND created_by = auth.uid()` |
+| UPDATE | Enable update for scan only | public | is_scan() AND created_by ... |
 | DELETE | Enable delete for admin only | public | `is_admin()` |
-| DELETE | Enable delete for scan only | public | `is_scan() AND created_by = auth.uid()` |
+| DELETE | Enable delete for scan only | public | is_scan() AND created_by ... |
 
 **Notes**: Scan can only CRUD their own chapters.
 
@@ -176,7 +176,8 @@ analytics.
 | INSERT | Users can insert own favorites | public | `auth.uid() = user_id` |
 | DELETE | Users can delete own favorites | public | `auth.uid() = user_id` |
 
-**Notes**: Each user can only see/manage their own favorites. No admin override.
+**Notes**: Each user can only see/manage their own favorites. No admin
+override.
 
 ---
 
@@ -186,7 +187,7 @@ analytics.
 
 | Operation | Policy | Condition |
 | --------- | ------ | --------- |
-| INSERT | Covers: authenticated insert own folder | `bucket_id = 'covers' AND auth.role() = 'authenticated' AND (storage.foldername(name))[1] = auth.uid()::text` |
+| INSERT | Covers: authenticated insert own folder | bucket_id = 'covers' A... |
 | UPDATE | Covers: authenticated update own folder | Same as INSERT |
 | DELETE | Covers: authenticated delete own folder | Same as INSERT |
 
@@ -194,7 +195,7 @@ analytics.
 
 | Operation | Policy | Condition |
 | --------- | ------ | --------- |
-| INSERT | Chapters: authenticated insert own folder | `bucket_id = 'chapters' AND auth.role() = 'authenticated' AND (storage.foldername(name))[1] = auth.uid()::text` |
+| INSERT | Chapters: authenticated insert own folder | bucket_id = 'chapter... |
 | UPDATE | Chapters: authenticated update own folder | Same as INSERT |
 | DELETE | Chapters: authenticated delete own folder | Same as INSERT |
 

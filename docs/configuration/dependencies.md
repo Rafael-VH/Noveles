@@ -4,12 +4,14 @@
 
 ## Overview
 
-Noveles uses 14 runtime dependencies and 3 dev dependencies. All are managed via `pubspec.yaml` with version constraints. The project targets Dart SDK `>=3.3.4 <4.0.0`.
+Noveles uses 14 runtime dependencies and 3 dev dependencies. All are managed via
+`pubspec.yaml` with version constraints. The project targets Dart SDK `>=3.3.4
+<4.0.0`.
 
 ## Runtime Dependencies
 
 | Category | Package | Version | Purpose |
-|----------|---------|---------|---------|
+| ---------- | --------- | --------- | --------- |
 | **State Management** | | | |
 | | `bloc` | `^8.1.4` | BLoC pattern core |
 | | `flutter_bloc` | `^8.1.6` | Flutter BLoC widgets |
@@ -36,7 +38,7 @@ Noveles uses 14 runtime dependencies and 3 dev dependencies. All are managed via
 ## Dev Dependencies
 
 | Package | Version | Purpose |
-|---------|---------|---------|
+| --------- | --------- | --------- |
 | `flutter_test` | SDK | Unit and widget testing |
 | `flutter_lints` | `^5.0.0` | Lint rules |
 | `mocktail` | `^1.0.4` | Mock objects for testing |
@@ -50,9 +52,10 @@ The app loads environment variables via `flutter_dotenv`:
 flutter:
   assets:
     - .env
-```
+```text
 
 Required environment variables (see `docs/configuration/environment.md`):
+
 - `SUPABASE_URL` — Supabase project URL
 - `SUPABASE_ANON_KEY` — Supabase anonymous API key
 

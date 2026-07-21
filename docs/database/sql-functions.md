@@ -11,10 +11,11 @@ CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS BOOLEAN AS $$
   SELECT EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'admin');
 $$ LANGUAGE sql SECURITY DEFINER STABLE;
-```
+```text
 
 **Purpose**: Check if current user has admin role.
-**Used in**: RLS policies for books, authors, genres, tooks, chapters, profiles.
+**Used in**: RLS policies for books, authors, genres, tooks, chapters,
+profiles.
 
 ---
 
@@ -25,7 +26,7 @@ CREATE OR REPLACE FUNCTION public.is_scan()
 RETURNS BOOLEAN AS $$
   SELECT EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'scan');
 $$ LANGUAGE sql SECURITY DEFINER STABLE;
-```
+```text
 
 **Purpose**: Check if current user has scan role.
 **Used in**: RLS policies for books, authors, genres, tooks, chapters, labels.
@@ -39,7 +40,7 @@ CREATE OR REPLACE FUNCTION public.is_user()
 RETURNS BOOLEAN AS $$
   SELECT EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'user');
 $$ LANGUAGE sql SECURITY DEFINER STABLE;
-```
+```text
 
 **Purpose**: Check if current user has user role.
 **Used in**: App-level role validation, RLS for user_favorites.
@@ -51,9 +52,12 @@ $$ LANGUAGE sql SECURITY DEFINER STABLE;
 ```sql
 CREATE OR REPLACE FUNCTION public.is_admin_or_scan()
 RETURNS BOOLEAN AS $$
-  SELECT EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role IN ('admin', 'scan'));
+  SELECT EXISTS (
+    SELECT 1 FROM profiles
+    WHERE id = auth.uid() AND role IN ('admin', 'scan')
+  );
 $$ LANGUAGE sql SECURITY DEFINER STABLE;
-```
+```text
 
 **Purpose**: Check if current user is admin or scan.
 **Used in**: Combined role checks.
@@ -73,7 +77,7 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
-```
+```text
 
 **Purpose**: Auto-create profile when user signs up.
 **Trigger**: `auth.users` AFTER INSERT.
@@ -90,7 +94,7 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-```
+```text
 
 **Purpose**: Auto-enable RLS on new tables.
 **Trigger**: Not actively used.
@@ -112,7 +116,7 @@ AS $$
   GROUP BY DATE(viewed_at)
   ORDER BY view_date;
 $$;
-```
+```text
 
 **Purpose**: Get daily view counts for the last N days.
 **Returns**: `view_date` (DATE), `view_count` (BIGINT)
@@ -134,7 +138,7 @@ AS $$
   ORDER BY view_count DESC
   LIMIT limit_count;
 $$;
-```
+```text
 
 **Purpose**: Get top N books by view count.
 **Returns**: `book_id`, `book_name`, `view_count`
@@ -160,7 +164,7 @@ AS $$
     (SELECT COUNT(*) FROM books) as total_books,
     (SELECT COUNT(*) FROM books WHERE is_visible = true) as visible_books;
 $$;
-```
+```text
 
 **Purpose**: Get overview metrics for admin dashboard.
 **Returns**: `total_views`, `views_today`, `total_books`, `visible_books`

@@ -1,17 +1,21 @@
 # Chapters
 
-> Individual chapter entities — CRUD, content upload/download, and reading screen.
+> Individual chapter entities — CRUD, content upload/download, and reading
+screen.
 
 ## Overview
 
-The Chapters feature manages individual chapters within a took (volume). Chapters have text content that can be either inline or uploaded as a file to Supabase Storage. The reading screen provides a scrollable text view with chapter navigation.
+The Chapters feature manages individual chapters within a took (volume).
+Chapters have text content that can be either inline or uploaded as a file to
+Supabase Storage. The reading screen provides a scrollable text view with
+chapter navigation.
 
 ## Data Model
 
 **`ChapterEntity`** (`lib/features/chapters/domain/chapter_entity.dart`):
 
 | Field | Type | Description |
-|-------|------|-------------|
+| ------- | ------ | ------------- |
 | `id` | `int` | Primary key |
 | `createdAt` | `DateTime` | Creation timestamp |
 | `number` | `String` | Chapter number (display string) |
@@ -22,38 +26,40 @@ The Chapters feature manages individual chapters within a took (volume). Chapter
 
 **`ChapterRef`** (`lib/features/chapters/domain/chapter_ref.dart`):
 
-Lightweight reference used in BLoC events — carries `id`, `content`, `number`, `title`, `tookId` to avoid passing full entities through the event bus.
+Lightweight reference used in BLoC events — carries `id`, `content`, `number`,
+`title`, `tookId` to avoid passing full entities through the event bus.
 
 ## Use Cases
 
 | Use Case | Signature | Purpose |
-|----------|-----------|---------|
-| `GetChapters` | `Future<Result<List<ChapterEntity>>> call({int page, int pageSize})` | Paginated chapter listing |
-| `GetChapterById` | `Future<Result<ChapterEntity?>> call(int id)` | Single chapter |
-| `GetChapterContent` | `Future<Result<String>> call(String path)` | Download or return inline content |
-| `CreateChapter` | `Future<Result<int>> call(ChapterEntity chapter)` | Create a new chapter |
-| `UpdateChapter` | `Future<Result<void>> call(ChapterEntity chapter)` | Update chapter metadata/content |
-| `DeleteChapter` | `Future<Result<void>> call(int id)` | Delete a chapter |
-| `UploadChapterContent` | `Future<Result<String>> call(String filePath)` | Upload .md/.txt to Storage |
+| ---------- | ----------- | --------- |
+| GetChapters | `FR<L<CE>>` call({int off}) | Paginated chapter listing |
+| GetChapterById | `FR<CE?>` call(int id) | Single chapter |
+| GetChapterContent | `FR<String>` call(String p) | Download or return inline |
+| CreateChapter | `FR<int>` call(CE ch) | Create a new chapter |
+| UpdateChapter | `FR<void>` call(CE ch) | Update chapter metadata |
+| `DeleteChapter` | `FR<void>` call(int id) | Delete a chapter |
+| UploadContent | `FR<String>` call(String f) | Upload .md/.txt to Storage |
 
-**Repository**: `ChapterRepository` → `ChapterRepositoryImpl`. `downloadContent` determines if a path is a storage reference or inline text.
+**Repository**: `ChapterRepository` → `ChapterRepositoryImpl`. `downloadContent`
+determines if a path is a storage reference or inline text.
 
 ## BLoC
 
 **`ChapterBloc`** (`lib/features/chapters/presentation/bloc/chapter_bloc.dart`):
 
 | Event | Description |
-|-------|-------------|
+| ------- | ------------- |
 | `LoadChapters` | Load chapter list |
 | `LoadChapterContent` | Load and display chapter text |
 | `NavigateChapter` | Move to next/previous chapter |
 
 | State | Data | When |
-|-------|------|------|
+| ------- | ------ | ------ |
 | `ChapterInitial` | — | Initial state |
 | `ChapterLoading` | — | Fetching data |
 | `ChaptersLoaded` | `List<ChapterEntity> chapters` | Chapter list loaded |
-| `ChapterContentLoaded` | `ChapterEntity chapter, String content` | Reading view ready |
+| ChapterContentLoaded | ChapterEntity chapter,String ... | Reading view ready |
 | `ChapterError` | `String message` | Error occurred |
 
 ## Screens
@@ -76,7 +82,8 @@ Lightweight reference used in BLoC events — carries `id`, `content`, `number`,
 
 ## Related
 
-- [Entities](../../domain/entities.md) — `ChapterEntity`, `ChapterRef` field details
+- [Entities](../../domain/entities.md) — `ChapterEntity`, `ChapterRef` field
+details
 - [Use Cases](../../domain/use-cases.md) — Chapter use case signatures
 - [User Types](../../user-types/regular-user.md) — Chapter reading
 - [User Types](../../user-types/scan-user.md) — Chapter creation

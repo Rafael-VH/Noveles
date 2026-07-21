@@ -1,6 +1,7 @@
 # Deployment
 
-> Build and deploy Noveles to Android, Web, and iOS — with Supabase production setup.
+> Build and deploy Noveles to Android, Web, and iOS — with Supabase production
+setup.
 
 ## Android
 
@@ -8,7 +9,7 @@
 
 ```bash
 flutter build apk --debug
-```
+```text
 
 Output: `build/app/outputs/flutter-apk/app-debug.apk`
 
@@ -16,7 +17,7 @@ Output: `build/app/outputs/flutter-apk/app-debug.apk`
 
 ```bash
 flutter build apk --release
-```
+```text
 
 Output: `build/app/outputs/flutter-apk/app-release.apk`
 
@@ -24,23 +25,26 @@ Output: `build/app/outputs/flutter-apk/app-release.apk`
 
 ```bash
 flutter build appbundle --release
-```
+```text
 
 Output: `build/app/outputs/bundle/release/app-release.aab`
 
-**Signing**: Configure `android/app/build.gradle` with your keystore for release builds.
+**Signing**: Configure `android/app/build.gradle` with your keystore for release
+builds.
 
 ## Web
 
 ```bash
 flutter build web --release
-```
+```text
 
 Output: `build/web/`
 
-Serve with any static file server. For Supabase on web, ensure your project's auth redirect URLs include your deployment domain.
+Serve with any static file server. For Supabase on web, ensure your project's
+auth redirect URLs include your deployment domain.
 
 **Notes**:
+
 - Web builds require proper CORS configuration in Supabase
 - `flutter_native_splash` is not used on web
 - `image_picker` may have limited functionality on web
@@ -49,11 +53,12 @@ Serve with any static file server. For Supabase on web, ensure your project's au
 
 ```bash
 flutter build ipa --release
-```
+```text
 
 Output: `build/ios/ipa/`
 
 **Requirements**:
+
 - Xcode with valid signing certificate
 - Configure bundle identifier in `ios/Runner.xcodeproj`
 - Set up provisioning profiles for distribution
@@ -64,7 +69,7 @@ Output: `build/ios/ipa/`
 
 ```bash
 supabase db push
-```
+```text
 
 Applies all migrations from `supabase/migrations/` to the remote database.
 
@@ -73,7 +78,7 @@ Applies all migrations from `supabase/migrations/` to the remote database.
 Verify these buckets exist in your Supabase dashboard:
 
 | Bucket | Purpose | Public |
-|--------|---------|--------|
+| -------- | --------- | -------- |
 | `covers` | Book/took cover images | Yes |
 | `chapters` | Chapter content files (.md, .txt) | No |
 | `avatars` | User profile pictures | Yes |
@@ -90,18 +95,20 @@ See `docs/database/sql-functions.md` for function definitions.
 
 ### RLS Policies
 
-Ensure Row-Level Security policies are active on all tables. See `docs/database/rls-policies.md` for the full policy list.
+Ensure Row-Level Security policies are active on all tables. See
+`docs/database/rls-policies.md` for the full policy list.
 
 ## Environment Variables
 
 Create a production `.env` file at the project root:
 
-```
+```bash
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your-anon-key
-```
+```text
 
-**Security**: Never commit `.env` to version control. The `.gitignore` already excludes it.
+**Security**: Never commit `.env` to version control. The `.gitignore` already
+excludes it.
 
 ## Build Versioning
 
@@ -109,9 +116,10 @@ Update version in `pubspec.yaml` before each release:
 
 ```yaml
 version: 1.1.0+1  # version+build_number
-```
+```text
 
-The build number auto-increments for Android; for iOS, set it explicitly in Xcode.
+The build number auto-increments for Android; for iOS, set it explicitly in
+Xcode.
 
 ## Related
 

@@ -1,17 +1,21 @@
 # Profiles
 
-> User profiles — display info, avatar upload, password change, and role management.
+> User profiles — display info, avatar upload, password change, and role
+management.
 
 ## Overview
 
-The Profiles feature manages user profile data beyond authentication. It handles display name, bio, avatar upload, password changes, and admin-level role management (assigning roles, suspending users). The `UserEntity` is shared across the entire app as the canonical user representation.
+The Profiles feature manages user profile data beyond authentication. It handles
+display name, bio, avatar upload, password changes, and admin-level role
+management (assigning roles, suspending users). The `UserEntity` is shared
+across the entire app as the canonical user representation.
 
 ## Data Model
 
 **`UserEntity`** (`lib/features/profiles/domain/user_entity.dart`):
 
 | Field | Type | Description |
-|-------|------|-------------|
+| ------- | ------ | ------------- |
 | `id` | `String` | Supabase Auth UUID |
 | `email` | `String` | User email |
 | `role` | `UserRole` | `user`, `scan`, `admin`, or `suspended` |
@@ -21,34 +25,36 @@ The Profiles feature manages user profile data beyond authentication. It handles
 
 **Computed getters**: `isUser`, `isScan`, `isAdmin`, `isSuspended`
 
-**`UserRole`** enum (`lib/features/profiles/domain/user_role.dart`): `user`, `scan`, `admin`, `suspended`
+**`UserRole`** enum (`lib/features/profiles/domain/user_role.dart`): `user`,
+`scan`, `admin`, `suspended`
 
 ## Use Cases
 
 | Use Case | Signature | Purpose |
-|----------|-----------|---------|
-| `GetProfile` | `Future<Result<UserEntity>> call()` | Get current user profile |
-| `UpdateProfile` | `Future<Result<UserEntity>> call({String? displayName, String? bio, String? avatarUrl})` | Update profile fields |
-| `UploadAvatar` | `Future<Result<String>> call(String filePath)` | Upload avatar to Storage |
-| `ChangePassword` | `Future<Result<void>> call(String newPassword)` | Change account password |
-| `GetAllProfiles` | `Future<Result<List<UserEntity>>> call({int limit, String? afterEmail})` | Admin: list all users (paginated) |
-| `UpdateUserRole` | `Future<Result<UserEntity>> call({required String userId, required String role})` | Admin: change user role |
+| ---------- | ----------- | --------- |
+| GetProfile | `FR<UE>` call() | Get current user profile |
+| UpdateProfile | `FR<UE>` call({String? d}) | Update profile fields |
+| UploadAvatar | `FR<String>` call(String fp) | Upload avatar to Storage |
+| ChangePassword | `FR<void>` call(String np) | Change account password |
+| GetAllProfiles | `FR<L<UE>>` call({int p}) | Admin: list all users |
+| UpdateUserRole | `FR<UE>` call({required ... | Admin: change user role |
 
-**Repository**: `ProfilesRepository` → `ProfilesRepositoryImpl` queries `profiles` table and Supabase Auth.
+**Repository**: `ProfilesRepository` → `ProfilesRepositoryImpl` queries
+`profiles` table and Supabase Auth.
 
 ## BLoC
 
 **`ProfileBloc`** (`lib/features/profiles/presentation/bloc/profile_bloc.dart`):
 
 | Event | Description |
-|-------|-------------|
+| ------- | ------------- |
 | `LoadProfile` | Load current user profile |
 | `UpdateProfile` | Update display name, bio, or avatar |
 | `UploadAvatar` | Pick and upload avatar image |
 | `ChangePassword` | Change account password |
 
 | State | Data | When |
-|-------|------|------|
+| ------- | ------ | ------ |
 | `ProfileInitial` | — | Initial |
 | `ProfileLoading` | — | Processing |
 | `ProfileLoaded` | `UserEntity profile` | Profile loaded |

@@ -4,14 +4,17 @@
 
 ## Overview
 
-Tooks represent volumes or compiled editions of a book. Each book contains one or more tooks, and each took contains chapters. This three-level hierarchy (Book → Took → Chapter) allows organizing content into logical volumes with their own covers and metadata.
+Tooks represent volumes or compiled editions of a book. Each book contains one
+or more tooks, and each took contains chapters. This three-level hierarchy (Book
+→ Took → Chapter) allows organizing content into logical volumes with their own
+covers and metadata.
 
 ## Data Model
 
 **`TookEntity`** (`lib/features/tooks/domain/took_entity.dart`):
 
 | Field | Type | Description |
-|-------|------|-------------|
+| ------- | ------ | ------------- |
 | `id` | `int` | Primary key |
 | `createdAt` | `DateTime` | Creation timestamp |
 | `cover` | `String` | Volume cover image |
@@ -25,15 +28,16 @@ Tooks represent volumes or compiled editions of a book. Each book contains one o
 ## Use Cases
 
 | Use Case | Signature | Purpose |
-|----------|-----------|---------|
-| `GetTooks` | `Future<Result<List<TookEntity>>> call()` | List all tooks |
-| `GetTooksByBook` | `Future<Result<List<TookEntity>>> call(int bookId)` | List tooks for a specific book |
+| ---------- | ----------- | --------- |
+| GetTooks | `FR<L<TookEntity>>` call() | List all tooks |
+| GetTooksByBook | `FR<L<TookEntity>>` call(int bid) | List tooks for book |
 | `GetTookById` | `Future<Result<TookEntity?>> call(int id)` | Single took |
-| `CreateTook` | `Future<Result<int>> call(TookEntity took)` | Create a new took |
-| `UpdateTook` | `Future<Result<void>> call(TookEntity took)` | Update took metadata |
+| CreateTook | `Future<Result<int>> call(TookEntity took)` | Create a new took |
+| UpdateTook | `FR<void>` call(TookEntity took) | Update took metadata |
 | `DeleteTook` | `Future<Result<void>> call(int id)` | Delete a took |
 
-**Repository**: `TookRepository` → `TookRepositoryImpl` queries the `tooks` table.
+**Repository**: `TookRepository` → `TookRepositoryImpl` queries the `tooks`
+table.
 
 ## Screens
 
@@ -50,7 +54,8 @@ Tooks represent volumes or compiled editions of a book. Each book contains one o
 
 - Took card/compact view used in book detail screens
 
-No dedicated BLoC — tooks are managed through the `ScanTookBloc` (scan feature) and loaded as part of `BookWithRelations` for reading views.
+No dedicated BLoC — tooks are managed through the `ScanTookBloc` (scan feature)
+and loaded as part of `BookWithRelations` for reading views.
 
 ## DI Registration
 

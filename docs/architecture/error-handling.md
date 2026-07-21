@@ -4,23 +4,24 @@
 
 ## Result Pattern
 
-The app uses a `Result<T>` sealed class to represent success or failure without exceptions:
+The app uses a ``Result<T>`` sealed class to represent success or failure
+without exceptions:
 
 ```dart
-sealed class Result<T> {
+sealed class `Result<T>` {
   const Result();
 }
 
-final class Ok<T> extends Result<T> {
+final class Ok<T> extends `Result<T>` {
   final T value;
   const Ok(this.value);
 }
 
-final class Err<T> extends Result<T> {
+final class Err<T> extends `Result<T>` {
   final Failure error;
   const Err(this.error);
 }
-```
+```text
 
 **Source**: `lib/core/errors/result.dart`
 
@@ -36,13 +37,15 @@ switch (result) {
   case Err(:final error):
     emit(AuthError(error.message));
 }
-```
+```text
 
-**Pattern**: `case Ok(:final value):` destructures the value, `case Err(:final error):` destructures the failure.
+**Pattern**: `case Ok(:final value):` destructures the value, `case Err(:final
+error):` destructures the failure.
 
 ## Failure Hierarchy
 
-All failures extend a sealed `Failure` class with `message` and optional `cause`:
+All failures extend a sealed `Failure` class with `message` and optional
+`cause`:
 
 ```dart
 sealed class Failure {
@@ -50,29 +53,30 @@ sealed class Failure {
   final Object? cause;
   const Failure(this.message, {this.cause});
 }
-```
+```text
 
 **Source**: `lib/core/errors/failure.dart`
 
 ## Failure Types
 
 | Failure | Purpose | When Thrown |
-|---------|---------|-------------|
+| --------- | --------- | ------------- |
 | `AuthFailure` | Authentication errors | Login, logout, session failures |
 | `BookFailure` | Book CRUD errors | Book create/update/delete failures |
-| `ChapterFailure` | Chapter CRUD errors | Chapter create/update/delete failures |
+| ChapterFailure | Chapter CRUD errors | Chapter create/update/delete failures |
 | `TookFailure` | Took CRUD errors | Took create/update/delete failures |
 | `GenreFailure` | Genre CRUD errors | Genre create/update/delete failures |
 | `LabelFailure` | Label CRUD errors | Label create/update/delete failures |
 | `ProfileFailure` | Profile errors | Profile update, avatar upload failures |
-| `StorageFailure` | Storage/upload errors | File upload failures to Supabase Storage |
+| StorageFailure | Storage/upload errors | File upload failures to Supabase... |
 | `FavoriteFailure` | Favorite toggle errors | Favorite add/remove failures |
 | `AnalyticsFailure` | Analytics query errors | Admin analytics fetch failures |
 
 ## Key Principles
 
-1. **Never throw exceptions** — all errors are wrapped in `Result<T>`
-2. **Each feature has its own Failure type** — enables pattern matching at the UI layer
+1. **Never throw exceptions** — all errors are wrapped in ``Result<T>``
+2. **Each feature has its own Failure type** — enables pattern matching at the
+UI layer
 3. **Optional cause** — preserves original exception for debugging
 4. **String messages** — user-facing error messages (often in Spanish)
 

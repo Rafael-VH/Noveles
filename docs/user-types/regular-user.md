@@ -1,19 +1,23 @@
 # Regular User
 
-> Default role for authenticated users — browse books, manage profile, and favorites.
+> Default role for authenticated users — browse books, manage profile, and
+favorites.
 
 ## Role Overview
 
-`UserRole.user` is the default role assigned to new registrations. Regular users can browse the library, read chapters, manage their profile, and maintain a personal favorites list.
+`UserRole.user` is the default role assigned to new registrations. Regular users
+can browse the library, read chapters, manage their profile, and maintain a
+personal favorites list.
 
-**Enum value**: `UserRole.user` (default in `UserRole.fromString()` for unknown values)
+**Enum value**: `UserRole.user` (default in `UserRole.fromString()` for unknown
+values)
 
 **Source**: `lib/features/profiles/domain/user_role.dart`
 
 ## Permissions
 
 | Action | Allowed |
-|--------|---------|
+| ------ | ------- |
 | Browse visible books | ✅ |
 | Read book details and chapters | ✅ |
 | View and manage favorites | ✅ |
@@ -28,35 +32,38 @@
 ## Screens
 
 | Screen | File | Purpose |
-|--------|------|---------|
-| `MainScreen` | `lib/features/app/presentation/screens/main_screen.dart` | Home with book carousel, genre chips, paginated book list |
-| `BookScreen` | `lib/features/books/presentation/screens/book_screen.dart` | Book details, chapters list |
-| `ChapterScreen` | `lib/features/chapters/presentation/screens/chapter_screen.dart` | Chapter content reader |
-| `ProfileScreen` | `lib/features/profiles/presentation/screens/profile_screen.dart` | Edit profile, upload avatar, change password |
-| `FavoritesScreen` | `lib/features/favorites/presentation/screens/favorites_screen.dart` | List of favorited books |
+| ------ | ---- | ------- |
+| MainScreen | main_screen.dart | Home with book carousel,genre chips,pagin... |
+| `BookScreen` | `book_screen.dart` | Book details, chapters list |
+| `ChapterScreen` | `chapter_screen.dart` | Chapter content reader |
+| ProfileScreen | profile_screen.dart | Edit profile,upload avatar,change p... |
+| `FavoritesScreen` | `favorites_screen.dart` | List of favorited books |
 
 ## Navigation
 
-The `AppDrawer` (`lib/features/app/presentation/widgets/app_drawer.dart`) shows these items for regular users:
+The `AppDrawer` (`lib/features/app/presentation/widgets/app_drawer.dart`) shows
+these items for regular users:
 
 | Item | Icon | Destination |
-|------|------|-------------|
+| ---- | ---- | ----------- |
 | Inicio | `Icons.home` | Closes drawer (stays on `MainScreen`) |
 | Editar Perfil | `Icons.person` | `ProfileScreen` |
 | Mis Favoritos | `Icons.favorite` | `FavoritesScreen` |
 | Cerrar Sesión | `Icons.logout` | Logout confirmation dialog |
 
-**Note**: Admin and Scan panel links are hidden for regular users via `isAdmin`/`isScan` flags.
+**Note**: Admin and Scan panel links are hidden for regular users via
+`isAdmin`/`isScan` flags.
 
 ## Routing
 
-In `lib/core/app/app.dart`, the auth state handler routes regular users to `MainScreen`:
+In `lib/core/app/app.dart`, the auth state handler routes regular users to
+`MainScreen`:
 
 ```dart
 if (authState.user.isUser) {
   return const MainScreen();
 }
-```
+```text
 
 **Source**: `lib/core/app/app.dart` (lines 61-63)
 
@@ -73,6 +80,7 @@ Regular users cannot:
 ## RLS Enforcement
 
 Supabase Row Level Security ensures regular users can only:
+
 - Read visible books (`is_visible = true`)
 - Read/write their own profile
 - Read/write their own favorites

@@ -4,14 +4,17 @@
 
 ## Overview
 
-The Labels feature manages color-coded tags that can be assigned to books. Labels use a junction table (`book_labels`) for many-to-many relationships. Only scan-role users can create and manage labels; regular users see them as visual indicators on book cards.
+The Labels feature manages color-coded tags that can be assigned to books.
+Labels use a junction table (`book_labels`) for many-to-many relationships. Only
+scan-role users can create and manage labels; regular users see them as visual
+indicators on book cards.
 
 ## Data Model
 
 **`LabelEntity`** (`lib/features/labels/domain/label_entity.dart`):
 
 | Field | Type | Description |
-|-------|------|-------------|
+| ------- | ------ | ------------- |
 | `id` | `int` | Primary key |
 | `createdAt` | `DateTime` | Creation timestamp |
 | `name` | `String` | Label name |
@@ -20,23 +23,24 @@ The Labels feature manages color-coded tags that can be assigned to books. Label
 ## Use Cases
 
 | Use Case | Signature | Purpose |
-|----------|-----------|---------|
-| `GetLabels` | `Future<Result<List<LabelEntity>>> call()` | List all labels |
-| `CreateLabel` | `Future<Result<void>> call(LabelEntity label)` | Create a label |
-| `UpdateLabel` | `Future<Result<void>> call(int id, String name, String color)` | Update label |
-| `DeleteLabel` | `Future<Result<void>> call(int id)` | Delete a label |
-| `AssignLabel` | `Future<Result<void>> call(int bookId, int labelId)` | Assign label to book |
-| `RemoveLabel` | `Future<Result<void>> call(int bookId, int labelId)` | Remove label from book |
-| `GetBookLabels` | `Future<Result<Map<int, Set<int>>>> call(List<int> bookIds)` | Batch label lookup for books |
+| ---------- | ----------- | --------- |
+| GetLabels | `FR<L<LE>>` call() | List all labels |
+| CreateLabel | `FR<void>` call(LE label) | Create a label |
+| UpdateLabel | `FR<void>` call(int id,String n,String c) | Update label |
+| `DeleteLabel` | `FR<void>` call(int id) | Delete a label |
+| AssignLabel | `FR<void>` call(int bid,int lid) | Assign label to book |
+| RemoveLabel | `FR<void>` call(int bid,int lid) | Remove label from book |
+| GetBookLabels | `FR<M<int,SE<int>>>` call(ids) | Batch label lookup |
 
-**Repository**: `LabelRepository` → `LabelRepositoryImpl` queries `labels` and `book_labels` tables.
+**Repository**: `LabelRepository` → `LabelRepositoryImpl` queries `labels` and
+`book_labels` tables.
 
 ## BLoC
 
 **`LabelBloc`** (`lib/features/labels/presentation/bloc/label_bloc.dart`):
 
 | Event | Description |
-|-------|-------------|
+| ------- | ------------- |
 | `LoadLabels` | Load all labels |
 | `CreateLabelEvent` | Create a new label |
 | `UpdateLabelEvent` | Update label name/color |
@@ -46,7 +50,7 @@ The Labels feature manages color-coded tags that can be assigned to books. Label
 | `LoadBookLabels` | Batch-load label assignments |
 
 | State | Data | When |
-|-------|------|------|
+| ------- | ------ | ------ |
 | `LabelInitial` | — | Initial |
 | `LabelLoading` | — | Fetching |
 | `LabelLoaded` | `List<LabelEntity> labels` | Labels loaded |
@@ -57,7 +61,8 @@ The Labels feature manages color-coded tags that can be assigned to books. Label
 
 ### LabelManagementScreen
 
-**File**: `lib/features/labels/presentation/screens/label_management_screen.dart`
+**File**:
+`lib/features/labels/presentation/screens/label_management_screen.dart`
 
 - Full CRUD UI for managing labels
 - Color picker for label colors

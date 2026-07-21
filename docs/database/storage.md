@@ -50,7 +50,7 @@
 
 | Operation | Policy Name | Condition |
 | --------- | ----------- | --------- |
-| INSERT | Covers: authenticated insert own folder | `bucket_id = 'covers' AND auth.role() = 'authenticated' AND (storage.foldername(name))[1] = auth.uid()::text` |
+| INSERT | Covers: authenticated insert own folder | bucket_id = 'covers' A... |
 | UPDATE | Covers: authenticated update own folder | Same as INSERT |
 | DELETE | Covers: authenticated delete own folder | Same as INSERT |
 
@@ -58,7 +58,7 @@
 
 | Operation | Policy Name | Condition |
 | --------- | ----------- | --------- |
-| INSERT | Chapters: authenticated insert own folder | `bucket_id = 'chapters' AND auth.role() = 'authenticated' AND (storage.foldername(name))[1] = auth.uid()::text` |
+| INSERT | Chapters: authenticated insert own folder | bucket_id = 'chapter... |
 | UPDATE | Chapters: authenticated update own folder | Same as INSERT |
 | DELETE | Chapters: authenticated delete own folder | Same as INSERT |
 
@@ -79,7 +79,7 @@ chapters/
 avatars/
   {user_id}/
     {filename}
-```
+```text
 
 **Key Points**:
 

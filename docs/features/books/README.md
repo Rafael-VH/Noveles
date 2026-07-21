@@ -1,17 +1,22 @@
 # Books
 
-> Core domain entity — CRUD operations, visibility toggle, pagination, and view tracking.
+> Core domain entity — CRUD operations, visibility toggle, pagination, and view
+tracking.
 
 ## Overview
 
-The Books feature is the central entity of the application. It manages novel metadata (title, author, cover, description, genre/label associations) and provides paginated listing, single-book detail, visibility toggling, and image upload. Books are loaded as `BookWithRelations` — a shared entity that flattens genre, took, and label data for presentation.
+The Books feature is the central entity of the application. It manages novel
+metadata (title, author, cover, description, genre/label associations) and
+provides paginated listing, single-book detail, visibility toggling, and image
+upload. Books are loaded as `BookWithRelations` — a shared entity that flattens
+genre, took, and label data for presentation.
 
 ## Data Model
 
 **`BookEntity`** (`lib/features/books/domain/book_entity.dart`):
 
 | Field | Type | Description |
-|-------|------|-------------|
+| ------- | ------ | ------------- |
 | `id` | `int` | Primary key |
 | `createdAt` | `DateTime` | Creation timestamp |
 | `cover` | `String` | Cover image URL/path |
@@ -39,31 +44,32 @@ The Books feature is the central entity of the application. It manages novel met
 ## Use Cases
 
 | Use Case | Signature | Purpose |
-|----------|-----------|---------|
-| `GetBooks` | `Future<Result<List<BookWithRelations>>> call({bool onlyVisible, int page, int pageSize})` | Paginated book listing |
-| `GetBookById` | `Future<Result<BookWithRelations?>> call(int id)` | Single book with relations |
-| `ToggleBookVisibility` | `Future<Result<void>> call(int bookId, bool isVisible)` | Show/hide book from users |
-| `CreateBook` | `Future<Result<int>> call(BookEntity book)` | Create a new book |
-| `UpdateBook` | `Future<Result<void>> call(BookEntity book)` | Update book metadata |
-| `DeleteBook` | `Future<Result<void>> call(int id)` | Delete a book |
-| `UploadImage` | `Future<Result<String>> call(String filePath)` | Upload cover image to Storage |
-| `GetBookLabels` | `Future<Result<Map<int, Set<int>>>> call(List<BookEntity> books)` | Batch label lookup for books |
-| `TrackBookView` | `Future<Result<void>> call(int bookId)` | Increment view counter |
+| ---------- | ----------- | --------- |
+| GetBooks | `FR<L<BWR>>` call({bool o}) | Paginated book listing |
+| GetBookById | `FR<BWR?>` call(int id) | Single book with relations |
+| ToggleBookVisibility | `FR<void>` call(int id) | Show/hide book from users |
+| CreateBook | `FR<int>` call(BE book) | Create a new book |
+| UpdateBook | `FR<void>` call(BE book) | Update book metadata |
+| `DeleteBook` | `FR<void>` call(int id) | Delete a book |
+| UploadImage | `FR<String>` call(String f) | Upload cover image to Storage |
+| GetBookLabels | `FR<M<int,SE<int>>>` call(ids) | Batch label lookup |
+| TrackBookView | `FR<void>` call(int id) | Increment view counter |
 
-**Repository**: `BookRepository` → `BookRepositoryImpl` uses Supabase queries with RLS policies.
+**Repository**: `BookRepository` → `BookRepositoryImpl` uses Supabase queries
+with RLS policies.
 
 ## BLoC
 
 **`BookBloc`** (`lib/features/books/presentation/bloc/book_bloc.dart`):
 
 | Event | Description |
-|-------|-------------|
+| ------- | ------------- |
 | `LoadBooks` | Load first page of books |
 | `LoadMoreBooks` | Load next page (pagination) |
 | `LoadBookById` | Load single book for detail view |
 
 | State | Data | When |
-|-------|------|------|
+| ------- | ------ | ------ |
 | `BookInitial` | — | Initial state |
 | `BookLoading` | — | Fetching data |
 | `BookLoaded` | `List<BookWithRelations> books, bool hasMore` | Books loaded |
