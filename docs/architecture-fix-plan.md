@@ -24,7 +24,8 @@ flutter test               # 217 pass, 2 pre-existing failures
 git status                 # Working tree limpio
 ```
 
-Cada fase genera **un commit independiente**. Si algo sale mal, se puede revertir por fase.
+Cada fase genera **un commit independiente**. Si algo sale mal, se puede
+revertir por fase.
 
 ---
 
@@ -34,16 +35,19 @@ Cada fase genera **un commit independiente**. Si algo sale mal, se puede reverti
 
 ### A1. Scan screens bypassing BLoC (S6, S7)
 
-**Problema:** `scan_took_edit_screen.dart` llama `getIt<UploadCover>()` directamente. `scan_chapter_edit_screen.dart` llama `getIt<UploadChapterContent>()` directamente. Ambas se saltan la capa BLoC.
+**Problema:** `scan_took_edit_screen.dart` llama `getIt<UploadCover>()`
+directamente. `scan_chapter_edit_screen.dart` llama
+`getIt<UploadChapterContent>()` directamente. Ambas se saltan la capa BLoC.
 
-**Archivos a modificar:**
+## Archivos a modificar
+
 - `lib/features/scan/presentation/bloc/scan_took_bloc.dart`
 - `lib/features/scan/presentation/bloc/scan_chapter_bloc.dart`
 - `lib/features/scan/presentation/screens/scan_took_edit_screen.dart`
 - `lib/features/scan/presentation/screens/scan_chapter_edit_screen.dart`
 - `lib/core/di/injection_scan.dart`
 
-**Paso 1 — Agregar eventos y estados de upload a ScanTookBloc:**
+## Paso 1 — Agregar eventos y estados de upload a ScanTookBloc
 
 En `scan_took_bloc.dart`, agregar:
 
@@ -101,7 +105,7 @@ class ScanTookBloc extends Bloc<ScanTookEvent, ScanTookState> {
 }
 ```
 
-**Paso 2 — Agregar eventos y estados de upload a ScanChapterBloc:**
+## Paso 2 — Agregar eventos y estados de upload a ScanChapterBloc
 
 En `scan_chapter_bloc.dart`, agregar:
 
@@ -159,7 +163,7 @@ class ScanChapterBloc extends Bloc<ScanChapterEvent, ScanChapterState> {
 }
 ```
 
-**Paso 3 — Actualizar DI:**
+## Paso 3 — Actualizar DI
 
 En `injection_scan.dart`:
 
@@ -183,7 +187,7 @@ getIt.registerFactory(
 );
 ```
 
-**Paso 4 — Refactorizar scan_took_edit_screen.dart:**
+## Paso 4 — Refactorizar scan_took_edit_screen.dart
 
 Reemplazar `_pickCover()` completo:
 
@@ -239,9 +243,10 @@ Future<void> _pickCover() async {
 }
 ```
 
-Eliminar el import: `import 'package:noveles/features/books/domain/upload_cover.dart';`
+Eliminar el import: `import
+'package:noveles/features/books/domain/upload_cover.dart';`
 
-**Paso 5 — Refactorizar scan_chapter_edit_screen.dart:**
+## Paso 5 — Refactorizar scan_chapter_edit_screen.dart
 
 Reemplazar `_pickContentFile()` completo:
 
@@ -282,9 +287,11 @@ try {
 }
 ```
 
-Eliminar el import: `import 'package:noveles/features/chapters/domain/upload_chapter_content.dart';`
+Eliminar el import: `import
+'package:noveles/features/chapters/domain/upload_chapter_content.dart';`
 
-**Verificación A1:**
+## Verificación A1
+
 ```bash
 dart analyze lib/features/scan/
 flutter test test/bloc/scan_*
@@ -294,20 +301,26 @@ flutter test test/bloc/scan_*
 
 ### A2. Core depende de features (C1, C2, C3)
 
-**Problema:** `main_screen.dart`, `carousel_appbar_sliver.dart`, `app_drawer.dart` viven en `core/` pero importan de `features/`.
+**Problema:** `main_screen.dart`, `carousel_appbar_sliver.dart`,
+`app_drawer.dart` viven en `core/` pero importan de `features/`.
 
-**Solución:** Crear `features/app/` como feature que orquesta el shell de la aplicación.
+**Solución:** Crear `features/app/` como feature que orquesta el shell de la
+aplicación.
 
-**Archivos a modificar:**
-- `lib/features/app/presentation/screens/main_screen.dart` (MOVER desde core/app/)
-- `lib/features/app/presentation/widgets/app_drawer.dart` (MOVER desde core/presentation/widgets/)
-- `lib/features/app/presentation/widgets/carousel_appbar_sliver.dart` (MOVER desde core/presentation/widgets/)
+## Archivos a modificar: (Part 2)
+
+- `lib/features/app/presentation/screens/main_screen.dart` (MOVER desde
+  core/app/)
+- `lib/features/app/presentation/widgets/app_drawer.dart` (MOVER desde
+  core/presentation/widgets/)
+- `lib/features/app/presentation/widgets/carousel_appbar_sliver.dart` (MOVER
+  desde core/presentation/widgets/)
 - `lib/core/app/app.dart` (actualizar import de MainScreen)
 - Todos los archivos que importen estos 3 archivos
 
-**Paso 1 — Crear estructura:**
+## Paso 1 — Crear estructura
 
-```
+```dart
 lib/features/app/
 ├── presentation/
 │   ├── screens/
@@ -317,7 +330,7 @@ lib/features/app/
 │       └── carousel_appbar_sliver.dart
 ```
 
-**Paso 2 — Mover archivos con git mv:**
+## Paso 2 — Mover archivos con git mv
 
 ```bash
 git mv lib/core/app/main_screen.dart lib/features/app/presentation/screens/main_screen.dart
@@ -325,10 +338,11 @@ git mv lib/core/presentation/widgets/app_drawer.dart lib/features/app/presentati
 git mv lib/core/presentation/widgets/carousel_appbar_sliver.dart lib/features/app/presentation/widgets/carousel_appbar_sliver.dart
 ```
 
-**Paso 3 — Actualizar imports en todos los archivos afectados:**
+## Paso 3 — Actualizar imports en todos los archivos afectados
 
 Busca y reemplaza:
-```
+
+```dart
 # main_screen.dart
 package:noveles/core/app/main_screen.dart → package:noveles/features/app/presentation/screens/main_screen.dart
 
@@ -340,24 +354,30 @@ package:noveles/core/presentation/widgets/carousel_appbar_sliver.dart → packag
 ```
 
 Archivos que importan `main_screen.dart`:
+
 - `lib/core/app/app.dart`
 
 Archivos que importan `app_drawer.dart`:
-- `lib/features/app/presentation/screens/main_screen.dart` (se auto-importa dentro de features/app/)
+
+- `lib/features/app/presentation/screens/main_screen.dart` (se auto-importa
+  dentro de features/app/)
 - `lib/features/admin/presentation/screens/admin_main_screen.dart`
 - `lib/features/scan/presentation/screens/scan_main_screen.dart`
 
 Archivos que importan `carousel_appbar_sliver.dart`:
-- `lib/features/app/presentation/screens/main_screen.dart` (se auto-importa dentro de features/app/)
 
-**Paso 4 — Eliminar directorios vacíos:**
+- `lib/features/app/presentation/screens/main_screen.dart` (se auto-importa
+  dentro de features/app/)
+
+## Paso 4 — Eliminar directorios vacíos
 
 ```bash
 # Si core/presentation/widgets/ queda vacío, eliminarlo
 # Si core/presentation/ queda vacío (excepto bloc/theme_bloc/), mantenerlo por theme_bloc
 ```
 
-**Verificación A2:**
+## Verificación A2
+
 ```bash
 dart analyze lib/
 flutter test test/widgets/admin_main_screen_test.dart
@@ -368,38 +388,43 @@ flutter test test/widgets/scan_main_screen_test.dart
 
 ### A3. BookWithRelations acopla 4 features (B1)
 
-**Problema:** `book_with_relations.dart` vive en `books/domain/` pero importa `genres/domain/`, `labels/domain/`, `tooks/domain/`.
+**Problema:** `book_with_relations.dart` vive en `books/domain/` pero importa
+`genres/domain/`, `labels/domain/`, `tooks/domain/`.
 
 **Solución:** Crear `lib/shared/domain/entities/` para entidades cross-feature.
 
-**Archivos a modificar:**
-- `lib/shared/domain/entities/book_with_relations.dart` (CREAR — mover desde books)
+## Archivos a modificar: (Part 3)
+
+- `lib/shared/domain/entities/book_with_relations.dart` (CREAR — mover desde
+  books)
 - `lib/shared/domain/entities/` (CREAR directorio)
 - Todos los archivos que importen `book_with_relations.dart`
 - `lib/features/books/domain/` (eliminar book_with_relations.dart)
 - `lib/features/books/data/book_repository_impl.dart` (actualizar import)
 - `lib/features/books/data/book_model.dart` (actualizar import si existe)
 
-**Paso 1 — Crear directorio compartido:**
+## Paso 1 — Crear directorio compartido
 
 ```bash
 mkdir -p lib/shared/domain/entities
 ```
 
-**Paso 2 — Mover BookWithRelations:**
+## Paso 2 — Mover BookWithRelations
 
 ```bash
 git mv lib/features/books/domain/book_with_relations.dart lib/shared/domain/entities/book_with_relations.dart
 ```
 
-**Paso 3 — Actualizar todos los imports:**
+## Paso 3 — Actualizar todos los imports
 
 Busca y reemplaza globalmente:
-```
+
+```bash
 package:noveles/features/books/domain/book_with_relations.dart → package:noveles/shared/domain/entities/book_with_relations.dart
 ```
 
 Archivos afectados (mínimo):
+
 - `lib/features/books/data/book_repository_impl.dart`
 - `lib/features/books/data/book_model.dart`
 - `lib/features/admin/presentation/bloc/admin_bloc.dart`
@@ -410,14 +435,15 @@ Archivos afectados (mínimo):
 - `lib/features/genres/presentation/screens/genre_screen.dart`
 - `lib/features/core/app/presentation/screens/main_screen.dart`
 
-**Paso 4 — Crear barrel:**
+## Paso 4 — Crear barrel
 
 ```dart
 // lib/shared/domain/entities/entities.dart
 export 'book_with_relations.dart';
 ```
 
-**Verificación A3:**
+## Verificación A3
+
 ```bash
 dart analyze lib/
 flutter test
@@ -427,11 +453,14 @@ flutter test
 
 ### A4. TookEntity embede ChapterEntity (T1)
 
-**Problema:** `TookEntity` tiene `List<ChapterEntity> listChapter` — dependencia cross-feature en domain.
+**Problema:** `TookEntity` tiene `List<ChapterEntity> listChapter` — dependencia
+cross-feature en domain.
 
-**Solución:** Cambiar a `List<int> listChapterIds` en domain, hidratar en data/model.
+**Solución:** Cambiar a `List<int> listChapterIds` en domain, hidratar en
+data/model.
 
-**Archivos a modificar:**
+## Archivos a modificar: (Part 4)
+
 - `lib/features/tooks/domain/took_entity.dart`
 - `lib/features/tooks/data/took_model.dart`
 - `lib/features/tooks/data/took_repository_impl.dart`
@@ -439,7 +468,7 @@ flutter test
 - `lib/features/scan/presentation/screens/scan_took_edit_screen.dart`
 - Cualquier archivo que acceda a `took.listChapter`
 
-**Paso 1 — Modificar TookEntity:**
+## Paso 1 — Modificar TookEntity
 
 ```dart
 // ANTES:
@@ -461,7 +490,7 @@ class TookEntity extends Equatable {
 
 Actualizar `copyWith` y `props` en consecuencia.
 
-**Paso 2 — Modificar TookModel:**
+## Paso 2 — Modificar TookModel
 
 ```dart
 // TookModelfromJson ya parsea chapters de Supabase.
@@ -484,15 +513,19 @@ class TookModel extends TookEntity {
 }
 ```
 
-**Paso 3 — Actualizar scan_took_edit_screen.dart:**
+## Paso 3 — Actualizar scan_took_edit_screen.dart
 
-La screen actualmente muestra `_chapters` como `List<ChapterEntity>`. Necesita obtener los capítulos completos de alguna manera. Opciones:
+La screen actualmente muestra `_chapters` como `List<ChapterEntity>`. Necesita
+obtener los capítulos completos de alguna manera. Opciones:
 
-- Opción A: El BLoC carga los chapters por ID (agregar evento `LoadTookChapters`)
+- Opción A: El BLoC carga los chapters por ID (agregar evento
+  `LoadTookChapters`)
 - Opción B: El screen recibe los chapters como parámetro aparte
-- Opción C: `TookModel` mantiene `chapters` como campo data-only accesible desde la screen
+- Opción C: `TookModel` mantiene `chapters` como campo data-only accesible desde
+  la screen
 
-**Recomendación: Opción C** — `TookModel` tiene `chapters` como campo extra que la screen puede castear:
+**Recomendación: Opción C** — `TookModel` tiene `chapters` como campo extra que
+la screen puede castear:
 
 ```dart
 // En scan_took_edit_screen.dart
@@ -502,11 +535,12 @@ _chapters = tookModel?.chapters.toList() ?? [];
 
 O mejor: pasar los chapters como parámetro separado al screen.
 
-**Paso 4 — Actualizar consumers:**
+## Paso 4 — Actualizar consumers
 
 Busca todos los usos de `took.listChapter` y reemplaza según contexto.
 
-**Verificación A4:**
+## Verificación A4
+
 ```bash
 dart analyze lib/features/tooks/
 dart analyze lib/features/scan/
@@ -519,15 +553,17 @@ flutter test
 
 ### B1. dart:io en profile_event.dart (P1)
 
-**Problema:** `PickAvatar` lleva `File file` — dependencia de plataforma en BLoC event.
+**Problema:** `PickAvatar` lleva `File file` — dependencia de plataforma en BLoC
+event.
 
-**Archivos a modificar:**
+## Archivos a modificar: (Part 5)
+
 - `lib/features/profiles/presentation/bloc/profile_event.dart`
 - `lib/features/profiles/presentation/bloc/profile_state.dart`
 - `lib/features/profiles/presentation/bloc/profile_bloc.dart`
 - `lib/features/profiles/presentation/screens/profile_screen.dart`
 
-**Paso 1 — Cambiar evento:**
+## Paso 1 — Cambiar evento
 
 ```dart
 // ANTES:
@@ -551,11 +587,12 @@ class PickAvatar extends ProfileEvent {
 
 Eliminar `import 'dart:io';` de `profile_event.dart`.
 
-**Paso 2 — Actualizar profile_state.dart:**
+## Paso 2 — Actualizar profile_state.dart
 
-Si `profile_state.dart` también importa `dart:io` para el estado, cambiar el estado a usar `String` en vez de `File`.
+Si `profile_state.dart` también importa `dart:io` para el estado, cambiar el
+estado a usar `String` en vez de `File`.
 
-**Paso 3 — Actualizar profile_bloc.dart:**
+## Paso 3 — Actualizar profile_bloc.dart
 
 ```dart
 // En _onPickAvatar:
@@ -565,7 +602,7 @@ Future<void> _onPickAvatar(events.PickAvatar event, Emitter<ProfileState> emit) 
 }
 ```
 
-**Paso 4 — Actualizar profile_screen.dart:**
+## Paso 4 — Actualizar profile_screen.dart
 
 ```dart
 // ANTES:
@@ -575,7 +612,8 @@ context.read<ProfileBloc>().add(PickAvatar(File(xFile.path)));
 context.read<ProfileBloc>().add(PickAvatar(xFile.path));
 ```
 
-**Verificación B1:**
+## Verificación B1
+
 ```bash
 dart analyze lib/features/profiles/
 flutter test test/bloc/profile_*
@@ -585,28 +623,33 @@ flutter test test/bloc/profile_*
 
 ### B2. TextStats en books/domain/ (CH1)
 
-**Problema:** `text_stats.dart` es una utilidad pura que vive en `books/domain/` pero es usada por `chapters/presentation/`.
+**Problema:** `text_stats.dart` es una utilidad pura que vive en `books/domain/`
+pero es usada por `chapters/presentation/`.
 
-**Archivos a modificar:**
+## Archivos a modificar: (Part 6)
+
 - `lib/core/utils/text_stats.dart` (CREAR — mover desde books)
-- `lib/features/chapters/presentation/screens/chapter_screen.dart` (actualizar import)
+- `lib/features/chapters/presentation/screens/chapter_screen.dart` (actualizar
+  import)
 - `lib/features/books/domain/` (eliminar text_stats.dart)
 - Barrel de books/domain (actualizar)
 
-**Paso 1 — Mover:**
+## Paso 1 — Mover
 
 ```bash
 git mv lib/features/books/domain/text_stats.dart lib/core/utils/text_stats.dart
 ```
 
-**Paso 2 — Actualizar imports:**
+## Paso 2 — Actualizar imports
 
 Busca y reemplaza:
-```
+
+```bash
 package:noveles/features/books/domain/text_stats.dart → package:noveles/core/utils/text_stats.dart
 ```
 
-**Verificación B2:**
+## Verificación B2
+
 ```bash
 dart analyze lib/
 flutter test
@@ -616,24 +659,26 @@ flutter test
 
 ### B3. Label BLoC importa books/domain (L1)
 
-**Problema:** `label_bloc.dart` importa `books/domain/get_book_labels.dart`.
+**Problema:**`label_bloc.dart` importa
+`books/domain/get_book_labels.dart`.**Solución:** Crear
+`get_labels_for_book.dart` en labels domain que haga lo
+mismo.
 
-**Solución:** Crear `get_labels_for_book.dart` en labels domain que haga lo mismo.
+## Archivos a modificar: (Part 7)
 
-**Archivos a modificar:**
 - `lib/features/labels/domain/get_labels_for_book.dart` (CREAR)
 - `lib/features/labels/presentation/bloc/label_bloc.dart` (actualizar import)
 - `lib/core/di/injection_labels.dart` (registrar nuevo use case)
 - `lib/features/labels/domain/labels.dart` (actualizar barrel)
 
-**Paso 1 — Leer `get_book_labels.dart` para entender qué hace:**
+## Paso 1 — Leer `get_book_labels.dart` para entender qué hace
 
 ```bash
 # Leer el archivo original
 cat lib/features/books/domain/get_book_labels.dart
 ```
 
-**Paso 2 — Crear `get_labels_for_book.dart` en labels:**
+## Paso 2 — Crear `get_labels_for_book.dart` en labels
 
 ```dart
 // lib/features/labels/domain/get_labels_for_book.dart
@@ -651,9 +696,11 @@ class GetLabelsForBook {
 }
 ```
 
-**Nota:** Esto requiere que `LabelRepository` tenga un método `getLabelsForBooks`. Si no lo tiene, hay que agregarlo a la interfaz y a la implementación.
+**Nota:** Esto requiere que `LabelRepository` tenga un método
+`getLabelsForBooks`. Si no lo tiene, hay que agregarlo a la interfaz y a la
+implementación.
 
-**Paso 3 — Actualizar LabelBloc:**
+## Paso 3 — Actualizar LabelBloc
 
 ```dart
 // ANTES:
@@ -665,7 +712,7 @@ import 'package:noveles/features/labels/domain/get_labels_for_book.dart';
 
 Cambiar el nombre de la dependencia: `getBookLabels` → `getLabelsForBook`.
 
-**Paso 4 — Actualizar DI:**
+## Paso 4 — Actualizar DI
 
 ```dart
 getIt.registerLazySingleton(
@@ -673,7 +720,8 @@ getIt.registerLazySingleton(
 );
 ```
 
-**Verificación B3:**
+## Verificación B3
+
 ```bash
 dart analyze lib/features/labels/
 flutter test test/bloc/label_*
@@ -683,13 +731,18 @@ flutter test test/bloc/label_*
 
 ### B4. GenreScreen importa books/domain (G1)
 
-**Problema:** `genre_screen.dart` importa `book_with_relations.dart`. Pero después del paso A3, esto ya será `shared/domain/entities/book_with_relations.dart`.
+**Problema:** `genre_screen.dart` importa `book_with_relations.dart`. Pero
+después del paso A3, esto ya será
+`shared/domain/entities/book_with_relations.dart`.
 
-**Verificar:** Después de A3, `genre_screen.dart` importará de `shared/` en vez de `books/`. Esto es **aceptable** — shared/ es un módulo compartido permitido.
+**Verificar:** Después de A3, `genre_screen.dart` importará de `shared/` en vez
+de `books/`. Esto es **aceptable**— shared/ es un módulo compartido
+permitido.**Acción:** Solo verificar que A3 resolvió esto. Si
+`genre_screen.dart` todavía
+importa de `books/`, actualizar a `shared/`.
 
-**Acción:** Solo verificar que A3 resolvió esto. Si `genre_screen.dart` todavía importa de `books/`, actualizar a `shared/`.
+## Verificación B4
 
-**Verificación B4:**
 ```bash
 dart analyze lib/features/genres/presentation/screens/genre_screen.dart
 ```
@@ -698,11 +751,13 @@ dart analyze lib/features/genres/presentation/screens/genre_screen.dart
 
 ### B5. ChapterScreen importa books/domain (CH1)
 
-**Problema:** `chapter_screen.dart` importa `text_stats.dart` de books. Se resuelve con B2.
+**Problema:** `chapter_screen.dart` importa `text_stats.dart` de books. Se
+resuelve con B2.
 
 **Acción:** Verificar que B2 resolvió esto.
 
-**Verificación B5:**
+## Verificación B5
+
 ```bash
 dart analyze lib/features/chapters/presentation/screens/chapter_screen.dart
 ```
@@ -711,15 +766,16 @@ dart analyze lib/features/chapters/presentation/screens/chapter_screen.dart
 
 ### B6. Admin books_tab importa labels/presentation (ADM2)
 
-**Problema:** `books_tab.dart` importa `LabelManagementScreen` directamente.
+**Problema:**`books_tab.dart` importa `LabelManagementScreen`
+directamente.**Solución:** Usar navegación por ruta nombrada en vez de import
+directo.
 
-**Solución:** Usar navegación por ruta nombrada en vez de import directo.
+## Archivos a modificar: (Part 8)
 
-**Archivos a modificar:**
 - `lib/features/admin/presentation/screens/books_tab.dart`
 - `lib/core/app/app.dart` (definir ruta si no existe)
 
-**Paso 1 — Verificar si hay rutas definidas en app.dart:**
+## Paso 1 — Verificar si hay rutas definidas en app.dart
 
 ```dart
 // Si app.dart usa MaterialApp en vez de MaterialApp.router,
@@ -730,7 +786,7 @@ routes: {
 },
 ```
 
-**Paso 2 — Actualizar books_tab.dart:**
+## Paso 2 — Actualizar books_tab.dart
 
 ```dart
 // ANTES:
@@ -742,7 +798,8 @@ Navigator.push(context, MaterialPageRoute(builder: (_) => const LabelManagementS
 Navigator.pushNamed(context, '/admin/labels');
 ```
 
-**Verificación B6:**
+## Verificación B6
+
 ```bash
 dart analyze lib/features/admin/
 flutter test test/widgets/admin_*
@@ -752,17 +809,20 @@ flutter test test/widgets/admin_*
 
 ### B7. Scan screens usan getIt en vez de context.read (S4, S5)
 
-**Problema:** `scan_took_edit_screen.dart` y `scan_chapter_edit_screen.dart` crean BLoCs con `getIt<>()` en vez de `context.read<>()`.
+**Problema:** `scan_took_edit_screen.dart` y `scan_chapter_edit_screen.dart`
+crean BLoCs con `getIt<>()` en vez de `context.read<>()`.
 
 **Solución:** Envolver las screens con `BlocProvider` en la navegación.
 
-**Archivos a modificar:**
+## Archivos a modificar: (Part 9)
+
 - `lib/features/scan/presentation/screens/scan_took_edit_screen.dart`
 - `lib/features/scan/presentation/screens/scan_chapter_edit_screen.dart`
-- `lib/features/scan/presentation/screens/scan_book_edit_screen.dart` (quien navega a estas)
+- `lib/features/scan/presentation/screens/scan_book_edit_screen.dart` (quien
+  navega a estas)
 - Cualquier archivo que navegue a estas screens
 
-**Paso 1 — Envolver scan_took_edit_screen con BlocProvider:**
+## Paso 1 — Envolver scan_took_edit_screen con BlocProvider
 
 En el archivo que navega a `ScanTookEditScreen`:
 
@@ -781,7 +841,7 @@ Navigator.push(context, MaterialPageRoute(
 ));
 ```
 
-**Paso 2 — Dentro de scan_took_edit_screen.dart:**
+## Paso 2 — Dentro de scan_took_edit_screen.dart
 
 ```dart
 // ANTES:
@@ -793,9 +853,11 @@ final bloc = context.read<ScanTookBloc>();
 
 Repetir para `ScanChapterEditScreen` y `ScanChapterBloc`.
 
-**Paso 3 — Eliminar imports de `getIt` de las screens** (si ya no se usan para otra cosa).
+**Paso 3 — Eliminar imports de `getIt` de las screens** (si ya no se usan para
+otra cosa).
 
-**Verificación B7:**
+## Verificación B7
+
 ```bash
 dart analyze lib/features/scan/
 flutter test test/widgets/scan_*
@@ -809,7 +871,7 @@ flutter test test/widgets/scan_*
 
 **Problema:** `auth/domain/` tiene archivos sueltos sin subdirectorios.
 
-**Archivos a reorganizar:**
+## Archivos a reorganizar
 
 ```
 # ANTES:
@@ -838,7 +900,7 @@ lib/features/auth/domain/
 └── auth.dart (barrel)
 ```
 
-**Paso 1 — Crear subdirectorios:**
+## Paso 1 — Crear subdirectorios
 
 ```bash
 mkdir -p lib/features/auth/domain/entities
@@ -846,7 +908,7 @@ mkdir -p lib/features/auth/domain/repositories
 mkdir -p lib/features/auth/domain/use_cases
 ```
 
-**Paso 2 — Mover archivos:**
+## Paso 2 — Mover archivos
 
 ```bash
 git mv lib/features/auth/domain/auth_event.dart lib/features/auth/domain/entities/auth_event.dart
@@ -858,7 +920,7 @@ git mv lib/features/auth/domain/logout.dart lib/features/auth/domain/use_cases/l
 git mv lib/features/auth/domain/register.dart lib/features/auth/domain/use_cases/register.dart
 ```
 
-**Paso 3 — Actualizar barrel `auth.dart`:**
+## Paso 3 — Actualizar barrel `auth.dart`
 
 ```dart
 export 'entities/auth_event.dart';
@@ -870,11 +932,13 @@ export 'use_cases/logout.dart';
 export 'use_cases/register.dart';
 ```
 
-**Paso 4 — Actualizar imports en consumers:**
+## Paso 4 — Actualizar imports en consumers
 
-Busca todos los imports de `auth/domain/` y actualiza si usan paths directos en vez del barrel.
+Busca todos los imports de `auth/domain/` y actualiza si usan paths directos en
+vez del barrel.
 
-**Verificación C1:**
+## Verificación C1
+
 ```bash
 dart analyze lib/features/auth/
 flutter test test/bloc/auth_*
@@ -887,11 +951,12 @@ flutter test test/repositories/auth_*
 
 **Problema:** Events, States y BLoC en un solo archivo.
 
-**Archivos a crear:**
+## Archivos a crear
+
 - `lib/features/scan/presentation/bloc/scan_took_event.dart`
 - `lib/features/scan/presentation/bloc/scan_took_state.dart`
 
-**Paso 1 — Extraer events:**
+## Paso 1 — Extraer events
 
 ```dart
 // scan_took_event.dart
@@ -927,7 +992,7 @@ class UploadTookCover extends ScanTookEvent {
 }
 ```
 
-**Paso 2 — Extraer states:**
+## Paso 2 — Extraer states
 
 ```dart
 // scan_took_state.dart
@@ -964,7 +1029,7 @@ class ScanTookCoverUploaded extends ScanTookState {
 }
 ```
 
-**Paso 3 — Actualizar scan_took_bloc.dart:**
+## Paso 3 — Actualizar scan_took_bloc.dart
 
 ```dart
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -973,7 +1038,8 @@ import 'package:noveles/features/scan/presentation/bloc/scan_took_state.dart';
 // ... (eliminar definiciones de events/states del archivo)
 ```
 
-**Verificación C2:**
+## Verificación C2
+
 ```bash
 dart analyze lib/features/scan/
 flutter test test/bloc/scan_*
@@ -985,11 +1051,13 @@ flutter test test/bloc/scan_*
 
 Mismo patrón que C2 pero para `scan_chapter_bloc.dart`.
 
-**Archivos a crear:**
+## Archivos a crear: (Part 2)
+
 - `lib/features/scan/presentation/bloc/scan_chapter_event.dart`
 - `lib/features/scan/presentation/bloc/scan_chapter_state.dart`
 
-**Verificación C3:**
+## Verificación C3
+
 ```bash
 dart analyze lib/features/scan/
 ```
@@ -998,20 +1066,31 @@ dart analyze lib/features/scan/
 
 ### C4. Eliminar duplicación export+import en BLoCs (CH2, L2, S3)
 
-**Problema:** Varios BLoCs tienen `export` + `import` del mismo archivo — redundante.
+**Problema:** Varios BLoCs tienen `export` + `import` del mismo archivo —
+redundante.
 
-**Archivos afectados:**
-- `lib/features/chapters/presentation/bloc/chapter_bloc.dart` (líneas 3-4 export, 8-9 import)
-- `lib/features/labels/presentation/bloc/label_bloc.dart` (líneas 3-4 export, 13-14 import)
-- `lib/features/scan/presentation/bloc/scan_bloc.dart` (líneas 3-4 export, 14-15 import)
+## Archivos afectados
 
-**Fix:** Eliminar las líneas de `export` (mantener solo `import`), ya que los BLoCs internamente necesitan los types. Los exports son para consumers externos — si consumers usan paths directos, los exports son innecesarios.
+- `lib/features/chapters/presentation/bloc/chapter_bloc.dart` (líneas 3-4
+  export, 8-9 import)
+- `lib/features/labels/presentation/bloc/label_bloc.dart` (líneas 3-4 export,
+  13-14 import)
+- `lib/features/scan/presentation/bloc/scan_bloc.dart` (líneas 3-4 export, 14-15
+  import)
 
-**Alternativa:** Eliminar los `import` duplicados y mantener solo los `export`. Los exports sirven para que consumidores hagan `import 'bloc.dart'` y obtengan events/states automáticamente.
+**Fix:** Eliminar las líneas de `export` (mantener solo `import`), ya que los
+BLoCs internamente necesitan los types. Los exports son para consumers externos
+— si consumers usan paths directos, los exports son innecesarios.
 
-**Decisión:** Mantener SOLO `export` (que son los que dan la API pública). Los consumers que usan paths directos ya están actualizados.
+**Alternativa:** Eliminar los `import` duplicados y mantener solo los `export`.
+Los exports sirven para que consumidores hagan `import 'bloc.dart'` y obtengan
+events/states automáticamente.
 
-**Verificación C4:**
+**Decisión:** Mantener SOLO `export` (que son los que dan la API pública). Los
+consumers que usan paths directos ya están actualizados.
+
+## Verificación C4
+
 ```bash
 dart analyze lib/
 flutter test
@@ -1023,10 +1102,11 @@ flutter test
 
 **Problema:** Falta un use case para obtener tooks por bookId.
 
-**Archivos a crear:**
+## Archivos a crear: (Part 3)
+
 - `lib/features/tooks/domain/get_tooks_by_book.dart`
 
-**Paso 1 — Verificar que el repositorio tiene el método:**
+## Paso 1 — Verificar que el repositorio tiene el método
 
 ```dart
 // lib/features/tooks/domain/took_repository.dart
@@ -1041,7 +1121,7 @@ abstract class TookRepository {
 }
 ```
 
-**Paso 2 — Implementar en TookRepositoryImpl:**
+## Paso 2 — Implementar en TookRepositoryImpl
 
 ```dart
 @override
@@ -1058,7 +1138,7 @@ Future<Result<List<TookEntity>>> getTooksByBook(int bookId) async {
 }
 ```
 
-**Paso 3 — Crear use case:**
+## Paso 3 — Crear use case
 
 ```dart
 // lib/features/tooks/domain/get_tooks_by_book.dart
@@ -1076,7 +1156,7 @@ class GetTooksByBook {
 }
 ```
 
-**Paso 4 — Registrar en DI:**
+## Paso 4 — Registrar en DI
 
 ```dart
 // lib/core/di/injection_tooks.dart
@@ -1085,14 +1165,15 @@ getIt.registerLazySingleton(
 );
 ```
 
-**Paso 5 — Actualizar barrel:**
+## Paso 5 — Actualizar barrel
 
 ```dart
 // lib/features/tooks/domain/tooks.dart
 export 'get_tooks_by_book.dart';
 ```
 
-**Verificación C5:**
+## Verificación C5
+
 ```bash
 dart analyze lib/features/tooks/
 flutter test test/bloc/took_*
@@ -1127,7 +1208,8 @@ grep -r "fromJson\|toJson" lib/features/*/domain/entities/
 grep -r "import.*repository" lib/features/*/presentation/bloc/
 ```
 
-**Esperado:**
+## Esperado
+
 - `dart analyze`: 0 errores
 - `flutter test`: 217+ pass, mismos 2 pre-existing failures
 - Grep 1-6: 0 resultados (o solo barrel exports permitidos)
@@ -1137,7 +1219,7 @@ grep -r "import.*repository" lib/features/*/presentation/bloc/
 ## Mapa de Commits
 
 | # | Fase | Commit Message |
-|---|------|----------------|
+| --- | ------ | ---------------- |
 | 1 | A1 | `refactor(scan): move upload logic from screens to BLoC layer` |
 | 2 | A2 | `refactor(app): move main_screen, app_drawer, carousel to features/app/` |
 | 3 | A3 | `refactor(shared): move BookWithRelations to shared/domain/entities/` |
@@ -1160,7 +1242,8 @@ grep -r "import.*repository" lib/features/*/presentation/bloc/
 A1 → A2 → A3 → A4 → B1 → B2 → B3 → B4/B5 (verify) → B6 → B7 → C1 → C2-C3 → C4 → C5
 ```
 
-**Dependencias:**
+## Dependencias
+
 - A3 debe ejecutarse ANTES de B4/B5 (verify after A3)
 - B2 debe ejecutarse ANTES de B5 (verify after B2)
 - C2-C3 debe ejecutarse DESPUÉS de A1 (ya que A1 agrega eventos nuevos)

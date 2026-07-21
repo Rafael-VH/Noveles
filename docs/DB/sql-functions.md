@@ -170,7 +170,9 @@ $$;
 
 ## Function Security Notes
 
-- All functions use `SECURITY DEFINER` — they run with the function owner's privileges, not the caller's
-- This is necessary because RLS policies would otherwise block the queries inside the functions
+- All functions use `SECURITY DEFINER` — they run with the function owner's
+  privileges, not the caller's
+- This is necessary because RLS policies would otherwise block the queries
+  inside the functions
 - `STABLE` functions are optimized for caching within a transaction
 - Analytics functions are read-only (SELECT only) — safe for any role to call

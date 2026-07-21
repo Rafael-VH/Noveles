@@ -2,7 +2,8 @@
 
 > Total: 63 policies across 11 tables.
 > All policies use PERMISSIVE mode.
-> Helper functions: `is_admin()`, `is_scan()`, `is_user()`, `is_admin_or_scan()`.
+> Helper functions: `is_admin()`, `is_scan()`, `is_user()`,
+  `is_admin_or_scan()`.
 
 ## Role Helper Functions
 
@@ -19,7 +20,7 @@ is_admin_or_scan() -- returns true if admin OR scan
 ## profiles (6 policies)
 
 | Operation | Policy Name | Role | Condition |
-|-----------|-------------|------|-----------|
+| ----------- | ------------- | ------ | ----------- |
 | SELECT | Admin can read all profiles | public | `is_admin()` |
 | SELECT | Scan can read all profiles | public | `is_scan()` |
 | SELECT | Users can read own profile | public | `auth.uid() = id` |
@@ -27,14 +28,15 @@ is_admin_or_scan() -- returns true if admin OR scan
 | UPDATE | Admin can update profiles | public | `is_admin()` |
 | UPDATE | Users can update own profile | public | `auth.uid() = id` |
 
-**Notes**: Scan can read all profiles (needed for author display). Users cannot delete profiles.
+**Notes**: Scan can read all profiles (needed for author display). Users cannot
+delete profiles.
 
 ---
 
 ## books (8 policies)
 
 | Operation | Policy Name | Role | Condition |
-|-----------|-------------|------|-----------|
+| ----------- | ------------- | ------ | ----------- |
 | SELECT | Admin can read all books | public | `is_admin()` |
 | SELECT | Scan can read all books | public | `is_scan() AND created_by = auth.uid()` |
 | SELECT | Users can read visible books | public | `is_visible = true AND NOT is_scan()` |
@@ -52,7 +54,7 @@ is_admin_or_scan() -- returns true if admin OR scan
 ## authors (7 policies)
 
 | Operation | Policy Name | Role | Condition |
-|-----------|-------------|------|-----------|
+| ----------- | ------------- | ------ | ----------- |
 | SELECT | Enable read for all users | public | `true` |
 | INSERT | Enable insert for admin only | public | `is_admin()` |
 | INSERT | Enable insert for scan only | public | `is_scan()` |
@@ -68,7 +70,7 @@ is_admin_or_scan() -- returns true if admin OR scan
 ## genres (7 policies)
 
 | Operation | Policy Name | Role | Condition |
-|-----------|-------------|------|-----------|
+| ----------- | ------------- | ------ | ----------- |
 | SELECT | Enable read for all users | public | `true` |
 | INSERT | Enable insert for admin only | public | `is_admin()` |
 | INSERT | Enable insert for scan only | public | `is_scan()` |
@@ -84,7 +86,7 @@ is_admin_or_scan() -- returns true if admin OR scan
 ## labels (4 policies)
 
 | Operation | Policy Name | Role | Condition |
-|-----------|-------------|------|-----------|
+| ----------- | ------------- | ------ | ----------- |
 | SELECT | Enable read for all users | public | `true` |
 | INSERT | Enable insert for scan and admin | public | `is_scan() OR is_admin()` |
 | UPDATE | Enable update for scan and admin | public | `is_scan() OR is_admin()` |
@@ -97,7 +99,7 @@ is_admin_or_scan() -- returns true if admin OR scan
 ## books_genres (7 policies)
 
 | Operation | Policy Name | Role | Condition |
-| --------- | ------------|------|-----------|
+| --------- | ------------ | ------ | ----------- |
 | SELECT | Enable read for all users | public | `true` |
 | INSERT | Enable insert for admin only | public | `is_admin()` |
 | INSERT | Enable insert for scan only | public | `is_scan()` |
@@ -156,12 +158,13 @@ is_admin_or_scan() -- returns true if admin OR scan
 
 ## book_views (2 policies)
 
-| Operation | Policy Name                 | Role          | Condition    |
+| Operation | Policy Name | Role | Condition |
 | --------- | --------------------------- | ------------- | ------------ |
-| SELECT    | Admin can read book views   | authenticated | `is_admin()` |
-| INSERT    | Users can insert book views | authenticated | `true`       |
+| SELECT | Admin can read book views | authenticated | `is_admin()` |
+| INSERT | Users can insert book views | authenticated | `true` |
 
-**Notes**: Any authenticated user can track views. Only admin can read analytics.
+**Notes**: Any authenticated user can track views. Only admin can read
+analytics.
 
 ---
 
@@ -195,7 +198,8 @@ is_admin_or_scan() -- returns true if admin OR scan
 | UPDATE | Chapters: authenticated update own folder | Same as INSERT |
 | DELETE | Chapters: authenticated delete own folder | Same as INSERT |
 
-**Notes**: Storage is restricted to `{user_id}/` prefix. Public read access enabled on both buckets.
+**Notes**: Storage is restricted to `{user_id}/` prefix. Public read access
+enabled on both buckets.
 
 ---
 

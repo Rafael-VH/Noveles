@@ -1,6 +1,7 @@
 # Clean Architecture Audit — Noveles
 
-> Auditoría completa del 18/07/2026 sobre la estructura de arquitectura limpia del proyecto.
+> Auditoría completa del 18/07/2026 sobre la estructura de arquitectura limpia
+  del proyecto.
 
 ---
 
@@ -30,7 +31,7 @@ core/    → NO depende de features/
 ### Reglas No Negociables
 
 | # | Regla | Descripción |
-|---|-------|-------------|
+| --- | ------- | ------------- |
 | 1 | **Domain Puro** | Sin imports de flutter/, supabase/, data/, presentation/ |
 | 2 | **Use Cases ≠ Implementaciones** | Use cases dependen de interfaces abstractas, nunca de repositorios concretos |
 | 3 | **Presentation NO salta capas** | BLoCs usan use_cases, nunca repositories |
@@ -43,13 +44,14 @@ core/    → NO depende de features/
 ## Resumen Global
 
 | Severidad | Cantidad | Descripción |
-|-----------|----------|-------------|
+| ----------- | ---------- | ------------- |
 | 🔴 **Crítico** | **4** | Inversión de dependencias core→features, screens bypassing BLoC |
 | 🟠 **Alto** | **10** | Acoplamiento cross-feature en domain, dart:io en eventos |
 | 🟡 **Menor** | **10** | Estructura inconsistente, imports duplicados, archivos monolíticos |
 | **Total** | **24** | |
 
 ### Features Completamente Compliant: 0/9
+
 ### Features con Violaciones: 9/9
 
 ---
@@ -58,13 +60,17 @@ core/    → NO depende de features/
 
 ### 🔴 1. Screens bypassing BLoC para llamar use_cases directamente
 
-**Archivos afectados:**
+## Archivos afectados
+
 - `lib/features/scan/presentation/screens/scan_took_edit_screen.dart:114`
 - `lib/features/scan/presentation/screens/scan_chapter_edit_screen.dart:86`
 
-**Problema:** Las pantallas crean use_cases vía `getIt<UploadCover>()` y los ejecutan directamente, saltándose toda la capa BLoC. Esto rompe el patrón de presentación.
+**Problema:** Las pantallas crean use_cases vía `getIt<UploadCover>()` y los
+ejecutan directamente, saltándose toda la capa BLoC. Esto rompe el patrón de
+presentación.
 
-**Ejemplo del problema:**
+## Ejemplo del problema
+
 ```dart
 // ❌ MAL — Screen llama use_case directamente
 final uploadCover = getIt<UploadCover>();
@@ -74,20 +80,28 @@ final result = await uploadCover(UploadCoverParams(...));
 context.read<ScanTookBloc>().add(UploadCoverRequested(file: file));
 ```
 
-**Fix:** Agregar eventos `UploadCoverRequested` y `UploadChapterContentRequested` al BLoC, mover la lógica de upload ahí, y que la screen solo emita el evento.
+**Fix:** Agregar eventos `UploadCoverRequested` y
+`UploadChapterContentRequested` al BLoC, mover la lógica de upload ahí, y que la
+screen solo emita el evento.
 
 ---
 
 ### 🔴 2. Core depende de features (dependencia invertida)
 
-**Archivos afectados:**
-- `lib/core/app/main_screen.dart` — importa books/domain, genres/domain, books/presentation, genres/presentation
-- `lib/core/presentation/widgets/carousel_appbar_sliver.dart` — importa books/domain
-- `lib/core/presentation/widgets/app_drawer.dart` — importa auth/presentation, admin/presentation, profiles/presentation
+## Archivos afectados: (Part 2)
 
-**Problema:** `core/` es la capa más interna y NO debería conocer `features/`. La flecha de dependencia está invertida.
+- `lib/core/app/main_screen.dart` — importa books/domain, genres/domain,
+  books/presentation, genres/presentation
+- `lib/core/presentation/widgets/carousel_appbar_sliver.dart` — importa
+  books/domain
+- `lib/core/presentation/widgets/app_drawer.dart` — importa auth/presentation,
+  admin/presentation, profiles/presentation
 
-**Fix:** Mover estos archivos a un módulo `features/app/` o crear interfaces de navegación en core que features implemente.
+**Problema:** `core/` es la capa más interna y NO debería conocer `features/`.
+La flecha de dependencia está invertida.
+
+**Fix:** Mover estos archivos a un módulo `features/app/` o crear interfaces de
+navegación en core que features implemente.
 
 ---
 
@@ -95,34 +109,40 @@ context.read<ScanTookBloc>().add(UploadCoverRequested(file: file));
 
 **Archivo:** `lib/features/books/domain/book_with_relations.dart`
 
-**Dependencias que importa:**
+## Dependencias que importa
+
 - `genres/domain/genre_entity.dart`
 - `labels/domain/label_entity.dart`
 - `tooks/domain/took_entity.dart`
 
-**Problema:** Una sola entidad crea una telaraña de dependencias entre 4 features. Al menos 5 archivos en 4 features distintas dependen de esta entidad.
+**Problema:** Una sola entidad crea una telaraña de dependencias entre 4
+features. Al menos 5 archivos en 4 features distintas dependen de esta entidad.
 
-**Fix:** Crear un módulo compartido `lib/shared/domain/entities/` o hacer que `BookWithRelations` use solo IDs en domain y se hidrate en data.
+**Fix:** Crear un módulo compartido `lib/shared/domain/entities/` o hacer que
+`BookWithRelations` use solo IDs en domain y se hidrate en data.
 
 ---
 
 ### 🔴 4. TookEntity embede ChapterEntity
 
-**Archivo:** `lib/features/tooks/domain/took_entity.dart`
+**Archivo:**`lib/features/tooks/domain/took_entity.dart`**Problema:**
+`TookEntity` tiene `List<ChapterEntity>` como campo, creando una
+dependencia cross-feature en domain.
 
-**Problema:** `TookEntity` tiene `List<ChapterEntity>` como campo, creando una dependencia cross-feature en domain.
-
-**Fix:** Cambiar a `List<int> listChapterIds` (IDs puros) y hidratar en data layer.
+**Fix:** Cambiar a `List<int> listChapterIds` (IDs puros) y hidratar en data
+layer.
 
 ---
 
 ### 🟠 5. dart:io en BLoC Event
 
-**Archivo:** `lib/features/profiles/presentation/bloc/profile_event.dart:1`
+**Archivo:**`lib/features/profiles/presentation/bloc/profile_event.dart:1`**Prob
+lema:** El evento `PickAvatar` lleva un objeto `File` de `dart:io`,
+creando una dependencia de plataforma en lo que debería ser un transportador de
+datos puro.
 
-**Problema:** El evento `PickAvatar` lleva un objeto `File` de `dart:io`, creando una dependencia de plataforma en lo que debería ser un transportador de datos puro.
-
-**Fix:** Cambiar `File file` por `String filePath` y crear el objeto `File` en la screen.
+**Fix:** Cambiar `File file` por `String filePath` y crear el objeto `File` en
+la screen.
 
 ---
 
@@ -131,16 +151,18 @@ context.read<ScanTookBloc>().add(UploadCoverRequested(file: file));
 ### CORE
 
 #### ✅ Correcto
+
 - `errors/failure.dart` y `errors/result.dart` son Dart puro
 - `cover/cover_url_service.dart` es infraestructura pura
 - `constants/`, `utils/` son puros
 - `presentation/bloc/theme_bloc/` es autocontenido
-- DI files (`injection.dart` + todos `injection_*.dart`) son la capa de wiring correctamente
+- DI files (`injection.dart` + todos `injection_*.dart`) son la capa de wiring
+  correctamente
 
 #### ❌ Violaciones
 
 | # | Archivo | Violación | Severidad |
-|---|---------|-----------|----------|
+| --- | --------- | ----------- | ---------- |
 | C1 | `app/main_screen.dart` | Core importa features/domain Y features/presentation | 🔴 Crítico |
 | C2 | `widgets/carousel_appbar_sliver.dart` | Core widget importa features/books/domain | 🔴 Crítico |
 | C3 | `widgets/app_drawer.dart` | Core widget importa features/auth,admin,profiles/presentation | 🔴 Crítico |
@@ -149,33 +171,35 @@ context.read<ScanTookBloc>().add(UploadCoverRequested(file: file));
 
 ### AUTH
 
-#### ✅ Correcto
+#### ✅ Correcto (Part 2)
+
 - Entidades puras con equatable
 - 5 use cases dependen solo de `core/errors` + `auth_repository.dart`
 - `AuthRepositoryImpl` depende de domain + Supabase
 - BLoC usa use_cases exclusivamente
 - Screens importan solo de `auth/presentation/` + `auth/domain/`
 
-#### ❌ Violaciones
+#### ❌ Violaciones (Part 2)
 
 | # | Archivo | Violación | Severidad |
-|---|---------|-----------|----------|
+| --- | --------- | ----------- | ---------- |
 | A1 | Domain folder structure | Estructura plana (sin subdirectorios entities/, use_cases/, repositories/) | 🟡 Menor |
 
 ---
 
 ### BOOKS
 
-#### ✅ Correcto
+#### ✅ Correcto (Part 3)
+
 - `BookEntity` es entidad escalar pura — sin imports de otras features
 - 9 use cases dependen solo de `core/errors` + `book_repository.dart`
 - `BookModel` y `BookRepositoryImpl` en data/
 - `BookBloc` recibe use cases por constructor, nunca llama repository
 
-#### ❌ Violaciones
+#### ❌ Violaciones (Part 3)
 
 | # | Archivo | Violación | Severidad |
-|---|---------|-----------|----------|
+| --- | --------- | ----------- | ---------- |
 | B1 | `domain/book_with_relations.dart` | Domain importa 3 features externas (genres, labels, tooks) | 🟠 Alto |
 | B2 | `domain/get_book_labels.dart` | Nombre engañoso — es un use case de books que accede labels data | 🟡 Menor |
 
@@ -183,15 +207,16 @@ context.read<ScanTookBloc>().add(UploadCoverRequested(file: file));
 
 ### CHAPTERS
 
-#### ✅ Correcto
+#### ✅ Correcto (Part 4)
+
 - `ChapterEntity` pura — sin imports externos
 - 7 use cases dependen solo de `core/errors` + `chapter_repository.dart`
 - `ChapterBloc` usa solo `GetChapterContent` use case
 
-#### ❌ Violaciones
+#### ❌ Violaciones (Part 4)
 
 | # | Archivo | Violación | Severidad |
-|---|---------|-----------|----------|
+| --- | --------- | ----------- | ---------- |
 | CH1 | `presentation/chapter_screen.dart` | Presentation importa `books/domain/text_stats.dart` | 🟠 Alto |
 | CH2 | `presentation/bloc/chapter_bloc.dart` | Duplicación export+import de event/state | 🟡 Code smell |
 
@@ -199,30 +224,32 @@ context.read<ScanTookBloc>().add(UploadCoverRequested(file: file));
 
 ### GENRES
 
-#### ✅ Correcto
+#### ✅ Correcto (Part 5)
+
 - `GenreEntity` pura — sin imports de features externas
 - 5 use cases dependen solo de `core/errors` + `genre_repository.dart`
 - `GenreBloc` usa use_cases
 
-#### ❌ Violaciones
+#### ❌ Violaciones (Part 5)
 
 | # | Archivo | Violación | Severidad |
-|---|---------|-----------|----------|
+| --- | --------- | ----------- | ---------- |
 | G1 | `presentation/screens/genre_screen.dart` | Importa `books/domain/book_with_relations.dart` | 🟠 Alto |
 
 ---
 
 ### LABELS
 
-#### ✅ Correcto
+#### ✅ Correcto (Part 6)
+
 - `LabelEntity` pura
 - 6 use cases dependen solo de domain
 - `LabelModel` y `LabelRepositoryImpl` en data/
 
-#### ❌ Violaciones
+#### ❌ Violaciones (Part 6)
 
 | # | Archivo | Violación | Severidad |
-|---|---------|-----------|----------|
+| --- | --------- | ----------- | ---------- |
 | L1 | `presentation/bloc/label_bloc.dart` | BLoC importa `books/domain/get_book_labels.dart` | 🟠 Alto |
 | L2 | `presentation/bloc/label_bloc.dart` | Duplicación export+import | 🟡 Code smell |
 
@@ -230,29 +257,31 @@ context.read<ScanTookBloc>().add(UploadCoverRequested(file: file));
 
 ### PROFILES
 
-#### ✅ Correcto
+#### ✅ Correcto (Part 7)
+
 - `UserEntity` pura
 - 5 use cases dependen solo de domain + `core/errors`
 - `ProfileBloc` usa use_cases
 
-#### ❌ Violaciones
+#### ❌ Violaciones (Part 7)
 
 | # | Archivo | Violación | Severidad |
-|---|---------|-----------|----------|
+| --- | --------- | ----------- | ---------- |
 | P1 | `presentation/bloc/profile_event.dart` | Evento importa `dart:io` (objeto File) | 🟠 Alto |
 
 ---
 
 ### TOOKS
 
-#### ✅ Correcto
+#### ✅ Correcto (Part 8)
+
 - 5 use cases dependen solo de domain + `core/errors`
 - `TookModel` y `TookRepositoryImpl` en data/
 
-#### ❌ Violaciones
+#### ❌ Violaciones (Part 8)
 
 | # | Archivo | Violación | Severidad |
-|---|---------|-----------|----------|
+| --- | --------- | ----------- | ---------- |
 | T1 | `domain/took_entity.dart` | Domain importa `chapters/domain/chapter_entity.dart` | 🟠 Alto |
 | T2 | `domain/tooks.dart` | Falta use case `get_tooks_by_book` | 🟡 Menor |
 
@@ -260,15 +289,16 @@ context.read<ScanTookBloc>().add(UploadCoverRequested(file: file));
 
 ### SCAN
 
-#### ✅ Correcto
+#### ✅ Correcto (Part 9)
+
 - ScanBloc usa use_cases de books (no repositories) — patrón correcto
 - Events y States son puros
 - 3 BLoCs siguen el patrón correcto
 
-#### ❌ Violaciones
+#### ❌ Violaciones (Part 9)
 
 | # | Archivo | Violación | Severidad |
-|---|---------|-----------|----------|
+| --- | --------- | ----------- | ---------- |
 | S1 | `bloc/scan_took_bloc.dart` | Events+States+BLoC en un solo archivo | 🟡 Code smell |
 | S2 | `bloc/scan_chapter_bloc.dart` | Mismo problema — archivo monolítico | 🟡 Code smell |
 | S3 | `bloc/scan_bloc.dart` | Duplicación export+import | 🟡 Code smell |
@@ -282,16 +312,17 @@ context.read<ScanTookBloc>().add(UploadCoverRequested(file: file));
 
 ### ADMIN
 
-#### ✅ Correcto
+#### ✅ Correcto (Part 10)
+
 - `AdminBloc` usa use_cases de books — nunca toca repositories
 - `AdminUsersBloc` usa use_cases de profiles
 - Screens son presentación limpia
 - Aliasing inteligente para evitar colisión de eventos
 
-#### ❌ Violaciones
+#### ❌ Violaciones (Part 10)
 
 | # | Archivo | Violación | Severidad |
-|---|---------|-----------|----------|
+| --- | --------- | ----------- | ---------- |
 | ADM1 | Feature structure | Sin capa domain/ o data/ propia | 🟡 Design note |
 | ADM2 | `screens/books_tab.dart` | Importa `labels/presentation/screens/label_management_screen.dart` | 🟠 Alto |
 | ADM3 | `admin_state.dart` | Importa `books/domain/book_with_relations.dart` | 🟡 Acceptable |
@@ -301,7 +332,7 @@ context.read<ScanTookBloc>().add(UploadCoverRequested(file: file));
 ## Lo que el Proyecto Hace Bien
 
 | # | Aspecto | Detalle |
-|---|---------|---------|
+| --- | --------- | --------- |
 | 1 | **BLoC → Use Case** | Ningún BLoC importa repositories directamente. Siempre pasa por use_cases. |
 | 2 | **Result Pattern** | `Result<T>`, `Ok<T>`, `Err<T>` usado consistentemente en todos los use cases. |
 | 3 | **Entities Inmutables** | Todas las entidades usan `copyWith` y `equatable`. |
@@ -317,7 +348,7 @@ context.read<ScanTookBloc>().add(UploadCoverRequested(file: file));
 ### Fase A — Críticas (debería hacerse primero)
 
 | # | Tarea | Archivos | Esfuerzo |
-|---|-------|----------|----------|
+| --- | ------- | ---------- | ---------- |
 | A1 | Mover upload logic de scan screens al BLoC | `scan_took_edit_screen.dart`, `scan_chapter_edit_screen.dart`, `scan_took_bloc.dart`, `scan_chapter_bloc.dart` | Alto |
 | A2 | Mover `main_screen` de `core/app/` a `features/app/` o crear interfaz de navegación | `main_screen.dart`, `app_drawer.dart`, `carousel_appbar_sliver.dart` | Alto |
 | A3 | Resolver acoplamiento `BookWithRelations` → crear módulo compartido o usar IDs | `book_with_relations.dart`, 5+ consumidores | Alto |
@@ -326,7 +357,7 @@ context.read<ScanTookBloc>().add(UploadCoverRequested(file: file));
 ### Fase B — Altas
 
 | # | Tarea | Archivos | Esfuerzo |
-|---|-------|----------|----------|
+| --- | ------- | ---------- | ---------- |
 | B1 | Quitar `dart:io` de `profile_event.dart` | `profile_event.dart`, `profile_screen.dart` | Bajo |
 | B2 | Mover `text_stats.dart` a `core/utils/` | `text_stats.dart` + 2 consumidores | Bajo |
 | B3 | Quitar acoplamiento `label_bloc.dart` → `books/domain/` | `label_bloc.dart`, crear `get_labels_for_book.dart` en labels | Medio |
@@ -338,7 +369,7 @@ context.read<ScanTookBloc>().add(UploadCoverRequested(file: file));
 ### Fase C — Menores
 
 | # | Tarea | Archivos | Esfuerzo |
-|---|-------|----------|----------|
+| --- | ------- | ---------- | ---------- |
 | C1 | Estructurar auth/domain/ con subdirectorios | `auth/domain/` (reorganizar) | Bajo |
 | C2 | Separar scan_took_bloc.dart en event/state/bloc files | `scan_took_bloc.dart` | Bajo |
 | C3 | Separar scan_chapter_bloc.dart en event/state/bloc files | `scan_chapter_bloc.dart` | Bajo |
@@ -351,7 +382,7 @@ context.read<ScanTookBloc>().add(UploadCoverRequested(file: file));
 
 ### Estado Actual (con violaciones)
 
-```
+```dart
 core/app/main_screen ──────→ features/books/domain
                           ──→ features/genres/domain
                           ──→ features/books/presentation
@@ -382,7 +413,7 @@ features/scan/screens ──────────→ use_cases directamente (
 
 ### Estado Objetivo
 
-```
+```bash
 core/                    ← NO depende de features/
 features/app/            ← main_screen, app_drawer, carousel (si necesitan features)
 

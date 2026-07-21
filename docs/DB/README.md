@@ -6,7 +6,7 @@
 ## Overview
 
 | Metric | Value |
-|--------|-------|
+| -------- | ------- |
 | Tables | 11 (all with RLS enabled) |
 | SQL Functions | 9 (all SECURITY DEFINER) |
 | Storage Buckets | 3 |
@@ -22,7 +22,7 @@
 ## Role Model
 
 | Role | Access Level |
-|------|-------------|
+| ------ | ------------- |
 | `admin` | Full access — CRUD on all tables, read analytics |
 | `scan` | Content creator — CRUD on own content (`created_by = auth.uid()`) |
 | `user` | Reader — read visible books, manage own favorites |
@@ -31,7 +31,7 @@
 ## Migration History
 
 | Version | Name | Date | Purpose |
-|---------|------|------|---------|
+| --------- | ------ | ------ | --------- |
 | 20260514220000 | initial_schema | May 14 | Core tables (books, authors, genres) |
 | 20260515000000 | authors_and_constraints | May 15 | Author constraints |
 | 20260515161849 | profiles_and_auth | May 15 | Auth + profiles |

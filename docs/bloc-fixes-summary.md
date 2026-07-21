@@ -1,7 +1,8 @@
 # BLoC & State Management Fixes — Resumen de Cambios
 
 > **Fecha:** 19 de julio de 2026
-> **Objetivo:** Corregir 17 problemas de bugs, malas prácticas y cobertura de tests en la capa de BLoC.
+> **Objetivo:** Corregir 17 problemas de bugs, malas prácticas y cobertura de
+  tests en la capa de BLoC.
 > **Resultado:** 17 issues cerrados, 21 tests nuevos, 111/111 tests pasando.
 
 ---
@@ -22,10 +23,12 @@
 
 ## Resumen Ejecutivo
 
-Se identificaron **17 problemas** en 7 BLoC files, 9 event files y 9 state files. Los issues abarcaban desde bugs críticos de pérdida de datos y race conditions, hasta deuda técnica y cobertura de tests incompleta.
+Se identificaron **17 problemas** en 7 BLoC files, 9 event files y 9 state
+files. Los issues abarcaban desde bugs críticos de pérdida de datos y race
+conditions, hasta deuda técnica y cobertura de tests incompleta.
 
 | Categoría | Issues | Estado |
-|-----------|--------|--------|
+| ----------- | -------- | -------- |
 | 🔴 Crítico (C1, C2) | 2 | ✅ Resueltos |
 | 🟠 Alto (H1–H4) | 4 | ✅ Resueltos (H3 documentado, no refactorizado) |
 | 🟡 Medio (M1–M6) | 6 | ✅ Resueltos |
@@ -37,7 +40,7 @@ Se identificaron **17 problemas** en 7 BLoC files, 9 event files y 9 state files
 ## Mapa de Commits
 
 | # | Hash | Mensaje | Archivos |
-|---|------|---------|----------|
+| --- | ------ | --------- | ---------- |
 | 1 | `6310f83` | `refactor(test): update event names in GenreBloc tests for clarity` | 1 |
 | 2 | `5f2c5d3` | `fix(bloc): improve UX and data consistency in Batch 1` | 5 |
 | 3 | `3a57e7b` | `fix: add ChapterRef entity for lightweight events + TODO for ScanBloc decomposition` | 6 |
@@ -51,24 +54,42 @@ Se identificaron **17 problemas** en 7 BLoC files, 9 event files y 9 state files
 ## Archivos Modificados (lib/)
 
 ### `lib/features/genres/presentation/bloc/genre_bloc.dart`
-**Problema (M1):** Los handlers de mutación (`_onCreateGenre`, `_onUpdateGenre`, `_onDeleteGenre`) emitían `GenreLoading()` antes de la operación, causando un flash de spinner en la UI y perdiendo los géneros cargados.
 
-**Fix:** Se eliminó `emit(GenreLoading())` de los 3 handlers de mutación. El `previousState` (capturado con `final previousState = state`) ya preserva los géneros antes de la operación. El loading solo se emite en `_onLoadGenres` (carga inicial).
+**Problema (M1):** Los handlers de mutación (`_onCreateGenre`, `_onUpdateGenre`,
+`_onDeleteGenre`) emitían `GenreLoading()` antes de la operación, causando un
+flash de spinner en la UI y perdiendo los géneros cargados.
 
-**Impacto:** La UI ya no muestra spinner durante creación/actualización/eliminación de géneros. Los datos existentes permanecen visibles.
+**Fix:** Se eliminó `emit(GenreLoading())` de los 3 handlers de mutación. El
+`previousState` (capturado con `final previousState = state`) ya preserva los
+géneros antes de la operación. El loading solo se emite en `_onLoadGenres`
+(carga inicial).
+
+**Impacto:** La UI ya no muestra spinner durante
+creación/actualización/eliminación de géneros. Los datos existentes permanecen
+visibles.
 
 ---
 
 ### `lib/features/labels/presentation/bloc/label_bloc.dart`
-**Problema (H1 + H2):**
-- `_emitLoaded()` pasaba `getLabelsForBooks([])` (lista vacía) después de cada mutación, recargando TODAS las asociaciones book-label innecesariamente.
-- Los errores en mutaciones reemplazaban `LabelLoaded` con `LabelError`, borrando todos los datos visibles.
 
-**Fix (H1):** Se reemplazó `_emitLoaded` por `_emitLabelsOnly`, que preserva `bookLabels` del estado anterior en lugar de hacer un fetch completo. Para Assign/Remove, se implementó mutación local: se actualiza `bookLabels` in-place sin hacer fetch.
+## Problema (H1 + H2)
 
-**Fix (H2):** Los errores de mutación ahora preservan el estado `LabelLoaded` cuando existe, mostrando el error en el campo `message` en lugar de reemplazar con `LabelError`.
+- `_emitLoaded()` pasaba `getLabelsForBooks([])` (lista vacía) después de cada
+  mutación, recargando TODAS las asociaciones book-label innecesariamente.
+- Los errores en mutaciones reemplazaban `LabelLoaded` con `LabelError`,
+  borrando todos los datos visibles.
 
-**Código nuevo clave (Assign local):**
+**Fix (H1):** Se reemplazó `_emitLoaded` por `_emitLabelsOnly`, que preserva
+`bookLabels` del estado anterior en lugar de hacer un fetch completo. Para
+Assign/Remove, se implementó mutación local: se actualiza `bookLabels` in-place
+sin hacer fetch.
+
+**Fix (H2):** Los errores de mutación ahora preservan el estado `LabelLoaded`
+cuando existe, mostrando el error en el campo `message` en lugar de reemplazar
+con `LabelError`.
+
+## Código nuevo clave (Assign local)
+
 ```dart
 case Ok():
   if (previousState is LabelLoaded) {
@@ -86,9 +107,14 @@ case Ok():
 ---
 
 ### `lib/features/scan/presentation/bloc/scan_bloc.dart`
-**Problema (M2):** `ScanCoverUploaded` solo portaba `filename`, perdiendo el contexto de libros. Cuando el UI hacía upload de cover, la pantalla podía quedar en blanco si necesitaba la lista de libros.
 
-**Fix:** Se modificó `_onUploadCover` para preservar la lista de libros del estado actual (`ScanLoaded` o `ScanGenresLoaded`) y pasarla al estado `ScanCoverUploaded`:
+**Problema (M2):** `ScanCoverUploaded` solo portaba `filename`, perdiendo el
+contexto de libros. Cuando el UI hacía upload de cover, la pantalla podía quedar
+en blanco si necesitaba la lista de libros.
+
+**Fix:** Se modificó `_onUploadCover` para preservar la lista de libros del
+estado actual (`ScanLoaded` o `ScanGenresLoaded`) y pasarla al estado
+`ScanCoverUploaded`:
 
 ```dart
 final books = switch (currentState) {
@@ -102,9 +128,10 @@ emit(ScanCoverUploaded(value, books: books));
 ---
 
 ### `lib/features/scan/presentation/bloc/scan_state.dart`
-**Problema (M2):** `ScanCoverUploaded` solo tenía `filename`.
 
-**Fix:** Se agregó el campo `books` con valor por defecto `const []` para compatibilidad hacia atrás:
+**Problema (M2):**`ScanCoverUploaded` solo tenía `filename`.**Fix:** Se agregó
+el campo `books` con valor por defecto `const []` para
+compatibilidad hacia atrás:
 
 ```dart
 class ScanCoverUploaded extends ScanState {
@@ -117,21 +144,30 @@ class ScanCoverUploaded extends ScanState {
 ---
 
 ### `lib/features/chapters/presentation/bloc/chapter_event.dart`
-**Problema (H4):** `LoadChapterContent` recibía `List<ChapterEntity>` (7 campos, incluyendo contenido completo innecesario).
 
-**Fix:** Se cambió el tipo a `List<ChapterRef>` — solo 5 campos ligeros (`id`, `content`, `number`, `title`, `tookId`).
+**Problema (H4):** `LoadChapterContent` recibía `List<ChapterEntity>` (7 campos,
+incluyendo contenido completo innecesario).
+
+**Fix:** Se cambió el tipo a `List<ChapterRef>` — solo 5 campos ligeros (`id`,
+`content`, `number`, `title`, `tookId`).
 
 ---
 
 ### `lib/features/chapters/presentation/bloc/chapter_bloc.dart`
-**Fix (H4):** El handler `_onLoadContent` ahora resuelve paths usando `ch.content` de `ChapterRef` en lugar de `ChapterEntity`. El resto de la lógica se mantiene igual.
 
-**Fix (L3):** Se eliminó el import redundante de `chapter_event.dart` y `chapter_state.dart` (ya exportados al inicio del archivo).
+**Fix (H4):** El handler `_onLoadContent` ahora resuelve paths usando
+`ch.content` de `ChapterRef` en lugar de `ChapterEntity`. El resto de la lógica
+se mantiene igual.
+
+**Fix (L3):** Se eliminó el import redundante de `chapter_event.dart` y
+`chapter_state.dart` (ya exportados al inicio del archivo).
 
 ---
 
 ### `lib/features/chapters/presentation/screens/chapter_screen.dart`
-**Fix (H4):** Los 2 call sites de `LoadChapterContent` ahora mapean `ChapterEntity` → `ChapterRef` antes de despachar:
+
+**Fix (H4):** Los 2 call sites de `LoadChapterContent` ahora mapean
+`ChapterEntity` → `ChapterRef` antes de despachar:
 
 ```dart
 chapters: widget.chapters.map(ChapterRef.fromEntity).toList(),
@@ -142,10 +178,12 @@ chapters: widget.chapters.map(ChapterRef.fromEntity).toList(),
 ## Archivo Nuevo (lib/)
 
 ### `lib/features/chapters/domain/chapter_ref.dart` (34 líneas)
-Value object ligero para eventos de `ChapterBloc`. Equatable, con `factory ChapterRef.fromEntity()` para conversión desde `ChapterEntity`.
+
+Value object ligero para eventos de `ChapterBloc`. Equatable, con `factory
+ChapterRef.fromEntity()` para conversión desde `ChapterEntity`.
 
 | Campo | Tipo | Descripción |
-|-------|------|-------------|
+| ------- | ------ | ------------- |
 | `id` | `int` | ID del capítulo |
 | `content` | `String` | Ruta/token para cargar contenido |
 | `number` | `String` | Número del capítulo |
@@ -157,55 +195,82 @@ Value object ligero para eventos de `ChapterBloc`. Equatable, con `factory Chapt
 ## Archivos de Tests Modificados
 
 ### `test/bloc/genre_bloc_test.dart`
-- Se actualizaron nombres de eventos (`CreateGenreEvent` → `CreateGenre`, etc.) para consistencia.
+
+- Se actualizaron nombres de eventos (`CreateGenreEvent` → `CreateGenre`, etc.)
+  para consistencia.
 - Se eliminaron asserts de `GenreLoading()` durante mutaciones (ya no se emite).
-- **+2 tests P0:** Verifican que `CreateGenre` desde `GenreLoaded` preserva los géneros existentes (C1 regression).
+- **+2 tests P0:** Verifican que `CreateGenre` desde `GenreLoaded` preserva los
+  géneros existentes (C1 regression).
 
 ### `test/bloc/label_bloc_test.dart` (173 líneas nuevas)
-- **Archivo completamente nuevo.**
-- **+7 tests P0:**
-  - `AssignLabel` desde `LabelLoaded` preserva bookLabels existentes y agrega la nueva etiqueta (H1)
-  - `RemoveLabel` desde `LabelLoaded` preserva bookLabels y remueve la etiqueta (H1)
-  - `CreateLabel` error desde `LabelLoaded` mantiene estado cargado con mensaje de error (H2)
-  - `DeleteLabel` error desde `LabelLoaded` mantiene estado cargado con mensaje de error (H2)
+
+- **Archivo completamente nuevo.**-**+7 tests P0:**
+  - `AssignLabel` desde `LabelLoaded` preserva bookLabels existentes y agrega la
+    nueva etiqueta (H1)
+  - `RemoveLabel` desde `LabelLoaded` preserva bookLabels y remueve la etiqueta
+    (H1)
+  - `CreateLabel` error desde `LabelLoaded` mantiene estado cargado con mensaje
+    de error (H2)
+  - `DeleteLabel` error desde `LabelLoaded` mantiene estado cargado con mensaje
+    de error (H2)
   - `AssignLabel` error desde `LabelLoaded` mantiene estado cargado (H2)
   - `RemoveLabel` error desde `LabelLoaded` mantiene estado cargado (H2)
   - Test de carga inicial (regression coverage)
 
 ### `test/bloc/scan_chapter_bloc_test.dart` (+33 líneas)
-- **+2 tests P0:** `UploadChapterFile` success y failure — cobertura de cero a completo para evento previamente no testeado.
+
+- **+2 tests P0:** `UploadChapterFile` success y failure — cobertura de cero a
+  completo para evento previamente no testeado.
 
 ### `test/bloc/scan_took_bloc_test.dart` (+33 líneas)
-- **+2 tests P0:** `UploadTookCover` success y failure — cobertura de cero a completo para evento previamente no testeado.
+
+- **+2 tests P0:** `UploadTookCover` success y failure — cobertura de cero a
+  completo para evento previamente no testeado.
 
 ### `test/bloc/auth_bloc_test.dart` (+66 líneas)
-- **+1 test P0:** Verifica que un segundo `LogoutRequested` durante logout activo es no-op (C2 race condition guard).
-- **+1 test P1:** Verifica que el stream `signedOut` dispara automáticamente `LogoutRequested` cuando no hay logout manual en progreso.
+
+- **+1 test P0:** Verifica que un segundo `LogoutRequested` durante logout
+  activo es no-op (C2 race condition guard).
+- **+1 test P1:** Verifica que el stream `signedOut` dispara automáticamente
+  `LogoutRequested` cuando no hay logout manual en progreso.
 
 ### `test/bloc/scan_bloc_test.dart` (+57 líneas)
+
 - **+2 tests P1:**
-  - `ScanCoverUploaded` porta libros del estado `ScanLoaded` previo (M2 books forwarding)
-  - `SaveScanBook` caeallback a `previousBooks` cuando `getBooks()` falla después de save exitoso (refresh fallback)
+  - `ScanCoverUploaded` porta libros del estado `ScanLoaded` previo (M2 books
+    forwarding)
+  - `SaveScanBook` caeallback a `previousBooks` cuando `getBooks()` falla
+    después de save exitoso (refresh fallback)
 
 ### `test/bloc/admin_bloc_test.dart` (+74 líneas)
+
 - **+2 tests P1:**
-  - `ToggleBookVisibility` actualiza el libro in-place en `AdminLoaded` sin refetch (getBooks llamado solo 1 vez para carga inicial)
-  - `DeleteAdminBook` elimina el libro in-place en `AdminLoaded` sin refetch (getBooks llamado solo 1 vez)
-  - Ambos tests usan `verify()` para confirmar que getBooks NO se llama nuevamente después de la mutación.
+  - `ToggleBookVisibility` actualiza el libro in-place en `AdminLoaded` sin
+    refetch (getBooks llamado solo 1 vez para carga inicial)
+  - `DeleteAdminBook` elimina el libro in-place en `AdminLoaded` sin refetch
+    (getBooks llamado solo 1 vez)
+  - Ambos tests usan `verify()` para confirmar que getBooks NO se llama
+    nuevamente después de la mutación.
 
 ### `test/bloc/book_bloc_test.dart` (+17 líneas)
-- **+1 test P1:** `LoadBookById` con error del use case emite `[BookLoading, BookError]` con el mensaje de error.
+
+- **+1 test P1:** `LoadBookById` con error del use case emite `[BookLoading,
+  BookError]` con el mensaje de error.
 
 ### `test/bloc/chapter_bloc_test.dart` (+25 líneas)
+
 - Se actualizaron imports para usar `ChapterRef` en lugar de `ChapterEntity`.
-- **+1 test P1:** Fallo parcial — cuando 1 capítulo falla entre varios, se emite `ChapterError` con el mensaje del fallo (no se entrega carga parcial).
+- **+1 test P1:** Fallo parcial — cuando 1 capítulo falla entre varios, se emite
+  `ChapterError` con el mensaje del fallo (no se entrega carga parcial).
 
 ---
 
 ## Archivos Eliminados
 
 ### `test/widget_test.dart`
-Placeholder smoke test (`expect 1+1, 2`). Eliminado como limpieza de Phase 3 (P2).
+
+Placeholder smoke test (`expect 1+1, 2`). Eliminado como limpieza de Phase 3
+(P2).
 
 ---
 
@@ -214,14 +279,14 @@ Placeholder smoke test (`expect 1+1, 2`). Eliminado como limpieza de Phase 3 (P2
 ### Phase 0 — Crítico
 
 | ID | Problema | Archivo | Fix |
-|----|----------|---------|-----|
+| ---- | ---------- | --------- | ----- |
 | C1 | GenreBloc emite `GenreLoading` durante mutaciones → géneros perdidos | `genre_bloc.dart` | Capturar `state` antes del emit; eliminar `GenreLoading` de mutadores |
 | C2 | AuthBloc race condition — stream `signedOut` dispara logout duplicado | `auth_bloc.dart` | Guard early-return con `_manualLogoutInProgress` |
 
 ### Phase 1 — Alto
 
 | ID | Problema | Archivo | Fix |
-|----|----------|---------|-----|
+| ---- | ---------- | --------- | ----- |
 | H1 | LabelBloc `_emitLoaded` pasa lista vacía a `getLabelsForBooks` | `label_bloc.dart` | `_emitLabelsOnly` preserva bookLabels; mutación local para Assign/Remove |
 | H2 | LabelBloc errores en mutaciones borran `LabelLoaded` | `label_bloc.dart` | Preservar `LabelLoaded` en errores, mostrar error en `message` |
 | H3 | ScanBloc God Class (7 use cases, 6 events) | `scan_bloc.dart` | TODO comment documentando deuda técnica (no refactorizar ahora) |
@@ -230,7 +295,7 @@ Placeholder smoke test (`expect 1+1, 2`). Eliminado como limpieza de Phase 3 (P2
 ### Phase 2 — Medio
 
 | ID | Problema | Archivo | Fix |
-|----|----------|---------|-----|
+| ---- | ---------- | --------- | ----- |
 | M1 | GenreBloc y LabelBloc emiten Loading durante mutaciones → spinner flash | `genre_bloc.dart` | Eliminar `GenreLoading` de mutadores |
 | M2 | ScanCoverUploaded pierde contexto de libros | `scan_state.dart`, `scan_bloc.dart` | Agregar campo `books` a `ScanCoverUploaded` |
 | M3 | GenreBloc y ScanChapterEvent sin const constructors | varios | Agregados en commit previo (`4bb4c47`) |
@@ -241,7 +306,7 @@ Placeholder smoke test (`expect 1+1, 2`). Eliminado como limpieza de Phase 3 (P2
 ### Phase 3 — Bajo
 
 | ID | Problema | Archivo | Fix |
-|----|----------|---------|-----|
+| ---- | ---------- | --------- | ----- |
 | L1 | ThemeBloc hardcodea dark mode | — | Resuelto en commit previo (`4bb4c47`) |
 | L2 | ThemeBloc no incluye themeData en Equatable props | — | Resuelto en commit previo (`4bb4c47`) |
 | L3 | Imports redundantes en BLoCs | varios `*_bloc.dart` | Eliminados exports/imports duplicados |
@@ -255,7 +320,7 @@ Placeholder smoke test (`expect 1+1, 2`). Eliminado como limpieza de Phase 3 (P2
 ### P0 — Verifican fixes críticos (14 tests)
 
 | Archivo | Tests | Qué verifican |
-|---------|-------|---------------|
+| --------- | ------- | --------------- |
 | `label_bloc_test.dart` | +7 | H1: bookLabels preservado en Assign/Remove; H2: errores mantienen LabelLoaded |
 | `genre_bloc_test.dart` | +2 | C1: CreateGenre desde GenreLoaded preserva géneros |
 | `scan_chapter_bloc_test.dart` | +2 | Cobertura UploadChapterFile success/failure |
@@ -265,7 +330,7 @@ Placeholder smoke test (`expect 1+1, 2`). Eliminado como limpieza de Phase 3 (P2
 ### P1 — Verifican fixes medios (7 tests)
 
 | Archivo | Tests | Qué verifican |
-|---------|-------|---------------|
+| --------- | ------- | --------------- |
 | `scan_bloc_test.dart` | +2 | M2: ScanCoverUploaded porta libros; refresh fallback preserva datos |
 | `admin_bloc_test.dart` | +2 | In-place toggle/delete sin refetch (verify getBooks called(1)) |
 | `auth_bloc_test.dart` | +1 | Stream signedOut dispara logout automático |
@@ -277,35 +342,53 @@ Placeholder smoke test (`expect 1+1, 2`). Eliminado como limpieza de Phase 3 (P2
 ## Decisiones de Diseño
 
 ### 1. Mutaciones locales vs. fetch completo (LabelBloc)
-**Decisión:** Para `AssignLabel`/`RemoveLabel`, se muta `bookLabels` in-place en lugar de hacer `getLabelsForBooks()`.
 
-**Razón:** Un fetch completo después de cada assign/remove es innecesario y lento. La mutación local es O(1) y mantiene la UI responsive. Solo se hace fetch completo en carga inicial (`_emitLabelsOnly`).
+**Decisión:** Para `AssignLabel`/`RemoveLabel`, se muta `bookLabels` in-place en
+lugar de hacer `getLabelsForBooks()`.
+
+**Razón:** Un fetch completo después de cada assign/remove es innecesario y
+lento. La mutación local es O(1) y mantiene la UI responsive. Solo se hace fetch
+completo en carga inicial (`_emitLabelsOnly`).
 
 ### 2. ChapterRef vs. ChapterEntity en eventos
-**Decisión:** Crear un value object ligero (`ChapterRef`) con solo 5 campos en lugar de pasar la entity completa.
 
-**Razón:** `ChapterEntity` tiene 7 campos incluyendo `content` (texto completo del capítulo), `createdAt`, y campos innecesarios para el evento. `ChapterRef` reduce el payload del event bus y hace los eventos más fáciles de comparar.
+**Decisión:** Crear un value object ligero (`ChapterRef`) con solo 5 campos en
+lugar de pasar la entity completa.
+
+**Razón:** `ChapterEntity` tiene 7 campos incluyendo `content` (texto completo
+del capítulo), `createdAt`, y campos innecesarios para el evento. `ChapterRef`
+reduce el payload del event bus y hace los eventos más fáciles de comparar.
 
 ### 3. No refactorizar ScanBloc (H3)
-**Decisión:** Documentar la deuda técnica con TODO comment en lugar de dividir en 3 BLoCs.
 
-**Razón:** El ScanBloc tiene 187 líneas con handlers bien separados. Dividirlo requeriría cambios en providers, screens y injection — alto riesgo para un fix de UX. Se documenta para futuro.
+**Decisión:** Documentar la deuda técnica con TODO comment en lugar de dividir
+en 3 BLoCs.
+
+**Razón:** El ScanBloc tiene 187 líneas con handlers bien separados. Dividirlo
+requeriría cambios en providers, screens y injection — alto riesgo para un fix
+de UX. Se documenta para futuro.
 
 ### 4. Preservar LabelLoaded en errores (H2)
-**Decisión:** En errores de mutación, si el estado actual es `LabelLoaded`, se emite `LabelLoaded` con el error en `message` en lugar de `LabelError`.
 
-**Razón:** El usuario no debería perder la vista de etiquetas por un error de red momentáneo. El error se muestra como feedback sin destruir el estado.
+**Decisión:** En errores de mutación, si el estado actual es `LabelLoaded`, se
+emite `LabelLoaded` con el error en `message` en lugar de `LabelError`.
+
+**Razón:** El usuario no debería perder la vista de etiquetas por un error de
+red momentáneo. El error se muestra como feedback sin destruir el estado.
 
 ### 5. M5 renombrado diferido
-**Decisión:** No renombrar `CreateGenreEvent` → `CreateGenre` por conflicto con el use case `CreateGenre` del mismo nombre en `lib/features/genres/domain/`.
 
-**Razón:** El renombrar causaría `ambiguous_import` al importar ambos en el mismo archivo. Se mantiene el sufijo `Event` para distinguirlo del use case.
+**Decisión:** No renombrar `CreateGenreEvent` → `CreateGenre` por conflicto con
+el use case `CreateGenre` del mismo nombre en `lib/features/genres/domain/`.
+
+**Razón:** El renombrar causaría `ambiguous_import` al importar ambos en el
+mismo archivo. Se mantiene el sufijo `Event` para distinguirlo del use case.
 
 ---
 
 ## Verificación Final
 
-```
+```dart
 $ dart analyze
   No issues found!
 
@@ -314,7 +397,7 @@ $ flutter test test/bloc/
 ```
 
 | Métrica | Antes | Después |
-|---------|-------|---------|
+| --------- | ------- | --------- |
 | Total BLoC tests | 90 | 111 |
 | Tests nuevos | — | 21 |
 | Archivos de test modificados | — | 9 |

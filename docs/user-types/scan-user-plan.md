@@ -1,22 +1,32 @@
 # Plan de Mejoras — Usuario Scan (`role = 'scan'`)
 
-> **Generado**: 2026-07-20 | **Basado en**: Auditoría de 1046 líneas (`docs/user-types/scan-user.md`)
+> **Generado**: 2026-07-20 | **Basado en**: Auditoría de 1046 líneas
+  (`docs/user-types/scan-user.md`)
 > **Estado**: Borrador — requiere aprobación antes de implementar
 
 ---
 
 ## Resumen Ejecutivo
 
-El rol scan está funcionalmente operativo: puede crear, editar y eliminar libros, tomos y capítulos propios. Sin embargo, la auditoría revela **dos vulnerabilidades de seguridad activas** (tooks/chapters sin ownership check en RLS, storage sin ownership check) que permiten a cualquier scan modificar datos de otros scans. Adicionalmente, el `ScanBloc` es monolítico (7 use cases, 6 eventos en una sola clase — el propio código tiene un `TODO` confirmando esto), el `UploadCover` está compartido entre books y tooks sin abstracción, y hay un riesgo de colisión de IDs por el patrón `DateTime.now().millisecondsSinceEpoch`.
+El rol scan está funcionalmente operativo: puede crear, editar y eliminar
+libros, tomos y capítulos propios. Sin embargo, la auditoría revela **dos
+vulnerabilidades de seguridad activas** (tooks/chapters sin ownership check en
+RLS, storage sin ownership check) que permiten a cualquier scan modificar datos
+de otros scans. Adicionalmente, el `ScanBloc` es monolítico (7 use cases, 6
+eventos en una sola clase — el propio código tiene un `TODO` confirmando esto),
+el `UploadCover` está compartido entre books y tooks sin abstracción, y hay un
+riesgo de colisión de IDs por el patrón `DateTime.now().millisecondsSinceEpoch`.
 
-La prioridad inmediata es **seguridad** (Fase 1). Las mejoras de arquitectura y UX son necesarias pero no bloqueantes. El plan cubre 6 categorías en 4 fases, con un estimado total de 2-3 semanas de desarrollo.
+La prioridad inmediata es **seguridad** (Fase 1). Las mejoras de arquitectura y
+UX son necesarias pero no bloqueantes. El plan cubre 6 categorías en 4 fases,
+con un estimado total de 2-3 semanas de desarrollo.
 
 ---
 
 ## Tabla de Prioridades
 
 | # | Item | Categoría | Prioridad | Esfuerzo | Dependencias | Estado |
-|---|------|-----------|-----------|----------|--------------|--------|
+| --- | ------ | ----------- | ----------- | ---------- | -------------- | -------- |
 | 1 | RLS ownership check en `tooks` | Seguridad | P0 | S | — | 🔲 Pendiente |
 | 2 | RLS ownership check en `chapters` | Seguridad | P0 | S | — | 🔲 Pendiente |
 | 3 | Storage ownership verification | Seguridad | P0 | M | #1, #2 | 🔲 Pendiente |
@@ -37,7 +47,8 @@ La prioridad inmediata es **seguridad** (Fase 1). Las mejoras de arquitectura y 
 
 ## Fase 1: Seguridad (P0) — CRÍTICO
 
-**Objetivo**: Eliminar las vulnerabilidades que permiten a un scan modificar datos de otro scan.
+**Objetivo**: Eliminar las vulnerabilidades que permiten a un scan modificar
+datos de otro scan.
 **Estimación**: 1-2 días (S + S + M)
 
 ---
@@ -47,9 +58,12 @@ La prioridad inmediata es **seguridad** (Fase 1). Las mejoras de arquitectura y 
 **Prioridad**: P0 | **Esfuerzo**: S (1-2 horas)
 **Dependencias**: Ninguna
 
-**Problema**: Las políticas INSERT/UPDATE/DELETE de `tooks` verifican solo `is_scan()` pero NO verifican `created_by = auth.uid()`. Cualquier scan puede modificar tomos de cualquier otro scan.
+**Problema**: Las políticas INSERT/UPDATE/DELETE de `tooks` verifican solo
+`is_scan()` pero NO verifican `created_by = auth.uid()`. Cualquier scan puede
+modificar tomos de cualquier otro scan.
 
-**Solución**: Crear migración que reemplace las políticas genéricas por políticas con ownership check.
+**Solución**: Crear migración que reemplace las políticas genéricas por
+políticas con ownership check.
 
 **Migración SQL**:
 
@@ -82,14 +96,19 @@ CREATE POLICY "Scan can delete own tooks"
   );
 ```
 
-**Nota**: `tooks` tiene FK a `books` via `book_id`, así que podemos verificar ownership del libro padre sin agregar `created_by` a la tabla `tooks`.
+**Nota**: `tooks` tiene FK a `books` via `book_id`, así que podemos verificar
+ownership del libro padre sin agregar `created_by` a la tabla `tooks`.
 
 **Archivos afectados**:
+
 - Nueva migración en `supabase/migrations/`
-- Archivo afectado: `lib/features/tooks/data/took_repository_impl.dart` (sin cambios necesarios, solo RLS)
+- Archivo afectado: `lib/features/tooks/data/took_repository_impl.dart` (sin
+  cambios necesarios, solo RLS)
 
 **Criterio de aceptación**:
-- [ ] Un scan A NO puede INSERT/UPDATE/DELETE tooks de un libro creado por scan B
+
+- [ ] Un scan A NO puede INSERT/UPDATE/DELETE tooks de un libro creado por scan
+  B
 - [ ] Un scan A SÍ puede INSERT/UPDATE/DELETE tooks de libros propios
 - [ ] Admin sigue pudiendo modificar cualquier took
 - [ ] Tests de migración pasan
@@ -101,9 +120,11 @@ CREATE POLICY "Scan can delete own tooks"
 **Prioridad**: P0 | **Esfuerzo**: S (1-2 horas)
 **Dependencias**: Ninguna (pero hacerlo junto con #1)
 
-**Problema**: Idéntico al de tooks. Las políticas de `chapters` verifican solo `is_scan()` sin ownership.
+**Problema**: Idéntico al de tooks. Las políticas de `chapters` verifican solo
+`is_scan()` sin ownership.
 
-**Solución**: La FK `chapters.took_id → tooks.id → tooks.book_id → books.created_by` permite verificar ownership via cadena de joins.
+**Solución**: La FK `chapters.took_id → tooks.id → tooks.book_id →
+books.created_by` permite verificar ownership via cadena de joins.
 
 **Migración SQL**:
 
@@ -149,6 +170,7 @@ CREATE POLICY "Scan can delete own chapters"
 ```
 
 **Criterio de aceptación**:
+
 - [ ] Un scan A NO puede INSERT/UPDATE/DELETE chapters de libros de scan B
 - [ ] Un scan A SÍ puede INSERT/UPDATE/DELETE chapters de libros propios
 - [ ] Admin mantiene acceso total
@@ -161,11 +183,15 @@ CREATE POLICY "Scan can delete own chapters"
 **Prioridad**: P0 | **Esfuerzo**: M (medio día)
 **Dependencias**: #1, #2 (las migraciones de RLS deben estar primero)
 
-**Problema**: Los buckets `covers` y `chapters` de Supabase Storage permiten a cualquier usuario autenticado subir/modificar/eliminar archivos. Un scan malicioso puede eliminar covers de otros scans.
+**Problema**: Los buckets `covers` y `chapters` de Supabase Storage permiten a
+cualquier usuario autenticado subir/modificar/eliminar archivos. Un scan
+malicioso puede eliminar covers de otros scans.
 
-**Solución**: Crear políticas de Storage con naming convention que permita verificación de ownership.
+**Solución**: Crear políticas de Storage con naming convention que permita
+verificación de ownership.
 
-**Enfoque recomendado**: Usar la convención de nombres de archivo `{user_id}/{filename}` en lugar de la configuración actual `{timestamp}.{ext}`.
+**Enfoque recomendado**: Usar la convención de nombres de archivo
+`{user_id}/{filename}` en lugar de la configuración actual `{timestamp}.{ext}`.
 
 **Cambios en Storage** (Supabase Dashboard o migración):
 
@@ -234,6 +260,7 @@ CREATE POLICY "Chapters: authenticated delete own folder"
 **Cambios en código** (cambiar filename pattern):
 
 `lib/features/books/data/book_repository_impl.dart` (L222):
+
 ```dart
 // ANTES:
 final filename = '${DateTime.now().millisecondsSinceEpoch}.$ext';
@@ -244,6 +271,7 @@ final filename = '$userId/${DateTime.now().millisecondsSinceEpoch}.$ext';
 ```
 
 `lib/features/chapters/data/chapter_repository_impl.dart` (L97):
+
 ```dart
 // ANTES:
 final filename = '${DateTime.now().millisecondsSinceEpoch}.$ext';
@@ -253,21 +281,28 @@ final userId = _supabase.client.auth.currentUser?.id ?? 'unknown';
 final filename = '$userId/${DateTime.now().millisecondsSinceEpoch}.$ext';
 ```
 
-`lib/core/cover/cover_url_service.dart` — sin cambios necesarios (Supabase maneja paths con `/` internamente).
+`lib/core/cover/cover_url_service.dart` — sin cambios necesarios (Supabase
+maneja paths con `/` internamente).
 
 **Archivos afectados**:
+
 - `lib/features/books/data/book_repository_impl.dart` — L222
 - `lib/features/chapters/data/chapter_repository_impl.dart` — L97
 - Nueva migración SQL
 - Supabase Dashboard: bucket policies
 
 **Criterio de aceptación**:
-- [ ] Un scan A NO puede subir/modificar/eliminar archivos en el folder de scan B
+
+- [ ] Un scan A NO puede subir/modificar/eliminar archivos en el folder de scan
+  B
 - [ ] Un scan A SÍ puede subir/modificar/eliminar archivos en su propio folder
-- [ ] Los covers existentes siguen siendo visibles (migración de archivos existentes)
+- [ ] Los covers existentes siguen siendo visibles (migración de archivos
+  existentes)
 - [ ] El `CoverUrlService` genera URLs correctas con paths anidados
 
-**Riesgo**: Migrar archivos existentes a la nueva estructura de carpetas requiere un script de migración en Supabase Storage API o un Edge Function temporal.
+**Riesgo**: Migrar archivos existentes a la nueva estructura de carpetas
+requiere un script de migración en Supabase Storage API o un Edge Function
+temporal.
 
 ---
 
@@ -276,13 +311,16 @@ final filename = '$userId/${DateTime.now().millisecondsSinceEpoch}.$ext';
 **Prioridad**: P0 | **Esfuerzo**: M (medio día)
 **Dependencias**: #3
 
-**Problema**: Cuando un scan elimina un libro/tomo, los archivos de cover y contenido NO se eliminan de Storage. No hay cascading delete configurado.
+**Problema**: Cuando un scan elimina un libro/tomo, los archivos de cover y
+contenido NO se eliminan de Storage. No hay cascading delete configurado.
 
-**Solución**: Crear Edge Function o script SQL que limpie archivos huérfanos periódicamente, y agregar eliminación en cascada en el repository layer.
+**Solución**: Crear Edge Function o script SQL que limpie archivos huérfanos
+periódicamente, y agregar eliminación en cascada en el repository layer.
 
 **Cambios en código**:
 
 `lib/features/books/data/book_repository_impl.dart` — en `deleteBook()`:
+
 ```dart
 @override
 Future<Result<void>> deleteBook(int id) async {
@@ -345,6 +383,7 @@ Future<void> _safeDeleteStorageFromUrl(String bucket, String url) async {
 ```
 
 **Criterio de aceptación**:
+
 - [ ] Eliminar un libro limpia sus covers de Storage
 - [ ] Eliminar un libro limpia los archivos de contenido de sus capítulos
 - [ ] Eliminar un tomo limpia su cover
@@ -354,7 +393,8 @@ Future<void> _safeDeleteStorageFromUrl(String bucket, String url) async {
 
 ## Fase 2: Core UX (P1) — Alta Prioridad
 
-**Objetivo**: Decomponer el ScanBloc monolítico y estabilizar la experiencia de usuario.
+**Objetivo**: Decomponer el ScanBloc monolítico y estabilizar la experiencia de
+usuario.
 **Estimación**: 3-4 días (L + S)
 
 ---
@@ -364,7 +404,10 @@ Future<void> _safeDeleteStorageFromUrl(String bucket, String url) async {
 **Prioridad**: P1 | **Esfuerzo**: L (1-2 días)
 **Dependencias**: Ninguna
 
-**Problema**: `ScanBloc` (187 líneas) maneja 7 use cases y 6 tipos de evento. El propio desarrollador dejó un `TODO` en L1-4 pidiendo esta división. Acopla upload de covers, CRUD de libros, carga de géneros y toggling de visibilidad en una sola clase.
+**Problema**: `ScanBloc` (187 líneas) maneja 7 use cases y 6 tipos de evento. El
+propio desarrollador dejó un `TODO` en L1-4 pidiendo esta división. Acopla
+upload de covers, CRUD de libros, carga de géneros y toggling de visibilidad en
+una sola clase.
 
 **Solución**: Dividir en dos BLoCs:
 
@@ -397,6 +440,7 @@ class ScanBookBloc extends Bloc<ScanBookEvent, ScanBookState> {
 ```
 
 **Eventos** (`scan_book_event.dart`):
+
 ```dart
 abstract class ScanBookEvent extends Equatable {}
 class LoadScanBooks extends ScanBookEvent {}
@@ -417,6 +461,7 @@ class ToggleScanBookVisibility extends ScanBookEvent {
 ```
 
 **Estados** (`scan_book_state.dart`):
+
 ```dart
 abstract class ScanBookState extends Equatable {}
 class ScanBookInitial extends ScanBookState {}
@@ -446,6 +491,7 @@ class ScanCoverBloc extends Bloc<ScanCoverEvent, ScanCoverState> {
 ```
 
 **Eventos** (`scan_cover_event.dart`):
+
 ```dart
 class UploadScanCover extends ScanCoverEvent {
   final String filePath;
@@ -453,6 +499,7 @@ class UploadScanCover extends ScanCoverEvent {
 ```
 
 **Estados** (`scan_cover_state.dart`):
+
 ```dart
 class ScanCoverInitial extends ScanCoverState {}
 class ScanCoverUploading extends ScanCoverState {}
@@ -466,9 +513,12 @@ class ScanCoverError extends ScanCoverState {
 
 #### C. Eliminar `LoadScanGenres` de los BLoCs de scan
 
-`LoadScanGenres` carga géneros que son solo lectura. En su lugar, el `GenreSelector` widget debe obtenerlos directamente del `GenreRepository` (ya inyectado vía DI) o crear un pequeño `GenreCubit`/`GenreBloc` compartido.
+`LoadScanGenres` carga géneros que son solo lectura. En su lugar, el
+`GenreSelector` widget debe obtenerlos directamente del `GenreRepository` (ya
+inyectado vía DI) o crear un pequeño `GenreCubit`/`GenreBloc` compartido.
 
-Opción recomendada: Crear un `GenreCubit` en `lib/features/genres/presentation/`:
+Opción recomendada: Crear un `GenreCubit` en
+`lib/features/genres/presentation/`:
 
 ```dart
 class GenreCubit extends Cubit<GenreState> {
@@ -486,9 +536,13 @@ class GenreCubit extends Cubit<GenreState> {
 ```
 
 **Archivos afectados**:
-- **Eliminar**: `lib/features/scan/presentation/bloc/scan_bloc.dart` (reemplazar)
-- **Eliminar**: `lib/features/scan/presentation/bloc/scan_event.dart` (reemplazar)
-- **Eliminar**: `lib/features/scan/presentation/bloc/scan_state.dart` (reemplazar)
+
+- **Eliminar**: `lib/features/scan/presentation/bloc/scan_bloc.dart`
+  (reemplazar)
+- **Eliminar**: `lib/features/scan/presentation/bloc/scan_event.dart`
+  (reemplazar)
+- **Eliminar**: `lib/features/scan/presentation/bloc/scan_state.dart`
+  (reemplazar)
 - **Crear**: `lib/features/scan/presentation/bloc/scan_book_bloc.dart`
 - **Crear**: `lib/features/scan/presentation/bloc/scan_book_event.dart`
 - **Crear**: `lib/features/scan/presentation/bloc/scan_book_state.dart`
@@ -497,11 +551,16 @@ class GenreCubit extends Cubit<GenreState> {
 - **Crear**: `lib/features/scan/presentation/bloc/scan_cover_state.dart`
 - **Crear**: `lib/features/genres/presentation/genre_cubit.dart` (o类似)
 - **Modificar**: `lib/core/di/injection_scan.dart` — registrar nuevos BLoCs
-- **Modificar**: `lib/features/scan/presentation/screens/scan_main_screen.dart` — usar `ScanBookBloc`
-- **Modificar**: `lib/features/scan/presentation/screens/scan_book_edit_screen.dart` — usar `ScanBookBloc` + `ScanCoverBloc`
-- **Modificar**: `test/bloc/scan_bloc_test.dart` — reemplazar por tests de los nuevos BLoCs
+- **Modificar**: `lib/features/scan/presentation/screens/scan_main_screen.dart`
+  — usar `ScanBookBloc`
+- **Modificar**:
+  `lib/features/scan/presentation/screens/scan_book_edit_screen.dart` — usar
+  `ScanBookBloc` + `ScanCoverBloc`
+- **Modificar**: `test/bloc/scan_bloc_test.dart` — reemplazar por tests de los
+  nuevos BLoCs
 
 **Criterio de aceptación**:
+
 - [ ] `ScanBookBloc` maneja solo CRUD de libros y visibilidad
 - [ ] `ScanCoverBloc` maneja solo upload de covers
 - [ ] `GenreCubit` carga géneros de forma independiente
@@ -517,24 +576,31 @@ class GenreCubit extends Cubit<GenreState> {
 **Prioridad**: P1 | **Esfuerzo**: S (1-2 horas)
 **Dependencias**: #2.1 (la decomposition debe ocurrir primero)
 
-**Problema**: El caso de uso `UploadCover` del dominio de `books` es reutilizado por `ScanTookBloc` para subir covers de tomos. El nombre es semánticamente incorrecto — no es un cover de libro, es una imagen genérica.
+**Problema**: El caso de uso `UploadCover` del dominio de `books` es reutilizado
+por `ScanTookBloc` para subir covers de tomos. El nombre es semánticamente
+incorrecto — no es un cover de libro, es una imagen genérica.
 
 **Solución**:
 
-1. Renombrar `lib/features/books/domain/upload_cover.dart` → `lib/core/domain/upload_image.dart` (o mover a un shared domain)
+1. Renombrar `lib/features/books/domain/upload_cover.dart` →
+   `lib/core/domain/upload_image.dart` (o mover a un shared domain)
 2. Renombrar la clase `UploadCover` → `UploadImage`
-3. Renombrar el parámetro en `BookRepository` de `uploadCover()` → `uploadImage()`
+3. Renombrar el parámetro en `BookRepository` de `uploadCover()` →
+   `uploadImage()`
 4. Actualizar todas las referencias
 
 **Archivos afectados**:
+
 - `lib/features/books/domain/upload_cover.dart` → mover/renombrar
 - `lib/features/books/domain/book_repository.dart` — renombrar método
 - `lib/features/books/data/book_repository_impl.dart` — renombrar método
-- `lib/features/scan/presentation/bloc/scan_cover_bloc.dart` (el nuevo) — import actualizado
+- `lib/features/scan/presentation/bloc/scan_cover_bloc.dart` (el nuevo) — import
+  actualizado
 - `lib/features/scan/presentation/bloc/scan_took_bloc.dart` — import actualizado
 - `lib/core/di/injection.dart` — registro actualizado
 
 **Criterio de aceptación**:
+
 - [ ] El caso de uso se llama `UploadImage` y vive en un dominio compartido
 - [ ] Tanto `ScanCoverBloc` como `ScanTookBloc` usan `UploadImage`
 - [ ] No hay imports rotos
@@ -543,7 +609,8 @@ class GenreCubit extends Cubit<GenreState> {
 
 ## Fase 3: Features Nuevos (P2) — Media Prioridad
 
-**Objetivo**: Completar funcionalidades que el RLS ya soporta pero que no tienen UI.
+**Objetivo**: Completar funcionalidades que el RLS ya soporta pero que no tienen
+UI.
 **Estimación**: 3-4 días (M + M + M)
 
 ---
@@ -553,13 +620,17 @@ class GenreCubit extends Cubit<GenreState> {
 **Prioridad**: P2 | **Esfuerzo**: M (medio día)
 **Dependencias**: #2.1 (para el patrón de BLoCs nuevos)
 
-**Problema**: El RLS permite a scan CRUD completo en `labels` (tabla `labels` y relación `books_labels`), pero NO hay pantalla para crear/editar/eliminar etiquetas. La ruta `/label-management` existe en `app.dart` (L32) pero no es accesible desde el drawer del scan.
+**Problema**: El RLS permite a scan CRUD completo en `labels` (tabla `labels` y
+relación `books_labels`), pero NO hay pantalla para crear/editar/eliminar
+etiquetas. La ruta `/label-management` existe en `app.dart` (L32) pero no es
+accesible desde el drawer del scan.
 
 **Solución**:
 
 1. Agregar entrada en `AppDrawer` para scan:
 
 `lib/features/app/presentation/widgets/app_drawer.dart`:
+
 ```dart
 // Dentro del drawer, después de "Editar Perfil":
 if (isScan)
@@ -573,9 +644,10 @@ if (isScan)
   ),
 ```
 
-2. Crear `ScanLabelBloc` (o reutilizar el existente del admin si existe):
+1. Crear `ScanLabelBloc` (o reutilizar el existente del admin si existe):
 
 `lib/features/scan/presentation/bloc/scan_label_bloc.dart`:
+
 ```dart
 class ScanLabelBloc extends Bloc<ScanLabelEvent, ScanLabelState> {
   final GetLabels getLabels;
@@ -586,17 +658,22 @@ class ScanLabelBloc extends Bloc<ScanLabelEvent, ScanLabelState> {
 }
 ```
 
-3. Asegurar que la pantalla `/label-management` funcione para scan (verificar que no tenga guards de admin).
+1. Asegurar que la pantalla `/label-management` funcione para scan (verificar
+   que no tenga guards de admin).
 
 **Archivos afectados**:
+
 - `lib/features/app/presentation/widgets/app_drawer.dart` — agregar ListTile
 - Posiblemente: `lib/features/labels/presentation/` — verificar compatibilidad
-- Crear: `lib/features/scan/presentation/bloc/scan_label_bloc.dart` (si no existe uno compartido)
+- Crear: `lib/features/scan/presentation/bloc/scan_label_bloc.dart` (si no
+  existe uno compartido)
 - `lib/core/di/injection_scan.dart` — registrar nuevo BLoC
 
 **Criterio de aceptación**:
+
 - [ ] El scan puede crear, editar y eliminar etiquetas desde su panel
-- [ ] El scan puede asociar/desasociar etiquetas a sus libros desde `ScanBookEditScreen`
+- [ ] El scan puede asociar/desasociar etiquetas a sus libros desde
+  `ScanBookEditScreen`
 - [ ] La entrada aparece en el drawer del scan
 - [ ] No hay acceso a funcionalidades de admin (gestión de usuarios, analytics)
 
@@ -607,14 +684,19 @@ class ScanLabelBloc extends Bloc<ScanLabelEvent, ScanLabelState> {
 **Prioridad**: P1 (subido a P1 por data integrity) | **Esfuerzo**: M (medio día)
 **Dependencias**: Ninguna
 
-**Problema**: `BookEntity.id`, `TookEntity.id` y `ChapterEntity.id` usan `DateTime.now().millisecondsSinceEpoch` como ID provisional antes del insert. Si dos operaciones ocurren en el mismo milisegundo, hay colisión. Esto se ve en:
+**Problema**: `BookEntity.id`, `TookEntity.id` y `ChapterEntity.id` usan
+`DateTime.now().millisecondsSinceEpoch` como ID provisional antes del insert. Si
+dos operaciones ocurren en el mismo milisegundo, hay colisión. Esto se ve en:
+
 - `scan_book_edit_screen.dart` L105
 - `scan_took_edit_screen.dart` L59
 - `scan_chapter_edit_screen.dart` L144
 
-**Solución**: Usar un UUID o String random como ID provisional, o mejor aún, refactorizar para que el entity no necesite un ID provisional.
+**Solución**: Usar un UUID o String random como ID provisional, o mejor aún,
+refactorizar para que el entity no necesite un ID provisional.
 
-**Enfoque recomendado**: Cambiar el tipo de `id` de `int` a `String` (UUID v4) para entidades provisionales, o usar un wrapper `PendingId`:
+**Enfoque recomendado**: Cambiar el tipo de `id` de `int` a `String` (UUID v4)
+para entidades provisionales, o usar un wrapper `PendingId`:
 
 ```dart
 // Opción A: ID provisional como String (UUID)
@@ -629,9 +711,12 @@ final book = BookEntity(
 );
 ```
 
-**Nota**: Esto requiere verificar que `BookWithRelations.id` y `BookEntity.id` se manejen consistentemente. Si el ID de DB es `int` (serial/bigint), el provisional puede ser un string que se reemplaza después del insert.
+**Nota**: Esto requiere verificar que `BookWithRelations.id` y `BookEntity.id`
+se manejen consistentemente. Si el ID de DB es `int` (serial/bigint), el
+provisional puede ser un string que se reemplaza después del insert.
 
-**Alternativa más segura (recomendada)**: No asignar ID provisional. En su lugar, refactorizar para que la operación de guardado devuelva el ID real:
+**Alternativa más segura (recomendada)**: No asignar ID provisional. En su
+lugar, refactorizar para que la operación de guardado devuelva el ID real:
 
 ```dart
 // BookRepository: cambiar return type
@@ -649,9 +734,12 @@ switch (result) {
 ```
 
 **Archivos afectados**:
-- `lib/features/books/domain/book_entity.dart` — cambiar tipo de `id` o eliminar ID provisional
+
+- `lib/features/books/domain/book_entity.dart` — cambiar tipo de `id` o eliminar
+  ID provisional
 - `lib/features/books/domain/create_book.dart` — cambiar return type
-- `lib/features/books/data/book_repository_impl.dart` — `createBook()` retorna ID real
+- `lib/features/books/data/book_repository_impl.dart` — `createBook()` retorna
+  ID real
 - `lib/features/scan/presentation/screens/scan_book_edit_screen.dart` L105
 - `lib/features/scan/presentation/screens/scan_took_edit_screen.dart` L59
 - `lib/features/scan/presentation/screens/scan_chapter_edit_screen.dart` L144
@@ -661,23 +749,32 @@ switch (result) {
 - `lib/features/chapters/data/chapter_repository_impl.dart` — similarly
 
 **Criterio de aceptación**:
+
 - [ ] No hay más `DateTime.now().millisecondsSinceEpoch` en screens
 - [ ] El ID real de la DB se usa para crear entidades hijas (tomos, capítulos)
-- [ ] No hay regresiones en el flujo crear libro → agregar tomo → agregar capítulo
+- [ ] No hay regresiones en el flujo crear libro → agregar tomo → agregar
+  capítulo
 - [ ] Tests de BLoC actualizados para reflejar el cambio
 
 ---
 
 ### 3.3 — Genre management para scan (opcional)
 
-**Prioridad**: P3 (bajado — el scan no necesita crear géneros) | **Esfuerzo**: M (medio día)
+**Prioridad**: P3 (bajado — el scan no necesita crear géneros) | **Esfuerzo**: M
+(medio día)
 **Dependencias**: Ninguna
 
-**Problema**: Los géneros son solo lectura para scan. Si el scan necesita un género nuevo, debe pedir al admin que lo cree.
+**Problema**: Los géneros son solo lectura para scan. Si el scan necesita un
+género nuevo, debe pedir al admin que lo cree.
 
-**Solución (si se aprueba)**: Agregar un botón "Sugerir género" que envíe una solicitud al admin, o permitir al scan crear géneros temporalmente marcados como "pending approval".
+**Solución (si se aprueba)**: Agregar un botón "Sugerir género" que envíe una
+solicitud al admin, o permitir al scan crear géneros temporalmente marcados como
+"pending approval".
 
-**Nota**: Esta funcionalidad NO está en el RLS actual (géneros solo se crean por admin). Requiere cambio de RLS si se implementa. **Recomendación: NO implementar** — mantener géneros como admin-only es una decisión de diseño válida.
+**Nota**: Esta funcionalidad NO está en el RLS actual (géneros solo se crean por
+admin). Requiere cambio de RLS si se implementa. **Recomendación: NO
+implementar** — mantener géneros como admin-only es una decisión de diseño
+válida.
 
 ---
 
@@ -693,7 +790,9 @@ switch (result) {
 **Prioridad**: P2 (subido) | **Esfuerzo**: M (medio día)
 **Dependencias**: #2.1 (la decomposition facilita esto)
 
-**Problema**: Las screens no muestran loading indicators consistentes durante operaciones de escritura. El `SaveScanBook` usa un `Completer` con timeout de 10 segundos que puede fallar silenciosamente.
+**Problema**: Las screens no muestran loading indicators consistentes durante
+operaciones de escritura. El `SaveScanBook` usa un `Completer` con timeout de 10
+segundos que puede fallar silenciosamente.
 
 **Solución**:
 
@@ -741,13 +840,16 @@ BlocConsumer<ScanBookBloc, ScanBookState>(
 ```
 
 **Archivos afectados**:
+
 - `lib/features/scan/presentation/screens/scan_book_edit_screen.dart`
 - `lib/features/scan/presentation/screens/scan_took_edit_screen.dart`
 - `lib/features/scan/presentation/screens/scan_chapter_edit_screen.dart`
 - `lib/features/scan/presentation/screens/scan_main_screen.dart`
 
 **Criterio de aceptación**:
-- [ ] Cada operación de escritura muestra un `CircularProgressIndicator` durante la carga
+
+- [ ] Cada operación de escritura muestra un `CircularProgressIndicator` durante
+  la carga
 - [ ] Los errores se muestran como `SnackBar` con color rojo
 - [ ] Los mensajes de éxito se muestran como `SnackBar` con color verde
 - [ ] No hay `Completer` con timeout en ninguna screen
@@ -759,9 +861,11 @@ BlocConsumer<ScanBookBloc, ScanBookState>(
 **Prioridad**: P2 | **Esfuerzo**: S (1-2 horas)
 **Dependencias**: Ninguna
 
-**Problema**: La subida de covers y contenido no muestra progreso. El usuario no sabe si la app está funcionando o colgada.
+**Problema**: La subida de covers y contenido no muestra progreso. El usuario no
+sabe si la app está funcionando o colgada.
 
-**Solución**: Supabase Storage soporta `onUploadProgress` callback. Agregar un `ValueNotifier<double>` que actualice la UI.
+**Solución**: Supabase Storage soporta `onUploadProgress` callback. Agregar un
+`ValueNotifier<double>` que actualice la UI.
 
 ```dart
 // En ScanCoverBloc o en la screen:
@@ -780,16 +884,21 @@ Future<void> _onUploadCover(UploadScanCover event, Emitter<ScanCoverState> emit)
 }
 ```
 
-**Nota**: Verificar la API de `supabase_flutter` para `onUploadProgress`. Si no está disponible, usar un `StreamedResponse` o simulación de progreso basada en tamaño.
+**Nota**: Verificar la API de `supabase_flutter` para `onUploadProgress`. Si no
+está disponible, usar un `StreamedResponse` o simulación de progreso basada en
+tamaño.
 
 **Archivos afectados**:
+
 - `lib/features/scan/presentation/bloc/scan_cover_bloc.dart` (el nuevo)
 - `lib/features/scan/presentation/screens/widgets/cover_picker.dart`
 - `lib/features/scan/presentation/screens/scan_chapter_edit_screen.dart`
 
 **Criterio de aceptación**:
+
 - [ ] Se muestra una barra de progreso durante la subida de covers
-- [ ] Se muestra una barra de progreso durante la subida de contenido de capítulos
+- [ ] Se muestra una barra de progreso durante la subida de contenido de
+  capítulos
 - [ ] El progreso se resetea al completar
 
 ---
@@ -799,11 +908,14 @@ Future<void> _onUploadCover(UploadScanCover event, Emitter<ScanCoverState> emit)
 **Prioridad**: P3 | **Esfuerzo**: S (1-2 horas)
 **Dependencias**: Ninguna
 
-**Problema**: La validación de campos requeridos (nombre del libro, número de tomo, número de capítulo) no muestra mensajes de error claros.
+**Problema**: La validación de campos requeridos (nombre del libro, número de
+tomo, número de capítulo) no muestra mensajes de error claros.
 
-**Solución**: Agregar `validator` a cada `TextFormField` con mensajes descriptivos.
+**Solución**: Agregar `validator` a cada `TextFormField` con mensajes
+descriptivos.
 
 **En `scan_book_edit_screen.dart`**:
+
 ```dart
 TextFormField(
   controller: _nameCtrl,
@@ -821,11 +933,13 @@ TextFormField(
 ```
 
 **Archivos afectados**:
+
 - `lib/features/scan/presentation/screens/scan_book_edit_screen.dart`
 - `lib/features/scan/presentation/screens/scan_took_edit_screen.dart`
 - `lib/features/scan/presentation/screens/scan_chapter_edit_screen.dart`
 
 **Criterio de aceptación**:
+
 - [ ] Cada campo requerido muestra un mensaje de error si está vacío
 - [ ] Los campos opcionales no muestran error si están vacíos
 - [ ] La validación ocurre antes de enviar al BLoC
@@ -837,7 +951,9 @@ TextFormField(
 **Prioridad**: P2 | **Esfuerzo**: L (1-2 días)
 **Dependencias**: #2.1 (los tests deben cubrir los nuevos BLoCs)
 
-**Estado actual**: Hay tests básicos para `ScanBloc`, `ScanTookBloc` y `ScanChapterBloc` en `test/bloc/`. Sin embargo:
+**Estado actual**: Hay tests básicos para `ScanBloc`, `ScanTookBloc` y
+`ScanChapterBloc` en `test/bloc/`. Sin embargo:
+
 - No hay tests de integración con Supabase (RLS testing)
 - No hay tests de las screens (widget tests)
 - Los tests cubren happy paths pero no edge cases
@@ -852,6 +968,7 @@ TextFormField(
 ```
 
 Cubrir:
+
 - Happy path para cada evento
 - Error handling (cada use case falla)
 - Refresh fallback (save OK pero refresh falla)
@@ -865,6 +982,7 @@ Cubrir:
 ```
 
 Cubrir:
+
 - Form validation
 - Navegación entre screens
 - Empty state (sin libros)
@@ -877,12 +995,14 @@ Cubrir:
 ```
 
 Cubrir:
+
 - Scan A no puede modificar datos de scan B
 - Scan puede modificar datos propios
 - Admin puede modificar cualquier dato
 - Storage ownership verification
 
 **Archivos afectados**:
+
 - `test/bloc/scan_bloc_test.dart` → reemplazar por tests de nuevos BLoCs
 - Crear: `test/bloc/scan_book_bloc_test.dart`
 - Crear: `test/bloc/scan_cover_bloc_test.dart`
@@ -890,6 +1010,7 @@ Cubrir:
 - Crear: `test/integration/scan_rls_test.dart`
 
 **Criterio de aceptación**:
+
 - [ ] Test coverage > 80% para la feature scan
 - [ ] Todos los BLoCs tienen tests de happy path + error
 - [ ] Las screens tienen widget tests básicos
@@ -902,9 +1023,12 @@ Cubrir:
 **Prioridad**: P3 | **Esfuerzo**: L (1-2 días)
 **Dependencias**: #3.2 (mejor hacerlo después de resolver los IDs)
 
-**Problema**: Dos scans (o un scan y un admin) pueden editar el mismo libro/tomo simultáneamente sin detección. La última escritura sobreescribe silenciosamente la anterior.
+**Problema**: Dos scans (o un scan y un admin) pueden editar el mismo libro/tomo
+simultáneamente sin detección. La última escritura sobreescribe silenciosamente
+la anterior.
 
-**Solución**: Agregar columna `updated_at` con `DEFAULT now()` y verificar en UPDATE:
+**Solución**: Agregar columna `updated_at` con `DEFAULT now()` y verificar en
+UPDATE:
 
 ```sql
 -- Migración
@@ -935,6 +1059,7 @@ CREATE TRIGGER chapters_updated_at
 ```
 
 En el repository:
+
 ```dart
 Future<Result<void>> updateBook(BookEntity book) async {
   final result = await _supabase.client
@@ -951,14 +1076,18 @@ Future<Result<void>> updateBook(BookEntity book) async {
 ```
 
 **Archivos afectados**:
+
 - Nueva migración SQL
 - `lib/features/books/domain/book_entity.dart` — agregar `updatedAt`
-- `lib/features/books/data/book_repository_impl.dart` — `updateBook()` con lock check
+- `lib/features/books/data/book_repository_impl.dart` — `updateBook()` con lock
+  check
 - `lib/features/tooks/data/took_repository_impl.dart` — similar
 - `lib/features/chapters/data/chapter_repository_impl.dart` — similar
 
 **Criterio de aceptación**:
-- [ ] Si scan A edita un libro mientras scan B lo modifica, scan B recibe error de conflicto
+
+- [ ] Si scan A edita un libro mientras scan B lo modifica, scan B recibe error
+  de conflicto
 - [ ] El usuario recibe un mensaje claro de "conflicto de edición"
 - [ ] El `updated_at` se actualiza automáticamente en cada UPDATE
 
@@ -972,12 +1101,14 @@ Future<Result<void>> updateBook(BookEntity book) async {
 **Problema**: No hay documentación del módulo scan más allá de la auditoría.
 
 **Solución**: Crear `docs/scan-module.md` con:
+
 - Diagrama de arquitectura (BLoCs, screens, relations)
 - Flujo de datos: screen → BLoC → use case → repository → Supabase
 - RLS policy map (qué puede y qué no puede cada rol)
 - Guía de debugging comunes (errores de RLS, storage issues)
 
 **Criterio de aceptación**:
+
 - [ ] Documento existe en `docs/scan-module.md`
 - [ ] Cubre arquitectura, flujos y RLS
 - [ ] Incluye diagrama de dependencias
@@ -987,14 +1118,15 @@ Future<Result<void>> updateBook(BookEntity book) async {
 ## Estimación Total
 
 | Fase | Items | Esfuerzo Estimado |
-|------|-------|-------------------|
+| ------ | ------- | ------------------- |
 | **Fase 1: Seguridad (P0)** | #1, #2, #3, #4 | **2-3 días** (L) |
 | **Fase 2: Core UX (P1)** | #5, #6, #8 | **3-4 días** (L+) |
 | **Fase 3: Features (P2)** | #7 | **1 día** (M) |
 | **Fase 4: Polish (P3)** | #9, #10, #11, #12, #13, #15 | **4-5 días** (L+) |
-| **Total estimado** | 15 items | **10-13 días** (XL) |
-
-**Nota**: Las fases 1 y 2 son independientes y pueden ejecutarse en paralelo si hay dos desarrolladores. La fase 3 depende de la fase 2 (para el patrón de BLoCs). La fase 4 es independiente pero cada item tiene sus propias dependencias.
+| **Total estimado** | 15 items | **10-13 días**(XL) |**Nota**: Las fases 1 y 2 son independientes y pueden ejecutarse en paralelo si
+hay dos desarrolladores. La fase 3 depende de la fase 2 (para el patrón de
+BLoCs). La fase 4 es independiente pero cada item tiene sus propias
+dependencias.
 
 ---
 
@@ -1002,31 +1134,53 @@ Future<Result<void>> updateBook(BookEntity book) async {
 
 ### Riesgos Altos
 
-1. **Migración de Storage (#3)**: Cambiar la estructura de carpetas en Supabase Storage requiere migrar archivos existentes. Si hay miles de covers/chapters, esto puede ser costoso. **Mitigación**: Hacer un script de migración que copie archivos de `{timestamp}.{ext}` a `{user_id}/{timestamp}.{ext}` y actualice los registros en DB.
+1. **Migración de Storage (#3)**: Cambiar la estructura de carpetas en Supabase
+   Storage requiere migrar archivos existentes. Si hay miles de covers/chapters,
+   esto puede ser costoso. **Mitigación**: Hacer un script de migración que
+   copie archivos de `{timestamp}.{ext}` a `{user_id}/{timestamp}.{ext}` y
+   actualice los registros en DB.
 
-2. **RLS ownership via joins (#1, #2)**: Los JOINs en políticas RLS agregan overhead a cada query. Con tablas grandes, esto puede afectar performance. **Mitigación**: Verificar que las FK estén indexadas (`tooks.book_id`, `chapters.took_id`).
+2. **RLS ownership via joins (#1, #2)**: Los JOINs en políticas RLS agregan
+   overhead a cada query. Con tablas grandes, esto puede afectar performance.
+   **Mitigación**: Verificar que las FK estén indexadas (`tooks.book_id`,
+   `chapters.took_id`).
 
-3. **Decomposition del ScanBloc (#5)**: Cambiar los BLoCs requiere actualizar todas las screens que los consumen. Si hay 3+ screens, hay riesgo de regresiones. **Mitigación**: Hacer la decomposition en un branch dedicado con tests antes de mergear.
+3. **Decomposition del ScanBloc (#5)**: Cambiar los BLoCs requiere actualizar
+   todas las screens que los consumen. Si hay 3+ screens, hay riesgo de
+   regresiones. **Mitigación**: Hacer la decomposition en un branch dedicado con
+   tests antes de mergear.
 
 ### Riesgos Medios
 
-4. **ID provisional refactor (#8)**: Cambiar el tipo de `id` puede afectar serialization/deserialization y la UI que muestra IDs (como `ID: {id}` en `scan_main_screen.dart` L147). **Mitigación**: Verificar todas las referencias a `BookEntity.id` antes de cambiar.
+1. **ID provisional refactor (#8)**: Cambiar el tipo de `id` puede afectar
+   serialization/deserialization y la UI que muestra IDs (como `ID: {id}` en
+   `scan_main_screen.dart` L147). **Mitigación**: Verificar todas las
+   referencias a `BookEntity.id` antes de cambiar.
 
-5. **Tests de RLS (#12)**: Los tests de integración de RLS requieren un entorno de Supabase con las migraciones aplicadas. Esto puede ser costoso de configurar en CI. **Mitigación**: Usar Supabase local (Docker) para tests de integración.
+2. **Tests de RLS (#12)**: Los tests de integración de RLS requieren un entorno
+   de Supabase con las migraciones aplicadas. Esto puede ser costoso de
+   configurar en CI. **Mitigación**: Usar Supabase local (Docker) para tests de
+   integración.
 
 ### Consideraciones
 
-6. **Prioridad del usuario**: El usuario (developper) debe decidir si la funcionalidad de Label Management (#7) es necesaria. El RLS lo soporta, pero si nadie la usa, no vale la pena implementarla.
+1. **Prioridad del usuario**: El usuario (developper) debe decidir si la
+   funcionalidad de Label Management (#7) es necesaria. El RLS lo soporta, pero
+   si nadie la usa, no vale la pena implementarla.
 
-7. **Orden de implementación**: Fase 1 → Fase 2 → Fase 3 → Fase 4 es el orden natural. Cada fase es independiente de la anterior excepto las dependencias explícitas.
+2. **Orden de implementación**: Fase 1 → Fase 2 → Fase 3 → Fase 4 es el orden
+   natural. Cada fase es independiente de la anterior excepto las dependencias
+   explícitas.
 
-8. **Rollback plan**: Cada migración SQL debe tener un `DOWN` script. Los BLoCs nuevos deben coexistir con los antiguos temporalmente durante la transición.
+3. **Rollback plan**: Cada migración SQL debe tener un `DOWN` script. Los BLoCs
+   nuevos deben coexistir con los antiguos temporalmente durante la transición.
 
 ---
 
 ## Archivos Afectados — Resumen
 
 ### Archivos a crear (nuevos)
+
 ```
 lib/features/scan/presentation/bloc/scan_book_bloc.dart
 lib/features/scan/presentation/bloc/scan_book_event.dart
@@ -1044,7 +1198,8 @@ docs/scan-module.md
 ```
 
 ### Archivos a modificar
-```
+
+```dart
 lib/core/di/injection_scan.dart
 lib/core/di/injection.dart
 lib/features/scan/presentation/screens/scan_main_screen.dart
@@ -1061,6 +1216,7 @@ lib/features/tooks/data/took_repository_impl.dart
 ```
 
 ### Archivos a eliminar (post-migration)
+
 ```
 lib/features/scan/presentation/bloc/scan_bloc.dart
 lib/features/scan/presentation/bloc/scan_event.dart
@@ -1069,7 +1225,8 @@ test/bloc/scan_bloc_test.dart
 ```
 
 ### Migraciones SQL nuevas
-```
+
+```bash
 supabase/migrations/YYYYMMDDHHMMSS_fix_tooks_rls_ownership.sql
 supabase/migrations/YYYYMMDDHHMMSS_fix_chapters_rls_ownership.sql
 supabase/migrations/YYYYMMDDHHMMSS_fix_storage_rls_ownership.sql
@@ -1078,4 +1235,5 @@ supabase/migrations/YYYYMMDDHHMMSS_add_updated_at_optimistic_lock.sql
 
 ---
 
-*Plan generado el 2026-07-20. Basado en auditoría de 1046 líneas verificando 60+ archivos Dart y 20+ migraciones SQL.*
+*Plan generado el 2026-07-20. Basado en auditoría de 1046 líneas verificando 60+
+archivos Dart y 20+ migraciones SQL.*

@@ -36,7 +36,8 @@ factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
 );
 ```
 
-- El **default** del rol es `'user'` — si no hay `role` en el JSON, el usuario es `user`
+- El **default** del rol es `'user'` — si no hay `role` en el JSON, el usuario
+  es `user`
 - Serializa/deserializa con `toJson()` / `fromJson()`
 - Mapea `display_name` ↔ `displayName`, `avatar_url` ↔ `avatarUrl`
 
@@ -48,9 +49,7 @@ factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
 | `20260515230000_fix_admin_consolidation.sql` | 15 Mayo | **Elimina** columna `is_admin` — pasa a usar `role` string |
 | `20260517205000_fix_profiles_rls_recursion.sql` | 17 Mayo | Crea `is_admin()` SECURITY DEFINER |
 | `20260520000000_rename_admin_to_scan.sql` | 20 Mayo | **Renombra** admin→scan, crea `is_scan()`, elimina `is_admin()` |
-| `20260520010000_add_admin_role.sql` | 20 Mayo | **Re-introduce** el rol `admin` como tercer valor, crea `is_admin()` de nuevo |
-
-**Resultado final**: CHECK constraint es `role IN ('user', 'scan', 'admin')`.
+| `20260520010000_add_admin_role.sql` | 20 Mayo | **Re-introduce**el rol `admin` como tercer valor, crea `is_admin()` de nuevo |**Resultado final**: CHECK constraint es `role IN ('user', 'scan', 'admin')`.
 
 ---
 
@@ -58,7 +57,9 @@ factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
 
 ### 2.1 AuthBloc (`lib/features/auth/presentation/bloc/auth_bloc.dart`)
 
-El `AuthBloc` maneja login, registro, logout y verificación de sesión. **No distingue roles** — simplemente emite `AuthAuthenticated(user)` con el `UserEntity` completo.
+El `AuthBloc` maneja login, registro, logout y verificación de sesión. **No
+distingue roles** — simplemente emite `AuthAuthenticated(user)` con el
+`UserEntity` completo.
 
 ### 2.2 Enrutamiento por Rol (`lib/core/app/app.dart`, líneas 54-62)
 
@@ -74,9 +75,11 @@ if (authState is AuthAuthenticated) {
 }
 ```
 
-**Flujo admin**: Login → `AuthAuthenticated` → `isAdmin == true` → `AdminDashScreen`
+**Flujo admin**: Login → `AuthAuthenticated` → `isAdmin == true` →
+`AdminDashScreen`
 
-**No hay pantalla de bienvenida, onboarding, ni selección.** El admin es redirigido automáticamente.
+**No hay pantalla de bienvenida, onboarding, ni selección.** El admin es
+redirigido automáticamente.
 
 ### 2.3 Ruta `/admin`
 
@@ -106,7 +109,8 @@ Pantalla principal del admin. Usa `IndexedStack` con **4 tabs**:
 **BLoCs providers** (líneas 28-35):
 
 - `AdminBloc` — se crea al montar, dispara `LoadAdminBooks()` inmediatamente
-- `AdminUsersBloc` — se crea al montar, dispara `LoadAdminUsers()` inmediatamente
+- `AdminUsersBloc` — se crea al montar, dispara `LoadAdminUsers()`
+  inmediatamente
 
 **Drawer**: `AppDrawer(isAdmin: true)` — muestra "Panel Admin" como primer item.
 
@@ -114,11 +118,14 @@ Pantalla principal del admin. Usa `IndexedStack` con **4 tabs**:
 
 El drawer acepta `isScan` y `isAdmin` como parámetros:
 
-- **Si `isAdmin == true`** (línea 58-65): Muestra "Panel Admin" con icono `Icons.admin_panel_settings` → navega a `/admin`
-- **Si `isAdmin == false`** (línea 67-72): Muestra "Inicio" (user) o "Panel Scan" (scan)
+- **Si `isAdmin == true`** (línea 58-65): Muestra "Panel Admin" con icono
+  `Icons.admin_panel_settings` → navega a `/admin`
+- **Si `isAdmin == false`** (línea 67-72): Muestra "Inicio" (user) o "Panel
+  Scan" (scan)
 - **Común a todos**: "Editar Perfil" → `ProfileScreen`, "Cerrar Sesión"
 
-**Nota**: El drawer NO oculta el "Panel Admin" para usuarios regulares — simplemente no se muestra porque `isAdmin` es `false`.
+**Nota**: El drawer NO oculta el "Panel Admin" para usuarios regulares —
+simplemente no se muestra porque `isAdmin` es `false`.
 
 ### 3.3 Ruta a Label Management
 
@@ -147,8 +154,10 @@ onPressed: () => Navigator.pushNamed(context, '/label-management'),
 
 - Cada libro muestra: portada, nombre, autor, estado visible/oculto
 - **Acciones por libro**:
-  - **Toggle visibilidad** (ícono eye): `ToggleBookVisibility(book.id, !book.isVisible)` — publica u oculta
-  - **Eliminar** (ícono delete rojo): Abre dialog de confirmación → `DeleteAdminBook(bookId)`
+  - **Toggle visibilidad** (ícono eye): `ToggleBookVisibility(book.id,
+    !book.isVisible)` — publica u oculta
+  - **Eliminar** (ícono delete rojo): Abre dialog de confirmación →
+    `DeleteAdminBook(bookId)`
 - Pull-to-refresh recarga la lista
 
 **Estados del AdminBloc**:
@@ -163,16 +172,17 @@ onPressed: () => Navigator.pushNamed(context, '/label-management'),
 
 **CRUD completo**:
 
-- **Crear**: FAB (`FloatingActionButton`) → dialog con campo de nombre → `CreateGenreEvent`
-- **Editar**: Icono de lápiz por género → dialog pre-llenado → `UpdateGenreEvent`
+- **Crear**: FAB (`FloatingActionButton`) → dialog con campo de nombre →
+  `CreateGenreEvent`
+- **Editar**: Icono de lápiz por género → dialog pre-llenado →
+  `UpdateGenreEvent`
 - **Eliminar**: Icono de basura → dialog de confirmación → `DeleteGenreEvent`
 - **Listar**: ListView.builder con todos los géneros
 
 ### 4.3 Tab: Usuarios (`lib/features/admin/presentation/screens/users_tab.dart`)
 
-**Solo lectura actualmente** — NO permite cambiar roles ni eliminar usuarios.
-
-**Pantalla**:
+**Solo lectura actualmente**— NO permite cambiar roles ni eliminar
+usuarios.**Pantalla**:
 
 - Lista de todos los usuarios con `ListView.builder`
 - Cada usuario muestra:
@@ -195,7 +205,7 @@ onPressed: () => Navigator.pushNamed(context, '/label-management'),
 - Título "Analíticas"
 - Texto "Próximamente"
 
-**NO hay funcionalidad real de analytics implementada.**
+## NO hay funcionalidad real de analytics implementada
 
 ---
 
@@ -212,7 +222,8 @@ class AdminUsersBloc extends Bloc<AdminUsersEvent, AdminUsersState> {
 }
 ```
 
-**Evento único**: `LoadAdminUsers` → llama `getAllProfiles()` → emite `AdminUsersLoaded(users)`
+**Evento único**: `LoadAdminUsers` → llama `getAllProfiles()` → emite
+`AdminUsersLoaded(users)`
 
 ### 5.2 AdminUsersEvent (`lib/features/admin/presentation/bloc/admin_users_event.dart`)
 
@@ -312,7 +323,9 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
 | `AdminLoaded` | `books: List<BookWithRelations>`, `message?` | Lista cargada con mensaje opcional |
 | `AdminError` | `message: String` | Error con mensaje |
 
-**Nota importante**: `GetBooks` se llama **sin** `onlyVisible: true`, lo que significa que el admin ve **TODOS** los libros incluyendo los ocultos. Esto es intencional — el admin necesita gestionar visibilidad.
+**Nota importante**: `GetBooks` se llama **sin** `onlyVisible: true`, lo que
+significa que el admin ve **TODOS** los libros incluyendo los ocultos. Esto es
+intencional — el admin necesita gestionar visibilidad.
 
 ### 6.2 Flujo de Toggle Visibilidad
 
@@ -335,7 +348,8 @@ User tap delete → _confirmDeleteBook() → AlertDialog
   → Muestra SnackBar: "Libro eliminado"
 ```
 
-**Nota**: La eliminación en BD usa `ON DELETE CASCADE` — elimina tooks, chapters, book_genres, books_labels asociados.
+**Nota**: La eliminación en BD usa `ON DELETE CASCADE` — elimina tooks,
+chapters, book_genres, books_labels asociados.
 
 ---
 
@@ -343,7 +357,8 @@ User tap delete → _confirmDeleteBook() → AlertDialog
 
 ### 7.1 GenreBloc (`lib/features/genres/presentation/bloc/genre_bloc.dart`)
 
-**BLoC compartido** — el mismo `GenreBloc` se usa tanto en el admin como potencialmente en otras partes de la app.
+**BLoC compartido** — el mismo `GenreBloc` se usa tanto en el admin como
+potencialmente en otras partes de la app.
 
 ```dart
 class GenreBloc extends Bloc<GenreEvent, GenreState> {
@@ -363,13 +378,16 @@ class GenreBloc extends Bloc<GenreEvent, GenreState> {
 
 ### 7.2 Diferencia Admin vs Scan en Géneros
 
-**En la UI del admin**: Géneros tab tiene CRUD completo (crear, editar, eliminar).
+**En la UI del admin**: Géneros tab tiene CRUD completo (crear, editar,
+eliminar).
 
-**En la UI de scan**: No hay gestión de géneros — el scan solo gestiona libros y capítulos.
+**En la UI de scan**: No hay gestión de géneros — el scan solo gestiona libros y
+capítulos.
 
 **En RLS (base de datos)**:
 
-- `genres` tiene políticas INSERT/UPDATE/DELETE solo para admin (via `is_admin()`)
+- `genres` tiene políticas INSERT/UPDATE/DELETE solo para admin (via
+  `is_admin()`)
 - Scan NO puede modificar géneros en la BD
 
 ---
@@ -378,7 +396,8 @@ class GenreBloc extends Bloc<GenreEvent, GenreState> {
 
 ### 8.1 ProfileScreen (`lib/features/profiles/presentation/screens/profile_screen.dart`)
 
-**Común a todos los roles** — admin, scan y user usan la misma pantalla de perfil.
+**Común a todos los roles** — admin, scan y user usan la misma pantalla de
+perfil.
 
 **Capacidades**:
 
@@ -408,7 +427,8 @@ No tiene lógica específica para admin. Los eventos son:
 
 ### 9.1 Estado Actual: Stub
 
-`AnalyticsTab` es un placeholder que dice "Próximamente". **No hay funcionalidad de analytics implementada.**
+`AnalyticsTab` es un placeholder que dice "Próximamente". **No hay funcionalidad
+de analytics implementada.**
 
 ### 9.2 Tabla `book_views` (Preparada en BD)
 
@@ -433,18 +453,21 @@ CREATE TABLE IF NOT EXISTS public.book_views (
 - INSERT: Solo admin (`is_admin()`)
 - SELECT: Solo admin (`is_admin()`)
 
-**⚠️ PROBLEMA**: La tabla `book_views` existe pero **ningún código la usa** — no haytracking de vistas implementado en la app. Solo el admin podría insertar datos manualmente via Supabase.
+**⚠️ PROBLEMA**: La tabla `book_views` existe pero **ningún código la usa** — no
+haytracking de vistas implementado en la app. Solo el admin podría insertar
+datos manualmente via Supabase.
 
 ### 9.3 Referencias a Analytics en Código
 
 - `analytics_tab.dart` — solo el ícono y placeholder
-- `text_stats.dart` — utilidad para contar caracteres/palabras de capítulos (NO es analytics de uso)
+- `text_stats.dart` — utilidad para contar caracteres/palabras de capítulos (NO
+  es analytics de uso)
 
 ---
 
 ## 10. Asignación de Roles
 
-### 10.1 ¿Cómo se asigna el rol admin?
+### 10.1 ¿Cómo se asigna el rol admin
 
 **Solo por SQL directo** — no hay interfaz de usuario para asignar roles.
 
@@ -455,16 +478,19 @@ ALTER TABLE profiles ADD CONSTRAINT profiles_role_check
   CHECK (role IN ('user', 'scan', 'admin'));
 ```
 
-### 10.2 ¿Puede un admin cambiar roles?
+### 10.2 ¿Puede un admin cambiar roles
 
 **NO** — No hay:
 
 - ❌ UI para cambiar roles
 - ❌ Evento BLoC para cambiar roles
 - ❌ Use case para cambiar roles
-- ❌ RLS policy que permita UPDATE de `role` (excepto admin puede actualizar profiles)
+- ❌ RLS policy que permita UPDATE de `role` (excepto admin puede actualizar
+  profiles)
 
-**Paradoja**: La RLS policy `"Admin can update profiles"` (`20260524100000`) permite al admin hacer UPDATE en la tabla profiles, pero la app **no tiene código que use esta capacidad**.
+**Paradoja**: La RLS policy `"Admin can update profiles"` (`20260524100000`)
+permite al admin hacer UPDATE en la tabla profiles, pero la app **no tiene
+código que use esta capacidad**.
 
 ### 10.3 Historial de Asignación
 
@@ -533,7 +559,8 @@ $$;
 | "Enable update for admin only" | UPDATE | `is_admin()` | 20260522000000 |
 | "Enable delete for admin only" | DELETE | `is_admin()` | 20260522000000 |
 
-**Admin puede**: Ver TODOS los libros (visibles + ocultos), INSERT, UPDATE, DELETE
+**Admin puede**: Ver TODOS los libros (visibles + ocultos), INSERT, UPDATE,
+DELETE
 
 #### `profiles`
 
@@ -559,75 +586,76 @@ $$;
 
 #### `tooks`
 
-| Política | Operación                    | Condición |
+| Política | Operación | Condición |
 | -------- | ---------------------------- | --------- |
-| SELECT   | Ver todos (política pública) |           |
-| INSERT   | `is_admin()`                 |           |
-| UPDATE   | `is_admin()`                 |           |
-| DELETE   | `is_admin()`                 |           |
+| SELECT | Ver todos (política pública) | |
+| INSERT | `is_admin()` | |
+| UPDATE | `is_admin()` | |
+| DELETE | `is_admin()` | |
 
 #### `chapters`
 
-| Política | Operación                    | Condición |
+| Política | Operación | Condición |
 | -------- | ---------------------------- | --------- |
-| SELECT   | Ver todos (política pública) |           |
-| INSERT   | `is_admin()`                 |           |
-| UPDATE   | `is_admin()`                 |           |
-| DELETE   | `is_admin()`                 |           |
+| SELECT | Ver todos (política pública) | |
+| INSERT | `is_admin()` | |
+| UPDATE | `is_admin()` | |
+| DELETE | `is_admin()` | |
 
 #### `authors`
 
-| Política |      Operación     | Condición |
+| Política | Operación | Condición |
 | -------- | ------------------ | --------- |
-|  SELECT  | Ver todos (`true`) |           |
-|  INSERT  | `is_admin()`       |           |
-|  UPDATE  | `is_admin()`       |           |
-|  DELETE  | `is_admin()`       |           |
+| SELECT | Ver todos (`true`) | |
+| INSERT | `is_admin()` | |
+| UPDATE | `is_admin()` | |
+| DELETE | `is_admin()` | |
 
 #### `books_genres`
 
-| Política   | Operación          | Condición |
+| Política | Operación | Condición |
 | ---------- | ------------------ | --------- |
-| SELECT     | Ver todos (`true`) |           |
-| INSERT     | `is_admin()`       |           |
-| UPDATE     | `is_admin()`       |           |
-| DELETE     | `is_admin()`       |           |
+| SELECT | Ver todos (`true`) | |
+| INSERT | `is_admin()` | |
+| UPDATE | `is_admin()` | |
+| DELETE | `is_admin()` | |
 
 #### `labels`
 
-| Política  | Operación                 | Condición |
+| Política | Operación | Condición |
 | --------- | ------------------------- | --------- |
-| SELECT    | Ver todos (`true`)        |           |
-| INSERT    | `is_scan() OR is_admin()` |           |
-| UPDATE    | `is_scan() OR is_admin()` |           |
-| DELETE    | `is_scan() OR is_admin()` |           |
+| SELECT | Ver todos (`true`) | |
+| INSERT | `is_scan() OR is_admin()` | |
+| UPDATE | `is_scan() OR is_admin()` | |
+| DELETE | `is_scan() OR is_admin()` | |
 
 #### `books_labels`
 
-| Política |        Operación          | Condición |
-|----------|---------------------------|-----------|
-|  SELECT  |     Ver todos (`true`)    |           |
-|  INSERT  | `is_scan() OR is_admin()` |           |
-|  DELETE  | `is_scan() OR is_admin()` |           |
+| Política | Operación | Condición |
+| ---------- | --------------------------- | ----------- |
+| SELECT | Ver todos (`true`) | |
+| INSERT | `is_scan() OR is_admin()` | |
+| DELETE | `is_scan() OR is_admin()` | |
 
 #### `book_views`
 
-| Política |   Operación  | Condición |
-|----------|--------------|-----------|
-| INSERT   | `is_admin()` |           |
-| SELECT   | `is_admin()` |           |
+| Política | Operación | Condición |
+| ---------- | -------------- | ----------- |
+| INSERT | `is_admin()` | |
+| SELECT | `is_admin()` | |
 
-**Solo admin puede ver e insertar datos de analytics.**
+## Solo admin puede ver e insertar datos de analytics
 
 ### 11.3 Storage (Supabase Storage)
 
-|   Bucket   |             Lectura              |                 Escritura                  |
+| Bucket | Lectura | Escritura |
 | ---------- | -------------------------------- | ------------------------------------------ |
 | `chapters` | Pública (`Chapters public read`) | Autenticado (`Chapters authenticated all`) |
-| `covers`   | Pública (`Covers public read`)   |                      —                     |
-| `avatars`  |                 —                | Autenticado (upload por el propio usuario) |
+| `covers` | Pública (`Covers public read`) | — |
+| `avatars` | — | Autenticado (upload por el propio usuario) |
 
-**No hay políticas de storage específicas para admin** — el admin usa las mismas que cualquier usuario autenticado para storage.
+**No hay políticas de storage específicas para admin** — el admin usa las mismas
+que cualquier usuario autenticado para storage.
 
 ---
 
@@ -668,25 +696,27 @@ LabelManagementScreen (ruta /label-management)
 
 ### 13.1 Use Cases que el Admin Utiliza
 
-|        Use Case        | Archivo                                                 | ¿Exclusivo del Admin?              |
+| Use Case | Archivo | ¿Exclusivo del Admin? |
 | ---------------------- | ------------------------------------------------------- | ---------------------------------- |
-| `GetBooks`             | `lib/features/books/domain/get_book.dart`               | No (scan también)                  |
-| `ToggleBookVisibility` | `lib/features/books/domain/toggle_book_visibility.dart` | No (scan también)                  |
-| `DeleteBook`           | `lib/features/books/domain/delete_book.dart`            | No (scan también)                  |
-| `GetAllProfiles`       | `lib/features/profiles/domain/get_all_profiles.dart`    | **SÍ — Solo admin**                |
-| `GetGenre`             | `lib/features/genres/domain/get_genre.dart`             | No                                 |
-| `CreateGenre`          | `lib/features/genres/domain/create_genre.dart`          | **Funcional solo por admin en BD** |
-| `UpdateGenre`          | `lib/features/genres/domain/update_genre.dart`          | **Funcional solo por admin en BD** |
-| `DeleteGenre`          | `lib/features/genres/domain/delete_genre.dart`          | **Funcional solo por admin en BD** |
-| `GetProfile`           | `lib/features/profiles/domain/get_profile.dart`         | No                                 |
-| `UpdateProfile`        | `lib/features/profiles/domain/update_profile.dart`      | No                                 |
-| `ChangePassword`       | `lib/features/profiles/domain/change_password.dart`     | No                                 |
+| `GetBooks` | `lib/features/books/domain/get_book.dart` | No (scan también) |
+| `ToggleBookVisibility` | `lib/features/books/domain/toggle_book_visibility.dart` | No (scan también) |
+| `DeleteBook` | `lib/features/books/domain/delete_book.dart` | No (scan también) |
+| `GetAllProfiles` | `lib/features/profiles/domain/get_all_profiles.dart` | **SÍ — Solo admin** |
+| `GetGenre` | `lib/features/genres/domain/get_genre.dart` | No |
+| `CreateGenre` | `lib/features/genres/domain/create_genre.dart` | **Funcional solo por admin en BD** |
+| `UpdateGenre` | `lib/features/genres/domain/update_genre.dart` | **Funcional solo por admin en BD** |
+| `DeleteGenre` | `lib/features/genres/domain/delete_genre.dart` | **Funcional solo por admin en BD** |
+| `GetProfile` | `lib/features/profiles/domain/get_profile.dart` | No |
+| `UpdateProfile` | `lib/features/profiles/domain/update_profile.dart` | No |
+| `ChangePassword` | `lib/features/profiles/domain/change_password.dart` | No |
 
 ### 13.2 Use Cases Admin-Exclusivos por RLS
 
-Aunque los use cases en sí mismos no verifican el rol, la **BD solo permite** estas operaciones para admin:
+Aunque los use cases en sí mismos no verifican el rol, la **BD solo permite**
+estas operaciones para admin:
 
-- **INSERT/UPDATE/DELETE** en: books, genres, tooks, chapters, authors, books_genres
+- **INSERT/UPDATE/DELETE** en: books, genres, tooks, chapters, authors,
+  books_genres
 - **SELECT** en: book_views, profiles (todos los usuarios)
 - **UPDATE** en: profiles (cualquier usuario)
 
@@ -696,22 +726,22 @@ Aunque los use cases en sí mismos no verifican el rol, la **BD solo permite** e
 
 ### 14.1 Tabla Comparativa de Acciones
 
-| Acción                            |  Admin  | Scan   | User   |
-| --------------------------------- | :----: || :----: | :----: |
-| **VER libros ocultos**            |   ✅   | ✅     | ❌    |
-| **VER libros propios**            |   ✅   | ✅     | ✅    |
-| **Crear libros**                  |   ✅   | ✅     | ❌    |
-| **Eliminar libros**               |   ✅   | ✅     | ❌    |
-| **Toggle visibilidad**            |   ✅   | ✅     | ❌    |
-| **Crear/editar/eliminar géneros** |   ✅   | ❌     | ❌    |
-| **Crear/editar/eliminar labels**  |   ✅   | ✅     | ❌    |
-| **VER todos los usuarios**        |   ✅   | ❌     | ❌    |
-| **Actualizar perfil de otros**    |   ✅   | ❌     | ❌    |
-| **VER analytics (book_views)**    |   ✅   | ❌     | ❌    |
-| **INSERTar analytics**            |   ✅   | ❌     | ❌    |
-| **Editar propio perfil**          |   ✅   | ✅     | ✅    |
-| **Cambiar contraseña**            |   ✅   | ✅     | ✅    |
-| **Acceder a /label-management**   |   ✅   | ✅     | ❌    |
+| Acción | Admin | Scan | User |
+| --------------------------------- | :----: | | :----: | :----: |
+| **VER libros ocultos** | ✅ | ✅ | ❌ |
+| **VER libros propios** | ✅ | ✅ | ✅ |
+| **Crear libros** | ✅ | ✅ | ❌ |
+| **Eliminar libros** | ✅ | ✅ | ❌ |
+| **Toggle visibilidad** | ✅ | ✅ | ❌ |
+| **Crear/editar/eliminar géneros** | ✅ | ❌ | ❌ |
+| **Crear/editar/eliminar labels** | ✅ | ✅ | ❌ |
+| **VER todos los usuarios** | ✅ | ❌ | ❌ |
+| **Actualizar perfil de otros** | ✅ | ❌ | ❌ |
+| **VER analytics (book_views)** | ✅ | ❌ | ❌ |
+| **INSERTar analytics** | ✅ | ❌ | ❌ |
+| **Editar propio perfil** | ✅ | ✅ | ✅ |
+| **Cambiar contraseña** | ✅ | ✅ | ✅ |
+| **Acceder a /label-management** | ✅ | ✅ | ❌ |
 
 ### 14.2 Privilegios Exclusivos del Admin
 
@@ -752,11 +782,14 @@ void initAdminDependencies() {
 }
 ```
 
-**`registerFactory`** — Se crea una nueva instancia cada vez que se llama `getIt<AdminBloc>()`. Esto es correcto porque `AdminDashScreen` se monta y desmonta.
+**`registerFactory`** — Se crea una nueva instancia cada vez que se llama
+`getIt<AdminBloc>()`. Esto es correcto porque `AdminDashScreen` se monta y
+desmonta.
 
 ### 15.2 injection_profiles.dart
 
-`GetAllProfiles` se registra como `registerLazySingleton` — una sola instancia compartida entre el admin y cualquier otro consumidor.
+`GetAllProfiles` se registra como `registerLazySingleton` — una sola instancia
+compartida entre el admin y cualquier otro consumidor.
 
 ### 15.3 injection.dart (main)
 
@@ -877,27 +910,40 @@ supabase/migrations/20260616000001_fix_storage_rls_and_security_definer.sql
 
 ### 17.1 Brechas Críticas
 
-1. **No hay gestión de usuarios real** — El tab "Usuarios" solo muestra una lista. Un admin necesita poder cambiar roles, suspender y eliminar usuarios.
-2. **No hay creación de libros desde admin** — Solo puede gestionar visibilidad y eliminar, pero no crear libros nuevos (solo scan puede).
-3. **Analytics es un placeholder** — La tabla `book_views` existe pero no se usa.
-4. **No hay rol de "editor"** — El sistema tiene user/scan/admin pero no un rol intermedio que pueda gestionar contenido sin permisos de sistema.
+1. **No hay gestión de usuarios real** — El tab "Usuarios" solo muestra una
+   lista. Un admin necesita poder cambiar roles, suspender y eliminar usuarios.
+2. **No hay creación de libros desde admin** — Solo puede gestionar visibilidad
+   y eliminar, pero no crear libros nuevos (solo scan puede).
+3. **Analytics es un placeholder** — La tabla `book_views` existe pero no se
+   usa.
+4. **No hay rol de "editor"** — El sistema tiene user/scan/admin pero no un rol
+   intermedio que pueda gestionar contenido sin permisos de sistema.
 
 ### 17.2 Riesgos de Seguridad
 
-1. **`is_admin()` es SECURITY DEFINER** — Correcto, previene search_path injection
+1. **`is_admin()` es SECURITY DEFINER** — Correcto, previene search_path
+   injection
 2. **No hay rate limiting** — El admin puede hacer DELETE masivo sin protección
-3. **`getAllProfiles()` limita a 100** — Si hay más usuarios, algunos son invisibles
-4. **RLS "Admin can update profiles"** permite cambiar CUALQUIER campo incluyendo `role` — pero la app no lo usa, lo cual es bueno por ahora
-5. **`book_views` solo tiene admin policies** — Si se implementa tracking de usuarios, necesitará una política SELECT para users también
+3. **`getAllProfiles()` limita a 100** — Si hay más usuarios, algunos son
+   invisibles
+4. **RLS "Admin can update profiles"** permite cambiar CUALQUIER campo
+   incluyendo `role` — pero la app no lo usa, lo cual es bueno por ahora
+5. **`book_views` solo tiene admin policies** — Si se implementa tracking de
+   usuarios, necesitará una política SELECT para users también
 
 ### 17.3 Deuda Técnica
 
-1. Los roles son strings crudos (`'admin'`, `'scan'`, `'user'`) en vez de un enum — propenso a typos
-2. `AdminUsersBloc` tiene un solo evento (`LoadAdminUsers`) — over-engineered para solo cargar datos
+1. Los roles son strings crudos (`'admin'`, `'scan'`, `'user'`) en vez de un
+   enum — propenso a typos
+2. `AdminUsersBloc` tiene un solo evento (`LoadAdminUsers`) — over-engineered
+   para solo cargar datos
 3. No hay tests unitarios para los BLoCs del admin
-4. `GenreBloc` se crea como instancia nueva dentro de `GenresTab` — inconsistente con el patrón de providers del padre
-5. La ruta `/admin` está registrada como ruta nombrada pero el admin también llega via `AdminDashScreen` directo — doble punto de entrada
+4. `GenreBloc` se crea como instancia nueva dentro de `GenresTab` —
+   inconsistente con el patrón de providers del padre
+5. La ruta `/admin` está registrada como ruta nombrada pero el admin también
+   llega via `AdminDashScreen` directo — doble punto de entrada
 
 ---
 
-*Documento generado como parte de la auditoría del rol de administrador en el proyecto Noveles.*
+*Documento generado como parte de la auditoría del rol de administrador en el
+proyecto Noveles.*

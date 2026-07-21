@@ -30,7 +30,7 @@ labels ──M:N──> books (via books_labels)
 ## Table: `profiles`
 
 | Column | Type | Nullable | Default | Notes |
-|--------|------|----------|---------|-------|
+| -------- | ------ | ---------- | --------- | ------- |
 | `id` | UUID | NO | — | FK → auth.users(id), PK |
 | `role` | TEXT | NO | `'user'` | CHECK: user/scan/admin/suspended |
 | `created_at` | TIMESTAMPTZ | NO | `now()` | |
@@ -41,7 +41,7 @@ labels ──M:N──> books (via books_labels)
 ### Code Mapping
 
 | Layer | File | Purpose |
-|-------|------|---------|
+| ------- | ------ | --------- |
 | Entity | `lib/features/profiles/domain/user_entity.dart` | `UserEntity` with `isUser`, `isScan`, `isAdmin`, `isSuspended` getters |
 | Model | `lib/features/profiles/data/user_model.dart` | JSON mapping, `_validateRole()` |
 | Repository | `lib/features/profiles/domain/profiles_repository.dart` | Abstract: `getProfile`, `getAllProfiles`, `updateProfile`, `uploadAvatar` |
@@ -61,7 +61,7 @@ labels ──M:N──> books (via books_labels)
 ### Required Policies
 
 | Operation | Role | Why |
-|-----------|------|-----|
+| ----------- | ------ | ----- |
 | SELECT | User (own) | User reads own profile |
 | SELECT | Admin (all) | Admin manages users |
 | SELECT | Scan (all) | Scan needs to see author names |
@@ -74,7 +74,7 @@ labels ──M:N──> books (via books_labels)
 ## Table: `books`
 
 | Column | Type | Nullable | Default | Notes |
-|--------|------|----------|---------|-------|
+| -------- | ------ | ---------- | --------- | ------- |
 | `id` | INT | NO | nextval | PK |
 | `created_at` | TIMESTAMPTZ | YES | `now()` | |
 | `cover` | TEXT | NO | — | Storage URL |
@@ -95,10 +95,10 @@ labels ──M:N──> books (via books_labels)
 | `took_count` | INT | YES | `0` | Denormalized count |
 | `chapter_count` | INT | YES | `0` | Denormalized count |
 
-### Code Mapping
+### Code Mapping (Part 2)
 
 | Layer | File | Purpose |
-|-------|------|---------|
+| ------- | ------ | --------- |
 | Entity | `lib/features/books/domain/book_entity.dart` | `BookEntity` domain model |
 | Model | `lib/features/books/data/book_model.dart` | JSON mapping with `BookWithRelations` |
 | Repository | `lib/features/books/domain/book_repository.dart` | Abstract: `getBooks`, `getBookById`, `createBook`, `updateBook`, `deleteBook`, `toggleBookVisibility`, `uploadImage`, `trackBookView`, `getBookLabels` |
@@ -121,10 +121,10 @@ labels ──M:N──> books (via books_labels)
 | Migration | `20260514220000_initial_schema.sql` | Creates books table |
 | Migration | `20260524110000_fix_books_rls_scan_visibility.sql` | Scan visibility fix |
 
-### Required Policies
+### Required Policies (Part 2)
 
 | Operation | Role | Why |
-|-----------|------|-----|
+| ----------- | ------ | ----- |
 | SELECT | User (visible) | User reads published books |
 | SELECT | Admin (all) | Admin manages all books |
 | SELECT | Scan (own) | Scan reads own books for editing |
@@ -140,26 +140,27 @@ labels ──M:N──> books (via books_labels)
 ## Table: `authors`
 
 | Column | Type | Nullable | Default | Notes |
-|--------|------|----------|---------|-------|
+| -------- | ------ | ---------- | --------- | ------- |
 | `id` | INT | NO | nextval | PK |
 | `created_at` | TIMESTAMPTZ | YES | `now()` | |
 | `name` | TEXT | NO | — | Author name |
 | `description` | TEXT | YES | `''` | |
 
-### Code Mapping
+### Code Mapping (Part 3)
 
 | Layer | File | Purpose |
-|-------|------|---------|
+| ------- | ------ | --------- |
 | Repository Impl | `lib/features/books/data/book_repository_impl.dart` | Reads authors when fetching books with relations |
 | Screen | `lib/features/admin/presentation/screens/genres_tab.dart` | Admin genre/author management |
 | Migration | `20260515000000_authors_and_constraints.sql` | Creates authors table |
 
-**Note**: No dedicated `AuthorRepository` — authors are managed through books and genres tabs.
+**Note**: No dedicated `AuthorRepository` — authors are managed through books
+and genres tabs.
 
-### Required Policies
+### Required Policies (Part 3)
 
 | Operation | Role | Why |
-|-----------|------|-----|
+| ----------- | ------ | ----- |
 | SELECT | All | Authors are public data |
 | INSERT | Admin/Scan | Both can create authors |
 | UPDATE | Admin/Scan | Both can edit authors |
@@ -170,16 +171,16 @@ labels ──M:N──> books (via books_labels)
 ## Table: `genres`
 
 | Column | Type | Nullable | Default | Notes |
-|--------|------|----------|---------|-------|
+| -------- | ------ | ---------- | --------- | ------- |
 | `id` | INT | NO | identity | PK |
 | `created_at` | TIMESTAMPTZ | YES | `now()` | |
 | `name` | TEXT | NO | — | Genre name |
 | `description` | TEXT | YES | `''` | |
 
-### Code Mapping
+### Code Mapping (Part 4)
 
 | Layer | File | Purpose |
-|-------|------|---------|
+| ------- | ------ | --------- |
 | Entity | `lib/features/genres/domain/genre_entity.dart` | `GenreEntity` domain model |
 | Repository | `lib/features/genres/domain/genre_repository.dart` | Abstract: `getGenres`, `getGenreById`, `createGenre`, `updateGenre`, `deleteGenre` |
 | Repository Impl | `lib/features/genres/data/genre_repository_impl.dart` | Supabase calls |
@@ -192,10 +193,10 @@ labels ──M:N──> books (via books_labels)
 | DI | `lib/core/di/injection_scan.dart` | Registers GenreCubit |
 | Migration | `20260514220000_initial_schema.sql` | Creates genres table |
 
-### Required Policies
+### Required Policies (Part 4)
 
 | Operation | Role | Why |
-|-----------|------|-----|
+| ----------- | ------ | ----- |
 | SELECT | All | Genres are public data |
 | INSERT | Admin/Scan | Both can create genres |
 | UPDATE | Admin/Scan | Both can edit genres |
@@ -206,16 +207,16 @@ labels ──M:N──> books (via books_labels)
 ## Table: `labels`
 
 | Column | Type | Nullable | Default | Notes |
-|--------|------|----------|---------|-------|
+| -------- | ------ | ---------- | --------- | ------- |
 | `id` | BIGINT | NO | identity | PK |
 | `created_at` | TIMESTAMPTZ | NO | `now()` | |
 | `name` | TEXT | NO | — | Label name |
 | `color` | TEXT | NO | `'#71A202'` | Hex color |
 
-### Code Mapping
+### Code Mapping (Part 5)
 
 | Layer | File | Purpose |
-|-------|------|---------|
+| ------- | ------ | --------- |
 | Entity | `lib/features/labels/domain/label_entity.dart` | `LabelEntity` domain model |
 | Repository | `lib/features/labels/domain/label_repository.dart` | Abstract: `getLabels`, `getLabelById`, `createLabel`, `updateLabel`, `deleteLabel`, `assignLabel`, `removeLabel` |
 | Repository Impl | `lib/features/labels/data/label_repository_impl.dart` | Supabase calls for labels + books_labels |
@@ -225,10 +226,10 @@ labels ──M:N──> books (via books_labels)
 | DI | `lib/core/di/injection_labels.dart` | Registers LabelRepository, LabelBloc |
 | Migration | `20260520020000_labels.sql` | Creates labels table |
 
-### Required Policies
+### Required Policies (Part 5)
 
 | Operation | Role | Why |
-|-----------|------|-----|
+| ----------- | ------ | ----- |
 | SELECT | All | Labels are public data |
 | INSERT | Admin/Scan | Both can create labels |
 | UPDATE | Admin/Scan | Both can edit labels |
@@ -239,23 +240,23 @@ labels ──M:N──> books (via books_labels)
 ## Table: `books_genres` (M:N junction)
 
 | Column | Type | Nullable | Notes |
-|--------|------|----------|-------|
+| -------- | ------ | ---------- | ------- |
 | `book_id` | INT | NO | FK → books(id) |
 | `genre_id` | INT | NO | FK → genres(id) |
 
 **PK**: (book_id, genre_id)
 
-### Code Mapping
+### Code Mapping (Part 6)
 
 | Layer | File | Purpose |
-|-------|------|---------|
+| ------- | ------ | --------- |
 | Repository Impl | `lib/features/books/data/book_repository_impl.dart` | Insert/delete when creating/updating books |
 | Migration | `20260514220000_initial_schema.sql` | Creates junction table |
 
-### Required Policies
+### Required Policies (Part 6)
 
 | Operation | Role | Why |
-|-----------|------|-----|
+| ----------- | ------ | ----- |
 | SELECT | All | Junction data is public |
 | INSERT | Admin/Scan | Both assign genres to books |
 | DELETE | Admin/Scan | Both remove genres from books |
@@ -265,24 +266,24 @@ labels ──M:N──> books (via books_labels)
 ## Table: `books_labels` (M:N junction)
 
 | Column | Type | Nullable | Notes |
-|--------|------|----------|-------|
+| -------- | ------ | ---------- | ------- |
 | `book_id` | INT | NO | FK → books(id) |
 | `label_id` | BIGINT | NO | FK → labels(id) |
 
 **PK**: (book_id, label_id)
 
-### Code Mapping
+### Code Mapping (Part 7)
 
 | Layer | File | Purpose |
-|-------|------|---------|
+| ------- | ------ | --------- |
 | Repository Impl | `lib/features/books/data/book_repository_impl.dart` | Read labels for books, `getBookLabels()` |
 | Repository Impl | `lib/features/labels/data/label_repository_impl.dart` | Assign/remove labels from books |
 | Migration | `20260520020000_labels.sql` | Creates junction table |
 
-### Required Policies
+### Required Policies (Part 7)
 
 | Operation | Role | Why |
-|-----------|------|-----|
+| ----------- | ------ | ----- |
 | SELECT | All | Junction data is public |
 | INSERT | Admin/Scan | Both assign labels to books |
 | DELETE | Admin/Scan | Both remove labels from books |
@@ -292,7 +293,7 @@ labels ──M:N──> books (via books_labels)
 ## Table: `tooks`
 
 | Column | Type | Nullable | Default | Notes |
-|--------|------|----------|---------|-------|
+| -------- | ------ | ---------- | --------- | ------- |
 | `id` | INT | NO | nextval | PK |
 | `created_at` | TIMESTAMPTZ | YES | `now()` | |
 | `book_id` | INT | NO | — | FK → books(id) |
@@ -302,10 +303,10 @@ labels ──M:N──> books (via books_labels)
 | `created_by` | UUID | YES | — | FK → auth.users(id) |
 | `chapter_count` | INT | YES | `0` | Denormalized count |
 
-### Code Mapping
+### Code Mapping (Part 8)
 
 | Layer | File | Purpose |
-|-------|------|---------|
+| ------- | ------ | --------- |
 | Entity | `lib/features/tooks/domain/took_entity.dart` | `TookEntity` domain model |
 | Repository | `lib/features/tooks/domain/took_repository.dart` | Abstract: `getTooks`, `getTookById`, `createTook`, `updateTook`, `deleteTook` |
 | Repository Impl | `lib/features/tooks/data/took_repository_impl.dart` | Supabase calls |
@@ -317,10 +318,10 @@ labels ──M:N──> books (via books_labels)
 | DI | `lib/core/di/injection_scan.dart` | Registers ScanTookBloc |
 | Migration | `20260514220000_initial_schema.sql` | Creates tooks table |
 
-### Required Policies
+### Required Policies (Part 8)
 
 | Operation | Role | Why |
-|-----------|------|-----|
+| ----------- | ------ | ----- |
 | SELECT | All | Took metadata is public |
 | INSERT | Admin/Scan (own) | Scan creates tooks |
 | UPDATE | Admin/Scan (own) | Scan edits own tooks |
@@ -331,7 +332,7 @@ labels ──M:N──> books (via books_labels)
 ## Table: `chapters`
 
 | Column | Type | Nullable | Default | Notes |
-|--------|------|----------|---------|-------|
+| -------- | ------ | ---------- | --------- | ------- |
 | `id` | INT | NO | nextval | PK |
 | `created_at` | TIMESTAMPTZ | YES | `now()` | |
 | `took_id` | INT | NO | — | FK → tooks(id) |
@@ -340,10 +341,10 @@ labels ──M:N──> books (via books_labels)
 | `content` | TEXT | YES | `''` | Chapter content |
 | `created_by` | UUID | YES | — | FK → auth.users(id) |
 
-### Code Mapping
+### Code Mapping (Part 9)
 
 | Layer | File | Purpose |
-|-------|------|---------|
+| ------- | ------ | --------- |
 | Entity | `lib/features/chapters/domain/chapter_entity.dart` | `ChapterEntity` domain model |
 | Repository | `lib/features/chapters/domain/chapter_repository.dart` | Abstract: `getChapters`, `getChapterById`, `createChapter`, `updateChapter`, `deleteChapter` |
 | Repository Impl | `lib/features/chapters/data/chapter_repository_impl.dart` | Supabase calls |
@@ -355,10 +356,10 @@ labels ──M:N──> books (via books_labels)
 | DI | `lib/core/di/injection_scan.dart` | Registers ScanChapterBloc |
 | Migration | `20260514220000_initial_schema.sql` | Creates chapters table |
 
-### Required Policies
+### Required Policies (Part 9)
 
 | Operation | Role | Why |
-|-----------|------|-----|
+| ----------- | ------ | ----- |
 | SELECT | All | Chapter content is public |
 | INSERT | Admin/Scan (own) | Scan creates chapters |
 | UPDATE | Admin/Scan (own) | Scan edits own chapters |
@@ -369,16 +370,16 @@ labels ──M:N──> books (via books_labels)
 ## Table: `book_views`
 
 | Column | Type | Nullable | Default | Notes |
-|--------|------|----------|---------|-------|
+| -------- | ------ | ---------- | --------- | ------- |
 | `id` | BIGINT | NO | identity | PK |
 | `book_id` | BIGINT | NO | — | FK → books(id) CASCADE |
 | `viewed_at` | TIMESTAMPTZ | NO | `now()` | |
 | `user_id` | UUID | YES | — | FK → auth.users(id) SET NULL |
 
-### Code Mapping
+### Code Mapping (Part 10)
 
 | Layer | File | Purpose |
-|-------|------|---------|
+| ------- | ------ | --------- |
 | Repository Impl | `lib/features/books/data/book_repository_impl.dart` | `trackBookView()` — INSERT into book_views |
 | Use Case | `lib/features/books/domain/track_book_view.dart` | `TrackBookView` — fire-and-forget from BookScreen |
 | Screen | `lib/features/books/presentation/screens/book_screen.dart` | Calls `TrackBookView` after 2s delay in `initState()` |
@@ -392,10 +393,10 @@ labels ──M:N──> books (via books_labels)
 | Migration | `20260720050000_create_analytics_functions.sql` | Creates analytics SQL functions |
 | SQL Functions | `get_views_trend()`, `get_top_books()`, `get_analytics_overview()` | Analytics queries |
 
-### Required Policies
+### Required Policies (Part 10)
 
 | Operation | Role | Why |
-|-----------|------|-----|
+| ----------- | ------ | ----- |
 | SELECT | Admin | Only admin views analytics |
 | INSERT | Any authenticated | Any user tracking a view |
 
@@ -404,17 +405,17 @@ labels ──M:N──> books (via books_labels)
 ## Table: `user_favorites`
 
 | Column | Type | Nullable | Default | Notes |
-|--------|------|----------|---------|-------|
+| -------- | ------ | ---------- | --------- | ------- |
 | `user_id` | UUID | NO | — | FK → auth.users(id) CASCADE |
 | `book_id` | INT | NO | — | FK → books(id) CASCADE |
 | `created_at` | TIMESTAMPTZ | NO | `now()` | |
 
 **PK**: (user_id, book_id)
 
-### Code Mapping
+### Code Mapping (Part 11)
 
 | Layer | File | Purpose |
-|-------|------|---------|
+| ------- | ------ | --------- |
 | Entity | `lib/features/favorites/domain/favorite_entity.dart` | `FavoriteEntity` domain model |
 | Repository | `lib/features/favorites/domain/favorite_repository.dart` | Abstract: `getFavorites`, `isFavorite`, `toggleFavorite` |
 | Repository Impl | `lib/features/favorites/data/favorite_repository_impl.dart` | Supabase calls |
@@ -423,10 +424,10 @@ labels ──M:N──> books (via books_labels)
 | DI | `lib/core/di/injection_favorites.dart` | Registers FavoriteRepository, FavoriteBloc |
 | Migration | `20260720030000_create_user_favorites.sql` | Creates user_favorites table |
 
-### Required Policies
+### Required Policies (Part 11)
 
 | Operation | Role | Why |
-|-----------|------|-----|
+| ----------- | ------ | ----- |
 | SELECT | User (own) | User sees own favorites |
 | INSERT | User (own) | User adds favorites |
 | DELETE | User (own) | User removes favorites |

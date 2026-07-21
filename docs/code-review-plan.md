@@ -2,14 +2,16 @@
 
 ## Contexto
 
-Después de revisar la arquitectura limpia del proyecto (`lib/core`, `lib/features`), identificamos **12 issues** organizados en 4 niveles de prioridad. Este documento detalla los cambios necesarios para cada uno.
+Después de revisar la arquitectura limpia del proyecto (`lib/core`,
+`lib/features`), identificamos **12 issues** organizados en 4 niveles de
+prioridad. Este documento detalla los cambios necesarios para cada uno.
 
 ---
 
 ## Resumen de Issues por Prioridad
 
 | Prioridad | Cantidad | Tipo de Impacto |
-|-----------|----------|-----------------|
+| ----------- | ---------- | ----------------- |
 | **P0** | 3 | Crash garantizados en ciertos flujos |
 | **P1** | 4 | Memory leaks, data loss, poor UX |
 | **P2** | 3 | UX improvements |
@@ -21,11 +23,10 @@ Después de revisar la arquitectura limpia del proyecto (`lib/core`, `lib/featur
 
 ### P0-1: Null Safety en CoverUrlService
 
-**Archivo:** `lib/core/cover/cover_url_service.dart`
+**Archivo:**`lib/core/cover/cover_url_service.dart`**Problema:** Si `cover` es
+`null`, lanza `NoSuchMethodError`.
 
-**Problema:** Si `cover` es `null`, lanza `NoSuchMethodError`.
-
-**Cambio:**
+## Cambio
 
 ```dart
 // ANTES (línea 8-12)
@@ -47,11 +48,11 @@ String call(String? cover) {
 
 ### P0-2: Crash en AppDrawer con avatarUrl
 
-**Archivo:** `lib/features/presentation/widgets/app_drawer.dart`
+**Archivo:**`lib/features/presentation/widgets/app_drawer.dart`**Problema:**
+`CoverUrlService.call()` recibe `String` pero `user.avatarUrl`
+puede ser `null`.
 
-**Problema:** `CoverUrlService.call()` recibe `String` pero `user.avatarUrl` puede ser `null`.
-
-**Cambio (línea 34-42):**
+## Cambio (línea 34-42)
 
 ```dart
 // ANTES
@@ -78,17 +79,17 @@ CircleAvatar(
 ),
 ```
 
-**Nota:** Con P0-1 corregido (nullable `String?`), este código es seguro. Si prefieres mantenerlo defensivo, usa el código de arriba.
+**Nota:** Con P0-1 corregido (nullable `String?`), este código es seguro. Si
+prefieres mantenerlo defensivo, usa el código de arriba.
 
 ---
 
 ### P0-3: ANR en ChapterBloc - N+1 Queries
 
-**Archivo:** `lib/features/presentation/bloc/chapter/chapter_bloc.dart`
+**Archivo:**`lib/features/presentation/bloc/chapter/chapter_bloc.dart`**Problema
+:** Loop secuencial hace N queries, congelando la UI.
 
-**Problema:** Loop secuencial hace N queries, congelando la UI.
-
-**Cambio completo del archivo:**
+## Cambio completo del archivo
 
 ```dart
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -147,7 +148,8 @@ class ChapterBloc extends Bloc<ChapterEvent, ChapterState> {
 }
 ```
 
-**Beneficio:** Si hay 10 capítulos, el tiempo total es ~1 query en paralelo vs 10 secuenciales.
+**Beneficio:** Si hay 10 capítulos, el tiempo total es ~1 query en paralelo vs
+10 secuenciales.
 
 ---
 
@@ -155,11 +157,11 @@ class ChapterBloc extends Bloc<ChapterEvent, ChapterState> {
 
 ### P1-1: Memory Leak en AuthBloc
 
-**Archivo:** `lib/features/presentation/bloc/auth/auth_bloc.dart`
+**Archivo:**`lib/features/presentation/bloc/auth/auth_bloc.dart`**Problema:**
+`_listenAuthChanges()` puede acumular subscriptions si se llama
+múltiples veces.
 
-**Problema:** `_listenAuthChanges()` puede acumular subscriptions si se llama múltiples veces.
-
-**Cambio en el constructor (líneas 22-34):**
+## Cambio en el constructor (líneas 22-34)
 
 ```dart
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
@@ -198,11 +200,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
 ### P1-2: Lógica incorrecta en `_getProfile` durante registro
 
-**Archivo:** `lib/features/auth/data/auth_repository_impl.dart`
+**Archivo:**`lib/features/auth/data/auth_repository_impl.dart`**Problema:** Si
+el `insert` falla silenciosamente, retorna OK incorrectamente.
 
-**Problema:** Si el `insert` falla silenciosamente, retorna OK incorrectamente.
-
-**Cambio (líneas 127-139):**
+## Cambio (líneas 127-139)
 
 ```dart
 // ANTES
@@ -278,11 +279,10 @@ if (response == null) {
 
 ### P1-3: Sin Pagination en getBooks
 
-**Archivo:** `lib/features/books/data/book_repository_impl.dart`
+**Archivo:**`lib/features/books/data/book_repository_impl.dart`**Problema:**
+`limit(100)` trunca datos si hay más libros.
 
-**Problema:** `limit(100)` trunca datos si hay más libros.
-
-**Cambio en el método `getBooks` (líneas 14-30):**
+## Cambio en el método `getBooks` (líneas 14-30)
 
 ```dart
 // NUEVA FIRMA
@@ -314,7 +314,8 @@ Future<Result<List<BookEntity>>> getBooks({
 }
 ```
 
-**También actualizar** el repository interface en `lib/features/books/domain/book_repository.dart`.
+**También actualizar** el repository interface en
+`lib/features/books/domain/book_repository.dart`.
 
 ---
 
@@ -322,9 +323,9 @@ Future<Result<List<BookEntity>>> getBooks({
 
 **Archivo:** `lib/features/books/data/book_repository_impl.dart`
 
-**Método `uploadCover` (líneas 180-190)**
+## Método `uploadCover` (líneas 180-190)
 
-**Cambio:**
+## Cambio: (Part 2)
 
 ```dart
 static const int maxFileSizeBytes = 5 * 1024 * 1024; // 5MB
@@ -366,9 +367,8 @@ Future<Result<String>> uploadCover(String filePath) async {
 
 ### P2-1: Capítulo 12 - Logger en Producción
 
-**Archivo:** `lib/core/utils/logger.dart`
-
-**Mejora:** Usar `kDebugMode` para separar logs de desarrollo y producción.
+**Archivo:**`lib/core/utils/logger.dart`**Mejora:** Usar `kDebugMode` para
+separar logs de desarrollo y producción.
 
 ```dart
 import 'package:flutter/foundation.dart';
@@ -398,7 +398,8 @@ class AppLogger {
 }
 ```
 
-**Recomendación:** Agregar integración con Sentry o Firebase Crashlytics para producción.
+**Recomendación:** Agregar integración con Sentry o Firebase Crashlytics para
+producción.
 
 ---
 
@@ -406,7 +407,7 @@ class AppLogger {
 
 **Archivo:** `lib/core/supabase/chapter_cache.dart`
 
-**Cambio (línea 26):**
+## Cambio (línea 26)
 
 ```dart
 // ANTES
@@ -422,7 +423,7 @@ return utf8.decode(await file.readAsBytes(), allowMalformed: true);
 
 **Archivo:** `lib/features/presentation/screens/book/book_screen.dart`
 
-**Cambio (línea 10-12):**
+## Cambio (línea 10-12)
 
 ```dart
 // ANTES
@@ -446,22 +447,26 @@ class BookScreen extends StatefulWidget {
 
 ### P3-1: Eliminar comentarios innecesarios
 
-**Archivos:** Principalmente `lib/features/presentation/screens/main_screen.dart`
+**Archivos:** Principalmente
+`lib/features/presentation/screens/main_screen.dart`
 
 Eliminar comentarios como:
+
 - Línea 53: `// Manejo de estados: muestra un indicador de carga...`
 - Línea 58: `// Manejo de errores: muestra un mensaje de error...`
 - etc.
 
-Mantener solo comentarios que expliquen **por qué** se hace algo, no **qué** se hace.
+Mantener solo comentarios que expliquen **por qué**se hace algo, no**qué** se
+hace.
 
 ---
 
 ### P3-2: Hardcoded bucket names
 
-**Archivos:** `lib/features/books/data/book_repository_impl.dart`, `lib/features/chapters/data/chapter_repository_impl.dart`
+**Archivos:** `lib/features/books/data/book_repository_impl.dart`,
+`lib/features/chapters/data/chapter_repository_impl.dart`
 
-**Crear constantes centralizadas:**
+## Crear constantes centralizadas
 
 ```dart
 // lib/core/constants/storage_constants.dart
@@ -476,7 +481,7 @@ class StorageConstants {
 ## Orden de Implementación Sugerido
 
 | Orden | Issue | Archivos | Tiempo Est. |
-|-------|-------|----------|-------------|
+| ------- | ------- | ---------- | ------------- |
 | 1 | P0-1 | `cover_url_service.dart` | 2 min |
 | 2 | P0-2 | `app_drawer.dart` | 2 min |
 | 3 | P0-3 | `chapter_bloc.dart` | 5 min |
@@ -530,4 +535,3 @@ class StorageConstants {
 1. Confirmar que estás de acuerdo con este plan
 2. Decidir si quieres que proceda con la implementación
 3. ¿Prefieres que corrija todo de una vez o por partes (P0 primero)?
-

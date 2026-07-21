@@ -83,8 +83,10 @@ avatars/
 
 **Key Points**:
 
-- All uploads are prefixed with `{user_id}/` — users can only access their own folder
-- Existing files in root (without user prefix) are still readable but cannot be modified
+- All uploads are prefixed with `{user_id}/` — users can only access their own
+  folder
+- Existing files in root (without user prefix) are still readable but cannot be
+  modified
 - New uploads always go to user-specific folders
 
 ---

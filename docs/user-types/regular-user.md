@@ -25,7 +25,9 @@ class UserEntity extends Equatable {
 }
 ```
 
-**Observación crítica:** NO existe un getter `isUser`. El usuario regular se define por la AUSENCIA de `isAdmin` y `isScan`. Esto es un patrón defensivo débil — si se agrega un nuevo rol, se escapa de la lógica de routing.
+**Observación crítica:** NO existe un getter `isUser`. El usuario regular se
+define por la AUSENCIA de `isAdmin` y `isScan`. Esto es un patrón defensivo
+débil — si se agrega un nuevo rol, se escapa de la lógica de routing.
 
 ### 1.2 Modelo de Datos: `UserModel`
 
@@ -42,7 +44,8 @@ factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
 );
 ```
 
-**Nota:** El default de `role` en deserialización es `'user'` (línea 16). Si el JSON no trae `role`, se asume usuario regular.
+**Nota:** El default de `role` en deserialización es `'user'` (línea 16). Si el
+JSON no trae `role`, se asume usuario regular.
 
 ### 1.3 Tabla Supabase: `profiles`
 
@@ -80,13 +83,16 @@ CREATE TABLE IF NOT EXISTS profiles (
 
 **BLoC:** `lib/features/auth/presentation/bloc/auth_bloc.dart` (líneas 85-97)
 
-- `_onRegister` → emite `AuthLoading` → llama `register()` use case → emite `AuthAuthenticated(user)`
+- `_onRegister` → emite `AuthLoading` → llama `register()` use case → emite
+  `AuthAuthenticated(user)`
 
-**Repository:** `lib/features/auth/data/auth_repository_impl.dart` (líneas 44-69)
+**Repository:** `lib/features/auth/data/auth_repository_impl.dart` (líneas
+44-69)
 
 1. `auth.signUp(email, password)` → crea usuario en `auth.users`
 2. `_getProfile(user.id)` → busca en tabla `profiles`
-3. **Si NO existe perfil** (línea 127-151): lo crea automáticamente con `role: 'user'`
+3. **Si NO existe perfil** (línea 127-151): lo crea automáticamente con `role:
+   'user'`
 4. Retorna `UserModel.fromJson({id, email, ...profile})`
 
 ### 2.2 Login (`Login` → `AuthBloc` → `AuthRepositoryImpl`)
@@ -96,7 +102,8 @@ CREATE TABLE IF NOT EXISTS profiles (
 - Formulario: email + password
 - Emite `LoginRequested(email, password)`
 
-**Repository:** `lib/features/auth/data/auth_repository_impl.dart` (líneas 17-42)
+**Repository:** `lib/features/auth/data/auth_repository_impl.dart` (líneas
+17-42)
 
 1. `auth.signInWithPassword(email, password)`
 2. `_getProfile(user.id)` → misma lógica: busca o crea perfil con `role: 'user'`
@@ -125,11 +132,12 @@ CREATE TRIGGER on_auth_user_created
 **Flujo dual:** Hay DOS mecanismos de auto-creación:
 
 1. **Trigger SQL** — dispara al insertar en `auth.users`
-2. **`_getProfile()` en Dart** — fallback si el trigger falló o el perfil no existe
+2. **`_getProfile()` en Dart** — fallback si el trigger falló o el perfil no
+   existe
 
 ### 2.4 Sesión y Estado
 
-**Use Cases:**
+## Use Cases
 
 | Use Case | Archivo | Qué hace |
 | ---------------- | --------- | ---------- |
@@ -157,7 +165,8 @@ if (authState is AuthAuthenticated) {
 return const LoginScreen();             // línea 63 ← No autenticado
 ```
 
-**El usuario regular llega SIEMPRE a `MainScreen`.** No hay verificación explícita de `role == 'user'`, solo se descarta `isAdmin` e `isScan`.
+**El usuario regular llega SIEMPRE a `MainScreen`.** No hay verificación
+explícita de `role == 'user'`, solo se descarta `isAdmin` e `isScan`.
 
 ---
 
@@ -191,20 +200,22 @@ ChapterScreen
 
 ### 3.2 `MainScreen` — Home del Usuario Regular
 
-**Archivo:** `lib/features/app/presentation/screens/main_screen.dart` (163 líneas)
+**Archivo:** `lib/features/app/presentation/screens/main_screen.dart` (163
+líneas)
 
-**BLoCs creados:**
+## BLoCs creados
 
 - `BookBloc(onlyVisible: true)` → carga SOLO libros visibles (línea 30)
 - `GenreBloc` → carga todos los géneros
 
-**Componentes:**
+## Componentes
 
-1. **SliverAppBarHome** — Carousel automático de libros con cover, nombre, autor, labels
+1. **SliverAppBarHome** — Carousel automático de libros con cover, nombre,
+   autor, labels
 2. **Chips de género** — ListView horizontal que filtra libros por género
 3. **AppDrawer** — Menú lateral (ver sección 3.3)
 
-**Navegación desde MainScreen:**
+## Navegación desde MainScreen
 
 - Tap en libro del carousel → `BookScreen` (con transición de 1 segundo)
 - Tap en chip de género → `GenreScreen` (filtrado local de libros)
@@ -212,7 +223,8 @@ ChapterScreen
 
 ### 3.3 `AppDrawer` — Menú Lateral
 
-**Archivo:** `lib/features/app/presentation/widgets/app_drawer.dart` (129 líneas)
+**Archivo:** `lib/features/app/presentation/widgets/app_drawer.dart` (129
+líneas)
 
 **Para usuario regular** (cuando `isAdmin = false` y `isScan = false`):
 
@@ -225,7 +237,10 @@ ChapterScreen
 | "Cerrar Sesión" | ✅ | Dialog de confirmación → `LogoutRequested` |
 | "Panel Admin" | ❌ | Solo si `isAdmin = true` |
 
-**Nota:** El drawer recibe `isScan` e `isAdmin` como parámetros constructor (línea 9-12), pero en `MainScreen` se instancia como `const AppDrawer()` SIN pasar valores (línea 38 de main_screen.dart). Ambos defaultean a `false`, lo cual es correcto para el usuario regular.
+**Nota:** El drawer recibe `isScan` e `isAdmin` como parámetros constructor
+(línea 9-12), pero en `MainScreen` se instancia como `const AppDrawer()` SIN
+pasar valores (línea 38 de main_screen.dart). Ambos defaultean a `false`, lo
+cual es correcto para el usuario regular.
 
 ### 3.4 Pantallas NO Accesibles al Usuario Regular
 
@@ -241,25 +256,28 @@ ChapterScreen
 
 ### 4.1 `BookScreen` — Detalle del Libro
 
-**Archivo:** `lib/features/books/presentation/screens/book_screen.dart` (84 líneas)
+**Archivo:** `lib/features/books/presentation/screens/book_screen.dart` (84
+líneas)
 
-**Componentes:**
+## Componentes: (Part 2)
 
 - `SliverAppBarBook` — Cover con efecto blur, nombre, autor
 - `SliverPersistentHeaderBook` — Tabs "Info" y "Took"
 - `DetailView` — Pestaña de información
 - `TookView` — Pestaña de tomos
 
-**Tabs:**
+## Tabs
 
-1. **"Info"** → `DetailView` (descripción, publicado, tipo, país, estado, tomos, capítulos, géneros como chips)
+1. **"Info"** → `DetailView` (descripción, publicado, tipo, país, estado, tomos,
+   capítulos, géneros como chips)
 2. **"Took"** → `TookView` (lista de tomos con cantidad de capítulos)
 
 ### 4.2 `DetailView` — Información del Libro
 
-**Archivo:** `lib/features/books/presentation/views/detail/detail_view.dart` (99 líneas)
+**Archivo:** `lib/features/books/presentation/views/detail/detail_view.dart` (99
+líneas)
 
-**Muestra:**
+## Muestra
 
 - Descripción completa
 - CardInfoDetail: Publicado / Tipo de Novela
@@ -267,7 +285,7 @@ ChapterScreen
 - CardInfoDetail: Tomos / Capítulos (números)
 - Chips de géneros (tap sin acción — `onTap: () {}`)
 
-**Campos de `BookEntity` que NO se muestran al usuario regular:**
+## Campos de `BookEntity` que NO se muestran al usuario regular
 
 - `source` — URL fuente del libro (NO visible)
 - `link` — Link externo del libro (NO visible)
@@ -289,7 +307,8 @@ Muestra cada tomo como un `Card` con `ListTile`:
 
 ### 4.4 `TookScreen` — Capítulos de un Tomo
 
-**Archivo:** `lib/features/tooks/presentation/screens/took_screen.dart` (64 líneas)
+**Archivo:** `lib/features/tooks/presentation/screens/took_screen.dart` (64
+líneas)
 
 - SliverAppBar con número del tomo
 - SliverList de capítulos
@@ -298,32 +317,40 @@ Muestra cada tomo como un `Card` con `ListTile`:
 
 ### 4.5 `ChapterScreen` — Lector Inmersivo
 
-**Archivo:** `lib/features/chapters/presentation/screens/chapter_screen.dart` (186 líneas)
+**Archivo:** `lib/features/chapters/presentation/screens/chapter_screen.dart`
+(186 líneas)
 
-**Funcionalidades:**
+## Funcionalidades
 
 - **Modo inmersivo** — `SystemUiMode.immersive` al entrar, `edgeToEdge` al salir
 - **PageView** con `BouncingScrollPhysics` — swipe entre capítulos
-- **Estadísticas** — caracteres, palabras, frases, párrafos (calculados por `TextStats`)
-- **Personalización** — `textSize`, `selectedFont`, `selectedStyle`, `selectedWeight`
-- **Scroll controller** — oculta/muestra toolbar según dirección de scroll
-
-**Nota:** Las variables de estilo (`selectedFont`, `selectedStyle`, etc.) están declaradas pero NO tienen UI para cambiarlas actualmente (son defaults: Arial, normal, normal, 14.0).
+- **Estadísticas** — caracteres, palabras, frases, párrafos (calculados por
+  `TextStats`)
+- **Personalización** — `textSize`, `selectedFont`, `selectedStyle`,
+  `selectedWeight`
+- **Scroll controller**— oculta/muestra toolbar según dirección de
+  scroll**Nota:** Las variables de estilo (`selectedFont`, `selectedStyle`,
+  etc.) están
+declaradas pero NO tienen UI para cambiarlas actualmente (son defaults: Arial,
+normal, normal, 14.0).
 
 ### 4.6 Carga de Contenido de Capítulos
 
-**BLoC:** `lib/features/chapters/presentation/bloc/chapter_bloc.dart` (53 líneas)
+**BLoC:** `lib/features/chapters/presentation/bloc/chapter_bloc.dart` (53
+líneas)
 
 1. Recibe `List<ChapterRef>` + `initialIndex`
 2. Descarga contenido de CADA capítulo en paralelo (`Future.wait`)
 3. Resuelve contenido desde Supabase Storage (bucket `chapters`)
 4. Retorna `ChapterLoaded(chapters, initialIndex)`
 
-**Repository:** `lib/features/chapters/data/chapter_repository_impl.dart` (123 líneas)
+**Repository:** `lib/features/chapters/data/chapter_repository_impl.dart` (123
+líneas)
 
 `downloadContent(path)` (líneas 110-122):
 
-1. Si el path NO es storage path (no contiene `/`, ni termina en `.txt`/`.json`), retorna el string directo
+1. Si el path NO es storage path (no contiene `/`, ni termina en
+   `.txt`/`.json`), retorna el string directo
 2. Si es storage path, busca en cache local (`ChapterCache`)
 3. Si no está en cache, descarga de Supabase Storage
 4. Cachea para futuras lecturas
@@ -334,7 +361,8 @@ Muestra cada tomo como un `Card` con `ListTile`:
 
 ### 5.1 `ProfileScreen`
 
-**Archivo:** `lib/features/profiles/presentation/screens/profile_screen.dart` (189 líneas)
+**Archivo:** `lib/features/profiles/presentation/screens/profile_screen.dart`
+(189 líneas)
 
 **BLoC:** `ProfileBloc` con 4 eventos:
 
@@ -343,13 +371,14 @@ Muestra cada tomo como un `Card` con `ListTile`:
 - `PickAvatar(filePath)` → selecciona imagen
 - `ChangePassword(newPassword)` → cambia contraseña
 
-**Secciones de la pantalla:**
+## Secciones de la pantalla
 
 1. **AvatarSection** — CircleAvatar grande (50px radio) + botón "Cambiar foto"
 2. **Email** — Solo visual, no editable
-3. **ProfileEditForm** — Campos: Nombre (`displayName`), Biografía (`bio`), botón "Guardar cambios"
-4. **Divider**
-5. **PasswordChangeForm** — Nueva contraseña + confirmar, mínimo 6 caracteres
+3. **ProfileEditForm** — Campos: Nombre (`displayName`), Biografía (`bio`),
+   botón "Guardar cambios"
+4. **Divider**5.**PasswordChangeForm** — Nueva contraseña + confirmar, mínimo 6
+   caracteres
 6. **LogoutSection** — Botón de cerrar sesión con dialog de confirmación
 
 ### 5.2 Permisos de Perfil en Supabase
@@ -365,7 +394,8 @@ Muestra cada tomo como un `Card` con `ListTile`:
 
 ### 5.3 Upload de Avatar
 
-**Repository:** `lib/features/profiles/data/profiles_repository_impl.dart` (líneas 56-70)
+**Repository:** `lib/features/profiles/data/profiles_repository_impl.dart`
+(líneas 56-70)
 
 1. Sube a bucket `avatars` con path `{userId}/avatar.{ext}`
 2. `FileOptions(upsert: true)` — sobreescribe avatar anterior
@@ -437,7 +467,8 @@ return MainScreen();                                     // ← Usuario regular
 BookBloc(onlyVisible: true)
 ```
 
-El `BookBloc` con `onlyVisible: true` pasa este flag a `getBooks()`, que lo traduce a:
+El `BookBloc` con `onlyVisible: true` pasa este flag a `getBooks()`, que lo
+traduce a:
 
 ```dart
 query = query.eq('is_visible', true);  // book_repository_impl.dart línea 29
@@ -456,9 +487,11 @@ El usuario regular SOLO ve libros donde `is_visible = TRUE`.
 | `user_entity.dart` | 20 | `role == 'scan'` | Getter `isScan` |
 | `user_entity.dart` | 21 | `role == 'admin'` | Getter `isAdmin` |
 
-**Nota:** NO hay checks de rol en ningún BLoC de lectura (books, chapters, genres). Los BLoCs son agnósticos al rol — la restricción viene de:
+**Nota:** NO hay checks de rol en ningún BLoC de lectura (books, chapters,
+genres). Los BLoCs son agnósticos al rol — la restricción viene de:
 
-1. **RLS en Supabase** — el usuario solo puede SELECT donde las políticas lo permiten
+1. **RLS en Supabase** — el usuario solo puede SELECT donde las políticas lo
+   permiten
 2. **`onlyVisible` flag** — filtro client-side en `MainScreen`
 
 ### 7.4 Tablas con RLS Afectando al Usuario Regular
@@ -483,7 +516,8 @@ El usuario regular SOLO ve libros donde `is_visible = TRUE`.
 ### 8.1 Tablas que el Usuario Regular Lee
 
 1. **`profiles`** — Su propio perfil (SELECT WHERE id = auth.uid())
-2. **`books`** — Libros con `is_visible = true` (JOIN con authors, books_genres, genres, books_labels, labels, tooks, chapters)
+2. **`books`** — Libros con `is_visible = true` (JOIN con authors, books_genres,
+   genres, books_labels, labels, tooks, chapters)
 3. **`genres`** — Todos los géneros
 4. **`tooks`** — Todos los tomos (vía JOIN desde books)
 5. **`chapters`** — Todos los capítulos (vía JOIN desde tooks)
@@ -681,26 +715,43 @@ Todos los BLoCs siguen el mismo patrón:
 
 ### 🔴 Issues Críticos
 
-1. **`isFavorite` es un campo muerto** — Existe en `BookEntity` (línea 23), se serializa/deserializa, se escribe en DB, pero NO hay ninguna UI para que el usuario lo togglear ni filtre por él. El campo está desperdiciado.
+1. **`isFavorite` es un campo muerto** — Existe en `BookEntity` (línea 23), se
+   serializa/deserializa, se escribe en DB, pero NO hay ninguna UI para que el
+   usuario lo togglear ni filtre por él. El campo está desperdiciado.
 
-2. **`source` y `link` son invisibles** — `BookEntity` tiene estos campos (líneas 21-22), se cargan de Supabase, pero `DetailView` no los muestra. Si la app pretende dirigiros a contenido externo, esto está roto.
+2. **`source` y `link` son invisibles** — `BookEntity` tiene estos campos
+   (líneas 21-22), se cargan de Supabase, pero `DetailView` no los muestra. Si
+   la app pretende dirigiros a contenido externo, esto está roto.
 
-3. **Falta `isUser` getter** — `UserEntity` tiene `isAdmin` e `isScan` pero no `isUser`. El routing depende de la ausencia de ambos, lo cual es frágil.
+3. **Falta `isUser` getter** — `UserEntity` tiene `isAdmin` e `isScan` pero no
+   `isUser`. El routing depende de la ausencia de ambos, lo cual es frágil.
 
 ### 🟡 Issues Medios
 
-1. **Sin paginación real** — `getBooks` tiene `page`/`pageSize` pero `MainScreen` siempre llama `LoadBooks()` sin parámetros (usa defaults page=1, pageSize=50). No hay scroll infinito.
+1. **Sin paginación real** — `getBooks` tiene `page`/`pageSize` pero
+   `MainScreen` siempre llama `LoadBooks()` sin parámetros (usa defaults page=1,
+   pageSize=50). No hay scroll infinito.
 
-2. **Variables de estilo sin UI** — `ChapterScreen` declara `selectedFont`, `selectedStyle`, `selectedWeight`, `textSize` pero no hay widgets para cambiarlos. Son dead code de features futuras.
+2. **Variables de estilo sin UI** — `ChapterScreen` declara `selectedFont`,
+   `selectedStyle`, `selectedWeight`, `textSize` pero no hay widgets para
+   cambiarlos. Son dead code de features futuras.
 
-3. **Drawer no pasa `isScan`/`isAdmin`** — `MainScreen` instancia `AppDrawer()` sin argumentos. Funciona porque defaultean a `false`, pero si se necesita pasar el rol real, hay que cambiar `MainScreen`.
+3. **Drawer no pasa `isScan`/`isAdmin`** — `MainScreen` instancia `AppDrawer()`
+   sin argumentos. Funciona porque defaultean a `false`, pero si se necesita
+   pasar el rol real, hay que cambiar `MainScreen`.
 
-4. **Sin feature de favoritos** — No existe `FavoritesBloc`, `favorites_repository`, ni pantalla de favoritos. El campo `isFavorite` es la única evidencia de que se planeó.
+4. **Sin feature de favoritos** — No existe `FavoritesBloc`,
+   `favorites_repository`, ni pantalla de favoritos. El campo `isFavorite` es la
+   única evidencia de que se planeó.
 
 ### 🟢 Correcto
 
-1. **RLS bien estructurado** — Las políticas cubren SELECT/INSERT/UPDATE/DELETE por tabla y rol. El usuario regular tiene acceso de solo lectura a contenido y escritura solo a su perfil.
+1. **RLS bien estructurado** — Las políticas cubren SELECT/INSERT/UPDATE/DELETE
+   por tabla y rol. El usuario regular tiene acceso de solo lectura a contenido
+   y escritura solo a su perfil.
 
-2. **Auto-creación de perfil robusta** — Trigger SQL + fallback Dart aseguran que siempre exista un perfil con `role='user'`.
+2. **Auto-creación de perfil robusta** — Trigger SQL + fallback Dart aseguran
+   que siempre exista un perfil con `role='user'`.
 
-3. **Cache de capítulos** — `ChapterCache` evita re-descargar contenido ya leído, mejorando la experiencia offline.
+3. **Cache de capítulos** — `ChapterCache` evita re-descargar contenido ya
+   leído, mejorando la experiencia offline.
