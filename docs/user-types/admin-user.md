@@ -2,7 +2,7 @@
 
 > **Fecha de auditoría**: 2026-07-19
 > **Proyecto**: Noveles (Flutter + Supabase)
-> **Roles en sistema**: `user`, `scan`, `admin`
+> **Roles en sistema**: `user`, `scan`, `admin`, `suspended`
 
 ---
 
@@ -14,29 +14,31 @@
 class UserEntity extends Equatable {
   final String id;
   final String email;
-  final String role;        // 'user' | 'scan' | 'admin'
+  final UserRole role;   // UserRole enum: user, scan, admin, suspended
   final String? displayName;
   final String? bio;
   final String? avatarUrl;
 
-  bool get isScan => role == 'scan';    // Línea 20
-  bool get isAdmin => role == 'admin';  // Línea 21
+  bool get isScan => role == UserRole.scan;         // Línea 21
+  bool get isAdmin => role == UserRole.admin;       // Línea 22
+  bool get isUser => role == UserRole.user;         // Línea 23
+  bool get isSuspended => role == UserRole.suspended; // Línea 24
 }
 ```
 
-- `isAdmin` es un **getter simple** que compara `role == 'admin'`
-- No hay un enum de roles — se usa un `String` crudo
+- `isAdmin` es un **getter simple** que compara `role == UserRole.admin`
+- Los roles se definen en el enum `UserRole` (`lib/features/profiles/domain/user_role.dart`)
 - `copyWith` permite cambiar cualquier campo incluyendo `role`
 
 ### 1.2 UserModel (`lib/features/profiles/data/user_model.dart`)
 
 ```dart
 factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
-  role: (json['role'] as String?) ?? 'user',  // Default: 'user'
+  role: UserRole.fromString(json['role'] as String?),  // Default: UserRole.user
 );
 ```
 
-- El **default** del rol es `'user'` — si no hay `role` en el JSON, el usuario
+- El **default** del rol es `UserRole.user` — si no hay `role` en el JSON, el usuario
   es `user`
 - Serializa/deserializa con `toJson()` / `fromJson()`
 - Mapea `display_name` ↔ `displayName`, `avatar_url` ↔ `avatarUrl`
@@ -49,7 +51,8 @@ factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
 | `20260515230000_fix_admin_consolidation.sql` | 15 Mayo | **Elimina** columna `is_admin` — pasa a usar `role` string |
 | `20260517205000_fix_profiles_rls_recursion.sql` | 17 Mayo | Crea `is_admin()` SECURITY DEFINER |
 | `20260520000000_rename_admin_to_scan.sql` | 20 Mayo | **Renombra** admin→scan, crea `is_scan()`, elimina `is_admin()` |
-| `20260520010000_add_admin_role.sql` | 20 Mayo | **Re-introduce**el rol `admin` como tercer valor, crea `is_admin()` de nuevo |**Resultado final**: CHECK constraint es `role IN ('user', 'scan', 'admin')`.
+| `20260520010000_add_admin_role.sql` | 20 Mayo | **Re-introduce** el rol `admin` como tercer valor, crea `is_admin()` de nuevo |
+| `20260720040000_add_suspended_role.sql` | 20 Jul | **Agrega** rol `suspended` al CHECK constraint, crea `is_suspended()` |
 
 ---
 
@@ -216,31 +219,48 @@ usuarios.**Pantalla**:
 ```dart
 class AdminUsersBloc extends Bloc<AdminUsersEvent, AdminUsersState> {
   final GetAllProfiles getAllProfiles;
+  final UpdateUserRole updateUserRole;
+  final String currentUserId;
 
-  // Único evento: LoadAdminUsers
-  on<LoadAdminUsers>(_onLoadUsers);
+  AdminUsersBloc({
+    required this.getAllProfiles,
+    required this.updateUserRole,
+    required this.currentUserId,
+  }) : super(const AdminUsersInitial()) {
+    on<LoadAdminUsers>(_onLoadUsers);
+    on<ChangeUserRole>(_onChangeRole);
+    on<SuspendUser>(_onSuspendUser);
+  }
 }
 ```
+
+**Nota**: `AdminUsersBloc` NO está registrado en `injection_admin.dart`. Se
+crea directamente en `AdminDashScreen` (L40-44) con dependencias obtenidas
+de `getIt`.
 
 **Evento único**: `LoadAdminUsers` → llama `getAllProfiles()` → emite
 `AdminUsersLoaded(users)`
 
 ### 5.2 AdminUsersEvent (`lib/features/admin/presentation/bloc/admin_users_event.dart`)
 
-Solo un evento:
+3 eventos:
 
 ```dart
 class LoadAdminUsers extends AdminUsersEvent {
   const LoadAdminUsers();
 }
+
+class ChangeUserRole extends AdminUsersEvent {
+  final String targetUserId;
+  final String newRole;
+  const ChangeUserRole({required this.targetUserId, required this.newRole});
+}
+
+class SuspendUser extends AdminUsersEvent {
+  final String targetUserId;
+  const SuspendUser({required this.targetUserId});
+}
 ```
-
-**No hay eventos para**:
-
-- ❌ Cambiar rol de usuario
-- ❌ Eliminar usuario
-- ❌ Suspender usuario
-- ❌ Editar usuario
 
 ### 5.3 AdminUsersState (`lib/features/admin/presentation/bloc/admin_users_state.dart`)
 
@@ -287,9 +307,9 @@ Future<Result<List<UserEntity>>> getAllProfiles() async {
 | ----------- | -------- | ------- |
 | Listar usuarios | ✅ Funcional | Hasta 100, sin paginación |
 | Ver roles | ✅ Funcional | Badge muestra rol |
-| Cambiar rol | ❌ No implementado | No hay UI ni eventos |
+| Cambiar rol | ✅ Funcional | `ChangeUserRole` evento, `UpdateUserRole` use case |
 | Eliminar usuario | ❌ No implementado | No hay UI ni eventos |
-| Suspender usuario | ❌ No implementado | No hay lógica |
+| Suspender usuario | ✅ Funcional | `SuspendUser` evento, usa `UserRole.suspended` |
 | Buscar usuario | ❌ No implementado | Sin filtro de búsqueda |
 
 ---
@@ -475,22 +495,19 @@ El rol se almacena en la tabla `profiles`:
 
 ```sql
 ALTER TABLE profiles ADD CONSTRAINT profiles_role_check 
-  CHECK (role IN ('user', 'scan', 'admin'));
+  CHECK (role IN ('user', 'scan', 'admin', 'suspended'));
 ```
 
 ### 10.2 ¿Puede un admin cambiar roles
 
-**NO** — No hay:
+**SÍ** — Implementado con:
 
-- ❌ UI para cambiar roles
-- ❌ Evento BLoC para cambiar roles
-- ❌ Use case para cambiar roles
-- ❌ RLS policy que permita UPDATE de `role` (excepto admin puede actualizar
-  profiles)
+- ✅ UI en `UsersTab` con acciones por usuario
+- ✅ Evento `ChangeUserRole(targetUserId, newRole)` en `AdminUsersBloc`
+- ✅ Use case `UpdateUserRole` → `ProfilesRepository.updateUserRole()`
+- ✅ RLS policy `"Admin can update profiles"` permite UPDATE de `role`
 
-**Paradoja**: La RLS policy `"Admin can update profiles"` (`20260524100000`)
-permite al admin hacer UPDATE en la tabla profiles, pero la app **no tiene
-código que use esta capacidad**.
+**Nota**: El admin no puede cambiar su propio rol (protección en `_onChangeRole`).
 
 ### 10.3 Historial de Asignación
 
@@ -665,15 +682,15 @@ que cualquier usuario autenticado para storage.
 
 ```text
 AdminDashScreen
-├── AdminBloc (libros)
+├── AdminBloc (libros) — registrado en injection_admin.dart
 │   ├── Eventos: LoadAdminBooks, ToggleBookVisibility, DeleteAdminBook
 │   ├── Estados: AdminInitial, AdminLoading, AdminLoaded, AdminError
 │   └── Use Cases: GetBooks, ToggleBookVisibility, DeleteBook
 │
-├── AdminUsersBloc (usuarios)
-│   ├── Eventos: LoadAdminUsers
+├── AdminUsersBloc (usuarios) — creado directamente en AdminDashScreen
+│   ├── Eventos: LoadAdminUsers, ChangeUserRole, SuspendUser
 │   ├── Estados: AdminUsersInitial, AdminUsersLoading, AdminUsersLoaded, AdminUsersError
-│   └── Use Cases: GetAllProfiles
+│   └── Use Cases: GetAllProfiles, UpdateUserRole
 │
 └── GenreBloc (géneros) — creado internamente en GenresTab
     ├── Eventos: LoadGenres, CreateGenreEvent, UpdateGenreEvent, DeleteGenreEvent
@@ -702,6 +719,7 @@ LabelManagementScreen (ruta /label-management)
 | `ToggleBookVisibility` | `lib/features/books/domain/toggle_book_visibility.dart` | No (scan también) |
 | `DeleteBook` | `lib/features/books/domain/delete_book.dart` | No (scan también) |
 | `GetAllProfiles` | `lib/features/profiles/domain/get_all_profiles.dart` | **SÍ — Solo admin** |
+| `UpdateUserRole` | `lib/features/profiles/domain/update_user_role.dart` | **SÍ — Solo admin** |
 | `GetGenre` | `lib/features/genres/domain/get_genre.dart` | No |
 | `CreateGenre` | `lib/features/genres/domain/create_genre.dart` | **Funcional solo por admin en BD** |
 | `UpdateGenre` | `lib/features/genres/domain/update_genre.dart` | **Funcional solo por admin en BD** |
@@ -718,7 +736,7 @@ estas operaciones para admin:
 - **INSERT/UPDATE/DELETE** en: books, genres, tooks, chapters, authors,
   books_genres
 - **SELECT** en: book_views, profiles (todos los usuarios)
-- **UPDATE** en: profiles (cualquier usuario)
+- **UPDATE** en: profiles (cualquier usuario, incluyendo `role` via `UpdateUserRole`)
 
 ---
 
@@ -736,7 +754,8 @@ estas operaciones para admin:
 | **Crear/editar/eliminar géneros** | ✅ | ❌ | ❌ |
 | **Crear/editar/eliminar labels** | ✅ | ✅ | ❌ |
 | **VER todos los usuarios** | ✅ | ❌ | ❌ |
-| **Actualizar perfil de otros** | ✅ | ❌ | ❌ |
+| **Cambiar rol de usuarios** | ✅ | ❌ | ❌ |
+| **Suspender usuarios** | ✅ | ❌ | ❌ |
 | **VER analytics (book_views)** | ✅ | ❌ | ❌ |
 | **INSERTar analytics** | ✅ | ❌ | ❌ |
 | **Editar propio perfil** | ✅ | ✅ | ✅ |
@@ -747,19 +766,20 @@ estas operaciones para admin:
 
 1. **Panel Admin completo** (`AdminDashScreen`) — con 4 tabs
 2. **Gestión de géneros** — CRUD completo
-3. **Gestión de usuarios** — ver todos los usuarios y sus roles
+3. **Gestión de usuarios** — ver todos los usuarios, cambiar roles, suspender
 4. **Analytics tab** — preparada pero no implementada
 5. **Tabla `book_views`** — únicamente accesible por admin
-6. **UPDATE en profiles** de otros usuarios (RLS lo permite, la app no lo usa)
+6. **UPDATE en profiles** de otros usuarios (RLS lo permite, la app lo usa para roles)
 7. **Ver libros ocultos** en el tab de gestión (junto con scan)
 
 ### 14.3 Lo que el Admin NO Puede (que debería poder)
 
-1. **Cambiar roles de usuarios** — No hay UI ni eventos
-2. **Eliminar usuarios** — No hay UI ni eventos
-3. **Ver/interactuar con analytics** — Tab es placeholder
-4. **Crear libros** — Solo puede gestionar visibilidad y eliminar, pero NO crear
-5. **Ver logs de actividad** — No implementado
+1. ~~**Cambiar roles de usuarios**~~ — ✅ Implementado (`ChangeUserRole`)
+2. ~~**Eliminar usuarios**~~ — ❌ No implementado
+3. ~~**Suspender usuarios**~~ — ✅ Implementado (`SuspendUser` → `UserRole.suspended`)
+4. **Ver/interactuar con analytics** — Tab es placeholder
+5. **Crear libros** — Solo puede gestionar visibilidad y eliminar, pero NO crear
+6. **Ver logs de actividad** — No implementado
 
 ---
 
@@ -769,6 +789,9 @@ estas operaciones para admin:
 
 ```dart
 void initAdminDependencies() {
+  getIt.registerLazySingleton<AnalyticsRepository>(
+    () => AnalyticsRepositoryImpl(getIt<SupabaseClientProvider>()),
+  );
   getIt.registerFactory(
     () => AdminBloc(
       getBooks: getIt(),
@@ -777,14 +800,14 @@ void initAdminDependencies() {
     ),
   );
   getIt.registerFactory(
-    () => AdminUsersBloc(getAllProfiles: getIt()),
+    () => AdminAnalyticsBloc(analyticsRepository: getIt()),
   );
 }
 ```
 
-**`registerFactory`** — Se crea una nueva instancia cada vez que se llama
-`getIt<AdminBloc>()`. Esto es correcto porque `AdminDashScreen` se monta y
-desmonta.
+**Nota**: `AdminUsersBloc` NO está registrado aquí. Se crea directamente en
+`AdminDashScreen` (L40-44) porque necesita `currentUserId` del estado de
+`AuthBloc`, que no está disponible en el momento de configurar DI.
 
 ### 15.2 injection_profiles.dart
 
@@ -804,9 +827,12 @@ void setupDependencies() {
   initLabelsDependencies();
   initTooksDependencies();
   initScanDependencies();
-  initAdminDependencies();     // ← AdminBloc, AdminUsersBloc aquí
+  initAdminDependencies();     // ← AdminBloc, AdminAnalyticsBloc aquí
 }
 ```
+
+**Nota**: `AdminUsersBloc` no está en DI — se crea directamente en
+`AdminDashScreen` porque necesita `currentUserId` del estado de auth.
 
 ---
 
@@ -842,11 +868,13 @@ lib/core/di/injection_genres.dart                        (DI de genres)
 ### 16.3 Profiles
 
 ```text
-lib/features/profiles/domain/user_entity.dart             (isAdmin getter)
-lib/features/profiles/data/user_model.dart                (fromJson con default 'user')
-lib/features/profiles/domain/profiles_repository.dart     (getAllProfiles abstract)
-lib/features/profiles/data/profiles_repository_impl.dart  (getAllProfiles impl)
+lib/features/profiles/domain/user_entity.dart             (isAdmin, isUser, isSuspended getters)
+lib/features/profiles/domain/user_role.dart               (UserRole enum)
+lib/features/profiles/data/user_model.dart                (fromJson con UserRole.fromString)
+lib/features/profiles/domain/profiles_repository.dart     (getAllProfiles, updateUserRole abstract)
+lib/features/profiles/data/profiles_repository_impl.dart  (getAllProfiles, updateUserRole impl)
 lib/features/profiles/domain/get_all_profiles.dart        (use case)
+lib/features/profiles/domain/update_user_role.dart        (use case para cambiar rol)
 lib/features/profiles/presentation/bloc/profile_bloc.dart
 lib/features/profiles/presentation/screens/profile_screen.dart
 ```
@@ -902,6 +930,7 @@ supabase/migrations/20260524100000_profiles_rls_insert_update.sql (admin UPDATE 
 supabase/migrations/20260524110000_fix_books_rls_scan_visibility.sql
 supabase/migrations/20260615000000_audit_fixes_v4.sql        (is_admin_or_scan fn)
 supabase/migrations/20260616000001_fix_storage_rls_and_security_definer.sql
+supabase/migrations/20260720040000_add_suspended_role.sql      (rol suspended, CHECK constraint)
 ```
 
 ---
@@ -910,14 +939,14 @@ supabase/migrations/20260616000001_fix_storage_rls_and_security_definer.sql
 
 ### 17.1 Brechas Críticas
 
-1. **No hay gestión de usuarios real** — El tab "Usuarios" solo muestra una
-   lista. Un admin necesita poder cambiar roles, suspender y eliminar usuarios.
+1. ~~**No hay gestión de usuarios real**~~ — Parcialmente resuelto: se agregaron
+   `ChangeUserRole` y `SuspendUser`. Falta eliminar usuarios.
 2. **No hay creación de libros desde admin** — Solo puede gestionar visibilidad
    y eliminar, pero no crear libros nuevos (solo scan puede).
 3. **Analytics es un placeholder** — La tabla `book_views` existe pero no se
    usa.
-4. **No hay rol de "editor"** — El sistema tiene user/scan/admin pero no un rol
-   intermedio que pueda gestionar contenido sin permisos de sistema.
+4. **No hay rol de "editor"** — El sistema tiene user/scan/admin/suspended pero
+   no un rol intermedio que pueda gestionar contenido sin permisos de sistema.
 
 ### 17.2 Riesgos de Seguridad
 
@@ -933,10 +962,9 @@ supabase/migrations/20260616000001_fix_storage_rls_and_security_definer.sql
 
 ### 17.3 Deuda Técnica
 
-1. Los roles son strings crudos (`'admin'`, `'scan'`, `'user'`) en vez de un
-   enum — propenso a typos
-2. `AdminUsersBloc` tiene un solo evento (`LoadAdminUsers`) — over-engineered
-   para solo cargar datos
+1. ~~Los roles son strings crudos (`'admin'`, `'scan'`, `'user'`) en vez de un
+   enum — propenso a typos~~ — ✅ Resuelto: se usa `UserRole` enum
+2. `AdminUsersBloc` tiene solo 3 eventos — suficiente para las funcionalidades actuales
 3. No hay tests unitarios para los BLoCs del admin
 4. `GenreBloc` se crea como instancia nueva dentro de `GenresTab` —
    inconsistente con el patrón de providers del padre

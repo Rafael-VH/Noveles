@@ -29,28 +29,30 @@
 
 ### 1.1 UserEntity
 
-**Archivo**: `lib/features/profiles/domain/user_entity.dart` (50 líneas)
+**Archivo**: `lib/features/profiles/domain/user_entity.dart` (53 líneas)
 
 ```dart
 class UserEntity extends Equatable {
   final String id;       // UUID de Supabase Auth
   final String email;
-  final String role;     // 'user' | 'scan' | 'admin'
+  final UserRole role;   // UserRole enum: user, scan, admin, suspended
   final String? displayName;
   final String? bio;
   final String? avatarUrl;
 
-  bool get isScan => role == 'scan';   // Línea 20
-  bool get isAdmin => role == 'admin'; // Línea 21
+  bool get isScan => role == UserRole.scan;       // Línea 21
+  bool get isAdmin => role == UserRole.admin;     // Línea 22
+  bool get isUser => role == UserRole.user;       // Línea 23
+  bool get isSuspended => role == UserRole.suspended; // Línea 24
 }
 ```
 
 **Getters de rol**:
 
-- `isScan` → `role == 'scan'` (L20)
-- `isAdmin` → `role == 'admin'` (L21)
-- No hay getter `isUser` — el usuario regular es el "default" (no matchea
-  ninguno de los dos)
+- `isScan` → `role == UserRole.scan` (L21)
+- `isAdmin` → `role == UserRole.admin` (L22)
+- `isUser` → `role == UserRole.user` (L23)
+- `isSuspended` → `role == UserRole.suspended` (L24)
 
 ### 1.2 UserModel
 
@@ -60,22 +62,22 @@ class UserEntity extends Equatable {
 factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
   id: json['id'] as String,
   email: (json['email'] as String?) ?? '',
-  role: (json['role'] as String?) ?? 'user',  // Default: 'user'
+  role: UserRole.fromString(json['role'] as String?),  // Default: UserRole.user
   displayName: json['display_name'] as String?,
   bio: json['bio'] as String?,
   avatarUrl: json['avatar_url'] as String?,
 );
 ```
 
-**Nota**: El `role` se mapea desde `profiles` (no de `auth.users`). El default
-es `'user'`.
+**Nota**: El `role` se mapea desde `profiles` (no de `auth.users`) usando
+`UserRole.fromString()`. El default es `UserRole.user`.
 
 ### 1.3 Roles en Supabase
 
 **Tabla `profiles`** — CHECK constraint (migración final):
 
 ```sql
-CHECK (role IN ('user', 'scan', 'admin'))
+CHECK (role IN ('user', 'scan', 'admin', 'suspended'))
 ```
 
 **Función helper `is_scan()`** (migración `20260520000000`):
@@ -268,7 +270,7 @@ líneas)
 
 - Renderiza géneros como `FilterChip` en un `Wrap`
 - Permite selección múltiple
-- Carga géneros desde `ScanBloc` via `LoadScanGenres`
+- Carga géneros desde `ScanBookBloc` via `LoadScanGenres`
 
 #### TookListSection
 
@@ -533,7 +535,7 @@ TookEntity({
 
 El scan interactúa con géneros de **lectura sola**:
 
-- `LoadScanGenres` en `ScanBloc` → llama `GetGenre()` →
+- `LoadScanGenres` en `ScanBookBloc` → llama `GetGenre()` →
   `GenreRepository.getGenres()`
 - Los géneros se cargan al abrir `ScanBookEditScreen` (L68)
 - Se renderizan como `FilterChip` en `GenreSelector`
@@ -780,19 +782,15 @@ Se usa en: `scan_main_screen.dart` (L133), `cover_picker.dart` (L38),
 
 ## 10. BLoCs y Estado
 
-### 10.1 ScanBloc (Libros + Covers + Géneros + Visibilidad)
+### 10.1 ScanBookBloc (Libros + Géneros + Visibilidad)
 
-**Archivo**: `lib/features/scan/presentation/bloc/scan_bloc.dart` (187 líneas)
+**Archivo**: `lib/features/scan/presentation/bloc/scan_book_bloc.dart`
 
-**Nota del developer** (L1-4):
+**Nota**: Originalmente existía un `ScanBloc` monolítico que manejaba libros,
+covers, géneros y visibilidad. Fue dividido en BLoCs separados:
+`ScanBookBloc`, `ScanCoverBloc`, `ScanTookBloc`, `ScanChapterBloc`.
 
-```dart
-// TODO(tech-debt): Split ScanBloc into ScanBookBloc, ScanCoverBloc, ScanGenreBloc.
-// Currently handles book CRUD, cover upload, genre loading, and visibility toggling
-// — 7 use cases and 6 event types in one class.
-```
-
-**7 casos de uso**:
+**5 casos de uso**:
 
 | Caso de uso | Tipo | Descripción |
 | ----------- | ---- | ----------- |
@@ -801,30 +799,33 @@ Se usa en: `scan_main_screen.dart` (L133), `cover_picker.dart` (L38),
 | `UpdateBook` | Escritura | Actualiza libro existente |
 | `DeleteBook` | Escritura | Elimina libro |
 | `GetGenre` | Lectura | Lista todos los géneros disponibles |
-| `UploadCover` | Escritura | Sube cover a Supabase Storage |
 | `ToggleBookVisibility` | Escritura | Cambia is_visible del libro |
 
-**6 tipos de evento**:
+**Eventos**:
 
 1. `LoadScanBooks` → carga libros
 2. `LoadScanGenres` → carga géneros
-3. `UploadScanCover(filePath)` → sube cover
-4. `SaveScanBook(book, isUpdate)` → crea o actualiza libro
-5. `DeleteScanBook(bookId)` → elimina libro
-6. `ToggleScanBookVisibility(bookId, isVisible)` → toggle visibilidad
+3. `SaveScanBook(book, isUpdate)` → crea o actualiza libro
+4. `DeleteScanBook(bookId)` → elimina libro
+5. `ToggleScanBookVisibility(bookId, isVisible)` → toggle visibilidad
 
-**5 estados**:
+**Estados**:
 
 1. `ScanInitial`
 2. `ScanLoading`
 3. `ScanLoaded(books, message?)`
-4. `ScanCoverUploaded(filename, books)`
-5. `ScanGenresLoaded(books, genres)`
-6. `ScanError(message)`
+4. `ScanGenresLoaded(books, genres)`
+5. `ScanError(message)`
 
-**Patrón de refresh**: Después de cada operación de escritura
-(create/update/delete/toggle), se recarga la lista completa de libros para
-mantener consistencia.
+### 10.1b ScanCoverBloc (Covers)
+
+**Archivo**: `lib/features/scan/presentation/bloc/scan_cover_bloc.dart`
+
+Maneja la subida de covers para libros y tomos.
+
+| Caso de uso | Tipo |
+| ----------- | ---- |
+| `UploadCover` | Escritura |
 
 ### 10.2 ScanTookBloc (Tomos)
 
@@ -917,7 +918,7 @@ chapters(*))`, no vía casos de uso dedicados.
 | **Crear/Eliminar libros** | ✅ (propios) | ✅ (todos) |
 | **Toggle visibilidad** | ✅ (propios) | ✅ (todos) |
 | **Crear/Eliminar géneros** | ❌ | ✅ |
-| **Gestionar usuarios** | ❌ | ✅ (UsersTab) |
+| **Gestionar usuarios** | ❌ | ✅ (UsersTab — listar, cambiar rol, suspender) |
 | **Ver analíticas** | ❌ | ✅ (AnalyticsTab — placeholder) |
 | **Crear/Eliminar etiquetas** | ✅ (RLS lo permite) | ✅ |
 | **Gestionar labels UI** | ❌ (no hay pantalla) | ✅ (LabelManagementScreen) |
@@ -959,7 +960,7 @@ chapters(*))`, no vía casos de uso dedicados.
 
 1. Ver libros de otros scans (solo los propios)
 2. Crear/editar/eliminar géneros
-3. Gestionar usuarios (promover, editar roles)
+3. Gestionar usuarios (promover, cambiar rol, suspender) — solo admin
 4. Ver analíticas (book_views)
 5. Ver la pantalla de home de lectura (MainScreen)
 6. Editar perfiles de otros usuarios
@@ -972,9 +973,12 @@ chapters(*))`, no vía casos de uso dedicados.
 
 | Archivo | Líneas | Descripción |
 | ------- | ------ | ----------- |
-| `lib/features/scan/presentation/bloc/scan_bloc.dart` | 187 | BLoC principal de libros |
-| `lib/features/scan/presentation/bloc/scan_event.dart` | 69 | 6 eventos de scan |
-| `lib/features/scan/presentation/bloc/scan_state.dart` | 51 | 6 estados de scan |
+| `lib/features/scan/presentation/bloc/scan_book_bloc.dart` | — | BLoC de libros (split desde ScanBloc) |
+| `lib/features/scan/presentation/bloc/scan_book_event.dart` | — | Eventos de libros |
+| `lib/features/scan/presentation/bloc/scan_book_state.dart` | — | Estados de libros |
+| `lib/features/scan/presentation/bloc/scan_cover_bloc.dart` | — | BLoC de covers (split desde ScanBloc) |
+| `lib/features/scan/presentation/bloc/scan_cover_event.dart` | — | Eventos de covers |
+| `lib/features/scan/presentation/bloc/scan_cover_state.dart` | — | Estados de covers |
 | `lib/features/scan/presentation/bloc/scan_chapter_bloc.dart` | 61 | BLoC de capítulos |
 | `lib/features/scan/presentation/bloc/scan_chapter_event.dart` | 30 | 3 eventos de capítulo |
 | `lib/features/scan/presentation/bloc/scan_chapter_state.dart` | 32 | 5 estados de capítulo |
@@ -1024,12 +1028,13 @@ chapters(*))`, no vía casos de uso dedicados.
 | ------- | ------ | ----------- |
 | `lib/core/app/app.dart` | 73 | Routing por rol |
 | `lib/core/di/injection.dart` | 36 | DI principal |
-| `lib/core/di/injection_scan.dart` | 41 | DI de scan (3 BLoCs) |
+| `lib/core/di/injection_scan.dart` | — | DI de scan (4 BLoCs: Book, Cover, Took, Chapter) |
 | `lib/core/constants/storage_constants.dart` | 4 | Nombres de buckets |
 | `lib/core/cover/cover_url_service.dart` | 14 | Construcción de URLs de cover |
 | `lib/features/app/presentation/widgets/app_drawer.dart` | 129 | Drawer con menú condicional |
-| `lib/features/profiles/domain/user_entity.dart` | 50 | Entidad de usuario con isScan |
-| `lib/features/profiles/data/user_model.dart` | 39 | Modelo de usuario |
+| `lib/features/profiles/domain/user_entity.dart` | 53 | Entidad de usuario con isScan, isUser, isAdmin, isSuspended |
+| `lib/features/profiles/domain/user_role.dart` | 18 | UserRole enum: user, scan, admin, suspended |
+| `lib/features/profiles/data/user_model.dart` | 40 | Modelo de usuario con UserRole.fromString |
 | `lib/shared/domain/entities/book_with_relations.dart` | 109 | Libro con relaciones hidratadas |
 | `lib/features/auth/presentation/bloc/auth_bloc.dart` | 115 | BLoC de autenticación |
 
@@ -1056,6 +1061,7 @@ chapters(*))`, no vía casos de uso dedicados.
 | `20260615000000_audit_fixes_v4.sql` | is_admin_or_scan(), cleanup, type fixes |
 | `20260616000001_fix_storage_rls_and_security_definer.sql` | Chapters storage RLS, SECURITY DEFINER fix |
 | `20260617153406_fix_chapters_storage_rls.sql` | Chapters: authenticated upload/update/delete |
+| `20260720040000_add_suspended_role.sql` | Agrega rol `suspended` al CHECK constraint |
 
 ---
 
@@ -1078,11 +1084,7 @@ chapters(*))`, no vía casos de uso dedicados.
 
 ### 🟡 Tech Debt
 
-1. **ScanBloc monolítico**: El propio código tiene un `TODO` indicando que
-   debería dividirse en `ScanBookBloc`, `ScanCoverBloc`, `ScanGenreBloc` (L1-4
-   de scan_bloc.dart).
-
-2. **UploadCover compartido**: `ScanTookBloc` reutiliza `UploadCover` del
+1. **UploadCover compartido**: `ScanTookBloc` reutiliza `UploadCover` del
    dominio de books para subir covers de tomos. Funciona pero acopla
    semanticamente tomos al bucket de covers de libros.
 
