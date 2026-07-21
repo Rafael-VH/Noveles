@@ -116,6 +116,26 @@ El flujo de auth es idéntico para todos los roles:
    `AuthAuthenticated(user)`
 4. **`LogoutRequested`** → llama `logout()` → emite `AuthUnauthenticated()`
 
+#### Diagrama de Secuencia — Flujo de Login
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant S as Screen
+    participant B as AuthBloc
+    participant R as AuthRepository
+    participant SB as Supabase
+
+    U->>S: Enter email + password
+    S->>B: LoginRequested(email, password)
+    B->>R: login(email, password)
+    R->>SB: signInWithPassword()
+    SB-->>R: UserResponse
+    R-->>B: Result<UserEntity>
+    B-->>S: AuthSuccess / AuthFailure
+    S->>S: Route by role (isUser/isScan/isAdmin)
+```
+
 ### 2.2 Routing por Rol (CRÍTICO)
 
 **Archivo**: `lib/core/app/app.dart` (73 líneas), líneas 54-62:
@@ -343,6 +363,33 @@ ScanMainScreen
                           └── books.delete().eq('id', id)
 ```
 
+#### Diagrama de Secuencia — Creación de Libro
+
+```mermaid
+sequenceDiagram
+    participant S as ScanUser
+    participant SE as ScanBookEditScreen
+    participant SB as ScanBookBloc
+    participant R as BookRepository
+    participant U as UploadImage
+    participant SBk as Supabase
+
+    S->>SE: Create new book
+    SE->>SB: SaveScanBook(book)
+    alt Has cover image
+        SB->>U: uploadImage(filePath)
+        U->>SBk: Storage upload
+        SBk-->>U: public URL
+        U-->>SB: cover URL
+    end
+    SB->>R: createBook(book)
+    R->>SBk: INSERT books
+    SBk-->>R: book ID
+    R-->>SB: Result<int>
+    SB-->>SE: BookSaved
+    SE-->>S: Navigate to book list
+```
+
 ### 4.2 Operaciones Supabase (Books)
 
 | Operación | Tabla | SQL | RLS Policy |
@@ -448,6 +495,31 @@ ScanChapterEditScreen
   │           └── storage.from('chapters').getPublicUrl(filename)
   │
   └── _contentCtrl.text = publicUrl
+```
+
+#### Diagrama de Secuencia — Subida de Capítulo
+
+```mermaid
+sequenceDiagram
+    participant S as ScanUser
+    participant SE as ScanChapterEditScreen
+    participant CB as ScanChapterBloc
+    participant CR as ChapterRepository
+    participant U as UploadChapterContent
+    participant SB as Supabase
+
+    S->>SE: Create chapter + select file
+    SE->>CB: SaveScanChapter(chapter, filePath)
+    CB->>U: uploadChapterContent(filePath)
+    U->>SB: Storage upload (chapters bucket)
+    SB-->>U: storage path
+    U-->>CB: storage path
+    CB->>CR: createChapter(chapter)
+    CR->>SB: INSERT chapters
+    SB-->>CR: chapter ID
+    CR-->>CB: Result<int>
+    CB-->>SE: ChapterSaved
+    SE-->>S: Navigate to chapter list
 ```
 
 ### 5.3 Operaciones Supabase (Chapters)

@@ -66,6 +66,26 @@ El `AuthBloc` maneja login, registro, logout y verificación de sesión. **No
 distingue roles** — simplemente emite `AuthAuthenticated(user)` con el
 `UserEntity` completo.
 
+#### Diagrama de Secuencia — Flujo de Login
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant S as Screen
+    participant B as AuthBloc
+    participant R as AuthRepository
+    participant SB as Supabase
+
+    U->>S: Enter email + password
+    S->>B: LoginRequested(email, password)
+    B->>R: login(email, password)
+    R->>SB: signInWithPassword()
+    SB-->>R: UserResponse
+    R-->>B: Result<UserEntity>
+    B-->>S: AuthSuccess / AuthFailure
+    S->>S: Route by role (isUser/isScan/isAdmin)
+```
+
 ### 2.2 Enrutamiento por Rol (`lib/core/app/app.dart`, líneas 54-62)
 
 ```dart
@@ -148,6 +168,31 @@ onPressed: () => Navigator.pushNamed(context, '/label-management'),
 
 ### 4.1 Tab: Libros (`lib/features/admin/presentation/screens/books_tab.dart`)
 
+#### Diagrama de Secuencia — Carga del Dashboard Admin
+
+```mermaid
+sequenceDiagram
+    participant A as Admin
+    participant AD as AdminDashScreen
+    participant AB as AdminBloc
+    participant AR as AnalyticsRepository
+    participant SB as Supabase
+
+    A->>AD: Open admin panel
+    AD->>AB: LoadAdminData()
+    par Books tab
+        AB->>SB: SELECT books (all)
+    and Users tab
+        AB->>SB: SELECT profiles
+    and Analytics tab
+        AB->>AR: getOverview()
+        AR->>SB: SELECT from analytics functions
+    end
+    SB-->>AB: data
+    AB-->>AD: AdminDataLoaded
+    AD-->>A: Display dashboard
+```
+
 **Resumen superior** (líneas 52-78):
 
 - Card con estadísticas: "Visibles: X" y "Total: Y"
@@ -174,6 +219,7 @@ onPressed: () => Navigator.pushNamed(context, '/label-management'),
 - `AdminError` → Mensaje de error + botón reintentar
 
 ### 4.2 Tab: Géneros
+
 (`lib/features/admin/presentation/screens/genres_tab.dart`)
 
 **BLoC propio**: Crea su propia instancia de `GenreBloc` (no usa el del padre).
@@ -188,6 +234,7 @@ onPressed: () => Navigator.pushNamed(context, '/label-management'),
 - **Listar**: ListView.builder con todos los géneros
 
 ### 4.3 Tab: Usuarios
+
 (`lib/features/admin/presentation/screens/users_tab.dart`)
 
 **Solo lectura actualmente**— NO permite cambiar roles ni eliminar
@@ -207,6 +254,7 @@ usuarios.**Pantalla**:
 - Si no: fondo `surfaceContainerHighest`, texto del rol tal cual
 
 ### 4.4 Tab: Analíticas
+
 (`lib/features/admin/presentation/screens/analytics_tab.dart`)
 
 **Stub / Placeholder** — Solo muestra un card con:
@@ -222,7 +270,31 @@ usuarios.**Pantalla**:
 ## 5. Gestión de Usuarios (Solo Admin)
 
 ### 5.1 AdminUsersBloc
+
 (`lib/features/admin/presentation/bloc/admin_users_bloc.dart`)
+
+#### Diagrama de Secuencia — Cambio de Rol de Usuario
+
+```mermaid
+sequenceDiagram
+    participant A as Admin
+    participant UT as UsersTab
+    participant UB as AdminUsersBloc
+    participant R as ProfilesRepository
+    participant U as UpdateUserRole
+    participant SB as Supabase
+
+    A->>UT: Select user + new role
+    UT->>UB: ChangeUserRole(userId, newRole)
+    UB->>U: call(userId, role)
+    U->>R: updateUserRole(userId, role)
+    R->>SB: UPDATE profiles SET role = '...'
+    SB-->>R: updated user
+    R-->>U: Result<UserEntity>
+    U-->>UB: RoleChanged
+    UB-->>UT: User updated in list
+    UT-->>A: Show confirmation
+```
 
 ```dart
 class AdminUsersBloc extends Bloc<AdminUsersEvent, AdminUsersState> {

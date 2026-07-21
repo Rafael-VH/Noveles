@@ -140,6 +140,26 @@ El `AuthBloc` maneja login, registro, logout y verificación de sesión.
 **No distingue roles** — simplemente emite `AuthAuthenticated(user)` con
 el `UserEntity` completo.
 
+#### Diagrama de Secuencia — Flujo de Login
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant S as Screen
+    participant B as AuthBloc
+    participant R as AuthRepository
+    participant SB as Supabase
+
+    U->>S: Enter email + password
+    S->>B: LoginRequested(email, password)
+    B->>R: login(email, password)
+    R->>SB: signInWithPassword()
+    SB-->>R: UserResponse
+    R-->>B: Result<UserEntity>
+    B-->>S: AuthSuccess / AuthFailure
+    S->>S: Route by role (isUser/isScan/isAdmin)
+```
+
 **5 casos de uso inyectados**:
 
 | Caso de uso | Tipo | Descripción |
@@ -497,6 +517,34 @@ void _onScroll() {
 
 ### 4.4 Book Cards en el Carousel
 
+#### Diagrama de Secuencia — Navegación de Libros
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant MS as MainScreen
+    participant BB as BookBloc
+    participant R as BookRepository
+    participant SB as Supabase
+
+    U->>MS: Open app
+    MS->>BB: LoadBooks(onlyVisible: true)
+    BB->>R: getBooks()
+    R->>SB: SELECT * FROM books WHERE is_visible=true
+    SB-->>R: books with joins (genres, tooks, labels)
+    R-->>BB: List<BookWithRelations>
+    BB-->>MS: BooksLoaded(books, hasMore)
+    Note over MS: Carousel + Genre chips + Grid
+
+    U->>MS: Scroll down
+    MS->>BB: LoadMoreBooks(page: 2)
+    BB->>R: getBooks(page: 2)
+    R->>SB: SELECT ... OFFSET 10
+    SB-->>R: next page
+    R-->>BB: more books
+    BB-->>MS: BooksLoaded(updated list, hasMore)
+```
+
 Cada slide del carousel muestra:
 
 | Elemento | Fuente | Widget |
@@ -714,6 +762,33 @@ final contentResults = await Future.wait(
 
 ### 6.4 ChapterCache
 
+#### Diagrama de Secuencia — Lectura de Capítulo
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant CS as ChapterScreen
+    participant CB as ChapterBloc
+    participant CR as ChapterRepository
+    participant CC as ChapterCache
+    participant SB as Supabase
+
+    U->>CS: Select chapter
+    CS->>CB: LoadChapterContent(chapterId)
+    CB->>CR: getChapterContent(contentPath)
+    CR->>CC: Check cache
+    alt Cache hit
+        CC-->>CR: cached content
+    else Cache miss
+        CR->>SB: Download from Storage
+        SB-->>CR: file content
+        CR->>CC: Save to cache
+    end
+    CR-->>CB: Result<String>
+    CB-->>CS: ChapterContentLoaded(content)
+    CS-->>U: Display chapter text
+```
+
 **Archivo**: `lib/core/supabase/chapter_cache.dart` (42 líneas)
 
 Cache local de capítulos para lectura offline:
@@ -815,6 +890,26 @@ Widget reutilizable que muestra un ícono de corazón:
 - **Uso**: se encuentra en `DetailView` (pestaña Info de `BookScreen`)
 
 ### 7.5 FavoritesScreen
+
+#### Diagrama de Secuencia — Toggle de Favorito
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant FB as FavoriteButton
+    participant BLoC as FavoriteBloc
+    participant R as FavoriteRepository
+    participant SB as Supabase
+
+    U->>FB: Tap heart icon
+    FB->>BLoC: ToggleFavorite(userId, bookId)
+    BLoC->>R: toggleFavorite(userId, bookId)
+    R->>SB: UPSERT user_favorites
+    SB-->>R: success
+    R-->>BLoC: Result<bool> (isFavorite)
+    BLoC-->>FB: FavoriteToggled(isFavorite)
+    FB-->>U: Update heart icon
+```
 
 **Archivo**:
 `lib/features/favorites/presentation/screens/favorites_screen.dart`
