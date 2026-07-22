@@ -22,6 +22,7 @@ class _DetailViewState extends State<DetailView> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: SingleChildScrollView(
+        physics: const NeverScrollableScrollPhysics(),
         child: Column(
           children: [
             const SizedBox(height: 22.0),
@@ -117,9 +118,8 @@ class _DetailViewState extends State<DetailView> {
                       ? widget.books.source
                       : "N/A",
                   title2: "Enlace",
-                  text2: widget.books.link.isNotEmpty
-                      ? widget.books.link
-                      : "N/A",
+                  text2:
+                      widget.books.link.isNotEmpty ? widget.books.link : "N/A",
                 ),
               ),
               if (widget.books.link.isNotEmpty)

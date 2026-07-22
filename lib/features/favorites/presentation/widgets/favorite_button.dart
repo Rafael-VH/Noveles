@@ -43,6 +43,7 @@ class _FavoriteButtonState extends State<FavoriteButton> {
   Widget build(BuildContext context) {
     return BlocListener<FavoriteBloc, FavoriteState>(
       listener: (context, state) {
+        if (!mounted) return;
         if (state is FavoriteStatusChecked) {
           setState(() {
             _isFavorite = state.isFavorite;

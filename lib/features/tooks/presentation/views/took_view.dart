@@ -20,6 +20,7 @@ class _TookViewState extends State<TookView> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: ListView.builder(
+        physics: const NeverScrollableScrollPhysics(),
         itemCount: widget.tooks.length,
         itemBuilder: (context, index) {
           final item = widget.tooks[index];

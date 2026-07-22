@@ -7,6 +7,7 @@ import 'package:noveles/features/books/presentation/screens/widgets/sliver_app_b
 import 'package:noveles/features/books/presentation/screens/widgets/sliver_persistent_header_book.dart';
 import 'package:noveles/features/tooks/presentation/screens/took_screen.dart';
 import 'package:noveles/features/books/presentation/views/detail/detail_view.dart';
+import 'package:flutter/widgets.dart';
 import 'package:noveles/features/tooks/presentation/views/took_view.dart';
 
 class BookScreen extends StatefulWidget {
@@ -73,13 +74,17 @@ class _BookScreenState extends State<BookScreen>
           body: TabBarView(
             controller: _tabController,
             children: [
-              DetailView(books: widget.book),
-              TookView(
-                tooks: widget.book.listTook,
-                onTookTap: (took) => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TookScreen(tooks: took),
+              PrimaryScrollController.none(
+                child: DetailView(books: widget.book),
+              ),
+              PrimaryScrollController.none(
+                child: TookView(
+                  tooks: widget.book.listTook,
+                  onTookTap: (took) => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => TookScreen(tooks: took),
+                    ),
                   ),
                 ),
               ),
