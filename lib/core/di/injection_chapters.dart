@@ -9,6 +9,8 @@ import 'package:noveles/features/chapters/domain/get_chapter_content.dart';
 import 'package:noveles/features/chapters/domain/update_chapter.dart';
 import 'package:noveles/features/chapters/domain/delete_chapter.dart';
 import 'package:noveles/features/chapters/domain/upload_chapter_content.dart';
+import 'package:noveles/features/chapters/domain/mark_chapter_as_read.dart';
+import 'package:noveles/features/chapters/domain/get_read_chapter_ids.dart';
 import 'package:noveles/features/chapters/presentation/bloc/chapter_bloc.dart';
 
 final getIt = GetIt.instance;
@@ -40,6 +42,12 @@ void initChaptersDependencies() {
   );
   getIt.registerLazySingleton(
     () => UploadChapterContent(getIt()),
+  );
+  getIt.registerLazySingleton(
+    () => MarkChapterAsRead(getIt()),
+  );
+  getIt.registerLazySingleton(
+    () => GetReadChapterIds(getIt()),
   );
 
   getIt.registerFactory(

@@ -14,4 +14,10 @@ abstract class ChapterRepository {
   /// Uploads a file (e.g. .md or .txt) to the chapters storage bucket.
   /// Returns the public URL of the uploaded file.
   Future<Result<String>> uploadContent(String filePath);
+
+  /// Marks a chapter as read by a user.
+  Future<Result<void>> markChapterAsRead(int chapterId, String userId);
+
+  /// Returns the set of chapter IDs that a user has read within a took.
+  Future<Result<Set<int>>> getReadChapterIds(int tookId, String userId);
 }

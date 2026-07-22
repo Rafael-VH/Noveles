@@ -12,6 +12,8 @@ import 'package:noveles/features/books/domain/toggle_book_visibility.dart';
 import 'package:noveles/features/books/domain/upload_image.dart';
 import 'package:noveles/features/books/domain/get_book_labels.dart';
 import 'package:noveles/features/books/domain/track_book_view.dart';
+import 'package:noveles/features/books/domain/get_recent_views.dart';
+import 'package:noveles/features/books/domain/get_most_viewed_books.dart';
 import 'package:noveles/features/books/presentation/bloc/book_bloc.dart';
 
 final getIt = GetIt.instance;
@@ -52,6 +54,12 @@ void initBooksDependencies() {
   );
   getIt.registerLazySingleton(
     () => TrackBookView(getIt()),
+  );
+  getIt.registerLazySingleton(
+    () => GetRecentViews(getIt()),
+  );
+  getIt.registerLazySingleton(
+    () => GetMostViewedBooks(getIt()),
   );
 
   getIt.registerFactory(

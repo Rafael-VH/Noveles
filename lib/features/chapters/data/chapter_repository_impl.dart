@@ -105,6 +105,40 @@ class ChapterRepositoryImpl implements ChapterRepository {
     }
   }
 
+  @override
+  Future<Result<void>> markChapterAsRead(int chapterId, String userId) async {
+    try {
+      await _supabase.client.from('chapter_reads').insert({
+        'user_id': userId,
+        'chapter_id': chapterId,
+        'read_at': DateTime.now().toUtc().toIso8601String(),
+      });
+      return const Ok(null);
+    } catch (e) {
+      return Err(ChapterFailure('Error al marcar capítulo como leído', cause: e));
+    }
+  }
+
+  @override
+  Future<Result<Set<int>>> getReadChapterIds(int tookId, String userId) async {
+    try {
+      final chapterIds = await _supabase.client
+          .from('chapters')
+          .select('id')
+          .eq('took_id', tookId);
+      if (chapterIds.isEmpty) return const Ok({});
+      final ids = chapterIds.map<int>((e) => e['id'] as int).toList();
+      final response = await _supabase.client
+          .from('chapter_reads')
+          .select('chapter_id')
+          .eq('user_id', userId)
+          .inFilter('chapter_id', ids);
+      return Ok(response.map<int>((e) => e['chapter_id'] as int).toSet());
+    } catch (e) {
+      return Err(ChapterFailure('Error al obtener capítulos leídos', cause: e));
+    }
+  }
+
   bool _isStoragePath(String s) =>
       s.contains('/') || s.endsWith('.txt') || s.endsWith('.json');
 

@@ -115,6 +115,7 @@ void main() {
   late MockSupabaseClient mockClient;
   late MockSupabaseQueryBuilder mockQueryBuilder;
   late MockFilterBuilder mockFilter;
+  late MockFilterBuilder mockReadFilter;
   late MockTransformBuilder mockTransform;
   late MockSelectBuilder mockSelectBuilder;
   late MockMapResultBuilder mockMapResult;
@@ -140,6 +141,7 @@ void main() {
     mockClient = MockSupabaseClient();
     mockQueryBuilder = MockSupabaseQueryBuilder();
     mockFilter = MockFilterBuilder();
+    mockReadFilter = MockFilterBuilder();
     mockTransform = MockTransformBuilder();
     mockSelectBuilder = MockSelectBuilder();
     mockMapResult = MockMapResultBuilder();
@@ -164,6 +166,9 @@ void main() {
     when(() => mockQueryBuilder.update(any())).thenAnswer((_) => mockFilter);
     when(() => mockQueryBuilder.delete()).thenAnswer((_) => mockFilter);
     when(() => mockFilter.eq(any(), any())).thenAnswer((_) => mockFilter);
+    when(() => mockFilter.inFilter(any(), any())).thenAnswer((_) => mockFilter);
+    when(() => mockReadFilter.eq(any(), any())).thenAnswer((_) => mockReadFilter);
+    when(() => mockReadFilter.inFilter(any(), any())).thenAnswer((_) => mockReadFilter);
     when(() => mockFilter.order(
           any(),
           ascending: any(named: 'ascending'),
@@ -397,6 +402,78 @@ void main() {
         expect(result, isA<Err<String>>());
         final error = (result as Err<String>).error;
         expect(error.message, contains('Error al descargar contenido'));
+      });
+    });
+
+    group('markChapterAsRead', () {
+      test('returns Ok on success', () async {
+        mockFilter.thenReturns(<Map<String, dynamic>>[]);
+
+        final result = await repository.markChapterAsRead(1, 'user1');
+
+        expect(result, isA<Ok<void>>());
+        verify(() => mockClient.from('chapter_reads')).called(1);
+      });
+
+      test('returns Err on error', () async {
+        when(() => mockQueryBuilder.insert(
+              any(),
+              defaultToNull: any(named: 'defaultToNull'),
+            )).thenThrow(Exception('Insert failed'));
+
+        final result = await repository.markChapterAsRead(1, 'user1');
+        expect(result, isA<Err<void>>());
+        final error = (result as Err<void>).error;
+        expect(error.message, contains('Error al marcar capítulo como leído'));
+      });
+    });
+
+    group('getReadChapterIds', () {
+      test('returns set of chapter IDs on success', () async {
+        // First query: chapters table to get chapter IDs for this took
+        mockFilter.thenReturns([
+          {'id': 10},
+          {'id': 11},
+        ]);
+        // Second query: chapter_reads to get read chapters
+        mockReadFilter.thenReturns([
+          {'chapter_id': 10},
+        ]);
+        // Stub the second from() call to return a fresh filter for chapter_reads
+        when(() => mockClient.from('chapter_reads'))
+            .thenAnswer((_) {
+          final qb = MockSupabaseQueryBuilder();
+          when(() => qb.select(any())).thenAnswer((_) => mockReadFilter);
+          return qb;
+        });
+
+        final result = await repository.getReadChapterIds(5, 'user1');
+
+        expect(result, isA<Ok<Set<int>>>());
+        final value = (result as Ok<Set<int>>).value;
+        expect(value, {10});
+        verify(() => mockClient.from('chapters')).called(1);
+        verify(() => mockClient.from('chapter_reads')).called(1);
+      });
+
+      test('returns empty set when no chapters for this took', () async {
+        mockFilter.thenReturns(<Map<String, dynamic>>[]);
+
+        final result = await repository.getReadChapterIds(999, 'user1');
+
+        expect(result, isA<Ok<Set<int>>>());
+        final value = (result as Ok<Set<int>>).value;
+        expect(value, isEmpty);
+      });
+
+      test('returns Err on error', () async {
+        when(() => mockFilter.eq(any(), any()))
+            .thenThrow(Exception('Query failed'));
+
+        final result = await repository.getReadChapterIds(1, 'user1');
+        expect(result, isA<Err<Set<int>>>());
+        final error = (result as Err<Set<int>>).error;
+        expect(error.message, contains('Error al obtener capítulos leídos'));
       });
     });
   });

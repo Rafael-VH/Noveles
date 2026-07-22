@@ -16,4 +16,6 @@ abstract class BookRepository {
   Future<Result<String>> uploadImage(String filePath);
   Future<Result<Map<int, Set<int>>>> getBookLabels(List<BookEntity> books);
   Future<Result<void>> trackBookView(int bookId);
+  Future<Result<List<BookWithRelations>>> getRecentViews(String userId);
+  Future<Result<List<BookWithRelations>>> getMostViewedBooks();
 }

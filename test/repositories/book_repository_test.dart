@@ -114,6 +114,7 @@ void main() {
   late MockSupabaseClient mockClient;
   late MockSupabaseQueryBuilder mockQueryBuilder;
   late MockFilterBuilder mockFilter;
+  late MockFilterBuilder mockRpcFilter;
   late MockGoTrueClient mockAuth;
   late MockSupabaseStorageClient mockStorage;
   late MockStorageFileApi mockStorageFileApi;
@@ -153,6 +154,7 @@ void main() {
     mockClient = MockSupabaseClient();
     mockQueryBuilder = MockSupabaseQueryBuilder();
     mockFilter = MockFilterBuilder();
+    mockRpcFilter = MockFilterBuilder();
     mockAuth = MockGoTrueClient();
     mockStorage = MockSupabaseStorageClient();
     mockStorageFileApi = MockStorageFileApi();
@@ -164,6 +166,10 @@ void main() {
     when(() => mockStorage.from(any())).thenReturn(mockStorageFileApi);
 
     repository = BookRepositoryImpl(mockProvider);
+
+    // RPC returns a separate filter instance
+    when(() => mockClient.rpc(any(), params: any(named: 'params')))
+        .thenAnswer((_) => mockRpcFilter);
 
     // Default chain: from() → queryBuilder
     when(() => mockClient.from(any())).thenAnswer((_) => mockQueryBuilder);
@@ -177,6 +183,7 @@ void main() {
 
     // Default chain: filter methods return filter
     when(() => mockFilter.eq(any(), any())).thenAnswer((_) => mockFilter);
+    when(() => mockFilter.inFilter(any(), any())).thenAnswer((_) => mockFilter);
     when(() => mockFilter.filter(any(), any(), any())).thenAnswer((_) => mockFilter);
     when(() => mockFilter.order(
           any(),
@@ -681,6 +688,137 @@ void main() {
         expect(result, isA<Err<void>>());
         final error = (result as Err<void>).error;
         expect(error.message, contains('Error tracking view'));
+      });
+    });
+
+    group('getRecentViews', () {
+      test('returns list of BookWithRelations on success', () async {
+        // RPC returns IDs
+        mockRpcFilter.thenReturns([
+          {'book_id': 1},
+          {'book_id': 2},
+        ]);
+        // Follow-up select returns book data
+        mockFilter.thenReturns([
+          {
+            'id': 1,
+            'created_at': '2024-01-01T00:00:00.000',
+            'cover': 'cover.jpg',
+            'name': 'Recent Book 1',
+            'short': '',
+            'alternative': '',
+            'description': '',
+            'author_id': 1,
+            'author': 'Author',
+            'country': 'JP',
+            'state': 'ongoing',
+            'type': 'novel',
+            'release': '2024',
+            'took_count': 5,
+            'chapter_count': 10,
+            'source': '',
+            'link': '',
+            'is_favorite': false,
+            'is_visible': true,
+            'authors': {'id': 1, 'name': 'Author', 'created_at': '2024-01-01'},
+            'books_genres': <Map<String, dynamic>>[],
+            'books_labels': <Map<String, dynamic>>[],
+            'tooks': <Map<String, dynamic>>[],
+          },
+        ]);
+
+        final result = await repository.getRecentViews('user1');
+
+        expect(result, isA<Ok<List<BookWithRelations>>>());
+        final value = (result as Ok<List<BookWithRelations>>).value;
+        expect(value.length, 1);
+        expect(value.first.name, 'Recent Book 1');
+        verify(() => mockClient.rpc('get_user_recent_views',
+            params: any(named: 'params'))).called(1);
+      });
+
+      test('returns empty list when RPC returns no IDs', () async {
+        mockRpcFilter.thenReturns(<Map<String, dynamic>>[]);
+
+        final result = await repository.getRecentViews('user1');
+
+        expect(result, isA<Ok<List<BookWithRelations>>>());
+        final value = (result as Ok<List<BookWithRelations>>).value;
+        expect(value, isEmpty);
+      });
+
+      test('returns Err on error', () async {
+        when(() => mockClient.rpc(any(), params: any(named: 'params')))
+            .thenThrow(Exception('RPC failed'));
+
+        final result = await repository.getRecentViews('user1');
+        expect(result, isA<Err<List<BookWithRelations>>>());
+        final error = (result as Err<List<BookWithRelations>>).error;
+        expect(error.message, contains('Error al obtener vistas recientes'));
+      });
+    });
+
+    group('getMostViewedBooks', () {
+      test('returns list of BookWithRelations on success', () async {
+        mockRpcFilter.thenReturns([
+          {'book_id': 3},
+        ]);
+        mockFilter.thenReturns([
+          {
+            'id': 3,
+            'created_at': '2024-01-01T00:00:00.000',
+            'cover': 'popular.jpg',
+            'name': 'Popular Book',
+            'short': '',
+            'alternative': '',
+            'description': '',
+            'author_id': 1,
+            'author': 'Author',
+            'country': 'JP',
+            'state': 'ongoing',
+            'type': 'novel',
+            'release': '2024',
+            'took_count': 3,
+            'chapter_count': 6,
+            'source': '',
+            'link': '',
+            'is_favorite': false,
+            'is_visible': true,
+            'authors': {'id': 1, 'name': 'Author', 'created_at': '2024-01-01'},
+            'books_genres': <Map<String, dynamic>>[],
+            'books_labels': <Map<String, dynamic>>[],
+            'tooks': <Map<String, dynamic>>[],
+          },
+        ]);
+
+        final result = await repository.getMostViewedBooks();
+
+        expect(result, isA<Ok<List<BookWithRelations>>>());
+        final value = (result as Ok<List<BookWithRelations>>).value;
+        expect(value.length, 1);
+        expect(value.first.name, 'Popular Book');
+        verify(() => mockClient.rpc('get_most_viewed_books',
+            params: any(named: 'params'))).called(1);
+      });
+
+      test('returns empty list when RPC returns no IDs', () async {
+        mockRpcFilter.thenReturns(<Map<String, dynamic>>[]);
+
+        final result = await repository.getMostViewedBooks();
+
+        expect(result, isA<Ok<List<BookWithRelations>>>());
+        final value = (result as Ok<List<BookWithRelations>>).value;
+        expect(value, isEmpty);
+      });
+
+      test('returns Err on error', () async {
+        when(() => mockClient.rpc(any(), params: any(named: 'params')))
+            .thenThrow(Exception('RPC failed'));
+
+        final result = await repository.getMostViewedBooks();
+        expect(result, isA<Err<List<BookWithRelations>>>());
+        final error = (result as Err<List<BookWithRelations>>).error;
+        expect(error.message, contains('Error al obtener libros más vistos'));
       });
     });
   });

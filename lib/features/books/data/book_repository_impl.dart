@@ -313,4 +313,40 @@ class BookRepositoryImpl implements BookRepository {
       return Err(BookFailure('Error tracking view', cause: e));
     }
   }
+
+  @override
+  Future<Result<List<BookWithRelations>>> getRecentViews(String userId) async {
+    try {
+      final ids = await _supabase.client
+          .rpc('get_user_recent_views', params: {'uid': userId, 'max_results': 6});
+      if (ids.isEmpty) return const Ok([]);
+      final bookIdList = ids.map<int>((e) => e['book_id'] as int).toList();
+      final response = await _supabase.client
+          .from('books')
+          .select('*, authors(*), books_genres(genre_id, genres(*)), books_labels(*, labels(*)), tooks(*, chapters(*))')
+          .inFilter('id', bookIdList);
+      final books = response.map((json) => BookModel.fromJson(json)).toList();
+      return Ok(books);
+    } catch (e) {
+      return Err(BookFailure('Error al obtener vistas recientes', cause: e));
+    }
+  }
+
+  @override
+  Future<Result<List<BookWithRelations>>> getMostViewedBooks() async {
+    try {
+      final ids = await _supabase.client
+          .rpc('get_most_viewed_books', params: {'max_results': 6});
+      if (ids.isEmpty) return const Ok([]);
+      final bookIdList = ids.map<int>((e) => e['book_id'] as int).toList();
+      final response = await _supabase.client
+          .from('books')
+          .select('*, authors(*), books_genres(genre_id, genres(*)), books_labels(*, labels(*)), tooks(*, chapters(*))')
+          .inFilter('id', bookIdList);
+      final books = response.map((json) => BookModel.fromJson(json)).toList();
+      return Ok(books);
+    } catch (e) {
+      return Err(BookFailure('Error al obtener libros más vistos', cause: e));
+    }
+  }
 }
