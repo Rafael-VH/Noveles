@@ -11,7 +11,6 @@ class AppLogger {
       if (error != null) debugPrint('   Cause: $error');
       if (stackTrace != null) debugPrint('   Stack: $stackTrace');
     }
-    // TODO: Integrar Sentry/Firebase Crashlytics
   }
 
   static void warning(String message) {
