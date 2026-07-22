@@ -67,32 +67,33 @@ class _ChapterScreenState extends State<ChapterScreen> {
         },
         child: BlocBuilder<ChapterBloc, ChapterState>(
           builder: (context, state) {
-          if (state is ChapterLoading || state is ChapterInitial) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (state is ChapterError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(state.message),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => context.read<ChapterBloc>().add(
-                          LoadChapterContent(
-                            initialIndex: widget.i,
-                            chapters: widget.chapters.map(ChapterRef.fromEntity).toList(),
+            if (state is ChapterLoading || state is ChapterInitial) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (state is ChapterError) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(state.message),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () => context.read<ChapterBloc>().add(
+                            LoadChapterContent(
+                              initialIndex: widget.i,
+                              chapters: widget.chapters
+                                  .map(ChapterRef.fromEntity)
+                                  .toList(),
+                            ),
                           ),
-                        ),
-                    child: const Text('Reintentar'),
-                  ),
-                ],
-              ),
-            );
-          }
-          if (state is ChapterLoaded) {
-            return SafeArea(
-              child: PageView.builder(
+                      child: const Text('Reintentar'),
+                    ),
+                  ],
+                ),
+              );
+            }
+            if (state is ChapterLoaded) {
+              return PageView.builder(
                 itemCount: state.chapters.length,
                 physics: const BouncingScrollPhysics(),
                 controller: PageController(initialPage: state.initialIndex),
@@ -155,12 +156,11 @@ class _ChapterScreenState extends State<ChapterScreen> {
                     ],
                   );
                 },
-              ),
-            );
-          }
-          return const SizedBox.shrink();
-        },
-      ),
+              );
+            }
+            return const SizedBox.shrink();
+          },
+        ),
       ),
     );
   }

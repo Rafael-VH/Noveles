@@ -143,98 +143,94 @@ class _MainScreenState extends State<MainScreen> {
     bool hasMore = false,
   }) {
     if (listBook.isEmpty) {
-      return SafeArea(
-        child: Column(
-          children: [
-            AppBar(
-              title: const Text('Noveles'),
-              leading: Builder(
-                builder: (ctx) => IconButton(
-                  icon: const Icon(Icons.menu),
-                  onPressed: () => Scaffold.of(ctx).openDrawer(),
-                ),
+      return Column(
+        children: [
+          AppBar(
+            title: const Text('Noveles'),
+            leading: Builder(
+              builder: (ctx) => IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () => Scaffold.of(ctx).openDrawer(),
               ),
             ),
-            const Expanded(
-              child: EmptyState(
-                icon: Icons.menu_book_outlined,
-                message: 'No hay libros disponibles',
+          ),
+          const Expanded(
+            child: EmptyState(
+              icon: Icons.menu_book_outlined,
+              message: 'No hay libros disponibles',
+            ),
+          ),
+        ],
+      );
+    }
+
+    return CustomScrollView(
+      controller: _scrollController,
+      slivers: [
+        // Carousel
+        SliverAppBarHome(
+          listBook: listBook,
+          onBookTap: (book) => Navigator.push(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (_, __, ___) => BookScreen(book: book),
+              transitionDuration: const Duration(seconds: 1),
+            ),
+          ),
+          actions: [
+            Builder(
+              builder: (ctx) => IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: () => Scaffold.of(ctx).openDrawer(),
               ),
             ),
           ],
         ),
-      );
-    }
 
-    return SafeArea(
-      child: CustomScrollView(
-        controller: _scrollController,
-        slivers: [
-          // Carousel
-          SliverAppBarHome(
-            listBook: listBook,
-            onBookTap: (book) => Navigator.push(
-              context,
-              PageRouteBuilder(
-                pageBuilder: (_, __, ___) => BookScreen(book: book),
-                transitionDuration: const Duration(seconds: 1),
-              ),
-            ),
-            actions: [
-              Builder(
-                builder: (ctx) => IconButton(
-                  icon: const Icon(Icons.menu),
-                  onPressed: () => Scaffold.of(ctx).openDrawer(),
-                ),
-              ),
-            ],
-          ),
+        const SliverToBoxAdapter(child: SizedBox(height: 32.0)),
 
-          const SliverToBoxAdapter(child: SizedBox(height: 32.0)),
-
-          // Géneros
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: 60.0,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: listGenre
-                    .map(
-                      (item) => Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => GenreScreen(
-                                  genre: item.name,
-                                  books: listBook,
-                                  coverUrlService: getIt<CoverUrlService>(),
-                                ),
+        // Géneros
+        SliverToBoxAdapter(
+          child: SizedBox(
+            height: 60.0,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: listGenre
+                  .map(
+                    (item) => Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => GenreScreen(
+                                genre: item.name,
+                                books: listBook,
+                                coverUrlService: getIt<CoverUrlService>(),
                               ),
-                            );
-                          },
-                          child: Chip(
-                            label: Text(item.name),
-                          ),
+                            ),
+                          );
+                        },
+                        child: Chip(
+                          label: Text(item.name),
                         ),
                       ),
-                    )
-                    .toList(),
-              ),
+                    ),
+                  )
+                  .toList(),
             ),
           ),
+        ),
 
-          if (hasMore)
-            const SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 16),
-                child: Center(child: CircularProgressIndicator()),
-              ),
+        if (hasMore)
+          const SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Center(child: CircularProgressIndicator()),
             ),
-        ],
-      ),
+          ),
+      ],
     );
   }
 }

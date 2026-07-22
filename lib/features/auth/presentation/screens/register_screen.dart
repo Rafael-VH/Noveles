@@ -55,98 +55,97 @@ class _RegisterScreenState extends State<RegisterScreen> {
             );
           }
         },
-        child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.person_add_outlined,
-                      size: 64,
-                      color: colorScheme.primary,
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.person_add_outlined,
+                    size: 64,
+                    color: colorScheme.primary,
+                  ),
+                  const SizedBox(height: 24),
+                  TextFormField(
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: const InputDecoration(
+                      labelText: 'Correo electrónico',
+                      prefixIcon: Icon(Icons.email_outlined),
                     ),
-                    const SizedBox(height: 24),
-                    TextFormField(
-                      controller: _emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: const InputDecoration(
-                        labelText: 'Correo electrónico',
-                        prefixIcon: Icon(Icons.email_outlined),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Ingresa tu correo';
-                        }
-                        if (!value.contains('@')) {
-                          return 'Correo inválido';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _passwordController,
-                      obscureText: _obscurePassword,
-                      decoration: InputDecoration(
-                        labelText: 'Contraseña',
-                        prefixIcon: const Icon(Icons.lock_outlined),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscurePassword
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                          ),
-                          onPressed: () => setState(
-                              () => _obscurePassword = !_obscurePassword),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Ingresa tu correo';
+                      }
+                      if (!value.contains('@')) {
+                        return 'Correo inválido';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: _obscurePassword,
+                    decoration: InputDecoration(
+                      labelText: 'Contraseña',
+                      prefixIcon: const Icon(Icons.lock_outlined),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                         ),
+                        onPressed: () => setState(
+                            () => _obscurePassword = !_obscurePassword),
                       ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Ingresa tu contraseña';
-                        }
-                        if (value.length < 6) {
-                          return 'Mínimo 6 caracteres';
-                        }
-                        return null;
-                      },
                     ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _confirmController,
-                      obscureText: _obscureConfirm,
-                      decoration: InputDecoration(
-                        labelText: 'Confirmar contraseña',
-                        prefixIcon: const Icon(Icons.lock_outlined),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscureConfirm
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                          ),
-                          onPressed: () => setState(
-                              () => _obscureConfirm = !_obscureConfirm),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Ingresa tu contraseña';
+                      }
+                      if (value.length < 6) {
+                        return 'Mínimo 6 caracteres';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _confirmController,
+                    obscureText: _obscureConfirm,
+                    decoration: InputDecoration(
+                      labelText: 'Confirmar contraseña',
+                      prefixIcon: const Icon(Icons.lock_outlined),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscureConfirm
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                         ),
+                        onPressed: () =>
+                            setState(() => _obscureConfirm = !_obscureConfirm),
                       ),
-                      validator: (value) {
-                        if (value != _passwordController.text) {
-                          return 'Las contraseñas no coinciden';
-                        }
-                        return null;
-                      },
                     ),
-                    const SizedBox(height: 24),
-                    BlocBuilder<AuthBloc, AuthState>(
-                      builder: (context, state) {
-                        final isLoading = state is AuthLoading;
-                        return SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: isLoading ? null : _onRegister,
-                            child: isLoading
+                    validator: (value) {
+                      if (value != _passwordController.text) {
+                        return 'Las contraseñas no coinciden';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 24),
+                  BlocBuilder<AuthBloc, AuthState>(
+                    builder: (context, state) {
+                      final isLoading = state is AuthLoading;
+                      return SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: isLoading ? null : _onRegister,
+                          child: isLoading
                               ? SizedBox(
                                   height: 20,
                                   width: 20,
@@ -154,17 +153,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     strokeWidth: 2,
                                     color: colorScheme.onPrimary,
                                   ),
-                                  )
-                                : const Text(
-                                    'Registrarse',
-                                    style: TextStyle(fontSize: 16),
-                                  ),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                ),
+                                )
+                              : const Text(
+                                  'Registrarse',
+                                  style: TextStyle(fontSize: 16),
+                                ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
           ),

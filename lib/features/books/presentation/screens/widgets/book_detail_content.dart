@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:noveles/shared/domain/entities/book_with_relations.dart';
-import 'package:noveles/features/books/presentation/views/detail/widgets/card_info_detail.dart';
+import 'package:noveles/features/books/presentation/screens/widgets/card_info_detail.dart';
 import 'package:noveles/core/presentation/widgets/title_widget.dart';
 import 'package:noveles/features/favorites/presentation/widgets/favorite_button.dart';
 import 'package:url_launcher/url_launcher.dart';
