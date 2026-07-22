@@ -13,8 +13,6 @@ import 'package:noveles/features/auth/domain/use_cases/listen_auth_state.dart';
 import 'package:noveles/features/profiles/domain/user_entity.dart';
 import 'package:noveles/features/profiles/domain/user_role.dart';
 import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:noveles/features/auth/presentation/bloc/auth_event.dart';
-import 'package:noveles/features/auth/presentation/bloc/auth_state.dart';
 
 class MockLogin extends Mock implements Login {}
 

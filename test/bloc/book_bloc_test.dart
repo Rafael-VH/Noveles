@@ -7,8 +7,6 @@ import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 import 'package:noveles/features/books/domain/get_book.dart';
 import 'package:noveles/features/books/domain/get_book_by_id.dart';
 import 'package:noveles/features/books/presentation/bloc/book_bloc.dart';
-import 'package:noveles/features/books/presentation/bloc/book_event.dart';
-import 'package:noveles/features/books/presentation/bloc/book_state.dart';
 
 class MockGetBooks extends Mock implements GetBooks {}
 

@@ -11,8 +11,6 @@ import 'package:noveles/features/labels/domain/assign_label_to_book.dart';
 import 'package:noveles/features/labels/domain/remove_label_from_book.dart';
 import 'package:noveles/features/labels/domain/get_labels_for_books.dart';
 import 'package:noveles/features/labels/presentation/bloc/label_bloc.dart';
-import 'package:noveles/features/labels/presentation/bloc/label_event.dart';
-import 'package:noveles/features/labels/presentation/bloc/label_state.dart';
 
 class MockGetLabels extends Mock implements GetLabels {}
 

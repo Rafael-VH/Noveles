@@ -5,8 +5,6 @@ import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/core/errors/failure.dart';
 import 'package:noveles/features/books/domain/upload_image.dart';
 import 'package:noveles/features/scan/presentation/bloc/scan_cover_bloc.dart';
-import 'package:noveles/features/scan/presentation/bloc/scan_cover_event.dart';
-import 'package:noveles/features/scan/presentation/bloc/scan_cover_state.dart';
 
 class MockUploadImage extends Mock implements UploadImage {}
 
