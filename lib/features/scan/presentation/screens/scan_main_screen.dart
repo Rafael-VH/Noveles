@@ -44,7 +44,6 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
           if (state is ScanBookError) {
             showErrorSnack(context, state.message);
           }
-
           if (state is ScanBookLoaded && state.message != null) {
             showSuccessSnack(context, state.message!);
           }
@@ -56,25 +55,25 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
           ),
           body: BlocBuilder<ScanBookBloc, ScanBookState>(
             builder: (context, state) {
-              // Loading State
+              // Loading
               if (state is ScanBookLoading || state is ScanBookInitial) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
+                return const Center(child: CircularProgressIndicator());
               }
 
-              // Error State
+              // Error
               if (state is ScanBookError) {
                 return Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      Icon(Icons.error_outline, size: 48,
+                          color: Theme.of(context).colorScheme.error),
+                      const SizedBox(height: 12),
                       Text(state.message),
                       const SizedBox(height: 16),
                       ElevatedButton(
-                        onPressed: () => context.read<ScanBookBloc>().add(
-                              LoadScanBooks(),
-                            ),
+                        onPressed: () =>
+                            context.read<ScanBookBloc>().add(LoadScanBooks()),
                         child: const Text('Reintentar'),
                       ),
                     ],
@@ -82,23 +81,49 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
                 );
               }
 
-              // Loaded State
               final books = switch (state) {
                 ScanBookLoaded(:final books) => books,
                 _ => null,
               };
-
-              // No Books State
               if (books == null) return const SizedBox.shrink();
 
-              // Empty Books State
+              // Empty
               if (books.isEmpty) {
-                return const Center(
-                  child: Text('No hay libros'),
+                return Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.menu_book_outlined, size: 64,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurfaceVariant
+                              .withAlpha(80)),
+                      const SizedBox(height: 12),
+                      Text('No hay libros',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
+                              )),
+                      const SizedBox(height: 4),
+                      Text('Tocá + para crear tu primer libro',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
+                              )),
+                    ],
+                  ),
                 );
               }
 
-              // Books List
+              // Book list
               return RefreshIndicator(
                 onRefresh: () async {
                   context.read<ScanBookBloc>().add(LoadScanBooks());
@@ -107,72 +132,26 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
                       );
                 },
                 child: ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 80),
                   itemCount: books.length,
                   itemBuilder: (context, index) {
                     final book = books[index];
-                    return Card(
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 4,
-                      ),
-                      child: ListTile(
-                        leading: SizedBox(
-                          width: 48,
-                          height: 64,
-                          child: CachedNetworkImage(
-                            fit: BoxFit.cover,
-                            imageUrl: getIt<CoverUrlService>()(book.cover),
-                            errorWidget: (_, __, ___) => const Icon(
-                              Icons.book,
-                              size: 48,
-                            ),
-                          ),
-                        ),
-                        title: Text(
-                          book.name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        subtitle: Text(
-                          'ID: ${book.id} - ${book.tookCount} tomos',
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Switch(
-                              value: book.isVisible,
-                              onChanged: (value) {
-                                context.read<ScanBookBloc>().add(
-                                    ToggleScanBookVisibility(book.id, value));
-                              },
-                            ),
-                            IconButton(
-                              icon: Icon(
-                                Icons.edit,
-                                color: Theme.of(context).colorScheme.primary,
-                              ),
-                              onPressed: () => _editBook(context, book),
-                            ),
-                            IconButton(
-                              icon: Icon(
-                                Icons.delete,
-                                color: Theme.of(context).colorScheme.error,
-                              ),
-                              onPressed: () =>
-                                  _deleteBook(context, book.id, book.name),
-                            ),
-                          ],
-                        ),
-                        onTap: () => _editBook(context, book),
-                      ),
+                    return _BookCard(
+                      book: book,
+                      onEdit: () => _editBook(context, book),
+                      onDelete: () =>
+                          _deleteBook(context, book.id, book.name),
+                      onToggleVisibility: (value) {
+                        context.read<ScanBookBloc>().add(
+                              ToggleScanBookVisibility(book.id, value),
+                            );
+                      },
                     );
                   },
                 ),
               );
             },
           ),
-
-          // Add Book Button
           floatingActionButton: FloatingActionButton(
             onPressed: () => _createBook(context),
             child: const Icon(Icons.add),
@@ -182,7 +161,6 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
     );
   }
 
-  // Edit Book
   void _editBook(BuildContext context, BookWithRelations book) {
     Navigator.push(
       context,
@@ -200,7 +178,6 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
     );
   }
 
-  // Create Book
   void _createBook(BuildContext context) {
     Navigator.push(
       context,
@@ -218,7 +195,6 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
     );
   }
 
-  // Delete Book
   void _deleteBook(BuildContext context, int bookId, String bookName) {
     final bloc = context.read<ScanBookBloc>();
     showConfirmationDialog(
@@ -232,5 +208,218 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
         bloc.add(DeleteScanBook(bookId));
       }
     });
+  }
+}
+
+// ─── Book Card ─────────────────────────────────────────────────────
+
+class _BookCard extends StatelessWidget {
+  final BookWithRelations book;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+  final void Function(bool value) onToggleVisibility;
+
+  const _BookCard({
+    required this.book,
+    required this.onEdit,
+    required this.onDelete,
+    required this.onToggleVisibility,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final coverUrl = getIt<CoverUrlService>()(book.cover);
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: theme.colorScheme.outlineVariant),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onEdit,
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Cover
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: SizedBox(
+                  width: 56,
+                  height: 80,
+                  child: CachedNetworkImage(
+                    fit: BoxFit.cover,
+                    imageUrl: coverUrl,
+                    errorWidget: (_, __, ___) => Container(
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      child: Icon(Icons.book, size: 28,
+                          color: theme.colorScheme.onSurfaceVariant),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+
+              // Info
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      book.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    if (book.author.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        book.author,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 8),
+                    // Stats row
+                    Row(
+                      children: [
+                        _StatChip(
+                          icon: Icons.book_outlined,
+                          label: '${book.tookCount} tomos',
+                          theme: theme,
+                        ),
+                        const SizedBox(width: 8),
+                        if (book.chapterCount > 0)
+                          _StatChip(
+                            icon: Icons.article_outlined,
+                            label: '${book.chapterCount} caps.',
+                            theme: theme,
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              // Actions
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Switch(
+                    value: book.isVisible,
+                    onChanged: onToggleVisibility,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                  _ActionMenu(
+                    onEdit: onEdit,
+                    onDelete: onDelete,
+                    theme: theme,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StatChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final ThemeData theme;
+
+  const _StatChip({
+    required this.icon,
+    required this.label,
+    required this.theme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: theme.colorScheme.onSurfaceVariant),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ActionMenu extends StatelessWidget {
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+  final ThemeData theme;
+
+  const _ActionMenu({
+    required this.onEdit,
+    required this.onDelete,
+    required this.theme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<String>(
+      icon: Icon(Icons.more_vert, size: 18,
+          color: theme.colorScheme.onSurfaceVariant),
+      padding: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      onSelected: (value) {
+        switch (value) {
+          case 'edit':
+            onEdit();
+          case 'delete':
+            onDelete();
+        }
+      },
+      itemBuilder: (_) => [
+        PopupMenuItem(
+          value: 'edit',
+          child: Row(
+            children: [
+              Icon(Icons.edit_outlined, size: 18, color: theme.colorScheme.primary),
+              const SizedBox(width: 8),
+              const Text('Editar'),
+            ],
+          ),
+        ),
+        PopupMenuItem(
+          value: 'delete',
+          child: Row(
+            children: [
+              Icon(Icons.delete_outline, size: 18, color: theme.colorScheme.error),
+              const SizedBox(width: 8),
+              Text('Eliminar',
+                  style: TextStyle(color: theme.colorScheme.error)),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }
