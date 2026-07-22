@@ -7,7 +7,6 @@ import 'package:noveles/features/favorites/presentation/bloc/favorite_bloc.dart'
 import 'package:noveles/features/books/presentation/screens/widgets/book_detail_content.dart';
 import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 import 'package:noveles/features/genres/domain/genre_entity.dart';
-import 'package:noveles/features/tooks/domain/took_entity.dart';
 
 class MockAuthBloc extends Mock implements AuthBloc {}
 

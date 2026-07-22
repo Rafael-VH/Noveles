@@ -6,10 +6,8 @@ import 'package:mocktail/mocktail.dart';
 import 'package:noveles/features/app/presentation/bloc/recent_views/recent_views_bloc.dart';
 import 'package:noveles/features/app/presentation/widgets/section_recent_views.dart';
 import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:noveles/features/auth/presentation/bloc/auth_state.dart';
 import 'package:noveles/features/profiles/domain/user_entity.dart';
 import 'package:noveles/features/profiles/domain/user_role.dart';
-import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 import 'test_helpers.dart';
 
 class MockRecentViewsBloc extends Mock implements RecentViewsBloc {}

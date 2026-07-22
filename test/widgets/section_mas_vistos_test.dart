@@ -5,7 +5,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:noveles/features/app/presentation/bloc/popular_views/popular_views_bloc.dart';
 import 'package:noveles/features/app/presentation/widgets/section_mas_vistos.dart';
-import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 import 'test_helpers.dart';
 
 class MockPopularViewsBloc extends Mock implements PopularViewsBloc {}
