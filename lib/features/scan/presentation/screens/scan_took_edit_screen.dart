@@ -226,17 +226,64 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
     }
   }
 
+  // ─── Section helpers ───────────────────────────────────────────────
+
+  Widget _sectionCard({required String title, required IconData icon, required List<Widget> children}) {
+    final theme = Theme.of(context);
+    return Card(
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      clipBehavior: Clip.antiAlias,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, size: 18, color: theme.colorScheme.primary),
+                const SizedBox(width: 8),
+                Text(
+                  title,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            ...children,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSaveButton() {
+    if (_isSaving) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16),
+        child: SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      );
+    }
+    return TextButton(onPressed: _save, child: const Text('Guardar'));
+  }
+
+  // ─── Build ─────────────────────────────────────────────────────────
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(_isEditing ? 'Editar Tomo' : 'Nuevo Tomo'),
-        actions: [
-          TextButton(
-            onPressed: _save,
-            child: const Text('Guardar'),
-          ),
-        ],
+        actions: [_buildSaveButton()],
       ),
       floatingActionButton: _isEditing
           ? FloatingActionButton(
@@ -246,97 +293,157 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
               child: const Icon(Icons.add),
             )
           : null,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              // Number
-              TextFormField(
-                controller: _numberCtrl,
-                decoration: const InputDecoration(labelText: 'Número'),
-                validator: (v) =>
-                    v?.trim().isEmpty == true ? 'Requerido' : null,
-              ),
-
-              const SizedBox(height: 12),
-
-              // Title
-              TextFormField(
-                controller: _titleCtrl,
-                decoration: const InputDecoration(labelText: 'Título'),
-              ),
-
-              const SizedBox(height: 12),
-
-              // Cover
-              CoverPicker(
-                controller: _coverCtrl,
-                onPick: _pickCover,
-                onClear: () => setState(() => _coverCtrl.clear()),
-              ),
-
-              // Show Chapters (always visible after first save)
-              if (_isEditing) ...[
-                const SizedBox(height: 24),
-
-                const Divider(),
-
-                const Text(
-                  'Capítulos',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-
-                const SizedBox(height: 12),
-
-                // List of Chapters
-                ..._chapters.map(
-                  (ch) => Card(
-                    child: ListTile(
-                      title: Text(
-                        ch.title.isNotEmpty ? ch.title : 'Cap. ${ch.number}',
-                      ),
-                      subtitle: Text('ID: ${ch.id}'),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Edit Button
-                          IconButton(
-                            icon: Icon(
-                              Icons.edit,
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                            onPressed: () => _navigateToChapterEdit(
-                              chapter: ch,
-                              tookId: widget.took!.id,
-                            ),
-                          ),
-
-                          // Delete Button
-                          IconButton(
-                            icon: Icon(
-                              Icons.delete,
-                              color: Theme.of(context).colorScheme.error,
-                            ),
-                            onPressed: () => _deleteChapter(ch.id),
-                          ),
-                        ],
-                      ),
-                      onTap: () => _navigateToChapterEdit(
-                        chapter: ch,
-                        tookId: widget.took!.id,
+      body: Form(
+        key: _formKey,
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            // ── Cover & Info section ──
+            _sectionCard(
+              title: 'Información del tomo',
+              icon: Icons.book_outlined,
+              children: [
+                // Number + Title in a row
+                Row(
+                  children: [
+                    SizedBox(
+                      width: 100,
+                      child: TextFormField(
+                        controller: _numberCtrl,
+                        decoration: const InputDecoration(
+                          labelText: 'Número',
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (v) =>
+                            v?.trim().isEmpty == true ? 'Requerido' : null,
                       ),
                     ),
-                  ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextFormField(
+                        controller: _titleCtrl,
+                        decoration: const InputDecoration(
+                          labelText: 'Título',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-
+                const SizedBox(height: 16),
+                CoverPicker(
+                  controller: _coverCtrl,
+                  onPick: _pickCover,
+                  onClear: () => setState(() => _coverCtrl.clear()),
+                ),
               ],
+            ),
+
+            // ── Chapters section (only when editing) ──
+            if (_isEditing) ...[
+              const SizedBox(height: 24),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      children: [
+                        Icon(Icons.list_alt_outlined, size: 18, color: theme.colorScheme.primary),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Capítulos',
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: theme.colorScheme.primary,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            '${_chapters.length}',
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.onPrimaryContainer,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (_chapters.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: Center(
+                        child: Text(
+                          'Todavía no hay capítulos',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                    )
+                  else
+                    ..._chapters.map(
+                      (ch) => Card(
+                        margin: const EdgeInsets.only(bottom: 8),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          side: BorderSide(color: theme.colorScheme.outlineVariant),
+                        ),
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                          title: Text(
+                            ch.title.isNotEmpty ? ch.title : 'Cap. ${ch.number}',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          subtitle: Text(
+                            ch.number.isNotEmpty ? 'Capítulo $ch.number' : '',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                  Icons.edit_outlined,
+                                  color: theme.colorScheme.primary,
+                                ),
+                                onPressed: () => _navigateToChapterEdit(
+                                  chapter: ch,
+                                  tookId: widget.took!.id,
+                                ),
+                              ),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.delete_outline,
+                                  color: theme.colorScheme.error,
+                                ),
+                                onPressed: () => _deleteChapter(ch.id),
+                              ),
+                            ],
+                          ),
+                          onTap: () => _navigateToChapterEdit(
+                            chapter: ch,
+                            tookId: widget.took!.id,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ],
-          ),
+            const SizedBox(height: 32),
+          ],
         ),
       ),
     );

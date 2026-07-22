@@ -190,102 +190,189 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
     }
   }
 
+  // ─── Section helpers ───────────────────────────────────────────────
+
+  Widget _sectionCard({required String title, required IconData icon, required List<Widget> children}) {
+    final theme = Theme.of(context);
+    return Card(
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      clipBehavior: Clip.antiAlias,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, size: 18, color: theme.colorScheme.primary),
+                const SizedBox(width: 8),
+                Text(
+                  title,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            ...children,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSaveButton() {
+    if (_isSaving) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16),
+        child: SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      );
+    }
+    return TextButton(onPressed: _save, child: const Text('Guardar'));
+  }
+
+  // ─── Build ─────────────────────────────────────────────────────────
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final hasContent = _contentCtrl.text.isNotEmpty;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(_isEditing ? 'Editar Capítulo' : 'Nuevo Capítulo'),
-        actions: [
-          TextButton(onPressed: _save, child: const Text('Guardar')),
-        ],
+        actions: [_buildSaveButton()],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Number
-              TextFormField(
-                controller: _numberCtrl,
-                decoration: const InputDecoration(labelText: 'Número'),
-                validator: (v) =>
-                    v?.trim().isEmpty == true ? 'Requerido' : null,
-              ),
-
-              const SizedBox(height: 12),
-
-              // Title
-              TextFormField(
-                controller: _titleCtrl,
-                decoration: const InputDecoration(labelText: 'Título'),
-              ),
-
-              const SizedBox(height: 24),
-
-              // Content file
-              const Text(
-                'Archivo de contenido',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-
-              const SizedBox(height: 8),
-
-              if (hasContent)
-                Card(
-                  child: ListTile(
-                    leading: const Icon(Icons.description),
-                    title: Text(
-                      _uploadedFileName.isNotEmpty
-                          ? _uploadedFileName
-                          : _contentCtrl.text,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    trailing: TextButton(
-                      onPressed: _pickContentFile,
-                      child: const Text('Reemplazar'),
-                    ),
-                  ),
-                )
-              else
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      body: Form(
+        key: _formKey,
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            // ── Info section ──
+            _sectionCard(
+              title: 'Información del capítulo',
+              icon: Icons.article_outlined,
+              children: [
+                Row(
                   children: [
-                    Text(
-                      'Ningún archivo seleccionado',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    SizedBox(
+                      width: 100,
+                      child: TextFormField(
+                        controller: _numberCtrl,
+                        decoration: const InputDecoration(
+                          labelText: 'Número',
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (v) =>
+                            v?.trim().isEmpty == true ? 'Requerido' : null,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextFormField(
+                        controller: _titleCtrl,
+                        decoration: const InputDecoration(
+                          labelText: 'Título',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
+              ],
+            ),
 
-              ElevatedButton.icon(
-                onPressed: _pickContentFile,
-                icon: const Icon(Icons.upload_file),
-                label: const Text('Seleccionar archivo .md o .txt'),
-              ),
+            const SizedBox(height: 16),
 
-              if (!hasContent)
-                Padding(
-                  padding: const EdgeInsets.only(top: 4),
-                  child: Text(
-                    'El contenido se subirá a Supabase Storage',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      fontSize: 12,
+            // ── Content section ──
+            _sectionCard(
+              title: 'Archivo de contenido',
+              icon: Icons.description_outlined,
+              children: [
+                // File status
+                if (hasContent)
+                  Card(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      side: BorderSide(color: theme.colorScheme.outlineVariant),
+                    ),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      leading: Icon(
+                        Icons.insert_drive_file,
+                        color: theme.colorScheme.primary,
+                      ),
+                      title: Text(
+                        _uploadedFileName.isNotEmpty
+                            ? _uploadedFileName
+                            : _contentCtrl.text,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      trailing: TextButton(
+                        onPressed: _pickContentFile,
+                        child: const Text('Reemplazar'),
+                      ),
+                    ),
+                  )
+                else
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 24),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: theme.colorScheme.surfaceContainerHighest,
+                    ),
+                    child: Column(
+                      children: [
+                        Icon(
+                          Icons.upload_file_outlined,
+                          size: 40,
+                          color: theme.colorScheme.onSurfaceVariant.withAlpha(100),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Ningún archivo seleccionado',
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: _pickContentFile,
+                    icon: const Icon(Icons.upload_file),
+                    label: const Text('Seleccionar archivo .md o .txt'),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
                 ),
-            ],
-          ),
+                if (!hasContent)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4),
+                    child: Text(
+                      'El contenido se subirá a Supabase Storage',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 32),
+          ],
         ),
       ),
     );
