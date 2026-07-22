@@ -12,6 +12,10 @@ import 'package:noveles/features/books/presentation/screens/book_screen.dart';
 import 'package:noveles/features/genres/presentation/screens/genre_screen.dart';
 import 'package:noveles/features/app/presentation/widgets/app_drawer.dart';
 import 'package:noveles/features/app/presentation/widgets/carousel_appbar_sliver.dart';
+import 'package:noveles/features/app/presentation/widgets/genre_chip_styled.dart';
+import 'package:noveles/features/app/presentation/widgets/section_header.dart';
+import 'package:noveles/features/app/presentation/widgets/section_novedades.dart';
+import 'package:noveles/features/app/presentation/widgets/section_populares.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -46,6 +50,25 @@ class _MainScreenState extends State<MainScreen> {
         context.read<BookBloc>().add(LoadMoreBooks(_currentPage));
       }
     }
+  }
+
+  List<BookWithRelations> _sortedNovedades(List<BookWithRelations> books) {
+    final sorted = List<BookWithRelations>.from(books)
+      ..sort((a, b) {
+        final c = b.createdAt.compareTo(a.createdAt);
+        return c != 0 ? c : b.id.compareTo(a.id);
+      });
+    return sorted.take(6).toList();
+  }
+
+  List<BookWithRelations> _sortedPopulares(List<BookWithRelations> books) {
+    final sorted = List<BookWithRelations>.from(books)
+      ..sort((a, b) {
+        final tookComp = b.tookCount.compareTo(a.tookCount);
+        if (tookComp != 0) return tookComp;
+        return b.chapterCount.compareTo(a.chapterCount);
+      });
+    return sorted.take(6).toList();
   }
 
   @override
@@ -177,29 +200,55 @@ class _MainScreenState extends State<MainScreen> {
               transitionDuration: const Duration(seconds: 1),
             ),
           ),
-          actions: [
-            Builder(
-              builder: (ctx) => IconButton(
-                icon: const Icon(Icons.menu),
-                onPressed: () => Scaffold.of(ctx).openDrawer(),
-              ),
-            ),
-          ],
+          actions: [],
         ),
 
         const SliverToBoxAdapter(child: SizedBox(height: 32.0)),
 
+        // Novedades
+        SliverToBoxAdapter(
+          child: SectionNovedades(
+            books: _sortedNovedades(listBook),
+            onBookTap: (book) => Navigator.push(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (_, __, ___) => BookScreen(book: book),
+                transitionDuration: const Duration(seconds: 1),
+              ),
+            ),
+          ),
+        ),
+
+        // Populares
+        SliverToBoxAdapter(
+          child: SectionPopulares(
+            books: _sortedPopulares(listBook),
+            onBookTap: (book) => Navigator.push(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (_, __, ___) => BookScreen(book: book),
+                transitionDuration: const Duration(seconds: 1),
+              ),
+            ),
+          ),
+        ),
+
         // Géneros
+        SliverToBoxAdapter(
+          child: SectionHeader(title: 'Géneros', icon: Icons.category),
+        ),
         SliverToBoxAdapter(
           child: SizedBox(
             height: 60.0,
             child: ListView(
               scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
               children: listGenre
                   .map(
                     (item) => Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                      child: InkWell(
+                      child: GenreChipStyled(
+                        genre: item,
                         onTap: () {
                           Navigator.push(
                             context,
@@ -212,9 +261,6 @@ class _MainScreenState extends State<MainScreen> {
                             ),
                           );
                         },
-                        child: Chip(
-                          label: Text(item.name),
-                        ),
                       ),
                     ),
                   )
