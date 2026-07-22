@@ -11,6 +11,7 @@ import 'injection_labels.dart';
 import 'injection_tooks.dart';
 import 'injection_scan.dart';
 import 'injection_admin.dart';
+import 'injection_app.dart';
 
 final getIt = GetIt.instance;
 
@@ -26,6 +27,7 @@ void setupDependencies() {
   initTooksDependencies();
   initScanDependencies();
   initAdminDependencies();
+  initAppDependencies();
 }
 
 void _registerCore() {
