@@ -118,6 +118,7 @@ class _TookChapterSheetState extends State<_TookChapterSheet> {
         widget.took.id,
         authState.user.id,
       );
+      if (!mounted) return;
       switch (result) {
         case Ok(:final value):
           setState(() {
@@ -128,6 +129,7 @@ class _TookChapterSheetState extends State<_TookChapterSheet> {
           setState(() => _loadingReadIds = false);
       }
     } else {
+      if (!mounted) return;
       setState(() => _loadingReadIds = false);
     }
   }
