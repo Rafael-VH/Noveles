@@ -10,6 +10,7 @@ import 'package:noveles/features/scan/presentation/bloc/scan_book_bloc.dart';
 import 'package:noveles/features/scan/presentation/bloc/scan_cover_bloc.dart';
 import 'package:noveles/features/scan/presentation/bloc/scan_took_bloc.dart';
 import 'package:noveles/features/app/presentation/widgets/app_drawer.dart';
+import 'package:noveles/features/genres/presentation/genre_cubit.dart';
 import 'package:noveles/features/scan/presentation/screens/scan_book_edit_screen.dart';
 
 class ScanMainScreen extends StatefulWidget {
@@ -191,6 +192,7 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
             BlocProvider.value(value: _scanBookBloc),
             BlocProvider(create: (_) => getIt<ScanCoverBloc>()),
             BlocProvider(create: (_) => getIt<ScanTookBloc>()),
+            BlocProvider(create: (_) => getIt<GenreCubit>()),
           ],
           child: ScanBookEditScreen(book: book),
         ),
@@ -208,6 +210,7 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
             BlocProvider.value(value: _scanBookBloc),
             BlocProvider(create: (_) => getIt<ScanCoverBloc>()),
             BlocProvider(create: (_) => getIt<ScanTookBloc>()),
+            BlocProvider(create: (_) => getIt<GenreCubit>()),
           ],
           child: const ScanBookEditScreen(),
         ),
