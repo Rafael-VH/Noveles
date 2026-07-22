@@ -81,6 +81,7 @@ class ProfilesRepositoryImpl implements ProfilesRepository {
         query = query.gt('email', afterEmail);
       }
       final response = await query.order('email').limit(limit + 1);
+      // ignore: unused_local_variable
       final hasMore = response.length > limit;
       final profiles = response
           .take(limit)
