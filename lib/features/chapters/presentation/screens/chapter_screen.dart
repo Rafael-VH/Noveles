@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/core/presentation/notification_service.dart';
+import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 import 'package:noveles/features/chapters/domain/chapter_ref.dart';
+import 'package:noveles/features/chapters/domain/mark_chapter_as_read.dart';
 import 'package:noveles/features/chapters/presentation/bloc/chapter_bloc.dart';
 
 class ChapterScreen extends StatefulWidget {
@@ -30,6 +33,7 @@ class _ChapterScreenState extends State<ChapterScreen> {
   void initState() {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
     super.initState();
+    _markCurrentChapterAsRead();
     scrollController.addListener(() {
       setState(() {
         if (scrollController.position.userScrollDirection ==
@@ -47,6 +51,13 @@ class _ChapterScreenState extends State<ChapterScreen> {
             chapters: widget.chapters.map(ChapterRef.fromEntity).toList(),
           ),
         );
+  }
+
+  void _markCurrentChapterAsRead() {
+    final authState = context.read<AuthBloc>().state;
+    if (authState is AuthAuthenticated) {
+      getIt<MarkChapterAsRead>()(widget.chapters[widget.i].id, authState.user.id);
+    }
   }
 
   @override

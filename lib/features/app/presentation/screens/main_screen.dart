@@ -16,6 +16,10 @@ import 'package:noveles/features/app/presentation/widgets/genre_chip_styled.dart
 import 'package:noveles/features/app/presentation/widgets/section_header.dart';
 import 'package:noveles/features/app/presentation/widgets/section_novedades.dart';
 import 'package:noveles/features/app/presentation/widgets/section_populares.dart';
+import 'package:noveles/features/app/presentation/bloc/recent_views/recent_views_bloc.dart';
+import 'package:noveles/features/app/presentation/bloc/popular_views/popular_views_bloc.dart';
+import 'package:noveles/features/app/presentation/widgets/section_recent_views.dart';
+import 'package:noveles/features/app/presentation/widgets/section_mas_vistos.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -84,6 +88,12 @@ class _MainScreenState extends State<MainScreen> {
         ),
         BlocProvider(
           create: (_) => getIt<GenreBloc>()..add(LoadGenres()),
+        ),
+        BlocProvider(
+          create: (_) => getIt<RecentViewsBloc>(),
+        ),
+        BlocProvider(
+          create: (_) => getIt<PopularViewsBloc>(),
         ),
       ],
       child: Scaffold(
@@ -205,6 +215,13 @@ class _MainScreenState extends State<MainScreen> {
 
         const SliverToBoxAdapter(child: SizedBox(height: 32.0)),
 
+        // Continuar leyendo
+        SliverToBoxAdapter(
+          child: SectionRecentViews(),
+        ),
+
+        const SliverToBoxAdapter(child: SizedBox(height: 16)),
+
         // Novedades
         SliverToBoxAdapter(
           child: SectionNovedades(
@@ -218,6 +235,13 @@ class _MainScreenState extends State<MainScreen> {
             ),
           ),
         ),
+
+        // Más vistos
+        SliverToBoxAdapter(
+          child: SectionMasVistos(),
+        ),
+
+        const SliverToBoxAdapter(child: SizedBox(height: 16)),
 
         // Populares
         SliverToBoxAdapter(

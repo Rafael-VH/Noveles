@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/di/injection.dart';
-import 'package:noveles/features/tooks/data/took_model.dart';
-import 'package:noveles/features/tooks/domain/took_entity.dart';
+import 'package:noveles/core/errors/result.dart';
+import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
+import 'package:noveles/features/chapters/domain/get_read_chapter_ids.dart';
 import 'package:noveles/features/chapters/presentation/bloc/chapter_bloc.dart';
 import 'package:noveles/features/chapters/presentation/screens/chapter_screen.dart';
+import 'package:noveles/features/tooks/data/took_model.dart';
+import 'package:noveles/features/tooks/domain/took_entity.dart';
 
 class TookScreen extends StatefulWidget {
   final TookEntity tooks;
@@ -20,6 +23,40 @@ class _TookScreenState extends State<TookScreen> {
   /// Runtime cast: data layer hydrates TookModel with full chapters.
   List<ChapterEntity> get _chapters =>
       (widget.tooks is TookModel) ? (widget.tooks as TookModel).chapters : [];
+
+  Set<int> _readChapterIds = {};
+  bool _loadingReadIds = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadReadChapterIds();
+  }
+
+  Future<void> _loadReadChapterIds() async {
+    final authState = context.read<AuthBloc>().state;
+    if (authState is AuthAuthenticated) {
+      final result = await getIt<GetReadChapterIds>()(
+        widget.tooks.id,
+        authState.user.id,
+      );
+      switch (result) {
+        case Ok(:final value):
+          setState(() {
+            _readChapterIds = value;
+            _loadingReadIds = false;
+          });
+        case Err():
+          setState(() {
+            _loadingReadIds = false;
+          });
+      }
+    } else {
+      setState(() {
+        _loadingReadIds = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +88,14 @@ class _TookScreenState extends State<TookScreen> {
                       ),
                     ),
                   ),
-                  title: Text(item.title),
+                  title: Text(
+                    item.title,
+                    style: TextStyle(
+                      color: _readChapterIds.contains(item.id)
+                          ? Colors.grey
+                          : null,
+                    ),
+                  ),
                   subtitle: Text(item.number),
                 );
               },
