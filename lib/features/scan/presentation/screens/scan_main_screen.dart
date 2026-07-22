@@ -51,7 +51,27 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
         child: Scaffold(
           drawer: const AppDrawer(isScan: true),
           appBar: AppBar(
-            title: const Text('Panel Scan'),
+            title: Row(
+              children: [
+                const Text('Panel Scan'),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.tertiaryContainer,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    'SCAN',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onTertiaryContainer,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 1.2,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
           body: BlocBuilder<ScanBookBloc, ScanBookState>(
             builder: (context, state) {

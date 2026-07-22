@@ -282,7 +282,11 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isEditing ? 'Editar Tomo' : 'Nuevo Tomo'),
+        title: Text(_isEditing && widget.took != null
+            ? (widget.took!.title.isNotEmpty
+                ? widget.took!.title
+                : 'Tomo ${widget.took!.number}')
+            : 'Nuevo Tomo'),
         actions: [_buildSaveButton()],
       ),
       floatingActionButton: _isEditing

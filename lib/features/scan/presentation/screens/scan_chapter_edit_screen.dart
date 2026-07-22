@@ -247,7 +247,11 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_isEditing ? 'Editar Capítulo' : 'Nuevo Capítulo'),
+        title: Text(_isEditing && widget.chapter != null
+            ? (widget.chapter!.title.isNotEmpty
+                ? widget.chapter!.title
+                : 'Cap. ${widget.chapter!.number}')
+            : 'Nuevo Capítulo'),
         actions: [_buildSaveButton()],
       ),
       body: Form(

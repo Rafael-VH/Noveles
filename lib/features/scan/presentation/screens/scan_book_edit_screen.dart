@@ -498,7 +498,9 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
       ],
       child: Scaffold(
         appBar: AppBar(
-          title: Text(_isEditing ? 'Editar Libro' : 'Nuevo Libro'),
+          title: Text(_isEditing && widget.book != null
+              ? widget.book!.name
+              : 'Nuevo Libro'),
           actions: [_buildSaveButton()],
         ),
         body: Form(
