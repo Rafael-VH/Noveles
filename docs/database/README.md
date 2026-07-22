@@ -1,14 +1,14 @@
 # Supabase Database Audit
 
-> Audit date: 2026-07-20
-> Migrations applied: 31 (last: `20260720223843_create_analytics_functions`)
+> Audit date: 2026-07-22
+> Migrations applied: 32 (last: `20260722000000_chapter_reads`)
 
 ## Overview
 
 | Metric | Value |
 | -------- | ------- |
-| Tables | 11 (all with RLS enabled) |
-| SQL Functions | 9 (all SECURITY DEFINER) |
+| Tables | 12 (all with RLS enabled) |
+| SQL Functions | 11 (all SECURITY DEFINER) |
 | Storage Buckets | 3 |
 | Total RLS Policies | 63 |
 
@@ -64,3 +64,4 @@ policies
 | 20260720030000 | create_user_favorites | Jul 20 | Favorites table |
 | 20260720040000 | add_suspended_role | Jul 20 | Suspended role constraint |
 | 20260720050000 | create_analytics_func... | Jul 20 | Analytics SQL functions |
+| 20260722000000 | chapter_reads | Jul 22 | Chapter read tracking + view RPCs |

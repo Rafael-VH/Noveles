@@ -54,6 +54,8 @@ genre, took, and label data for presentation.
 | UploadImage | `FR<String>` call(String f) | Upload cover image to Storage |
 | GetBookLabels | `FR<M<int,SE<int>>>` call(ids) | Batch label lookup |
 | TrackBookView | `FR<void>` call(int id) | Increment view counter |
+| GetRecentViews | `FR<L<BWR>>` call(String userId) | User's recently viewed books |
+| GetMostViewedBooks | `FR<L<BWR>>` call() | Globally most viewed books |
 
 **Repository**: `BookRepository` → `BookRepositoryImpl` uses Supabase queries
 with RLS policies.

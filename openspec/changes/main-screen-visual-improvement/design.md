@@ -6,7 +6,7 @@ Refactor puramente presentacional de `MainScreen`: se toman los widgets existent
 
 Flujo:
 
-```
+```text
 MainScreen (StatefulWidget)
   └─ _buildContent(listBook, listGenre)
        └─ CustomScrollView
@@ -17,7 +17,7 @@ MainScreen (StatefulWidget)
             │    └─ BookCardHorizontal × N (sorted tookCount DESC)
             ├─ Géneros (existente, refactorizado con GenreChipStyled)
             └─ Loading indicator (preservado)
-```
+```text
 
 ## Architecture Decisions
 

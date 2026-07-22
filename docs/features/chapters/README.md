@@ -40,6 +40,8 @@ Lightweight reference used in BLoC events — carries `id`, `content`, `number`,
 | UpdateChapter | `FR<void>` call(CE ch) | Update chapter metadata |
 | `DeleteChapter` | `FR<void>` call(int id) | Delete a chapter |
 | UploadContent | `FR<String>` call(String f) | Upload .md/.txt to Storage |
+| MarkChapterAsRead | `FR<void>` call(int chId, String uId) | Track chapter as read |
+| GetReadChapterIds | `FR<Set<int>>` call(int tookId, String uId) | Read chapter IDs for a took |
 
 **Repository**: `ChapterRepository` → `ChapterRepositoryImpl`. `downloadContent`
 determines if a path is a storage reference or inline text.
@@ -71,6 +73,14 @@ determines if a path is a storage reference or inline text.
 - Scrollable text reading view
 - Chapter navigation (previous/next)
 - Title and number display
+- On init, calls `MarkChapterAsRead` (fire-and-forget) to track reading progress
+
+### TookScreen (read coloring)
+
+**File**: `lib/features/tooks/presentation/screens/took_screen.dart`
+
+- Loads read chapter IDs via `GetReadChapterIds` on init
+- Chapter titles colored grey if already read, white/default if unread
 
 ## DI Registration
 
@@ -85,9 +95,10 @@ determines if a path is a storage reference or inline text.
 - [Entities](../../domain/entities.md) — `ChapterEntity`, `ChapterRef` field
 details
 - [Use Cases](../../domain/use-cases.md) — Chapter use case signatures
-- [User Types](../../user-types/regular-user.md) — Chapter reading
+- [User Types](../../user-types/regular-user.md) — Chapter reading, read tracking
 - [User Types](../../user-types/scan-user.md) — Chapter creation
-- [Database](../../database/tables.md) — `chapters` table schema
+- [Database](../../database/tables.md) — `chapters`, `chapter_reads` table schema
 - [Database](../../database/storage.md) — Chapter content storage
+- [App](../../features/app/README.md) — `SectionRecentViews` uses read tracking
 
 ← Back to [index](../../README.md)

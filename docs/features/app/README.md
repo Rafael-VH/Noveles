@@ -19,16 +19,24 @@ The primary home screen for regular users. It combines:
 
 - **Carousel**: A `SliverAppBarHome` widget showing featured books in a carousel
 at the top
+- **Continuar leyendo**: `SectionRecentViews` — horizontal scroll of recently
+viewed books (auth-dependent, triggers `LoadRecentViews(userId)`)
+- **Novedades**: `SectionNovedades` — newest books sorted by creation date
+- **Más vistos**: `SectionMasVistos` — most viewed books globally (horizontal
+scroll)
+- **Populares**: `SectionPopulares` — sorted by took/chapter count
 - **Genre chips**: Horizontal scrolling genre filter — tapping navigates to
 `GenreScreen`
 - **Infinite scroll**: `ScrollController` listener triggers `LoadMoreBooks` when
 within 200px of bottom
 - **Empty state**: Shows `EmptyState` widget when no books are available
 
-**BLoCs provided** (created locally, not from DI):
+**BLoCs provided**:
 
 - `BookBloc` with `onlyVisible: true` — regular users only see published books
 - `GenreBloc` — loaded via `getIt<GenreBloc>()`
+- `RecentViewsBloc` — loaded via `getIt<RecentViewsBloc>()`
+- `PopularViewsBloc` — loaded via `getIt<PopularViewsBloc>()`
 
 ### AppDrawer
 
@@ -66,7 +74,10 @@ book detail, genre screen
 
 ## Related
 
-- [Books](../../features/books/README.md) — `BookBloc`, `BookWithRelations`
+- [Books](../../features/books/README.md) — `BookBloc`, `BookWithRelations`,
+`GetRecentViews`, `GetMostViewedBooks`
+- [Chapters](../../features/chapters/README.md) — `MarkChapterAsRead`,
+`GetReadChapterIds`, read tracking
 - [Genres](../../features/genres/README.md) — `GenreBloc`, genre chips
 - [Favorites](../../features/favorites/README.md) — Favorites screen via drawer
 - [Auth](../../features/auth/README.md) — `AuthBloc` drives drawer visibility

@@ -1,6 +1,6 @@
 # SQL Functions
 
-> All 9 functions are SECURITY DEFINER and run with owner privileges.
+> All 11 functions are SECURITY DEFINER and run with owner privileges.
 
 ## Role Helper Functions
 
@@ -44,6 +44,55 @@ $$ LANGUAGE sql SECURITY DEFINER STABLE;
 
 **Purpose**: Check if current user has user role.
 **Used in**: App-level role validation, RLS for user_favorites.
+
+---
+
+## View Tracking Functions
+
+### `get_user_recent_views(uid UUID, max_results INT DEFAULT 6)`
+
+```sql
+CREATE OR REPLACE FUNCTION public.get_user_recent_views(
+  uid UUID,
+  max_results INT DEFAULT 6
+) RETURNS TABLE(book_id BIGINT)
+  LANGUAGE sql SECURITY DEFINER STABLE
+AS $$
+  SELECT b.id FROM book_views bv
+  JOIN books b ON b.id = bv.book_id
+  WHERE bv.user_id = uid
+  ORDER BY bv.viewed_at DESC
+  LIMIT max_results;
+$$;
+```
+
+**Purpose**: Get the N most recently viewed book IDs for a given user.
+**Returns**: `book_id` (BIGINT)
+**Called by**: `BookRepositoryImpl.getRecentViews()` via Supabase RPC.
+**Why SECURITY DEFINER**: `book_views` RLS blocks user SELECT — regular users can INSERT but not SELECT. This function runs with owner privileges to bypass that restriction.
+
+---
+
+### `get_most_viewed_books(max_results INT DEFAULT 6)`
+
+```sql
+CREATE OR REPLACE FUNCTION public.get_most_viewed_books(
+  max_results INT DEFAULT 6
+) RETURNS TABLE(book_id BIGINT)
+  LANGUAGE sql SECURITY DEFINER STABLE
+AS $$
+  SELECT b.id FROM book_views bv
+  JOIN books b ON b.id = bv.book_id
+  GROUP BY b.id
+  ORDER BY COUNT(*) DESC
+  LIMIT max_results;
+$$;
+```
+
+**Purpose**: Get the N most viewed book IDs globally.
+**Returns**: `book_id` (BIGINT)
+**Called by**: `BookRepositoryImpl.getMostViewedBooks()` via Supabase RPC.
+**Why SECURITY DEFINER**: Same reason — bypasses RLS on `book_views` for SELECT.
 
 ---
 
@@ -180,3 +229,6 @@ $$;
   inside the functions
 - `STABLE` functions are optimized for caching within a transaction
 - Analytics functions are read-only (SELECT only) — safe for any role to call
+- View tracking functions (`get_user_recent_views`, `get_most_viewed_books`)
+  bypass RLS on `book_views` — users can read aggregated view data without direct
+  table access

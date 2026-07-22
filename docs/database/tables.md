@@ -13,12 +13,15 @@ auth.users ──1:1──> profiles
     │           ├──1:N──> books_labels ──> labels
     │           ├──1:N──> tooks (book_id)
     │           │           └──1:N──> chapters (took_id)
+    │           │                           └──1:N──> chapter_reads (chapter_id)
     │           ├──1:N──> book_views (book_id)
     │           └──1:N──> user_favorites (book_id)
     │
     ├──1:N──> tooks (created_by)
     ├──1:N──> chapters (created_by)
-    └──1:N──> user_favorites (user_id)
+    │           └──1:N──> chapter_reads (chapter_id)
+    ├──1:N──> user_favorites (user_id)
+    └──1:N──> chapter_reads (user_id)
 
 authors ──1:N──> books (author_id)
 genres ──M:N──> books (via books_genres)
@@ -402,6 +405,36 @@ and genres tabs.
 
 ---
 
+## Table: `chapter_reads`
+
+| Column | Type | Nullable | Default | Notes |
+|--------|------|----------|---------|-------|
+| `user_id` | UUID | NO | — | FK → auth.users(id) |
+| `chapter_id` | INTEGER | NO | — | FK → chapters(id) |
+| `read_at` | TIMESTAMPTZ | NO | `now()` | When the chapter was read |
+
+**PK**: (user_id, chapter_id)
+
+**RLS**: Enabled — users SELECT/INSERT own rows only.
+
+### Code Mapping
+
+| Layer | File | Purpose |
+|-------|------|---------|
+| N/A (DB only) | — | No domain entity; tracked via repository methods |
+| Repo | `chapter_repository.dart` | `markChapterAsRead`, `getReadChapterIds` |
+| Use Cases | `mark_chapter_as_read.dart`, `get_read_chapter_ids.dart` | Delegates to repository |
+| Migration | `20260722000000_chapter_reads.sql` | Creates chapter_reads table |
+
+### Required Policies
+
+| Operation | Role | Why |
+|-----------|------|-----|
+| SELECT | User (own) | User sees own reading progress |
+| INSERT | User (own) | User marks chapters as read |
+
+---
+
 ## Table: `user_favorites`
 
 | Column | Type | Nullable | Default | Notes |
@@ -449,6 +482,7 @@ and genres tabs.
 - **chapters**: Full CRUD
 - **book_views**: SELECT only (analytics)
 - **user_favorites**: No access (user-only)
+- **chapter_reads**: No access (admin-only is user responsibility)
 
 ### Scan
 
@@ -463,6 +497,7 @@ and genres tabs.
 - **chapters**: CRUD own (created_by = auth.uid())
 - **book_views**: INSERT only (tracking)
 - **user_favorites**: No access (user-only)
+- **chapter_reads**: No access (scan-only is user responsibility)
 
 ### User
 
@@ -477,6 +512,7 @@ and genres tabs.
 - **chapters**: SELECT only
 - **book_views**: INSERT only (tracking)
 - **user_favorites**: Full CRUD own
+- **chapter_reads**: Full CRUD own
 
 ### Suspended
 

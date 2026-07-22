@@ -11,7 +11,7 @@ each with tailored screens and permissions. Content is stored in Supabase
 (Postgres + Storage), and the app follows Clean Architecture with BLoC state
 management.
 
-**Key stats**: 9 entities, 46 use cases, 16 BLoCs, 19 screens, 11 features.
+**Key stats**: 9 entities, 50 use cases, 18 BLoCs, 19 screens, 11 features.
 
 ## Tech Stack
 
@@ -46,7 +46,7 @@ management.
 | Favorites | [../lib/features/favorites/](../lib/feature... | Book favoriting |
 | Admin | [../lib/features/admin/](../lib/features/admin/) | Admin dashboard |
 | Scan | [../lib/features/scan/](../lib/features/scan/) | Content creation |
-| App | [../lib/features/app/](../lib/features/app/) | Shell, routing, drawer |
+| App | [../lib/features/app/](../lib/features/app/) | Shell, routing, drawer, main screen sections (carousel, continuar leyendo, novedades, más vistos, populares, géneros) |
 | **User Types** | | |
 | Regular User | [user-types/regular-user.md](user-types/reg... | Default role |
 | Scan User | [user-types/scan-user.md](user-types/s... | Content creator role |
@@ -83,4 +83,4 @@ lib/
 
 ---
 
-> Last verified: 2026-07-21
+> Last verified: 2026-07-22
