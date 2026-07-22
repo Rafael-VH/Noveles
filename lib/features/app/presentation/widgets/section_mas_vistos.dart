@@ -4,7 +4,6 @@ import 'package:noveles/features/app/presentation/bloc/popular_views/popular_vie
 import 'package:noveles/features/app/presentation/widgets/book_card_vertical.dart';
 import 'package:noveles/features/app/presentation/widgets/section_header.dart';
 import 'package:noveles/features/books/presentation/screens/book_screen.dart';
-import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 
 class SectionMasVistos extends StatefulWidget {
   const SectionMasVistos({super.key});

@@ -5,7 +5,6 @@ import 'package:noveles/features/app/presentation/widgets/book_card_vertical.dar
 import 'package:noveles/features/app/presentation/widgets/section_header.dart';
 import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:noveles/features/books/presentation/screens/book_screen.dart';
-import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 
 class SectionRecentViews extends StatefulWidget {
   const SectionRecentViews({super.key});
