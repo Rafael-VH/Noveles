@@ -15,45 +15,46 @@ class GenreSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Label
-        const Text(
-          'Géneros',
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
+    final theme = Theme.of(context);
+
+    // Loading state
+    if (genres.isEmpty) {
+      return Row(
+        children: [
+          SizedBox(
+            width: 16,
+            height: 16,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
-        ),
-
-        const SizedBox(height: 8),
-
-        // Loading state
-        if (genres.isEmpty)
+          const SizedBox(width: 12),
           Text(
             'Cargando géneros...',
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 6,
+      children: genres
+          .map(
+            (genre) => FilterChip(
+              label: Text(genre.name),
+              selected: selectedIds.contains(genre.id),
+              onSelected: (selected) => onToggle(genre.id, selected),
+              visualDensity: VisualDensity.compact,
+              selectedColor: theme.colorScheme.primaryContainer,
+              checkmarkColor: theme.colorScheme.onPrimaryContainer,
             ),
           )
-
-        // Genre chips
-        else
-          Wrap(
-            spacing: 8,
-            runSpacing: 4,
-            children: genres
-                .map(
-                  (genre) => FilterChip(
-                    label: Text(genre.name),
-                    selected: selectedIds.contains(genre.id),
-                    onSelected: (selected) => onToggle(genre.id, selected),
-                  ),
-                )
-                .toList(),
-          ),
-      ],
+          .toList(),
     );
   }
 }

@@ -212,6 +212,249 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
     }
   }
 
+  // ─── Section helpers ───────────────────────────────────────────────
+
+  Widget _sectionCard({required String title, required IconData icon, required List<Widget> children}) {
+    final theme = Theme.of(context);
+    return Card(
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      clipBehavior: Clip.antiAlias,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, size: 18, color: theme.colorScheme.primary),
+                const SizedBox(width: 8),
+                Text(
+                  title,
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            ...children,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSaveButton() {
+    if (_isSaving) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16),
+        child: SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      );
+    }
+    return TextButton(onPressed: _save, child: const Text('Guardar'));
+  }
+
+  Widget _buildCoverSection() {
+    return _sectionCard(
+      title: 'Portada',
+      icon: Icons.image_outlined,
+      children: [
+        CoverPicker(
+          controller: _coverCtrl,
+          onPick: _pickCover,
+          onClear: () => setState(() => _coverCtrl.clear()),
+        ),
+        const SizedBox(height: 12),
+        TextFormField(
+          controller: _nameCtrl,
+          decoration: const InputDecoration(
+            labelText: 'Nombre',
+            border: OutlineInputBorder(),
+          ),
+          validator: (v) => v?.trim().isEmpty == true ? 'Requerido' : null,
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: TextFormField(
+                controller: _authorCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Autor',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: TextFormField(
+                controller: _countryCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'País',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDescriptionSection() {
+    return _sectionCard(
+      title: 'Descripción',
+      icon: Icons.description_outlined,
+      children: [
+        TextFormField(
+          maxLines: 5,
+          controller: _descriptionCtrl,
+          decoration: const InputDecoration(
+            labelText: 'Descripción',
+            border: OutlineInputBorder(),
+            alignLabelWithHint: true,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: TextFormField(
+                controller: _shortCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Nombre corto',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: TextFormField(
+                controller: _alternativeCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Nombre alternativo',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildClassificationSection() {
+    return _sectionCard(
+      title: 'Clasificación',
+      icon: Icons.tune_outlined,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: DropdownButtonFormField<String>(
+                initialValue: _state,
+                decoration: const InputDecoration(
+                  labelText: 'Estado',
+                  border: OutlineInputBorder(),
+                ),
+                isExpanded: true,
+                items: const [
+                  DropdownMenuItem(value: '', child: Text('Seleccioná...')),
+                  DropdownMenuItem(value: 'Emisión', child: Text('Emisión')),
+                  DropdownMenuItem(value: 'Finalizado', child: Text('Finalizado')),
+                  DropdownMenuItem(value: 'Pausado', child: Text('Pausado')),
+                  DropdownMenuItem(value: 'Abandonado', child: Text('Abandonado')),
+                ],
+                onChanged: (v) => setState(() => _state = v ?? ''),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: DropdownButtonFormField<String>(
+                initialValue: _type,
+                decoration: const InputDecoration(
+                  labelText: 'Tipo',
+                  border: OutlineInputBorder(),
+                ),
+                isExpanded: true,
+                items: const [
+                  DropdownMenuItem(value: '', child: Text('Seleccioná...')),
+                  DropdownMenuItem(value: 'Web', child: Text('Web Novel')),
+                  DropdownMenuItem(value: 'Ligera', child: Text('Light Novel')),
+                ],
+                onChanged: (v) => setState(() => _type = v ?? ''),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: TextFormField(
+                controller: _releaseCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Año',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: TextFormField(
+                controller: _sourceCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Fuente',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: TextFormField(
+                controller: _linkCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Link',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGenresSection() {
+    return _sectionCard(
+      title: 'Géneros',
+      icon: Icons.label_outline,
+      children: [
+        GenreSelector(
+          genres: _allGenres,
+          selectedIds: _selectedGenreIds,
+          onToggle: (id, selected) {
+            setState(() {
+              if (selected) {
+                _selectedGenreIds.add(id);
+              } else {
+                _selectedGenreIds.remove(id);
+              }
+            });
+          },
+        ),
+      ],
+    );
+  }
+
+  // ─── Build ─────────────────────────────────────────────────────────
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocListener(
@@ -256,226 +499,97 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(_isEditing ? 'Editar Libro' : 'Nuevo Libro'),
-          actions: [
-            TextButton(onPressed: _save, child: const Text('Guardar')),
-          ],
+          actions: [_buildSaveButton()],
         ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                // Name
-                TextFormField(
-                  controller: _nameCtrl,
-                  decoration: const InputDecoration(labelText: 'Nombre'),
-                  validator: (v) =>
-                      v?.trim().isEmpty == true ? 'Requerido' : null,
-                ),
-
-                const SizedBox(height: 12),
-
-                // Cover
-                CoverPicker(
-                  controller: _coverCtrl,
-                  onPick: _pickCover,
-                  onClear: () => setState(() => _coverCtrl.clear()),
-                ),
-
-                const SizedBox(height: 12),
-
-                // Short Name
-                TextFormField(
-                  controller: _shortCtrl,
-                  decoration:
-                      const InputDecoration(labelText: 'Nombre corto'),
-                ),
-
-                const SizedBox(height: 12),
-
-                // Alternative Name
-                TextFormField(
-                  controller: _alternativeCtrl,
-                  decoration:
-                      const InputDecoration(labelText: 'Nombre alternativo'),
-                ),
-
-                const SizedBox(height: 12),
-
-                // Description
-                TextFormField(
-                  maxLines: 3,
-                  controller: _descriptionCtrl,
-                  decoration: const InputDecoration(labelText: 'Descripción'),
-                ),
-
-                const SizedBox(height: 12),
-
-                // Author
-                TextFormField(
-                  controller: _authorCtrl,
-                  decoration: const InputDecoration(labelText: 'Autor'),
-                ),
-
-                const SizedBox(height: 12),
-
-                // Country
-                TextFormField(
-                  controller: _countryCtrl,
-                  decoration: const InputDecoration(labelText: 'País'),
-                ),
-
-                const SizedBox(height: 12),
-
-                // State
-                DropdownButtonFormField<String>(
-                  initialValue: _state,
-                  decoration: const InputDecoration(labelText: 'Estado'),
-                  items: const [
-                    DropdownMenuItem(value: '', child: Text('Seleccioná...')),
-                    DropdownMenuItem(
-                        value: 'Emisión', child: Text('Emisión')),
-                    DropdownMenuItem(
-                        value: 'Finalizado', child: Text('Finalizado')),
-                    DropdownMenuItem(
-                        value: 'Pausado', child: Text('Pausado')),
-                    DropdownMenuItem(
-                        value: 'Abandonado', child: Text('Abandonado')),
-                  ],
-                  onChanged: (v) => setState(() => _state = v ?? ''),
-                ),
-
-                const SizedBox(height: 12),
-
-                // Type
-                DropdownButtonFormField<String>(
-                  initialValue: _type,
-                  decoration: const InputDecoration(labelText: 'Tipo'),
-                  items: const [
-                    DropdownMenuItem(value: '', child: Text('Seleccioná...')),
-                    DropdownMenuItem(value: 'Web', child: Text('Web Novel')),
-                    DropdownMenuItem(
-                        value: 'Ligera', child: Text('Light Novel')),
-                  ],
-                  onChanged: (v) => setState(() => _type = v ?? ''),
-                ),
-
-                const SizedBox(height: 12),
-
-                // Release
-                TextFormField(
-                  controller: _releaseCtrl,
-                  decoration: const InputDecoration(labelText: 'Lanzamiento'),
-                ),
-
-                const SizedBox(height: 12),
-
-                // Source
-                TextFormField(
-                  controller: _sourceCtrl,
-                  decoration: const InputDecoration(labelText: 'Fuente'),
-                ),
-
-                const SizedBox(height: 12),
-
-                // Link
-                TextFormField(
-                  controller: _linkCtrl,
-                  decoration: const InputDecoration(labelText: 'Link'),
-                ),
-
+        body: Form(
+          key: _formKey,
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              _buildCoverSection(),
+              const SizedBox(height: 16),
+              _buildDescriptionSection(),
+              const SizedBox(height: 16),
+              _buildClassificationSection(),
+              const SizedBox(height: 16),
+              _buildGenresSection(),
+              if (_isEditing) ...[
                 const SizedBox(height: 16),
-
-                // Genres
-                GenreSelector(
-                  genres: _allGenres,
-                  selectedIds: _selectedGenreIds,
-                  onToggle: (id, selected) {
-                    setState(() {
-                      if (selected) {
-                        _selectedGenreIds.add(id);
-                      } else {
-                        _selectedGenreIds.remove(id);
-                      }
-                    });
-                  },
-                ),
-
-                if (_isEditing)
-                  TookListSection(
-                    isEditing: true,
-                    tooks: _tooks,
-                    bookId: _bookId,
-                    onAddTook: _addTook,
-                    onEditTook: (took, bookId) async {
-                      final refreshed = await Navigator.push<bool>(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => BlocProvider(
-                            create: (_) => getIt<ScanTookBloc>(),
-                            child: ScanTookEditScreen(
-                              took: took,
-                              bookId: bookId,
-                            ),
+                TookListSection(
+                  isEditing: true,
+                  tooks: _tooks,
+                  bookId: _bookId,
+                  onAddTook: _addTook,
+                  onEditTook: (took, bookId) async {
+                    final refreshed = await Navigator.push<bool>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => BlocProvider(
+                          create: (_) => getIt<ScanTookBloc>(),
+                          child: ScanTookEditScreen(
+                            took: took,
+                            bookId: bookId,
                           ),
                         ),
-                      );
-                      if (refreshed == true && mounted) {
-                        context.read<ScanBookBloc>().add(LoadScanBooks());
-                      }
-                    },
-                    onDeleteTook: (tookId) async {
-                      final bloc = context.read<ScanTookBloc>();
-                      final completer = Completer<ScanTookState>();
-                      late StreamSubscription sub;
-                      sub = bloc.stream.listen((s) {
-                        if (s is ScanTookLoaded || s is ScanTookError) {
-                          sub.cancel();
-                          if (!completer.isCompleted) completer.complete(s);
-                        }
-                      });
-                      bloc.add(DeleteScanTook(tookId));
-                      try {
-                        final result = await completer.future
-                            .timeout(const Duration(seconds: 10));
-                        if (result is ScanTookLoaded && mounted) {
-                          setState(() =>
-                              _tooks.removeWhere((t) => t.id == tookId));
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content:
-                                  Text(result.message ?? 'Tomo eliminado'),
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.tertiary,
-                            ),
-                          );
-                        } else if (result is ScanTookError && mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(result.message),
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.error,
-                            ),
-                          );
-                        }
-                      } on TimeoutException {
+                      ),
+                    );
+                    if (refreshed == true && mounted) {
+                      context.read<ScanBookBloc>().add(LoadScanBooks());
+                    }
+                  },
+                  onDeleteTook: (tookId) async {
+                    final bloc = context.read<ScanTookBloc>();
+                    final completer = Completer<ScanTookState>();
+                    late StreamSubscription sub;
+                    sub = bloc.stream.listen((s) {
+                      if (s is ScanTookLoaded || s is ScanTookError) {
                         sub.cancel();
-                        if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content:
-                                  const Text('La operación tardó demasiado'),
-                              backgroundColor:
-                                  Theme.of(context).colorScheme.error,
-                            ),
-                          );
-                        }
+                        if (!completer.isCompleted) completer.complete(s);
                       }
-                    },
-                  ),
+                    });
+                    bloc.add(DeleteScanTook(tookId));
+                    try {
+                      final result = await completer.future
+                          .timeout(const Duration(seconds: 10));
+                      if (result is ScanTookLoaded && mounted) {
+                        setState(() =>
+                            _tooks.removeWhere((t) => t.id == tookId));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content:
+                                Text(result.message ?? 'Tomo eliminado'),
+                            backgroundColor:
+                                Theme.of(context).colorScheme.tertiary,
+                          ),
+                        );
+                      } else if (result is ScanTookError && mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(result.message),
+                            backgroundColor:
+                                Theme.of(context).colorScheme.error,
+                          ),
+                        );
+                      }
+                    } on TimeoutException {
+                      sub.cancel();
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content:
+                                const Text('La operación tardó demasiado'),
+                            backgroundColor:
+                                Theme.of(context).colorScheme.error,
+                          ),
+                        );
+                      }
+                    }
+                  },
+                ),
               ],
-            ),
+              // Bottom padding
+              const SizedBox(height: 32),
+            ],
           ),
         ),
         floatingActionButton: _isEditing

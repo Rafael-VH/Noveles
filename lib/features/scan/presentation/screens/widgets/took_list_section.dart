@@ -21,53 +21,97 @@ class TookListSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 12),
-
-        const Divider(),
-
-        // Section title
-        const Text(
-          'Tomos',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+        // Header
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Row(
+            children: [
+              Icon(Icons.book_outlined, size: 18, color: theme.colorScheme.primary),
+              const SizedBox(width: 8),
+              Text(
+                'Tomos',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primaryContainer,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '${tooks.length}',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.onPrimaryContainer,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
-
-        const SizedBox(height: 8),
-
-        // Show tooks
-        if (isEditing)
+        // Took list
+        if (tooks.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Center(
+              child: Text(
+                'Todavía no hay tomos',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
+          )
+        else
           ...tooks.map(
             (took) {
               final bid = bookId;
               return Card(
+                margin: const EdgeInsets.only(bottom: 8),
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  side: BorderSide(
+                    color: theme.colorScheme.outlineVariant,
+                  ),
+                ),
                 child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   title: Text(
                     took.title.isNotEmpty ? took.title : 'Tomo ${took.number}',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
-                  subtitle: Text('${took.listChapterIds.length} capítulos'),
+                  subtitle: Text(
+                    '${took.listChapterIds.length} capítulos',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                  ),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Edit Button
                       IconButton(
                         icon: Icon(
-                          Icons.edit,
-                          color: Theme.of(context).colorScheme.primary,
+                          Icons.edit_outlined,
+                          color: theme.colorScheme.primary,
                         ),
                         onPressed:
                             bid != null ? () => onEditTook(took, bid) : null,
                       ),
-
-                      // Delete Button
                       IconButton(
                         icon: Icon(
-                          Icons.delete,
-                          color: Theme.of(context).colorScheme.error,
+                          Icons.delete_outline,
+                          color: theme.colorScheme.error,
                         ),
                         onPressed: () => onDeleteTook(took.id),
                       ),
