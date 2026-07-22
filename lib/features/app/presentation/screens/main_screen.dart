@@ -31,6 +31,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   final ScrollController _scrollController = ScrollController();
   int _currentPage = 1;
+  BookBloc? _bookBloc;
 
   @override
   void initState() {
@@ -46,12 +47,14 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   void _onScroll() {
+    final bloc = _bookBloc;
+    if (bloc == null) return;
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 200) {
-      final bookState = context.read<BookBloc>().state;
+      final bookState = bloc.state;
       if (bookState is BookLoaded && bookState.hasMore) {
         _currentPage++;
-        context.read<BookBloc>().add(LoadMoreBooks(_currentPage));
+        bloc.add(LoadMoreBooks(_currentPage));
       }
     }
   }
@@ -80,11 +83,15 @@ class _MainScreenState extends State<MainScreen> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (_) => BookBloc(
-            getBooks: getIt(),
-            getBookById: getIt(),
-            onlyVisible: true,
-          )..add(LoadBooks()),
+          create: (_) {
+            final bloc = BookBloc(
+              getBooks: getIt(),
+              getBookById: getIt(),
+              onlyVisible: true,
+            )..add(LoadBooks());
+            _bookBloc = bloc;
+            return bloc;
+          },
         ),
         BlocProvider(
           create: (_) => getIt<GenreBloc>()..add(LoadGenres()),
