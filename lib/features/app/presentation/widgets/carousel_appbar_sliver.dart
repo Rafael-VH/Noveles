@@ -83,16 +83,16 @@ class _SliverAppBarHomeState extends State<SliverAppBarHome> {
                       left: 0.0,
                       right: 0.0,
                       bottom: 0.0,
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Text(
-                              item.name,
-                              style: Theme.of(context).textTheme.labelLarge,
-                            ),
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text(
+                        item.name,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
                             Text(
                               "Autor ${item.author}",
                               style: Theme.of(context)
@@ -127,29 +127,36 @@ class _SliverAppBarHomeState extends State<SliverAppBarHome> {
           ),
           if (widget.listBook.isNotEmpty)
             Positioned(
-              bottom: 8,
-              left: 0,
-              right: 0,
+              bottom: 0,
+              left: 16,
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  widget.listBook.length,
-                  (i) => AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    margin: const EdgeInsets.symmetric(horizontal: 2),
-                    width: _carouselIndex == i ? 24 : 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: _carouselIndex == i
-                          ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context)
-                              .colorScheme
-                              .onSurfaceVariant
-                              .withValues(alpha: 0.5),
-                      borderRadius: BorderRadius.circular(4),
+                children: [
+                  Text(
+                    '${_carouselIndex + 1}/${widget.listBook.length}',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                  ),
+                  const SizedBox(width: 8),
+                  ...List.generate(
+                    widget.listBook.length,
+                    (i) => AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      margin: const EdgeInsets.symmetric(horizontal: 2),
+                      width: _carouselIndex == i ? 24 : 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: _carouselIndex == i
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context)
+                                .colorScheme
+                                .onSurfaceVariant
+                                .withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
             ),
         ],

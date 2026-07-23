@@ -145,5 +145,54 @@ void main() {
       expect(boxes[0].size.width, greaterThan(boxes[1].size.width));
       expect(boxes[1].size.width, boxes[2].size.width);
     });
+
+    testWidgets('usa titleLarge para el nombre del libro', (tester) async {
+      final books = List.generate(1, (i) => createTestBook(
+        id: i + 1,
+        name: 'Book Title',
+      ));
+
+      await tester.pumpWidget(wrapWithMaterial(
+        Scaffold(
+          body: CustomScrollView(
+            slivers: [
+              SliverAppBarHome(
+                listBook: books,
+                onBookTap: (_) {},
+                actions: [],
+              ),
+            ],
+          ),
+        ),
+      ));
+      await tester.pump();
+
+      final text = tester.widget<Text>(find.text('Book Title'));
+      expect(text.style?.fontSize, 22);
+    });
+
+    testWidgets('muestra indicador "1/N"', (tester) async {
+      final books = List.generate(3, (i) => createTestBook(
+        id: i + 1,
+        name: 'Book ${i + 1}',
+      ));
+
+      await tester.pumpWidget(wrapWithMaterial(
+        Scaffold(
+          body: CustomScrollView(
+            slivers: [
+              SliverAppBarHome(
+                listBook: books,
+                onBookTap: (_) {},
+                actions: [],
+              ),
+            ],
+          ),
+        ),
+      ));
+      await tester.pump();
+
+      expect(find.text('1/3'), findsOneWidget);
+    });
   });
 }
