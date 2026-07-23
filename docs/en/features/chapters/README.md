@@ -40,8 +40,8 @@ Lightweight reference used in BLoC events — carries `id`, `content`, `number`,
 | UpdateChapter | `FR<void>` call(CE ch) | Update chapter metadata |
 | `DeleteChapter` | `FR<void>` call(int id) | Delete a chapter |
 | UploadContent | `FR<String>` call(String f) | Upload .md/.txt to Storage |
-| MarkChapterAsRead | `FR<void>` call(int chId, String uId) | Track chapter as read |
-| GetReadChapterIds | `FR<Set<int>>` call(int tookId, String uId) | Read chapter IDs for a took |
+| MarkChapterAsRead | `FR<void>` call(int chId, String uId) | Read status |
+| GetReadChapterIds | `FR<Set<int>>` call(tookId, uId) | Read chapter IDs |
 
 **Repository**: `ChapterRepository` → `ChapterRepositoryImpl`. `downloadContent`
 determines if a path is a storage reference or inline text.

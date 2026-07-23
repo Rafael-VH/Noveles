@@ -69,7 +69,9 @@ $$;
 **Purpose**: Get the N most recently viewed book IDs for a given user.
 **Returns**: `book_id` (BIGINT)
 **Called by**: `BookRepositoryImpl.getRecentViews()` via Supabase RPC.
-**Why SECURITY DEFINER**: `book_views` RLS blocks user SELECT — regular users can INSERT but not SELECT. This function runs with owner privileges to bypass that restriction.
+**Why SECURITY DEFINER**: `book_views` RLS blocks user SELECT — reg users can
+INSERT but not SELECT. This function runs with owner privileges to bypass that
+restriction.
 
 ---
 

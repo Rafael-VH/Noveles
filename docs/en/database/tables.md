@@ -1,7 +1,7 @@
 # Tables & Schema
 
-> All 11 tables have RLS enabled.
-> Last audit: 2026-07-20
+> All 12 tables have RLS enabled.
+> Last audit: 2026-07-23
 
 ## Entity Relationship
 
@@ -16,6 +16,7 @@ auth.users ──1:1──> profiles
     │           │                           └──1:N──> chapter_reads (chapter_id)
     │           ├──1:N──> book_views (book_id)
     │           └──1:N──> user_favorites (book_id)
+    │           └──1:N──> label_rules (label_id)
     │
     ├──1:N──> tooks (created_by)
     ├──1:N──> chapters (created_by)
@@ -423,7 +424,7 @@ and genres tabs.
 |-------|------|---------|
 | N/A (DB only) | — | No domain entity; tracked via repository methods |
 | Repo | `chapter_repository.dart` | `markChapterAsRead`, `getReadChapterIds` |
-| Use Cases | `mark_chapter_as_read.dart`, `get_read_chapter_ids.dart` | Delegates to repository |
+| Use Cases | `mark_chapter_as_read`, `get_read_chapter_ids` | Delegates repo |
 | Migration | `20260722000000_chapter_reads.sql` | Creates chapter_reads table |
 
 ### Required Policies
@@ -464,6 +465,41 @@ and genres tabs.
 | SELECT | User (own) | User sees own favorites |
 | INSERT | User (own) | User adds favorites |
 | DELETE | User (own) | User removes favorites |
+
+---
+
+## Table: `label_rules`
+
+| Column | Type | Nullable | Default | Notes |
+|--------|------|----------|---------|-------|
+| `id` | BIGINT | NO | identity | PK |
+| `label_id` | BIGINT | NO | — | FK → labels(id) ON DELETE CASCADE |
+| `rule_type` | TEXT | NO | — | CHECK: new_release/most_read/most_popular |
+| `params` | JSONB | NO | `'{}'` | Rule configuration (days, limit) |
+| `created_at` | TIMESTAMPTZ | NO | `now()` | |
+| `updated_at` | TIMESTAMPTZ | NO | `now()` | Auto-updated by trigger |
+
+### Code Mapping (Part 12)
+
+| Layer | File | Purpose |
+|-------|------|---------|
+| Entity | `label_rule_entity.dart` | `LabelRuleEntity`, `LabelRuleType` enum |
+| Model | `label_rule_model.dart` | JSON mapping |
+| Repo | label_rule_repository.dart | Abstract: getRules,create,update,delete |
+| Repo Impl | label_rule_repository_impl.dart | Supabase calls |
+| Use Cases | get, create, update, delete rules | Business logic |
+| BLoC | `label_rules_bloc.dart` | Label Rules state management |
+| Screen | `label_rules_admin_tab.dart` | Admin tab UI |
+| DI | `injection_labels.dart` | Registers LRR, 4 use cases, LRBloc |
+| Edge Function | `supabase/functions/sync-labels/index.ts` | Server-side eval |
+| Migration | `20260723043750_label_rules.sql` | Creates label_rules table |
+
+### Required Policies (Part 12)
+
+| Operation | Role | Why |
+|-----------|------|-----|
+| SELECT | All authenticated | Everyone can read rules (needed for display) |
+| ALL | Admin | Admin manages label rules (CREATE, UPDATE, DELETE) |
 
 ---
 

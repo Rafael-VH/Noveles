@@ -1,6 +1,6 @@
 # RLS Policies
 
-> Total: 63 policies across 11 tables.
+> Total: 65 policies across 12 tables.
 > All policies use PERMISSIVE mode.
 > Helper functions: `is_admin()`, `is_scan()`, `is_user()`,
   `is_admin_or_scan()`.
@@ -178,6 +178,18 @@ analytics.
 
 **Notes**: Each user can only see/manage their own favorites. No admin
 override.
+
+---
+
+## label_rules (2 policies)
+
+| Operation | Policy Name | Role | Condition |
+|-----------|-------------|------|-----------|
+| ALL | Admins can manage label_rules | authenticated | `is_admin()` |
+| SELECT | Everyone can read label_rules | authenticated | `true` |
+
+**Notes**: Admin-only CRUD. All authenticated users can read rules (the app
+needs to display them). No scan or regular user write access.
 
 ---
 

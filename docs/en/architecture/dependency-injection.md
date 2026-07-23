@@ -32,6 +32,8 @@ void _registerCore() {
 
 ## Feature Modules
 
+**12 feature modules** (with `label_rules` inside `injection_labels.dart`):
+
 Each feature has its own injection file that registers repositories, use cases,
 and BLoCs:
 
@@ -42,7 +44,7 @@ and BLoCs:
 | Chapters | ``chapters`` | `ChapterRepository`, 7 use cases, `ChapterBloc` |
 | **Tooks** | `injection_tooks.dart` | `TookRepository`, 6 use cases (no BLoC) |
 | Genres | ``genres`` | `GenreRepository`, 5 use cases, `GenreBloc` |
-| Labels | ``labels`` | `LabelRepository`, 7 use cases, `LabelBloc` |
+| Labels | injection_labels.dart | LabelRepo+Bloc, LabelRuleRepo+RulesBloc |
 | Profiles | ``profiles`` | `ProfilesRepository`, 6 use cases, `ProfileBloc` |
 | Favorites | ``favorites`` | FavoriteRepo, FavoriteBloc (no use cases) |
 | Scan | `scan` | ScanBookB,ScanCoverB,GenreC,ScanTookB,ScanChapterB |
@@ -91,6 +93,10 @@ instance per request is needed.
 3. Then calls each feature's `init*Dependencies()` in order:
 - Profiles → Auth → Books → Chapters → Favorites → Genres → Labels → Tooks →
 Scan → Admin
+
+> **Note**: `label_rules` dependencies are registered inside
+> `initLabelsDependencies()` (in `injection_labels.dart`, not a separate file).
+
 4. Each feature function registers its own dependencies using `getIt`
 
 ```dart

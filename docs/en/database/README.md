@@ -1,13 +1,13 @@
 # Supabase Database Audit
 
-> Audit date: 2026-07-22
-> Migrations applied: 32 (last: `20260722000000_chapter_reads`)
+> Audit date: 2026-07-23
+> Migrations applied: 35 (last: `20260722000000_chapter_reads`)
 
 ## Overview
 
 | Metric | Value |
 | -------- | ------- |
-| Tables | 12 (all with RLS enabled) |
+| Tables | 13 (all with RLS enabled) |
 | SQL Functions | 11 (all SECURITY DEFINER) |
 | Storage Buckets | 3 |
 | Total RLS Policies | 63 |
@@ -33,6 +33,9 @@ policies
 
 | Version | Name | Date | Purpose |
 | --------- | ------ | ------ | --------- |
+| 20260723043930 | enable_pg_net | Jul 23 | Enable pg_net for edge func calls |
+| 20260723043750 | label_rules | Jul 23 | Label rules table + RLS + trigger |
+| 20260723041644 | add_email_to_profiles | Jul 23 | Add email col to profiles |
 | 20260514220000 | initial_schema | May 14 | Core tables (books,authors,gen... |
 | 20260515000000 | authors_and_constraints | May 15 | Author constraints |
 | 20260515161849 | profiles_and_auth | May 15 | Auth + profiles |

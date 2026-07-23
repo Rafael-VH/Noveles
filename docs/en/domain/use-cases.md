@@ -86,6 +86,15 @@ class MyUseCase {
 | RemoveLabelFromBook(bookId,lblId) | `FR<void>` | |
 | GetLabelsForBooks(bookIds) | `FR<M<int,SE<int>>>` | |
 
+## Label Rules (4 use cases)
+
+| Use Case | Returns | Notes |
+| ---------- | --------- | ------- |
+| GetRules() | `FR<L<LabelRuleEntity>>` | |
+| CreateRule(labelId,ruleType,params) | `FR<void>` | |
+| UpdateRule(ruleId,params) | `FR<void>` | |
+| DeleteRule(ruleId) | `FR<void>` | |
+
 ## Profiles (6 use cases)
 
 | Use Case | Returns | Notes |
@@ -131,9 +140,10 @@ Admin analytics uses repository methods directly:
 | Tooks | 6 | — | 6 |
 | Genres | 5 | — | 5 |
 | Labels | 7 | — | 7 |
+| Label Rules | 4 | — | 4 |
 | Profiles | 6 | — | 6 |
 | Favorites | — | 3 | 3 |
 | Admin | — | 3 | 3 |
-| **Total** | **46** | **6** | **52** |
+| **Total** | **50** | **6** | **56** |
 
 ← Back to [index](../README.md)

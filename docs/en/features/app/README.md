@@ -11,6 +11,13 @@ infinite scroll pagination for the book feed.
 
 ## Components
 
+- **MainScreen** — main home screen for regular users with carousel, sections,
+  infinite scroll
+- **AppDrawer** — Material 3 NavigationDrawer with role-based sections,
+  sub-widgets (AppDrawerHeader, DrawerSectionLabel, LogoutFooter)
+- **SliverAppBarHome (Carousel)** — carousel slider of book covers in the sliver
+  app bar
+
 ### MainScreen
 
 **File**: `lib/features/app/presentation/screens/main_screen.dart`
@@ -42,18 +49,49 @@ within 200px of bottom
 
 **File**: `lib/features/app/presentation/widgets/app_drawer.dart`
 
-Shared navigation drawer used by all roles. Menu items are role-conditional:
+Shared navigation drawer used by all roles. Built with Material 3 `NavigationDrawer`
+(replaces legacy `Drawer` + `ListView` + `ListTile`). Menu items are organized into
+role-based sections; items that don't apply to the current role are excluded entirely
+(not hidden).
 
-| Item | Visible To | Action |
-| ------ | ----------- | -------- |
-| Panel Admin | Admin only | Push named route `/admin` |
-| Panel Scan / Inicio | All roles | Pop drawer (home) |
-| Editar Perfil | All roles | Push `ProfileScreen` |
-| Mis Favoritos | All roles | Push `FavoritesScreen` |
-| Etiquetas | Scan only | Push `LabelManagementScreen` |
-| Cerrar Sesion | All roles | Confirm + `LogoutRequested` |
+**Role-based section structure**:
 
-Drawer header shows user avatar (or fallback icon), display name, and email.
+| Section | Items | reader | scan | admin |
+| --------- | ------- | -------- | ------ | ------- |
+| Navegación | Inicio | ✅ | ✅ | — |
+| Navegación | Panel Admin | — | — | ✅ |
+| Perfil | Editar Perfil | ✅ | ✅ | ✅ |
+| Perfil | Mis Favoritos | ✅ | — | — |
+| Gestión | Etiquetas | — | ✅ | ✅ |
+| Sesión | Cerrar Sesión | ✅ | ✅ | ✅ |
+
+**Key behaviors**:
+
+- **Admin users**: only see "Panel Admin" and "Editar Perfil" in
+  Navegación/Perfil sections — no "Mis Favoritos" or "Etiquetas"
+- **Scan users**: see "Inicio", "Editar Perfil", "Etiquetas" — no
+  "Panel Admin" or "Mis Favoritos"
+- **Regular users (lectores)**: see "Inicio", "Editar Perfil", "Mis Favoritos"
+  — no admin or scan items
+- **Suspended users**: not routed to any home screen (blocked at `AuthBloc` level)
+- **Unauthenticated**: shows simplified header with "Iniciar Sesión" option
+- **Loading**: renders `SizedBox.shrink()` while auth state resolves
+
+**Sub-widgets**:
+
+- **AppDrawerHeader** (`lib/features/app/presentation/widgets/drawer/app_drawer_header.dart`):
+  Gradient background (primary → primaryContainer), avatar 48px with fallback icon,
+  display name, email. Simplified variant used when unauthenticated.
+- **DrawerSectionLabel** (`lib/features/app/presentation/widgets/drawer/drawer_section_label.dart`):
+  Section divider with `labelSmall` text style (e.g., "Navegación", "Perfil", "Gestión",
+  "Sesión"). Passed through as non-selectable items.
+- **LogoutFooter** (`lib/features/app/presentation/widgets/drawer/logout_footer.dart`):
+  Divider + ListTile with error-colored leading icon and "Cerrar Sesión". Dispatches
+  `LogoutRequested` via `showConfirmationDialog`.
+
+**Theme**: NavigationDrawer customizes `indicatorShape` (borderRadius 12),
+`tileHeight` (56), and `indicatorColor` (primaryContainer) in both light and
+dark themes.
 
 ### SliverAppBarHome (Carousel)
 

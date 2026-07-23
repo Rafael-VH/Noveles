@@ -1,6 +1,6 @@
 # Domain Entities
 
-> Complete catalog of all 9 domain entities with field definitions and
+> Complete catalog of all 10 domain entities with field definitions and
 relationships.
 
 ← [Back to index](../README.md)
@@ -16,6 +16,7 @@ relationships.
 | `TookEntity` | `lib/features/tooks/domain/took_entity.dart` | 9 | tooks |
 | `GenreEntity` | `lib/features/genres/domain/genre_entity.dart` | 4 | genres |
 | `LabelEntity` | `lib/features/labels/domain/label_entity.dart` | 4 | labels |
+| `LabelRuleEntity` | `label_rule_entity.dart` | 6 (+1 enum) | label_rules |
 | `UserEntity` | `user_entity.dart` | 6 (+4 getters) | profiles |
 | `FavoriteEntity` | `favorite_entity.dart` | 3 | favorites |
 
@@ -149,6 +150,31 @@ tooks, and each took contains multiple chapters.
 | `name` | `String` | No | Label name |
 | `color` | `String` | No | Label color (hex or name) |
 
+## LabelRuleEntity
+
+**File**: `lib/features/label_rules/domain/label_rule_entity.dart`
+**Extends**: `Equatable`
+
+| Field | Dart Type | Nullable | Description |
+| ------- | ----------- | ---------- | ------------- |
+| `id` | `int` | No | Primary key |
+| `labelId` | `int` | No | FK → labels(id) |
+| `ruleType` | `LabelRuleType` | No | Enum (4 values) |
+| `params` | `Map<String, dynamic>` | No | JSON config parameters |
+| `createdAt` | `DateTime` | No | Creation timestamp |
+| `updatedAt` | `DateTime` | No | Last update timestamp |
+
+### LabelRuleType Enum
+
+**File**: `lib/features/label_rules/domain/label_rule_entity.dart`
+
+| Value | Display Name | Description |
+| ------- | ------------- | ------------- |
+| `newRelease` | Novedad | Books newer than N days |
+| `mostRead` | Más leídos | Top N by views in period |
+| `mostPopular` | Más populares | Top N by took/chapter count |
+| `mostFavorited` | Más favoritos | Top N by user favorites |
+
 ## UserEntity
 
 **File**: `lib/features/profiles/domain/user_entity.dart`
@@ -220,6 +246,8 @@ UserEntity ──(createdBy)──→ BookEntity
                                                    (many-to-many via books_labels)
 
 UserEntity ──(userId)──→ FavoriteEntity ──(bookId)──→ BookEntity
+
+LabelRuleEntity ──(labelId)──→ LabelEntity
 ```text
 
 ### Join Tables (Supabase)

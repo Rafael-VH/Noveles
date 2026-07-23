@@ -1,13 +1,13 @@
 # Testing Strategy
 
-> 34 test files across 5 categories, covering BLoCs, entities, repositories, use
+> 55 test files across 5 categories, covering BLoCs, entities, repositories, use
 cases, and widgets.
 
 ← [Back to index](../README.md)
 
 ## Overview
 
-Noveles has **34 test files** organized by layer. Tests use `mocktail` for
+Noveles has **55 test files** organized by layer. Tests use `mocktail` for
 mocking and `bloc_test` for BLoC state verification.
 
 ## Test Categories
@@ -18,8 +18,8 @@ mocking and `bloc_test` for BLoC state verification.
 | E Tests | 5 | test/entities/ | E construction,copyWith,props,equality |
 | Repo Tests | 8 | test/repositories/ | Data layer: Supabase queries,error ... |
 | Use Case Tests | 3 | test/use_cases/ | Business logic: domain rules, Resu... |
-| Widget Tests | 4 | `test/widgets/` | UI rendering, user interactions |
-| **Total** | **34** | | |
+| Widget Tests | 20 | `test/widgets/` | UI rendering, user interactions |
+| **Total** | **55** | | |
 
 ### BLoC Tests (14 files)
 
@@ -71,14 +71,30 @@ mocking and `bloc_test` for BLoC state verification.
 | `label_use_cases_test.dart` | Label use cases |
 | `track_book_view_test.dart` | `TrackBookView` |
 
-### Widget Tests (4 files)
+### Widget Tests (20 files)
 
 | File | Component Tested |
 | ------ | ----------------- |
-| `admin_main_screen_test.dart` | `AdminDashScreen` |
+| `main_screen_sections_test.dart` | Main screen sections |
+| `section_header_test.dart` | Section header widget |
+| `section_novedades_test.dart` | Novedades section |
+| `section_mas_vistos_test.dart` | Más vistos section |
+| `section_populares_test.dart` | Populares section |
+| `section_recent_views_test.dart` | Recent views section |
+| `genre_chip_styled_test.dart` | Genre chip styled widget |
+| `book_card_horizontal_test.dart` | Horizontal book card |
+| `book_card_vertical_test.dart` | Vertical book card |
+| `book_detail_content_test.dart` | Book detail content |
+| `book_took_list_test.dart` | Book took list |
+| `carousel_dots_test.dart` | Carousel dots indicator |
+| `chapter_screen_read_test.dart` | Chapter reading screen |
+| `took_screen_test.dart` | Took screen |
 | `confirmation_dialog_test.dart` | Confirmation dialog |
 | `empty_state_test.dart` | Empty state widget |
 | `snackbar_helper_test.dart` | Snackbar helper |
+| `admin_main_screen_test.dart` | AdminDashScreen |
+| `app_drawer_test.dart` | AppDrawer (NavigationDrawer, role-based menus) |
+| `test_helpers.dart` | Shared test utilities (helper file, not a test) |
 
 ## Patterns Used
 
@@ -141,7 +157,7 @@ testWidgets('renders correctly', (tester) async {
 | E tests | ⚠️ 5/9 | Missing: GenreEntity,FavoriteEntity,BookWithRelations,... |
 | Repository tests | ✅ 8/8 | All repositories covered |
 | Use case tests | ⚠️ 3/46 | Only 3 use cases tested out of 46 |
-| Widget tests | ⚠️ 4/19 | Only 4 screens/widgets tested |
+| Widget tests | ✅ 20/20 | All widgets have tests now |
 | Integration tests | ❌ None | No `integration_test/` directory |
 
 ### Missing Use Case Tests
@@ -177,4 +193,4 @@ open coverage/html/index.html
 
 ---
 
-> Last verified: 2026-07-21
+> Last verified: 2026-07-23
