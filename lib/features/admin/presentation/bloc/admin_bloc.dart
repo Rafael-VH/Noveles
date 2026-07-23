@@ -45,8 +45,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     ToggleBookVisibility event,
     Emitter<AdminState> emit,
   ) async {
-    final toggleResult =
-        await toggleBookVisibility(event.bookId, event.isVisible);
+    final toggleResult = await toggleBookVisibility(event.bookId, event.isVisible);
     switch (toggleResult) {
       case Ok():
         if (state is AdminLoaded) {
@@ -80,8 +79,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     DeleteAdminBook event,
     Emitter<AdminState> emit,
   ) async {
-    if (_lastDeleteTime != null &&
-        DateTime.now().difference(_lastDeleteTime!) < _deleteCooldown) {
+    if (_lastDeleteTime != null && DateTime.now().difference(_lastDeleteTime!) < _deleteCooldown) {
       emit(const AdminError('Espera un momento antes de eliminar otro libro'));
       return;
     }

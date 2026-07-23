@@ -77,9 +77,7 @@ class AdminUsersBloc extends Bloc<AdminUsersEvent, AdminUsersState> {
     UserRole targetRole = UserRole.user;
     final currentState = state;
     if (currentState is AdminUsersLoaded) {
-      final user = currentState.users
-          .where((u) => u.id == event.targetUserId)
-          .firstOrNull;
+      final user = currentState.users.where((u) => u.id == event.targetUserId).firstOrNull;
       if (user != null) {
         targetRole = user.isSuspended ? UserRole.user : UserRole.suspended;
       }

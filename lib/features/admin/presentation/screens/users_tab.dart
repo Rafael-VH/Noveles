@@ -76,53 +76,83 @@ class _UsersTabState extends State<UsersTab> {
                   );
                 }
 
-                return ListView.builder(
-                  itemCount: users.length,
-                  itemBuilder: (context, index) {
-                    final user = users[index];
-                    return ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: user.isSuspended
-                            ? Theme.of(context).colorScheme.errorContainer
-                            : user.role == UserRole.admin
-                                ? Theme.of(context).colorScheme.primary
-                                : Theme.of(context)
-                                    .colorScheme
-                                    .secondaryContainer,
-                        child: Text(
-                          (user.displayName ?? user.email)[0].toUpperCase(),
+                return Column(
+                  children: [
+                    if (_searchQuery.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Row(
+                          children: [
+                            Chip(
+                              label: Text(
+                                '${users.length} de ${state.users.length}',
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      title: Text(user.displayName ?? user.email),
-                      subtitle: Text(user.email),
-                      onTap: () => _showRoleDialog(context, user),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          RoleBadge(role: user.role),
-                          const SizedBox(width: 4),
-                          IconButton(
-                            icon: Icon(
-                              user.isSuspended
-                                  ? Icons.person_add
-                                  : Icons.block,
-                              color: user.isSuspended
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Theme.of(context).colorScheme.error,
-                            ),
-                            tooltip: user.isSuspended
-                                ? 'Reactivar'
-                                : 'Suspender',
-                            onPressed: () {
-                              context
-                                  .read<AdminUsersBloc>()
-                                  .add(SuspendUser(targetUserId: user.id));
-                            },
-                          ),
-                        ],
+                    Expanded(
+                      child: RefreshIndicator(
+                        onRefresh: () async {
+                          context
+                              .read<AdminUsersBloc>()
+                              .add(const LoadAdminUsers());
+                        },
+                        child: ListView.builder(
+                          itemCount: users.length,
+                          itemBuilder: (context, index) {
+                            final user = users[index];
+                            return ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor: user.isSuspended
+                                    ? Theme.of(context)
+                                        .colorScheme
+                                        .errorContainer
+                                    : user.role == UserRole.admin
+                                        ? Theme.of(context).colorScheme.primary
+                                        : Theme.of(context)
+                                            .colorScheme
+                                            .secondaryContainer,
+                                child: Text(
+                                  (user.displayName ?? user.email)[0]
+                                      .toUpperCase(),
+                                ),
+                              ),
+                              title: Text(user.displayName ?? user.email),
+                              subtitle: Text(user.email),
+                              onTap: () => _showRoleDialog(context, user),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  RoleBadge(role: user.role),
+                                  const SizedBox(width: 4),
+                                  IconButton(
+                                    icon: Icon(
+                                      user.isSuspended
+                                          ? Icons.person_add
+                                          : Icons.block,
+                                      color: user.isSuspended
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .primary
+                                          : Theme.of(context).colorScheme.error,
+                                    ),
+                                    tooltip: user.isSuspended
+                                        ? 'Reactivar'
+                                        : 'Suspender',
+                                    onPressed: () {
+                                      context.read<AdminUsersBloc>().add(
+                                          SuspendUser(targetUserId: user.id));
+                                    },
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
                       ),
-                    );
-                  },
+                    ),
+                  ],
                 );
               }
 
@@ -178,7 +208,9 @@ class _UsersTabState extends State<UsersTab> {
                 child: Row(
                   children: [
                     Icon(
-                      user.role == role ? Icons.radio_button_checked : Icons.radio_button_unchecked,
+                      user.role == role
+                          ? Icons.radio_button_checked
+                          : Icons.radio_button_unchecked,
                       size: 20,
                     ),
                     const SizedBox(width: 12),

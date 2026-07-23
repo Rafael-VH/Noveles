@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/di/injection.dart';
+import 'package:noveles/shared/presentation/widgets/confirmation_dialog.dart';
 import 'package:noveles/shared/presentation/widgets/snackbar_helper.dart';
+import 'package:noveles/features/admin/presentation/bloc/admin_analytics_bloc.dart';
+import 'package:noveles/features/admin/presentation/bloc/admin_analytics_event.dart';
 import 'package:noveles/features/admin/presentation/bloc/admin_bloc.dart';
 import 'package:noveles/features/admin/presentation/bloc/admin_users_bloc.dart';
 import 'package:noveles/features/admin/presentation/screens/analytics_tab.dart';
 import 'package:noveles/features/admin/presentation/screens/books_tab.dart';
 import 'package:noveles/features/admin/presentation/screens/genres_tab.dart';
+import 'package:noveles/features/admin/presentation/screens/summary_tab.dart';
 import 'package:noveles/features/admin/presentation/screens/users_tab.dart';
 import 'package:noveles/features/app/presentation/widgets/app_drawer.dart';
 import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
@@ -27,10 +31,33 @@ class _AdminDashScreenState extends State<AdminDashScreen> {
     final currentUserId = authState is AuthAuthenticated
         ? authState.user.id
         : '';
+    final adminEmail = authState is AuthAuthenticated
+        ? authState.user.email
+        : '';
 
     return Scaffold(
       drawer: const AppDrawer(isAdmin: true),
-      appBar: AppBar(title: const Text('Panel Admin')),
+      appBar: AppBar(
+        title: const Text('Panel Admin'),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: Center(
+              child: Text(
+                adminEmail,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+              ),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Cerrar Sesión',
+            onPressed: () => _confirmLogout(context),
+          ),
+        ],
+      ),
       body: MultiBlocProvider(
         providers: [
           BlocProvider(
@@ -43,6 +70,10 @@ class _AdminDashScreenState extends State<AdminDashScreen> {
               currentUserId: currentUserId,
             )..add(const LoadAdminUsers()),
           ),
+          BlocProvider(
+            create: (_) =>
+                getIt<AdminAnalyticsBloc>()..add(const LoadAnalytics()),
+          ),
         ],
         child: BlocListener<AdminUsersBloc, AdminUsersState>(
           listener: (context, state) {
@@ -51,48 +82,73 @@ class _AdminDashScreenState extends State<AdminDashScreen> {
             }
           },
           child: BlocConsumer<AdminBloc, AdminState>(
-          listener: (context, state) {
-            if (state is AdminLoaded && state.message != null) {
-              showSuccessSnack(context, state.message!);
-            }
-            if (state is AdminError) {
-              showErrorSnack(context, state.message);
-            }
-          },
-          builder: (context, state) => IndexedStack(
-            index: _currentIndex,
-            children: [
-              BooksTab(state: state),
-              const GenresTab(),
-              const UsersTab(),
-              const AnalyticsTab(),
-            ],
+            listener: (context, state) {
+              if (state is AdminLoaded && state.message != null) {
+                showSuccessSnack(context, state.message!);
+              }
+              if (state is AdminError) {
+                showErrorSnack(context, state.message);
+              }
+            },
+            builder: (context, state) => IndexedStack(
+              index: _currentIndex,
+              children: [
+                const SummaryTab(),
+                BooksTab(state: state),
+                const GenresTab(),
+                const UsersTab(),
+                const AnalyticsTab(),
+              ],
+            ),
           ),
         ),
       ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.library_books),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _currentIndex,
+        onDestinationSelected: (index) =>
+            setState(() => _currentIndex = index),
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.dashboard_outlined),
+            selectedIcon: Icon(Icons.dashboard),
+            label: 'Resumen',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.library_books_outlined),
+            selectedIcon: Icon(Icons.library_books),
             label: 'Libros',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.category),
-            label: 'G�neros',
+          NavigationDestination(
+            icon: Icon(Icons.category_outlined),
+            selectedIcon: Icon(Icons.category),
+            label: 'Géneros',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.people),
+          NavigationDestination(
+            icon: Icon(Icons.people_outlined),
+            selectedIcon: Icon(Icons.people),
             label: 'Usuarios',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.analytics),
-            label: 'Anal�ticas',
+          NavigationDestination(
+            icon: Icon(Icons.analytics_outlined),
+            selectedIcon: Icon(Icons.analytics),
+            label: 'Analíticas',
           ),
         ],
       ),
     );
+  }
+
+  void _confirmLogout(BuildContext context) {
+    showConfirmationDialog(
+      context: context,
+      title: 'Cerrar Sesión',
+      message: '¿Estás seguro de que deseas cerrar sesión?',
+      confirmLabel: 'Cerrar Sesión',
+      isDestructive: true,
+    ).then((confirmed) {
+      if (confirmed == true) {
+        context.read<AuthBloc>().add(LogoutRequested());
+      }
+    });
   }
 }

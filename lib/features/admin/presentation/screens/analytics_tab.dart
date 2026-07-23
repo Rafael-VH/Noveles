@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
 import 'package:noveles/features/admin/presentation/bloc/admin_analytics_bloc.dart';
 import 'package:noveles/features/admin/presentation/bloc/admin_analytics_event.dart';
 import 'package:noveles/features/admin/presentation/bloc/admin_analytics_state.dart';
@@ -10,11 +9,8 @@ class AnalyticsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => GetIt.instance<AdminAnalyticsBloc>()
-        ..add(const LoadAnalytics()),
-      child: const _AnalyticsTabContent(),
-    );
+    // AdminAnalyticsBloc is provided by AdminDashScreen's MultiBlocProvider
+    return const _AnalyticsTabContent();
   }
 }
 
@@ -153,34 +149,7 @@ class _AnalyticsTabContent extends StatelessWidget {
               ),
             )
           else
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: state.trend.map((entry) {
-                    final date = entry['view_date']?.toString() ?? '';
-                    final count = entry['view_count'] ?? 0;
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(date),
-                          ),
-                          Text(
-                            '$count vistas',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(fontWeight: FontWeight.w600),
-                          ),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ),
+            _TrendBarChart(trend: state.trend),
         ],
       ),
     );
@@ -251,6 +220,95 @@ class _AnalyticsTabContent extends StatelessWidget {
   }
 }
 
+class _TrendBarChart extends StatelessWidget {
+  final List<dynamic> trend;
+  const _TrendBarChart({required this.trend});
+
+  @override
+  Widget build(BuildContext context) {
+    final maxCount = trend.fold<int>(0, (max, e) {
+      final count = e['view_count'] as int? ?? 0;
+      return count > max ? count : max;
+    });
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            // Header row
+            Row(
+              children: [
+                Text(
+                  'Últimos ${trend.length} días',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+                const Spacer(),
+                Text(
+                  'Máx: $maxCount',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            // Bars
+            ...trend.asMap().entries.map((entry) {
+              final date = entry.value['view_date']?.toString() ?? '';
+              final count = (entry.value['view_count'] as int?) ?? 0;
+              final fraction = maxCount > 0 ? count / maxCount : 0.0;
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 80,
+                      child: Text(
+                        date,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: LinearProgressIndicator(
+                          value: fraction,
+                          minHeight: 20,
+                          backgroundColor:
+                              colorScheme.surfaceContainerHighest,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            colorScheme.primary,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    SizedBox(
+                      width: 48,
+                      child: Text(
+                        '$count',
+                        textAlign: TextAlign.end,
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.copyWith(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _MetricCard extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -274,15 +332,15 @@ class _MetricCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(icon, size: 24, color: color),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             Text(
               value,
               style: Theme.of(context)
                   .textTheme
-                  .headlineSmall
+                  .titleLarge
                   ?.copyWith(fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Text(
               label,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(

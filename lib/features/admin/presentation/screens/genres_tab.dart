@@ -1,36 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/di/injection.dart';
+import 'package:noveles/shared/presentation/widgets/confirmation_dialog.dart';
 import 'package:noveles/shared/presentation/widgets/snackbar_helper.dart';
 import 'package:noveles/features/genres/domain/genre_entity.dart';
 import 'package:noveles/features/genres/presentation/bloc/genre_bloc.dart';
 
-class GenresTab extends StatefulWidget {
+class GenresTab extends StatelessWidget {
   const GenresTab({super.key});
 
   @override
-  State<GenresTab> createState() => _GenresTabState();
-}
-
-class _GenresTabState extends State<GenresTab> {
-  late final GenreBloc _genreBloc;
-
-  @override
-  void initState() {
-    super.initState();
-    _genreBloc = getIt<GenreBloc>()..add(LoadGenres());
-  }
-
-  @override
-  void dispose() {
-    _genreBloc.close();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: _genreBloc,
+    return BlocProvider(
+      create: (_) => getIt<GenreBloc>()..add(LoadGenres()),
       child: BlocConsumer<GenreBloc, GenreState>(
         listener: (context, state) {
           if (state is GenreLoaded && state.message != null) {
@@ -81,30 +63,35 @@ class GenreListContent extends StatelessWidget {
         if (genres.isEmpty)
           const Center(child: Text('No hay géneros'))
         else
-          ListView.builder(
-            padding: const EdgeInsets.only(bottom: 80),
-            itemCount: genres.length,
-            itemBuilder: (context, index) {
-              final genre = genres[index];
-              return ListTile(
-                leading: const Icon(Icons.category),
-                title: Text(genre.name),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.edit),
-                      onPressed: () => _showEditGenreDialog(context, genre),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.delete,
-                          color: Theme.of(context).colorScheme.error),
-                      onPressed: () => _confirmDeleteGenre(context, genre.id),
-                    ),
-                  ],
-                ),
-              );
+          RefreshIndicator(
+            onRefresh: () async {
+              context.read<GenreBloc>().add(LoadGenres());
             },
+            child: ListView.builder(
+              padding: const EdgeInsets.only(bottom: 80),
+              itemCount: genres.length,
+              itemBuilder: (context, index) {
+                final genre = genres[index];
+                return ListTile(
+                  leading: const Icon(Icons.category),
+                  title: Text(genre.name),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit),
+                        onPressed: () => _showEditGenreDialog(context, genre),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.delete,
+                            color: Theme.of(context).colorScheme.error),
+                        onPressed: () => _confirmDeleteGenre(context, genre.id),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
         Positioned(
           bottom: 16,
@@ -211,29 +198,16 @@ class GenreListContent extends StatelessWidget {
   }
 
   void _confirmDeleteGenre(BuildContext context, int genreId) {
-    showDialog(
+    showConfirmationDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Eliminar género'),
-        content:
-            const Text('¿Estás seguro de que deseas eliminar este género?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancelar'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              context.read<GenreBloc>().add(DeleteGenreEvent(genreId));
-            },
-            child: Text(
-              'Eliminar',
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
-          ),
-        ],
-      ),
-    );
+      title: 'Eliminar género',
+      message: '¿Estás seguro de que deseas eliminar este género?',
+      confirmLabel: 'Eliminar',
+      isDestructive: true,
+    ).then((confirmed) {
+      if (confirmed == true) {
+        context.read<GenreBloc>().add(DeleteGenreEvent(genreId));
+      }
+    });
   }
 }

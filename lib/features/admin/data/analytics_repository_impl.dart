@@ -13,8 +13,7 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
     int daysBack = 30,
   }) async {
     try {
-      final response = await _supabase.client
-          .rpc('get_views_trend', params: {'days_back': daysBack});
+      final response = await _supabase.client.rpc('get_views_trend', params: {'days_back': daysBack});
       final data = (response as List).cast<Map<String, dynamic>>();
       return Ok(data);
     } catch (e) {
@@ -27,8 +26,7 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
     int limitCount = 10,
   }) async {
     try {
-      final response = await _supabase.client
-          .rpc('get_top_books', params: {'limit_count': limitCount});
+      final response = await _supabase.client.rpc('get_top_books', params: {'limit_count': limitCount});
       final data = (response as List).cast<Map<String, dynamic>>();
       return Ok(data);
     } catch (e) {
@@ -39,8 +37,7 @@ class AnalyticsRepositoryImpl implements AnalyticsRepository {
   @override
   Future<Result<Map<String, dynamic>>> getOverview() async {
     try {
-      final response =
-          await _supabase.client.rpc('get_analytics_overview');
+      final response = await _supabase.client.rpc('get_analytics_overview');
       final data = (response as List).first as Map<String, dynamic>;
       return Ok(data);
     } catch (e) {

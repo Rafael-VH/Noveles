@@ -38,19 +38,65 @@ class BooksTab extends StatelessWidget {
   }
 }
 
-class BooksContent extends StatelessWidget {
+class BooksContent extends StatefulWidget {
   final AdminLoaded state;
   const BooksContent({super.key, required this.state});
 
   @override
+  State<BooksContent> createState() => _BooksContentState();
+}
+
+class _BooksContentState extends State<BooksContent> {
+  final _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final total = state.books.length;
-    final visible = state.books.where((b) => b.isVisible).length;
+    final total = widget.state.books.length;
+    final visible = widget.state.books.where((b) => b.isVisible).length;
+
+    var books = widget.state.books;
+    if (_searchQuery.isNotEmpty) {
+      final query = _searchQuery.toLowerCase();
+      books = books.where((b) {
+        return b.name.toLowerCase().contains(query) ||
+            b.author.toLowerCase().contains(query);
+      }).toList();
+    }
 
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+          child: TextField(
+            controller: _searchController,
+            decoration: InputDecoration(
+              hintText: 'Buscar libros...',
+              prefixIcon: const Icon(Icons.search),
+              suffixIcon: _searchQuery.isNotEmpty
+                  ? IconButton(
+                      icon: const Icon(Icons.clear),
+                      onPressed: () {
+                        _searchController.clear();
+                        setState(() => _searchQuery = '');
+                      },
+                    )
+                  : null,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            onChanged: (value) => setState(() => _searchQuery = value),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(12),
           child: Card(
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
@@ -78,17 +124,17 @@ class BooksContent extends StatelessWidget {
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: ElevatedButton.icon(
-            onPressed: () => Navigator.pushNamed(
-              context,
-              '/label-management',
+        if (_searchQuery.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Row(
+              children: [
+                Chip(
+                  label: Text('${books.length} de $total'),
+                ),
+              ],
             ),
-            icon: const Icon(Icons.label),
-            label: const Text('Gestionar Etiquetas'),
           ),
-        ),
         const SizedBox(height: 8),
         Expanded(
           child: RefreshIndicator(
@@ -98,19 +144,25 @@ class BooksContent extends StatelessWidget {
                     (s) => s is AdminLoaded || s is AdminError,
                   );
             },
-            child: state.books.isEmpty
+            child: books.isEmpty
                 ? ListView(
-                    children: const [
+                    children: [
                       SizedBox(
                         height: 200,
-                        child: Center(child: Text('No hay libros')),
+                        child: Center(
+                          child: Text(
+                            _searchQuery.isNotEmpty
+                                ? 'No se encontraron libros'
+                                : 'No hay libros',
+                          ),
+                        ),
                       ),
                     ],
                   )
                 : ListView.builder(
-                    itemCount: state.books.length,
+                    itemCount: books.length,
                     itemBuilder: (context, index) {
-                      final book = state.books[index];
+                      final book = books[index];
                       return Card(
                         margin: const EdgeInsets.symmetric(
                           horizontal: 12,
