@@ -16,17 +16,27 @@ class SliverAppBarBook extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final expandedHeight =
+        (MediaQuery.of(context).size.height * 0.48).clamp(280.0, 420.0);
+    final scaffoldBg = theme.scaffoldBackgroundColor;
+
     return SliverAppBar(
-      title: const Text('Details'),
+      title: Text(
+        books.name,
+        overflow: TextOverflow.ellipsis,
+        maxLines: 1,
+      ),
       backgroundColor: Colors.transparent,
       centerTitle: true,
       elevation: 0,
-      expandedHeight: 360.0,
-      flexibleSpace: SizedBox(
-        height: 360.0,
-        width: MediaQuery.of(context).size.width,
-        child: Stack(
+      stretch: true,
+      expandedHeight: expandedHeight,
+      flexibleSpace: FlexibleSpaceBar(
+        stretchModes: const [StretchMode.zoomBackground],
+        background: Stack(
           children: [
+            // Full-bleed cover image
             Positioned.fill(
               child: CachedNetworkImage(
                 fit: BoxFit.cover,
@@ -34,16 +44,18 @@ class SliverAppBarBook extends StatelessWidget {
                 errorWidget: (_, __, ___) => const SizedBox.shrink(),
               ),
             ),
+            // Blur overlay sigma 5
             Positioned.fill(
               child: ClipRect(
                 child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                  filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
                   child: Container(
-                    color: Theme.of(context).colorScheme.surface.withAlpha(10),
+                    color: scaffoldBg.withAlpha(10),
                   ),
                 ),
               ),
             ),
+            // Gradient fading into scaffold background
             Positioned.fill(
               child: Container(
                 decoration: BoxDecoration(
@@ -51,66 +63,61 @@ class SliverAppBarBook extends StatelessWidget {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Theme.of(context)
-                          .colorScheme
-                          .surface
-                          .withValues(alpha: 0.5),
-                      Theme.of(context)
-                          .colorScheme
-                          .surface
-                          .withValues(alpha: 0.7),
-                      Theme.of(context).colorScheme.surface,
+                      scaffoldBg.withValues(alpha: 0.5),
+                      scaffoldBg.withValues(alpha: 0.7),
+                      scaffoldBg,
                     ],
                   ),
                 ),
               ),
             ),
+            // Thumbnail with AspectRatio + title + author
             Positioned(
               top: 65.0,
               left: 16.0,
               right: 16.0,
               bottom: 0.0,
-              child: SizedBox(
-                child: Column(
-                  children: [
-                    Expanded(
-                      flex: 10,
-                      child: CachedNetworkImage(
-                        fit: BoxFit.cover,
-                        imageUrl: getIt<CoverUrlService>()(books.cover),
-                        errorWidget: (_, __, ___) =>
-                            const Icon(Icons.book, size: 48),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 2,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Text(
-                          books.name,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 18.0,
-                            fontWeight: FontWeight.bold,
-                          ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Flexible(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: AspectRatio(
+                        aspectRatio: 3 / 4,
+                        child: CachedNetworkImage(
+                          fit: BoxFit.cover,
+                          imageUrl: getIt<CoverUrlService>()(books.cover),
+                          errorWidget: (_, __, ___) =>
+                              const Icon(Icons.book, size: 48),
                         ),
                       ),
                     ),
-                    Expanded(
-                      flex: 1,
-                      child: Text(
-                        books.author,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          fontSize: 14.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    books.name,
+                    textAlign: TextAlign.center,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      color: theme.colorScheme.onSurface,
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    books.author,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: theme.colorScheme.onSurfaceVariant,
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
               ),
             ),
           ],

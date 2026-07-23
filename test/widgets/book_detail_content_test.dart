@@ -5,6 +5,9 @@ import 'package:mocktail/mocktail.dart';
 import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:noveles/features/favorites/presentation/bloc/favorite_bloc.dart';
 import 'package:noveles/features/books/presentation/screens/widgets/book_detail_content.dart';
+import 'package:noveles/features/books/presentation/screens/widgets/card_info_detail.dart';
+import 'package:noveles/features/app/presentation/widgets/genre_chip_styled.dart';
+import 'package:noveles/features/app/presentation/widgets/section_title.dart';
 import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 import 'package:noveles/features/genres/domain/genre_entity.dart';
 
@@ -102,14 +105,26 @@ void main() {
       expect(find.text('5'), findsOneWidget);
       expect(find.text('Capítulos'), findsOneWidget);
       expect(find.text('50'), findsOneWidget);
+
+      // Solo 1 CardInfoDetail ahora (6 pares fusionados)
+      expect(find.byType(CardInfoDetail), findsOneWidget);
     });
 
-    testWidgets('renderiza géneros como chips', (tester) async {
+    testWidgets('usa SectionTitle con showAccent para headers', (tester) async {
+      await tester.pumpWidget(buildTestWidget(baseBook));
+
+      expect(find.byType(SectionTitle), findsAtLeast(1));
+    });
+
+    testWidgets('renderiza géneros como GenreChipStyled', (tester) async {
       await tester.pumpWidget(buildTestWidget(baseBook));
 
       expect(find.text('Generos'), findsOneWidget);
       expect(find.text('Fantasía'), findsOneWidget);
       expect(find.text('Aventura'), findsOneWidget);
+
+      // Verifica que usa GenreChipStyled en vez de Chip crudo
+      expect(find.byType(GenreChipStyled), findsAtLeast(1));
     });
 
     testWidgets('muestra FavoriteButton', (tester) async {
@@ -132,7 +147,7 @@ void main() {
 
       await tester.pumpWidget(buildTestWidget(bookWithSource));
 
-      // TitleWidget "Fuente" + CardInfoDetail title1 "Fuente"
+      // SectionTitle "Fuente" + CardInfoDetail pair title "Fuente"
       expect(find.text('Fuente'), findsNWidgets(2));
       expect(find.text('Web Novel'), findsOneWidget);
     });
@@ -145,7 +160,7 @@ void main() {
 
       await tester.pumpWidget(buildTestWidget(bookWithLink));
 
-      // TitleWidget "Fuente" + CardInfoDetail title1 "Fuente"
+      // SectionTitle "Fuente" + CardInfoDetail pair title "Fuente"
       expect(find.text('Fuente'), findsNWidgets(2));
       expect(find.text('https://example.com/book'), findsOneWidget);
     });

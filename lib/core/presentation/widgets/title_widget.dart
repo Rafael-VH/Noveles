@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+@Deprecated('Use SectionTitle with showAccent instead')
 class TitleWidget extends StatelessWidget {
   const TitleWidget({
     super.key,

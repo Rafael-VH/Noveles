@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 import 'package:noveles/features/books/presentation/screens/widgets/card_info_detail.dart';
-import 'package:noveles/core/presentation/widgets/title_widget.dart';
+import 'package:noveles/features/app/presentation/widgets/section_title.dart';
+import 'package:noveles/features/app/presentation/widgets/genre_chip_styled.dart';
 import 'package:noveles/features/favorites/presentation/widgets/favorite_button.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -12,106 +13,102 @@ class BookDetailContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Column(
       children: [
         const SizedBox(height: 22.0),
+        // ── Description section ───────────────────────────────
         Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Flexible(
-              child: TitleWidget(
-                text: 'Descripción',
-                clContent: Theme.of(context).colorScheme.primary,
-                clText: Theme.of(context).colorScheme.onSurface,
+            const Expanded(
+              child: SectionTitle(
+                title: 'Descripción',
+                showAccent: true,
               ),
             ),
-            FavoriteButton(
-              bookId: books.id,
-              initialIsFavorite: books.isFavorite,
+            Padding(
+              padding: const EdgeInsets.only(right: 16, top: 8),
+              child: FavoriteButton(
+                bookId: books.id,
+                initialIsFavorite: books.isFavorite,
+              ),
             ),
           ],
         ),
         Padding(
-          padding: const EdgeInsets.all(10.0),
+          padding: const EdgeInsets.all(16.0),
           child: Text(
             books.description,
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
-              fontSize: 14.0,
+            style: theme.textTheme.bodyLarge?.copyWith(
+              color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
         ),
+        // ── Info cards (merged) ────────────────────────────────
+        const SectionTitle(
+          title: 'Detalles',
+          showAccent: true,
+        ),
         Padding(
-          padding: const EdgeInsets.all(6.0),
+          padding: const EdgeInsets.symmetric(horizontal: 6.0),
           child: CardInfoDetail(
-            title1: "Publicado",
-            text1: books.release,
-            title2: "Tipo de Novela",
-            text2: books.type,
+            pairs: [
+              InfoPair(title: 'Publicado', value: books.release),
+              InfoPair(title: 'Tipo de Novela', value: books.type),
+              InfoPair(title: 'País', value: books.country),
+              InfoPair(title: 'Estado', value: books.state),
+              InfoPair(title: 'Tomos', value: books.tookCount.toString()),
+              InfoPair(title: 'Capítulos', value: books.chapterCount.toString()),
+            ],
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.all(6.0),
-          child: CardInfoDetail(
-            title1: "País",
-            text1: books.country,
-            title2: "Estado",
-            text2: books.state,
-          ),
+        // ── Genres section ─────────────────────────────────────
+        const SizedBox(height: 16),
+        SectionTitle(
+          title: 'Generos',
+          showAccent: true,
         ),
         Padding(
-          padding: const EdgeInsets.all(6.0),
-          child: CardInfoDetail(
-            title1: "Tomos",
-            text1: books.tookCount.toString(),
-            title2: "Capítulos",
-            text2: books.chapterCount.toString(),
-          ),
-        ),
-        TitleWidget(
-          text: 'Generos',
-          clContent: Theme.of(context).colorScheme.primary,
-          clText: Theme.of(context).colorScheme.onSurface,
-        ),
-        Padding(
-          padding: const EdgeInsets.all(10.0),
+          padding: const EdgeInsets.all(16.0),
           child: Wrap(
             spacing: 8.0,
             runSpacing: 6.0,
             children: books.listGenre.map((item) {
-              return InkWell(
+              return GenreChipStyled(
+                genre: item,
                 onTap: () {},
-                child: Chip(
-                  elevation: 8.0,
-                  backgroundColor:
-                      Theme.of(context).colorScheme.surfaceContainerLow,
-                  label: Text(
-                    item.name,
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ),
               );
             }).toList(),
           ),
         ),
+        // ── Source section (conditional) ───────────────────────
         if (books.source.isNotEmpty || books.link.isNotEmpty) ...[
-          TitleWidget(
-            text: 'Fuente',
-            clContent: Theme.of(context).colorScheme.primary,
-            clText: Theme.of(context).colorScheme.onSurface,
+          const SizedBox(height: 16),
+          SectionTitle(
+            title: 'Fuente',
+            showAccent: true,
           ),
           Padding(
-            padding: const EdgeInsets.all(6.0),
+            padding: const EdgeInsets.symmetric(horizontal: 6.0, vertical: 8),
             child: CardInfoDetail(
-              title1: "Fuente",
-              text1: books.source.isNotEmpty ? books.source : "N/A",
-              title2: "Enlace",
-              text2: books.link.isNotEmpty ? books.link : "N/A",
+              pairs: [
+                InfoPair(
+                  title: 'Fuente',
+                  value: books.source.isNotEmpty ? books.source : 'N/A',
+                ),
+                InfoPair(
+                  title: 'Enlace',
+                  value: books.link.isNotEmpty ? books.link : 'N/A',
+                ),
+              ],
             ),
           ),
           if (books.link.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: InkWell(
                 onTap: () async {
                   final uri = Uri.parse(books.link);
@@ -122,7 +119,7 @@ class BookDetailContent extends StatelessWidget {
                 child: Text(
                   'Abrir enlace',
                   style: TextStyle(
-                    color: Theme.of(context).colorScheme.primary,
+                    color: theme.colorScheme.primary,
                     decoration: TextDecoration.underline,
                   ),
                 ),

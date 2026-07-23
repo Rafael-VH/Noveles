@@ -13,7 +13,7 @@ import 'package:noveles/features/genres/presentation/screens/genre_screen.dart';
 import 'package:noveles/features/app/presentation/widgets/app_drawer.dart';
 import 'package:noveles/features/app/presentation/widgets/carousel_appbar_sliver.dart';
 import 'package:noveles/features/app/presentation/widgets/genre_chip_styled.dart';
-import 'package:noveles/features/app/presentation/widgets/section_header.dart';
+import 'package:noveles/features/app/presentation/widgets/section_title.dart';
 import 'package:noveles/features/app/presentation/widgets/section_novedades.dart';
 import 'package:noveles/features/app/presentation/widgets/section_populares.dart';
 import 'package:noveles/features/app/presentation/bloc/recent_views/recent_views_bloc.dart';
@@ -263,7 +263,7 @@ class _MainScreenState extends State<MainScreen> {
 
         // Géneros
         SliverToBoxAdapter(
-          child: SectionHeader(title: 'Géneros', icon: Icons.category),
+          child: SectionTitle(title: 'Géneros', icon: Icons.category),
         ),
         SliverToBoxAdapter(
           child: SizedBox(
