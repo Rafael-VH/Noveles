@@ -61,5 +61,18 @@ void main() {
       await tester.tap(find.byType(InkWell));
       expect(tapped, isTrue);
     });
+
+    testWidgets('es StatefulWidget con AnimatedScale', (tester) async {
+      final book = createTestBook();
+
+      await tester.pumpWidget(wrapWithMaterial(
+        BookCardHorizontal(
+          book: book,
+          onTap: () {},
+        ),
+      ));
+
+      expect(find.byType(AnimatedScale), findsOneWidget);
+    });
   });
 }

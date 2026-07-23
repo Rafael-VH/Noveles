@@ -56,5 +56,20 @@ void main() {
       expect(textWidget.maxLines, equals(2));
       expect(textWidget.overflow, equals(TextOverflow.ellipsis));
     });
+
+    testWidgets('es StatefulWidget con AnimatedScale', (tester) async {
+      final book = createTestBook();
+      bool tapped = false;
+
+      await tester.pumpWidget(wrapWithMaterial(
+        BookCardVertical(
+          book: book,
+          onTap: () => tapped = true,
+        ),
+      ));
+
+      // Verify AnimatedScale exists
+      expect(find.byType(AnimatedScale), findsOneWidget);
+    });
   });
 }
