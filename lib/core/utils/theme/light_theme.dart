@@ -184,7 +184,7 @@ class LightTheme {
     cardTheme: CardThemeData(
       color: _LightColor.surface,
       surfaceTintColor: Colors.transparent,
-      elevation: 0,
+      elevation: 2.0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: const BorderSide(color: _LightColor.outlineVariant, width: 0.5),
@@ -200,7 +200,7 @@ class LightTheme {
         foregroundColor: _LightColor.onPrimary,
         disabledBackgroundColor: _LightColor.onSurface.withValues(alpha: 0.12),
         disabledForegroundColor: _LightColor.onSurface.withValues(alpha: 0.38),
-        elevation: 0,
+      elevation: 2.0,
         shadowColor: Colors.transparent,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         shape: RoundedRectangleBorder(

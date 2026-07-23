@@ -132,7 +132,7 @@ class DarkTheme {
     cardTheme: CardThemeData(
       color: DarkColor.surface,
       surfaceTintColor: Colors.transparent,
-      elevation: 0,
+      elevation: 2.0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
         side: const BorderSide(color: DarkColor.outlineVariant, width: 0.5),
@@ -148,7 +148,7 @@ class DarkTheme {
         foregroundColor: DarkColor.onPrimary,
         disabledBackgroundColor: DarkColor.onSurface.withValues(alpha: 0.12),
         disabledForegroundColor: DarkColor.onSurface.withValues(alpha: 0.38),
-        elevation: 0,
+      elevation: 2.0,
         shadowColor: Colors.transparent,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         shape: RoundedRectangleBorder(
