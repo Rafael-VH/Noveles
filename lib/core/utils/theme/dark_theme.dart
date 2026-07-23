@@ -98,6 +98,36 @@ class DarkTheme {
       }),
     ),
 
+    // ── Navigation Drawer ────────────────────────────────────
+    navigationDrawerTheme: NavigationDrawerThemeData(
+      backgroundColor: DarkColor.surface,
+      indicatorColor: DarkColor.primaryContainer,
+      indicatorShape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      tileHeight: 56,
+      labelTextStyle: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: DarkColor.onSurface,
+          );
+        }
+        return const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: DarkColor.onSurfaceVariant,
+        );
+      }),
+      iconTheme: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return const IconThemeData(color: DarkColor.primary);
+        }
+        return const IconThemeData(color: DarkColor.onSurfaceVariant);
+      }),
+    ),
+
     // ── Cards ─────────────────────────────────────────────────
     cardTheme: CardThemeData(
       color: DarkColor.surface,

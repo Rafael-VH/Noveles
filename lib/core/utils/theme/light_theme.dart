@@ -150,6 +150,36 @@ class LightTheme {
       }),
     ),
 
+    // ── Navigation Drawer ────────────────────────────────────
+    navigationDrawerTheme: NavigationDrawerThemeData(
+      backgroundColor: _LightColor.surface,
+      indicatorColor: _LightColor.primaryContainer,
+      indicatorShape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      tileHeight: 56,
+      labelTextStyle: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: _LightColor.onSurface,
+          );
+        }
+        return const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: _LightColor.onSurfaceVariant,
+        );
+      }),
+      iconTheme: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
+          return const IconThemeData(color: _LightColor.primary);
+        }
+        return const IconThemeData(color: _LightColor.onSurfaceVariant);
+      }),
+    ),
+
     // ── Cards ─────────────────────────────────────────────────
     cardTheme: CardThemeData(
       color: _LightColor.surface,
