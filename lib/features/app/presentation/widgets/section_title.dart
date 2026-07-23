@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 
-class SectionHeader extends StatelessWidget {
+class SectionTitle extends StatelessWidget {
   final String title;
   final IconData? icon;
   final Widget? trailing;
   final EdgeInsetsGeometry? padding;
+  final bool showAccent;
 
-  const SectionHeader({
+  const SectionTitle({
     super.key,
     required this.title,
     this.icon,
     this.trailing,
     this.padding,
+    this.showAccent = false,
   });
 
   @override
@@ -24,6 +26,13 @@ class SectionHeader extends StatelessWidget {
           padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
+          if (showAccent)
+            Container(
+              height: 26.0,
+              width: 6.0,
+              margin: const EdgeInsets.only(right: 4.0),
+              color: Theme.of(context).colorScheme.primary,
+            ),
           if (iconData != null) ...[
             Icon(iconData,
                 size: 20, color: Theme.of(context).colorScheme.primary),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:noveles/features/app/presentation/widgets/book_card_vertical.dart';
-import 'package:noveles/features/app/presentation/widgets/section_header.dart';
+import 'package:noveles/features/app/presentation/widgets/section_title.dart';
 import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 
 class SectionNovedades extends StatelessWidget {
@@ -19,7 +19,7 @@ class SectionNovedades extends StatelessWidget {
 
     return Column(
       children: [
-        const SectionHeader(title: 'Novedades', icon: Icons.new_releases),
+        const SectionTitle(title: 'Novedades', icon: Icons.new_releases),
         SizedBox(
           height: 250,
           child: ListView.builder(

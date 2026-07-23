@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:noveles/features/app/presentation/widgets/section_header.dart';
+import 'package:noveles/features/app/presentation/widgets/section_title.dart';
 import 'package:noveles/features/app/presentation/widgets/section_novedades.dart';
 import 'package:noveles/features/app/presentation/widgets/section_populares.dart';
 import 'package:noveles/features/app/presentation/widgets/genre_chip_styled.dart';
@@ -39,7 +39,7 @@ void main() {
                 books: books.take(6).toList(),
                 onBookTap: (_) {},
               ),
-              const SectionHeader(title: 'Géneros', icon: Icons.category),
+              const SectionTitle(title: 'Géneros', icon: Icons.category),
               SizedBox(
                 height: 60,
                 child: ListView(
