@@ -410,28 +410,24 @@ void main() {
         expect(error.message, contains('Error al obtener perfiles'));
       });
 
-      test('paginates with afterEmail parameter', () async {
+      test('orders by created_at ascending', () async {
         mockFilter.thenReturns([
           {
-            'id': 'user-3',
-            'email': 'user3@example.com',
+            'id': 'user-1',
+            'email': 'user1@example.com',
             'role': 'user',
-            'display_name': 'User 3',
+            'display_name': 'User 1',
             'bio': null,
             'avatar_url': null,
           },
         ]);
 
-        final result = await repository.getAllProfiles(
-          limit: 1,
-          afterEmail: 'user2@example.com',
-        );
+        final result = await repository.getAllProfiles(limit: 1);
 
         expect(result, isA<Ok<List<UserEntity>>>());
         final value = (result as Ok<List<UserEntity>>).value;
         expect(value.length, 1);
-        expect(value[0].email, 'user3@example.com');
-        verify(() => mockFilter.gt('email', 'user2@example.com')).called(1);
+        verify(() => mockFilter.order(any(), ascending: true)).called(1);
       });
 
       test('hasMore is true when extra record fetched', () async {

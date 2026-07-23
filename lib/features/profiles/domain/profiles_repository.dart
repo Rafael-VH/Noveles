@@ -9,7 +9,6 @@ abstract class ProfilesRepository {
   Future<Result<void>> changePassword(String newPassword);
   Future<Result<List<UserEntity>>> getAllProfiles({
     int limit = 50,
-    String? afterEmail,
   });
   Future<Result<UserEntity>> updateUserRole({
     required String userId,

@@ -73,14 +73,13 @@ class ProfilesRepositoryImpl implements ProfilesRepository {
   @override
   Future<Result<List<UserEntity>>> getAllProfiles({
     int limit = 50,
-    String? afterEmail,
   }) async {
     try {
-      var query = _supabase.client.from('profiles').select('*');
-      if (afterEmail != null) {
-        query = query.gt('email', afterEmail);
-      }
-      final response = await query.order('email').limit(limit + 1);
+      final response = await _supabase.client
+          .from('profiles')
+          .select('*')
+          .order('created_at', ascending: true)
+          .limit(limit + 1);
       // ignore: unused_local_variable
       final hasMore = response.length > limit;
       final profiles = response
