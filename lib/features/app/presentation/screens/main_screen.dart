@@ -108,10 +108,7 @@ class _MainScreenState extends State<MainScreen> {
           builder: (context) {
             final authState = context.read<AuthBloc>().state;
             final user = authState is AuthAuthenticated ? authState.user : null;
-            return AppDrawer(
-              isScan: user?.isScan ?? false,
-              isAdmin: user?.isAdmin ?? false,
-            );
+            return AppDrawer(user: user);
           },
         ),
         body: BlocBuilder<BookBloc, BookState>(

@@ -10,6 +10,7 @@ import 'package:noveles/features/scan/presentation/bloc/scan_book_bloc.dart';
 import 'package:noveles/features/scan/presentation/bloc/scan_cover_bloc.dart';
 import 'package:noveles/features/scan/presentation/bloc/scan_took_bloc.dart';
 import 'package:noveles/features/app/presentation/widgets/app_drawer.dart';
+import 'package:noveles/features/profiles/domain/user_role.dart';
 import 'package:noveles/features/genres/presentation/genre_cubit.dart';
 import 'package:noveles/features/scan/presentation/screens/scan_book_edit_screen.dart';
 
@@ -49,7 +50,7 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
           }
         },
         child: Scaffold(
-          drawer: const AppDrawer(isScan: true),
+          drawer: const AppDrawer(role: UserRole.scan),
           appBar: AppBar(
             title: Row(
               children: [

@@ -15,6 +15,7 @@ import 'package:noveles/features/admin/presentation/screens/users_tab.dart';
 import 'package:noveles/features/label_rules/presentation/screens/label_rules_admin_tab.dart';
 import 'package:noveles/features/app/presentation/widgets/app_drawer.dart';
 import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:noveles/features/profiles/domain/user_role.dart';
 
 class AdminDashScreen extends StatefulWidget {
   const AdminDashScreen({super.key});
@@ -33,7 +34,7 @@ class _AdminDashScreenState extends State<AdminDashScreen> {
     final adminEmail = authState is AuthAuthenticated ? authState.user.email : '';
 
     return Scaffold(
-      drawer: const AppDrawer(isAdmin: true),
+      drawer: const AppDrawer(role: UserRole.admin),
       appBar: AppBar(
         title: const Text('Panel Admin'),
         actions: [

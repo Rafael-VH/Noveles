@@ -29,7 +29,7 @@ void main() {
           value: authBloc,
           child: const MaterialApp(
             home: Scaffold(
-              body: AppDrawer(isAdmin: true),
+              body: AppDrawer(role: UserRole.admin),
             ),
           ),
         ),
@@ -41,7 +41,7 @@ void main() {
     testWidgets('shows Inicio for non-admin users', (tester) async {
       when(() => authBloc.state).thenReturn(
         AuthAuthenticated(
-          const UserEntity(id: '1', email: 'scan@test.com', role: UserRole.scan),
+          const UserEntity(id: '1', email: 'user@test.com', role: UserRole.user),
         ),
       );
 
@@ -50,7 +50,7 @@ void main() {
           value: authBloc,
           child: const MaterialApp(
             home: Scaffold(
-              body: AppDrawer(isAdmin: false),
+              body: AppDrawer(role: UserRole.user),
             ),
           ),
         ),
