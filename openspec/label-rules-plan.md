@@ -2,7 +2,10 @@
 
 ## Visión General
 
-Las etiquetas pasan de ser tags manuales sin propósito a un sistema **automático basado en reglas** que el admin configura. Cada regla evalúa datos reales (fecha de creación, visitas, favoritos) y asigna/desasigna etiquetas a los libros automáticamente.
+Las etiquetas pasan de ser tags manuales sin propósito a un sistema
+**automático basado en reglas** que el admin configura. Cada regla
+evalúa datos reales (fecha de creación, visitas, favoritos) y
+asigna/desasigna etiquetas a los libros automáticamente.
 
 ## 1. Base de Datos
 
@@ -26,12 +29,12 @@ CREATE TABLE label_rules (
 
 **Ejemplos de params por tipo:**
 
-| rule_type      | params                                 |
-|----------------|----------------------------------------|
-| `new_release`  | `{"days": 30}`                         |
-| `most_read`    | `{"limit": 10, "days": 30}`            |
-| `most_popular` | `{"limit": 10}`                        |
-| `most_favorited`| `{"limit": 10}`                       |
+| rule_type            | params                                 |
+| -------------------- | -------------------------------------- |
+| `new_release`        | `{"days": 30}`                         |
+| `most_read`          | `{"limit": 10, "days": 30}`            |
+| `most_popular`       | `{"limit": 10}`                        |
+| `most_favorited`     | `{"limit": 10}`                        |
 
 ## 2. Worker (Edge Function + Cron)
 
@@ -47,11 +50,11 @@ Ejecutada por Supabase Cron (pg_cron) cada cierto tiempo.
 **Lógica por tipo:**
 
 | Tipo | Query |
-|---|---|
+| --- | --- |
 | `new_release` | `books WHERE created_at >= NOW() - INTERVAL '$days days'` |
-| `most_read` | `book_views GROUP BY book_id WHERE viewed_at >= NOW() - INTERVAL '$days days' ORDER BY COUNT(*) DESC LIMIT $limit` |
-| `most_popular` | `books ORDER BY took_count + chapter_count DESC LIMIT $limit` |
-| `most_favorited` | `user_favorites GROUP BY book_id ORDER BY COUNT(*) DESC LIMIT $limit` |
+| `most_read` | Viewed in period, group by book, top N |
+| `most_popular` | Books sorted by total tooks+chapters, top N |
+| `most_favorited` | Favs grouped by book, top N |
 
 ## 3. Backend (Dart)
 
@@ -68,7 +71,8 @@ Nuevo tab o sección "Reglas de Etiquetas":
 - Editar/Eliminar regla
 - Botón "Ejecutar ahora" para forzar sync
 
-En el **detalle del libro** (`book_detail_content.dart`), mostrar las etiquetas automáticas con un ícono distintivo.
+En el **detalle del libro** (`book_detail_content.dart`), mostrar las
+etiquetas automáticas con un ícono distintivo.
 
 ## 5. Prioridad de Implementación
 
