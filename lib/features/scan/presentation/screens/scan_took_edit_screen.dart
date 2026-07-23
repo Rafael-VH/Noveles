@@ -214,6 +214,7 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
         ),
       ),
     );
+
     if (result != null && mounted) {
       setState(() {
         final idx = _chapters.indexWhere((c) => c.id == result.id);
@@ -228,7 +229,11 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
 
   // ─── Section helpers ───────────────────────────────────────────────
 
-  Widget _sectionCard({required String title, required IconData icon, required List<Widget> children}) {
+  Widget _sectionCard({
+    required String title,
+    required IconData icon,
+    required List<Widget> children,
+  }) {
     final theme = Theme.of(context);
     return Card(
       margin: EdgeInsets.zero,
@@ -353,7 +358,11 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
                     padding: const EdgeInsets.only(bottom: 8),
                     child: Row(
                       children: [
-                        Icon(Icons.list_alt_outlined, size: 18, color: theme.colorScheme.primary),
+                        Icon(
+                          Icons.list_alt_outlined,
+                          size: 18,
+                          color: theme.colorScheme.primary,
+                        ),
                         const SizedBox(width: 8),
                         Text(
                           'Capítulos',
@@ -364,7 +373,10 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
                         ),
                         const SizedBox(width: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: theme.colorScheme.primaryContainer,
                             borderRadius: BorderRadius.circular(10),
@@ -392,60 +404,88 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
                       ),
                     )
                   else
-                    ..._chapters.map(
-                      (ch) => Card(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          side: BorderSide(color: theme.colorScheme.outlineVariant),
-                        ),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                          title: Text(
-                            ch.title.isNotEmpty ? ch.title : 'Cap. ${ch.number}',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w500,
+                    ...((_chapters.toList()
+                          ..sort((a, b) => a.number.compareTo(b.number)))
+                        .asMap()
+                        .entries
+                        .map(
+                      (entry) {
+                        final idx = entry.key + 1;
+                        final ch = entry.value;
+                        return Card(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            side: BorderSide(
+                              color: theme.colorScheme.outlineVariant,
                             ),
                           ),
-                          subtitle: Text(
-                            ch.number.isNotEmpty ? 'Capítulo $ch.number' : '',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 4,
+                              vertical: 4,
+                            ),
+                            leading: CircleAvatar(
+                              radius: 14,
+                              backgroundColor:
+                                  theme.colorScheme.primaryContainer,
+                              child: Text(
+                                '$idx',
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: theme.colorScheme.onPrimaryContainer,
+                                ),
+                              ),
+                            ),
+                            title: Text(
+                              ch.number.isNotEmpty ? ch.number : '(sin número)',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            subtitle: ch.title.isNotEmpty
+                                ? Text(
+                                    ch.title,
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                    ),
+                                  )
+                                : null,
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.edit_outlined,
+                                    color: theme.colorScheme.primary,
+                                  ),
+                                  onPressed: () => _navigateToChapterEdit(
+                                    chapter: ch,
+                                    tookId: widget.took!.id,
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.delete_outline,
+                                    color: theme.colorScheme.error,
+                                  ),
+                                  onPressed: () => _deleteChapter(ch.id),
+                                ),
+                              ],
+                            ),
+                            onTap: () => _navigateToChapterEdit(
+                              chapter: ch,
+                              tookId: widget.took!.id,
                             ),
                           ),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: Icon(
-                                  Icons.edit_outlined,
-                                  color: theme.colorScheme.primary,
-                                ),
-                                onPressed: () => _navigateToChapterEdit(
-                                  chapter: ch,
-                                  tookId: widget.took!.id,
-                                ),
-                              ),
-                              IconButton(
-                                icon: Icon(
-                                  Icons.delete_outline,
-                                  color: theme.colorScheme.error,
-                                ),
-                                onPressed: () => _deleteChapter(ch.id),
-                              ),
-                            ],
-                          ),
-                          onTap: () => _navigateToChapterEdit(
-                            chapter: ch,
-                            tookId: widget.took!.id,
-                          ),
-                        ),
-                      ),
-                    ),
+                        );
+                      },
+                    )),
                 ],
               ),
             ],
+
             const SizedBox(height: 32),
           ],
         ),
