@@ -12,6 +12,7 @@ import 'package:noveles/features/admin/presentation/screens/books_tab.dart';
 import 'package:noveles/features/admin/presentation/screens/genres_tab.dart';
 import 'package:noveles/features/admin/presentation/screens/summary_tab.dart';
 import 'package:noveles/features/admin/presentation/screens/users_tab.dart';
+import 'package:noveles/features/label_rules/presentation/screens/label_rules_admin_tab.dart';
 import 'package:noveles/features/app/presentation/widgets/app_drawer.dart';
 import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
 
@@ -28,12 +29,8 @@ class _AdminDashScreenState extends State<AdminDashScreen> {
   @override
   Widget build(BuildContext context) {
     final authState = context.read<AuthBloc>().state;
-    final currentUserId = authState is AuthAuthenticated
-        ? authState.user.id
-        : '';
-    final adminEmail = authState is AuthAuthenticated
-        ? authState.user.email
-        : '';
+    final currentUserId = authState is AuthAuthenticated ? authState.user.id : '';
+    final adminEmail = authState is AuthAuthenticated ? authState.user.email : '';
 
     return Scaffold(
       drawer: const AppDrawer(isAdmin: true),
@@ -97,6 +94,7 @@ class _AdminDashScreenState extends State<AdminDashScreen> {
                 BooksTab(state: state),
                 const GenresTab(),
                 const UsersTab(),
+                const LabelRulesAdminTab(),
                 const AnalyticsTab(),
               ],
             ),
@@ -105,8 +103,7 @@ class _AdminDashScreenState extends State<AdminDashScreen> {
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
-        onDestinationSelected: (index) =>
-            setState(() => _currentIndex = index),
+        onDestinationSelected: (index) => setState(() => _currentIndex = index),
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.dashboard_outlined),
@@ -127,6 +124,11 @@ class _AdminDashScreenState extends State<AdminDashScreen> {
             icon: Icon(Icons.people_outlined),
             selectedIcon: Icon(Icons.people),
             label: 'Usuarios',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.auto_awesome_outlined),
+            selectedIcon: Icon(Icons.auto_awesome),
+            label: 'Etiquetas',
           ),
           NavigationDestination(
             icon: Icon(Icons.analytics_outlined),
