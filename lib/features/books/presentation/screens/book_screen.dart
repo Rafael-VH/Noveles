@@ -38,11 +38,6 @@ class _BookScreenState extends State<BookScreen> {
     });
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   void _showTookBottomSheet(BuildContext context, TookEntity took) {
     /// Runtime cast: data layer hydrates TookModel with full chapters.
     final chapters = (took is TookModel) ? took.chapters : <ChapterEntity>[];
@@ -182,41 +177,43 @@ class _TookChapterSheetState extends State<_TookChapterSheet> {
               ),
             ),
             const Divider(height: 1),
-            // Chapter list
+            // Chapter list or loading
             Expanded(
-              child: ListView.builder(
-                controller: scrollController,
-                itemCount: widget.chapters.length,
-                itemBuilder: (context, index) {
-                  final item = widget.chapters[index];
-                  return ListTile(
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => BlocProvider(
-                            create: (_) => getIt<ChapterBloc>(),
-                            child: ChapterScreen(
-                              i: index,
-                              chapters: widget.chapters,
+              child: _loadingReadIds
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                      controller: scrollController,
+                      itemCount: widget.chapters.length,
+                      itemBuilder: (context, index) {
+                        final item = widget.chapters[index];
+                        return ListTile(
+                          onTap: () {
+                            Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => BlocProvider(
+                                  create: (_) => getIt<ChapterBloc>(),
+                                  child: ChapterScreen(
+                                    i: index,
+                                    chapters: widget.chapters,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                          title: Text(
+                            item.title,
+                            style: TextStyle(
+                              color: _readChapterIds.contains(item.id)
+                                  ? Colors.grey
+                                  : null,
                             ),
                           ),
-                        ),
-                      );
-                    },
-                    title: Text(
-                      item.title,
-                      style: TextStyle(
-                        color: _readChapterIds.contains(item.id)
-                            ? Colors.grey
-                            : null,
-                      ),
+                          subtitle: Text(item.number),
+                        );
+                      },
                     ),
-                    subtitle: Text(item.number),
-                  );
-                },
-              ),
             ),
           ],
         );
