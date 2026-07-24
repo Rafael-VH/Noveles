@@ -376,7 +376,7 @@ Pantalla de edición de perfil. **Común a todos los roles**.
 ### 3.7 FavoritesScreen — Lista de Favoritos
 
 **Archivo**:
-`lib/features/favorites/presentation/screens/favorites_screen.dart`
+`lib/features/books/favorites/presentation/screens/favorites_screen.dart`
 (128 líneas)
 
 Pantalla que muestra la lista de libros marcados como favoritos.
@@ -828,7 +828,7 @@ class ChapterRef extends Equatable {
 
 ### 7.1 FavoriteBloc
 
-**Archivo**: `lib/features/favorites/presentation/bloc/favorite_bloc.dart`
+**Archivo**: `lib/features/books/favorites/presentation/bloc/favorite_bloc.dart`
 (65 líneas)
 
 **3 eventos**:
@@ -852,7 +852,7 @@ class ChapterRef extends Equatable {
 
 ### 7.2 FavoriteEntity
 
-**Archivo**: `lib/features/favorites/domain/favorite_entity.dart` (16
+**Archivo**: `lib/features/books/favorites/domain/favorite_entity.dart` (16
 líneas)
 
 ```dart
@@ -865,7 +865,7 @@ class FavoriteEntity extends Equatable {
 
 ### 7.3 FavoriteRepository
 
-**Archivo**: `lib/features/favorites/domain/favorite_repository.dart`
+**Archivo**: `lib/features/books/favorites/domain/favorite_repository.dart`
 (8 líneas)
 
 ```dart
@@ -879,7 +879,7 @@ abstract class FavoriteRepository {
 ### 7.4 FavoriteButton Widget
 
 **Archivo**:
-`lib/features/favorites/presentation/widgets/favorite_button.dart`
+`lib/features/books/favorites/presentation/widgets/favorite_button.dart`
 (75 líneas)
 
 Widget reutilizable que muestra un ícono de corazón:
@@ -912,7 +912,7 @@ sequenceDiagram
 ```
 
 **Archivo**:
-`lib/features/favorites/presentation/screens/favorites_screen.dart`
+`lib/features/books/favorites/presentation/screens/favorites_screen.dart`
 (128 líneas)
 
 Lista de libros favoritos del usuario:
@@ -1238,7 +1238,7 @@ específica para ningún rol — es el mismo para todos.
 
 ### 10.6 FavoriteBloc
 
-**Archivo**: `lib/features/favorites/presentation/bloc/favorite_bloc.dart`
+**Archivo**: `lib/features/books/favorites/presentation/bloc/favorite_bloc.dart`
 (65 líneas)
 
 Maneja toggle, carga y verificación de estado de favoritos. Opera sobre
@@ -1565,14 +1565,14 @@ lib/features/tooks/data/took_repository_impl.dart
 ### 14.5 Feature Favorites
 
 ```text
-lib/features/favorites/presentation/screens/favorites_screen.dart (128 líneas)
-lib/features/favorites/presentation/widgets/favorite_button.dart (75 líneas)
-lib/features/favorites/presentation/bloc/favorite_bloc.dart      (65 líneas)
-lib/features/favorites/presentation/bloc/favorite_event.dart     (37 líneas)
-lib/features/favorites/presentation/bloc/favorite_state.dart     (47 líneas)
-lib/features/favorites/domain/favorite_entity.dart              (16 líneas)
-lib/features/favorites/domain/favorite_repository.dart          (8 líneas)
-lib/features/favorites/data/favorite_repository_impl.dart
+lib/features/books/favorites/presentation/screens/favorites_screen.dart (128 líneas)
+lib/features/books/favorites/presentation/widgets/favorite_button.dart (75 líneas)
+lib/features/books/favorites/presentation/bloc/favorite_bloc.dart      (65 líneas)
+lib/features/books/favorites/presentation/bloc/favorite_event.dart     (37 líneas)
+lib/features/books/favorites/presentation/bloc/favorite_state.dart     (47 líneas)
+lib/features/books/favorites/domain/favorite_entity.dart              (16 líneas)
+lib/features/books/favorites/domain/favorite_repository.dart          (8 líneas)
+lib/features/books/favorites/data/favorite_repository_impl.dart
 ```
 
 ### 14.6 Feature Profiles
@@ -1624,11 +1624,11 @@ lib/features/auth/domain/use_cases/listen_auth_state.dart
 ```text
 lib/core/app/app.dart                                           (76 líneas)
 lib/core/di/injection.dart                                      (38 líneas)
-lib/core/di/injection_books.dart                                (63 líneas)
-lib/core/di/injection_chapters.dart                             (48 líneas)
-lib/core/di/injection_favorites.dart                            (21 líneas)
-lib/core/di/injection_profiles.dart                             (50 líneas)
-lib/core/di/injection_genres.dart                               (45 líneas)
+lib/features/books/di/injection_books.dart                                (63 líneas)
+lib/features/chapters/di/injection_chapters.dart                             (48 líneas)
+lib/features/books/di/injection_favorites.dart                            (21 líneas)
+lib/features/profiles/di/injection_profiles.dart                             (50 líneas)
+lib/features/genres/di/injection_genres.dart                               (45 líneas)
 lib/core/supabase/chapter_cache.dart                            (42 líneas)
 lib/core/supabase/supabase_client.dart
 lib/core/cover/cover_url_service.dart

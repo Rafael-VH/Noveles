@@ -95,9 +95,49 @@ with RLS policies.
 
 - Book detail sub-components (metadata, took list, etc.)
 
+## Favorites
+
+The Books feature includes a Favorites subsection at
+`lib/features/books/favorites/` for managing per-user book favorites.
+
+### FavoriteEntity
+
+**File**: `lib/features/books/favorites/domain/favorite_entity.dart`
+
+| Field | Type | Description |
+| ------- | ------ | ------------- |
+| `userId` | `String` | Authenticated user's UUID |
+| `bookId` | `int` | Book ID being favorited |
+| `createdAt` | `DateTime` | When the favorite was added |
+
+### Repository Methods
+
+| Method | Signature | Purpose |
+| -------- | ----------- | --------- |
+| toggleFavorite | `FR<bool>` call(uid,bid) | Add or remove favorite |
+| getFavorites | `FR<L<FavoriteEntity>>` call(uid) | Get all favorites for user |
+| isFavorite | `FR<bool>` call(uid,bid) | Check if book is favorited |
+
+### FavoriteBloc
+
+**File**: `lib/features/books/favorites/presentation/bloc/favorite_bloc.dart`
+
+| Event | Description |
+| ------- | ------------- |
+| `ToggleFavorite` | Toggle favorite status for a book |
+| `LoadFavorites` | Load all favorites for the current user |
+| `CheckFavoriteStatus` | Check if a specific book is favorited |
+
+### UI Components
+
+- **FavoritesScreen** (`lib/features/books/favorites/presentation/screens/favorites_screen.dart`)
+  — Full-screen list of favorited books
+- **FavoriteButton** (`lib/features/books/favorites/presentation/widgets/favorite_button.dart`)
+  — IconButton that toggles favorite status
+
 ## DI Registration
 
-**File**: `lib/core/di/injection_books.dart`
+**File**: `lib/features/books/di/injection_books.dart`
 
 - `BookRepository` → `LazySingleton`
 - All use cases → `LazySingleton`

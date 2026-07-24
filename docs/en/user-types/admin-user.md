@@ -955,10 +955,10 @@ lib/features/admin/presentation/bloc/admin_users_state.dart
 ```text
 lib/core/app/app.dart                          (enrutamiento por rol)
 lib/core/di/injection.dart                     (setup principal)
-lib/core/di/injection_admin.dart               (DI del admin)
-lib/core/di/injection_profiles.dart            (DI profiles, GetAllProfiles)
-lib/core/di/injection_books.dart               (DI de books)
-lib/core/di/injection_genres.dart              (DI de genres)
+lib/features/admin/di/injection_admin.dart               (DI del admin)
+lib/features/profiles/di/injection_profiles.dart            (DI profiles, GetAllProfiles)
+lib/features/books/di/injection_books.dart               (DI de books)
+lib/features/genres/di/injection_genres.dart              (DI de genres)
 ```text
 
 ### 16.3 Profiles

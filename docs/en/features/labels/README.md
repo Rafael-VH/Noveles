@@ -1,13 +1,18 @@
 # Labels
 
-> Color-coded labels with book assignment — many-to-many via junction table.
+> Color-coded labels with automatic rules — manual assignment and
+> server-side auto-labeling.
 
 ## Overview
 
 The Labels feature manages color-coded tags that can be assigned to books.
-Labels use a junction table (`book_labels`) for many-to-many relationships. Only
-scan-role users can create and manage labels; regular users see them as visual
-indicators on book cards.
+Labels use a junction table (`book_labels`) for many-to-many relationships.
+Only scan-role users can create and manage labels; regular users see them as
+visual indicators on book cards.
+
+This feature also includes **Label Rules** — automatic label assignment based
+on configurable rules (new releases, most read, most popular, most favorited).
+Rules are evaluated server-side by a Supabase Edge Function (`sync-labels`).
 
 ## Data Model
 
@@ -68,13 +73,83 @@ indicators on book cards.
 - Color picker for label colors
 - Accessible via scan user drawer and named route `/label-management`
 
+## Label Rules
+
+### Data Model
+
+**`LabelRuleEntity`** (`lib/features/labels/domain/label_rule_entity.dart`):
+
+| Field | Type | Description |
+| ------- | ------ | ------------- |
+| `id` | `int` | Primary key |
+| `labelId` | `int` | FK → labels(id), ON DELETE CASCADE |
+| `ruleType` | `LabelRuleType` | Enum: newRelease, mostRead, mostPopular, mostFavorited |
+| `params` | `Map<String, dynamic>` | JSON params (e.g., days, limit) |
+| `createdAt` | `DateTime` | Creation timestamp |
+| `updatedAt` | `DateTime` | Last update timestamp |
+
+### Rule Types
+
+| Type | Value | params | Query Logic |
+| ------- | ------- | -------- | ------------- |
+| Novedad | `new_release` | `{"days": 30}` | Books within $days of creation |
+| Más leídos | `most_read` | `{"limit": 10, "days": 30}` | Top N by book_views |
+| Más populares | `most_popular` | `{"limit": 10}` | Top N by took+chapters |
+| Más favoritos | `most_favorited` | `{"limit": 10}` | Top N by user_favorites |
+
+### Use Cases
+
+| Use Case | Signature | Purpose |
+| ---------- | ----------- | --------- |
+| GetRules | `FR<List<LabelRuleEntity>>` call() | List rules (newest first) |
+| CreateRule | `FR<void>` call(labelId, ruleType, params) | Create a rule |
+| UpdateRule | `FR<void>` call(ruleId, params) | Update rule params |
+| DeleteRule | `FR<void>` call(int ruleId) | Delete a rule |
+
+### LabelRulesBloc
+
+**File**: `lib/features/labels/presentation/bloc/label_rules_bloc.dart`
+
+| Event | Description |
+| ------- | ------------- |
+| `LoadLabelRules` | Load all rules |
+| `CreateLabelRule` | Create a new rule (reloads on success) |
+| `DeleteLabelRule` | Delete a rule (reloads on success) |
+
+| State | Data | When |
+| ------- | ------ | ------ |
+| `LabelRulesInitial` | — | Initial |
+| `LabelRulesLoading` | — | Fetching |
+| `LabelRulesLoaded` | `List<LabelRuleEntity> rules, String? message` | Loaded |
+| `LabelRulesError` | `String message` | Error |
+
+### LabelRulesAdminTab
+
+**File**: `lib/features/labels/presentation/screens/label_rules_admin_tab.dart`
+
+- Accessible as a tab in `AdminDashScreen`
+- Lists all rules with label name, rule type, and params
+- FAB to create a new rule: label selector + rule type + dynamic params form
+- Swipe-to-delete with confirmation
+
+### Edge Function
+
+**File**: `supabase/functions/sync-labels/index.ts`
+
+- Deployed as a Supabase Edge Function with `service_role` key
+- Iterates all rules, evaluates each against the database, syncs `books_labels`
+- Can be triggered manually from the admin tab via Supabase REST API
+
 ## DI Registration
 
-**File**: `lib/core/di/injection_labels.dart`
+**File**: `lib/features/labels/di/injection_labels.dart`
 
 - `LabelRepository` → `LazySingleton`
 - All use cases → `LazySingleton`
 - `LabelBloc` → `Factory`
+- `LabelRuleRepository` → `LazySingleton`
+- All 4 label rule use cases → `LazySingleton`
+- `LabelRulesBloc` → `Factory`
 
 ## Related
 

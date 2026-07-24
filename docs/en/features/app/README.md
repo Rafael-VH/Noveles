@@ -117,7 +117,7 @@ book detail, genre screen
 - [Chapters](../../features/chapters/README.md) — `MarkChapterAsRead`,
 `GetReadChapterIds`, read tracking
 - [Genres](../../features/genres/README.md) — `GenreBloc`, genre chips
-- [Favorites](../../features/favorites/README.md) — Favorites screen via drawer
+- [Books/Favorites](../../features/books/README.md) — Books and favorites via drawer
 - [Auth](../../features/auth/README.md) — `AuthBloc` drives drawer visibility
 - [Routing](../../architecture/routing.md) — Role-based home selection
 - [Theme](../../architecture/theme.md) — ThemeBloc drives app theme

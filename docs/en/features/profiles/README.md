@@ -78,7 +78,7 @@ across the entire app as the canonical user representation.
 
 ## DI Registration
 
-**File**: `lib/core/di/injection_profiles.dart`
+**File**: `lib/features/profiles/di/injection_profiles.dart`
 
 - `ProfilesRepository` → `LazySingleton`
 - All use cases → `LazySingleton`
