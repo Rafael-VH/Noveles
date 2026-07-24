@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:noveles/features/books/presentation/screens/widgets/sliver_app_bar_book.dart';
-import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 import 'test_helpers.dart';
 
 void main() {

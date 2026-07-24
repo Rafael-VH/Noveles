@@ -30,11 +30,11 @@ void main() {
         CardInfoDetail(pairs: pairs),
       ));
 
-      expect(find.text('Publicado'), findsOneWidget);
+      expect(find.text('PUBLICADO'), findsOneWidget);
       expect(find.text('2026'), findsOneWidget);
-      expect(find.text('Tipo'), findsOneWidget);
+      expect(find.text('TIPO'), findsOneWidget);
       expect(find.text('Novela'), findsOneWidget);
-      expect(find.text('País'), findsOneWidget);
+      expect(find.text('PAÍS'), findsOneWidget);
       expect(find.text('Argentina'), findsOneWidget);
     });
 
@@ -53,12 +53,12 @@ void main() {
       ));
 
       for (final p in pairs) {
-        expect(find.text(p.title), findsOneWidget);
+        expect(find.text(p.title.toUpperCase()), findsOneWidget);
         expect(find.text(p.value), findsOneWidget);
       }
     });
 
-    testWidgets('usa elevation del theme (no hardcodeada)', (tester) async {
+    testWidgets('usa Container con sombra y bordes redondeados', (tester) async {
       final pairs = [
         const InfoPair(title: 'A', value: '1'),
         const InfoPair(title: 'B', value: '2'),
@@ -68,10 +68,11 @@ void main() {
         CardInfoDetail(pairs: pairs),
       ));
 
-      // The Card should use theme default elevation (2.0)
-      final card = tester.widget<Card>(find.byType(Card));
-      // elevation is resolved to the theme's default
-      expect(card.elevation, isNot(6.0));
+      final container = tester.widget<Container>(find.byType(Container).first);
+      final decoration = container.decoration as BoxDecoration;
+      expect(decoration.borderRadius, BorderRadius.circular(16));
+      expect(decoration.boxShadow, isNotNull);
+      expect(decoration.boxShadow!.length, greaterThanOrEqualTo(1));
     });
   });
 }

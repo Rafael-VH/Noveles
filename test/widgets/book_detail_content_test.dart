@@ -93,17 +93,17 @@ void main() {
 
       expect(find.text('Descripción'), findsOneWidget);
       expect(find.text('Una descripción de prueba para el libro'), findsOneWidget);
-      expect(find.text('Publicado'), findsOneWidget);
+      expect(find.text('PUBLICADO'), findsOneWidget);
       expect(find.text('2026'), findsOneWidget);
-      expect(find.text('Tipo de Novela'), findsOneWidget);
+      expect(find.text('TIPO DE NOVELA'), findsOneWidget);
       expect(find.text('Novela'), findsOneWidget);
-      expect(find.text('País'), findsOneWidget);
+      expect(find.text('PAÍS'), findsOneWidget);
       expect(find.text('Argentina'), findsOneWidget);
-      expect(find.text('Estado'), findsOneWidget);
+      expect(find.text('ESTADO'), findsOneWidget);
       expect(find.text('Activo'), findsOneWidget);
-      expect(find.text('Tomos'), findsOneWidget);
+      expect(find.text('TOMOS'), findsOneWidget);
       expect(find.text('5'), findsOneWidget);
-      expect(find.text('Capítulos'), findsOneWidget);
+      expect(find.text('CAPÍTULOS'), findsOneWidget);
       expect(find.text('50'), findsOneWidget);
 
       // Solo 1 CardInfoDetail ahora (6 pares fusionados)
@@ -147,8 +147,9 @@ void main() {
 
       await tester.pumpWidget(buildTestWidget(bookWithSource));
 
-      // SectionTitle "Fuente" + CardInfoDetail pair title "Fuente"
-      expect(find.text('Fuente'), findsNWidgets(2));
+      // SectionTitle "Fuente" + CardInfoDetail pair title "FUENTE"
+      expect(find.text('Fuente'), findsOneWidget);
+      expect(find.text('FUENTE'), findsOneWidget);
       expect(find.text('Web Novel'), findsOneWidget);
     });
 
@@ -160,8 +161,9 @@ void main() {
 
       await tester.pumpWidget(buildTestWidget(bookWithLink));
 
-      // SectionTitle "Fuente" + CardInfoDetail pair title "Fuente"
-      expect(find.text('Fuente'), findsNWidgets(2));
+      // SectionTitle "Fuente" + CardInfoDetail pair title "FUENTE"
+      expect(find.text('Fuente'), findsOneWidget);
+      expect(find.text('FUENTE'), findsOneWidget);
       expect(find.text('https://example.com/book'), findsOneWidget);
     });
 
