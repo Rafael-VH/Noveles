@@ -9,6 +9,7 @@ import 'package:noveles/features/chapters/presentation/bloc/chapter_bloc.dart';
 import 'package:noveles/features/chapters/presentation/screens/chapter_screen.dart';
 import 'package:noveles/features/tooks/data/took_model.dart';
 import 'package:noveles/features/tooks/domain/took_entity.dart';
+import 'package:noveles/features/tooks/presentation/screens/widgets/took_sliver_header.dart';
 
 class TookScreen extends StatefulWidget {
   final TookEntity tooks;
@@ -66,40 +67,43 @@ class _TookScreenState extends State<TookScreen> {
       body: SafeArea(
         child: CustomScrollView(
           slivers: [
-            SliverAppBar(
-              title: Text(widget.tooks.number),
-            ),
+            TookSliverHeader(tooks: widget.tooks),
 
-            SliverList.builder(
-              itemCount: chapters.length,
-              itemBuilder: (context, index) {
-                final item = chapters[index];
+            if (_loadingReadIds)
+              const SliverFillRemaining(
+                child: Center(child: CircularProgressIndicator()),
+              )
+            else
+              SliverList.builder(
+                itemCount: chapters.length,
+                itemBuilder: (context, index) {
+                  final item = chapters[index];
 
-                return ListTile(
-                  onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => BlocProvider(
-                        create: (_) => getIt<ChapterBloc>(),
-                        child: ChapterScreen(
-                          i: index,
-                          chapters: chapters,
+                  return ListTile(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => BlocProvider(
+                          create: (_) => getIt<ChapterBloc>(),
+                          child: ChapterScreen(
+                            i: index,
+                            chapters: chapters,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  title: Text(
-                    item.title,
-                    style: TextStyle(
-                      color: _readChapterIds.contains(item.id)
-                          ? Colors.grey
-                          : null,
+                    title: Text(
+                      item.title,
+                      style: TextStyle(
+                        color: _readChapterIds.contains(item.id)
+                            ? Colors.grey
+                            : null,
+                      ),
                     ),
-                  ),
-                  subtitle: Text(item.number),
-                );
-              },
-            ),
+                    subtitle: Text(item.number),
+                  );
+                },
+              ),
           ],
         ),
       ),

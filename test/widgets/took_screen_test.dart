@@ -13,6 +13,7 @@ import 'package:noveles/features/profiles/domain/user_entity.dart';
 import 'package:noveles/features/profiles/domain/user_role.dart';
 import 'package:noveles/features/tooks/data/took_model.dart';
 import 'package:noveles/features/tooks/presentation/screens/took_screen.dart';
+import 'test_helpers.dart';
 
 class MockAuthBloc extends Mock implements AuthBloc {}
 class MockGetReadChapterIds extends Mock implements GetReadChapterIds {}
@@ -34,6 +35,8 @@ void main() {
 
     when(() => mockAuthBloc.stream).thenAnswer((_) => authController.stream);
     when(() => mockChapterBloc.stream).thenAnswer((_) => const Stream.empty());
+
+    setupCoverUrlService();
 
     if (!getIt.isRegistered<GetReadChapterIds>()) {
       getIt.registerFactory<GetReadChapterIds>(() => mockGetReadChapterIds);
@@ -138,6 +141,39 @@ void main() {
         final text = tile.title! as Text;
         expect(text.style?.color, isNull);
       }
+    });
+  });
+
+  group('TookScreen — loading indicator', () {
+    testWidgets('muestra CircularProgressIndicator mientras carga ids de capítulos leídos',
+        (tester) async {
+      final completer = Completer<Result<Set<int>>>();
+
+      when(() => mockAuthBloc.state).thenReturn(AuthAuthenticated(
+        UserEntity(id: 'user-1', email: 'test@test.com', role: UserRole.user),
+      ));
+      when(() => mockGetReadChapterIds(10, 'user-1'))
+          .thenAnswer((_) => completer.future);
+
+      await tester.pumpWidget(buildTestWidget());
+      await tester.pump();
+
+      // Loading indicator should be visible
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+      // ListTiles should NOT be visible yet
+      expect(find.byType(ListTile), findsNothing);
+
+      // Complete the future
+      completer.complete(Ok({}));
+      await tester.pump();
+
+      // Loading indicator should be gone
+      expect(find.byType(CircularProgressIndicator), findsNothing);
+
+      // ListTiles should now be visible
+      final listTiles = tester.widgetList<ListTile>(find.byType(ListTile)).toList();
+      expect(listTiles.length, 3);
     });
   });
 }
