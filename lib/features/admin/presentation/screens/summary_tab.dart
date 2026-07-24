@@ -106,10 +106,10 @@ class _MetricsGrid extends StatelessWidget {
     int viewsToday = 0;
 
     if (analyticsState is AnalyticsLoaded) {
-      totalViews = (analyticsState.overview['total_views'] ?? 0) as int;
-      viewsToday = (analyticsState.overview['views_today'] ?? 0) as int;
-      totalBooks = (analyticsState.overview['total_books'] ?? 0) as int;
-      visibleBooks = (analyticsState.overview['visible_books'] ?? 0) as int;
+      totalViews = analyticsState.overview.totalViews;
+      viewsToday = analyticsState.overview.viewsToday;
+      totalBooks = analyticsState.overview.totalBooks;
+      visibleBooks = analyticsState.overview.visibleBooks;
     }
 
     int totalUsers = 0;

@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:noveles/features/admin/domain/analytics_entities.dart';
 
 abstract class AdminAnalyticsState extends Equatable {
   const AdminAnalyticsState();
@@ -16,9 +17,9 @@ class AnalyticsLoading extends AdminAnalyticsState {
 }
 
 class AnalyticsLoaded extends AdminAnalyticsState {
-  final Map<String, dynamic> overview;
-  final List<Map<String, dynamic>> trend;
-  final List<Map<String, dynamic>> topBooks;
+  final AnalyticsOverview overview;
+  final List<AnalyticsTrendEntry> trend;
+  final List<AnalyticsTopBook> topBooks;
 
   const AnalyticsLoaded({
     required this.overview,

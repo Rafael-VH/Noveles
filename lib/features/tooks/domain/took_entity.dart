@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 
 class TookEntity extends Equatable {
   final int id;
@@ -9,6 +10,7 @@ class TookEntity extends Equatable {
   final int chapterCount;
   final int bookId;
   final List<int> listChapterIds;
+  final List<ChapterEntity> chapters;
   final String? createdBy;
 
   const TookEntity({
@@ -20,32 +22,9 @@ class TookEntity extends Equatable {
     required this.chapterCount,
     required this.bookId,
     this.listChapterIds = const [],
+    this.chapters = const [],
     this.createdBy,
   });
-
-  TookEntity copyWith({
-    int? id,
-    DateTime? createdAt,
-    String? cover,
-    String? number,
-    String? title,
-    int? chapterCount,
-    int? bookId,
-    List<int>? listChapterIds,
-    String? createdBy,
-  }) {
-    return TookEntity(
-      id: id ?? this.id,
-      createdAt: createdAt ?? this.createdAt,
-      cover: cover ?? this.cover,
-      number: number ?? this.number,
-      title: title ?? this.title,
-      chapterCount: chapterCount ?? this.chapterCount,
-      bookId: bookId ?? this.bookId,
-      listChapterIds: listChapterIds ?? this.listChapterIds,
-      createdBy: createdBy ?? this.createdBy,
-    );
-  }
 
   @override
   List<Object?> get props => [
@@ -57,6 +36,7 @@ class TookEntity extends Equatable {
         chapterCount,
         bookId,
         listChapterIds,
+        chapters,
         createdBy,
       ];
 }

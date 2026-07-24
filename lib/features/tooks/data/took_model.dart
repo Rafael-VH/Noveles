@@ -5,10 +5,8 @@ import 'package:noveles/features/tooks/domain/took_entity.dart';
 
 /// Data-layer model that hydrates full [ChapterEntity] objects from Supabase.
 /// Domain layer only knows about [listChapterIds] (int IDs);
-/// presentation layers that need full chapters cast to [TookModel].
+/// the [chapters] field is populated when Supabase returns joined data.
 class TookModel extends TookEntity {
-  final List<ChapterEntity> chapters;
-
   const TookModel({
     required super.id,
     required super.createdAt,
@@ -18,8 +16,8 @@ class TookModel extends TookEntity {
     required super.chapterCount,
     required super.bookId,
     super.listChapterIds = const [],
+    super.chapters = const [],
     super.createdBy,
-    this.chapters = const [],
   });
 
   factory TookModel.fromJson(Map<String, dynamic> json) {
@@ -59,6 +57,7 @@ class TookModel extends TookEntity {
         chapterCount: entity.chapterCount,
         bookId: entity.bookId,
         listChapterIds: entity.listChapterIds,
+        chapters: entity.chapters,
         createdBy: entity.createdBy,
       );
 }

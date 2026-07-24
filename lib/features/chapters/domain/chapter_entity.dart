@@ -22,28 +22,6 @@ class ChapterEntity extends Equatable {
     this.contentType = ChapterContentType.storagePath,
   });
 
-  ChapterEntity copyWith({
-    int? id,
-    DateTime? createdAt,
-    String? number,
-    String? title,
-    String? content,
-    int? tookId,
-    String? createdBy,
-    ChapterContentType? contentType,
-  }) {
-    return ChapterEntity(
-      id: id ?? this.id,
-      createdAt: createdAt ?? this.createdAt,
-      number: number ?? this.number,
-      title: title ?? this.title,
-      content: content ?? this.content,
-      tookId: tookId ?? this.tookId,
-      createdBy: createdBy ?? this.createdBy,
-      contentType: contentType ?? this.contentType,
-    );
-  }
-
   @override
   List<Object?> get props => [
         id,
