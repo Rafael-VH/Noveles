@@ -19,6 +19,7 @@ dependencies:
   equatable: ^2.0.5
 
   # ALMACENAMIENTO / PERSISTENCIA
+  shared_preferences: ^2.2.2
 
 
   # Dependency Injection
