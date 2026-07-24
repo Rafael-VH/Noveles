@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:noveles/core/supabase/chapter_cache.dart';
+import 'package:noveles/features/chapters/data/chapter_cache.dart';
 
 void main() {
   late Directory tempDir;
