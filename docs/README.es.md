@@ -6,7 +6,13 @@ novelas con acceso basado en roles, construida con Flutter + Supabase.
 [![Flutter](https://img.shields.io/badge/Flutter-3.3%2B-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-3.3%2B-0175C2?logo=dart&logoColor=white)](https://dart.dev)
 [![Supabase](https://img.shields.io/badge/Supabase-3FCF8E?logo=supabase&logoColor=white)](https://supabase.com)
-[![Tests](https://img.shields.io/badge/tests-388-passing-brightgreen)](docs/es/testing/README.md)
+[![Tests](https://img.shields.io/badge/tests-471-passing-brightgreen)](es/testing/README.md)
+
+---
+
+**🌐 Idioma / Language**: [🇬🇧 English](../../README.md)
+
+> 📚 [Documentación completa](es/README.md)
 
 ---
 
@@ -94,16 +100,14 @@ de uso sean testeables sin dependencia de framework.
 ```text
 lib/
 ├── core/              # Transversal: DI, errores, cliente Supabase, tema, utils
-├── features/          # 12 módulos de funcionalidad (domain/data/presentation c/u)
+├── features/          # 10 módulos de funcionalidad (domain/data/presentation c/u)
 │   ├── admin/         # Panel, analíticas, gestión de usuarios
 │   ├── app/           # Shell, routing, NavigationDrawer, pantalla de inicio
 │   ├── auth/          # Login, registro, gestión de sesión
-│   ├── books/         # CRUD de libros, paginación, seguimiento de vistas
+│   ├── books/         # CRUD de libros, paginación, seguimiento de vistas, favoritos
 │   ├── chapters/      # Lectura de capítulos, gestión de contenido
-│   ├── favorites/     # Favoritos personales de libros
 │   ├── genres/        # Clasificación por géneros
-│   ├── labels/        # Etiquetas manuales con código de color
-│   ├── label_rules/   # Reglas automáticas de asignación de etiquetas
+│   ├── labels/        # Etiquetas manuales con código de color + reglas automáticas
 │   ├── profiles/      # Perfiles de usuario, gestión de roles
 │   ├── scan/          # Panel de creación de contenido
 │   └── tooks/         # Volúmenes/tomos dentro de libros
@@ -113,16 +117,16 @@ lib/
 
 ## 🧪 Testing
 
-**388 tests y sumando** en todas las capas:
+**471 tests y sumando** en todas las capas:
 
 | Categoría | Cantidad | Lo que cubre |
 | :--- | :--- | :--- |
-| Tests BLoC | 14 | Todos los BLoCs: transiciones y manejo de eventos |
+| Tests BLoC | 16 | Todos los BLoCs: transiciones y manejo de eventos |
 | Tests de Entidades | 5 | Construcción, igualdad, copyWith |
-| Tests de Repositorios | 8 | Queries a Supabase, mapeo de errores |
+| Tests de Repositorios | 9 | Queries a Supabase, mapeo de errores |
 | Tests de Casos de Uso | 7 | Lógica de negocio, Result |
-| Tests de Widgets | 20 | Renderizado UI, interacciones y menús por rol |
-| **Total** | **55** | |
+| Tests de Widgets | 26 | Renderizado UI, interacciones y menús por rol |
+| **Total** | **471** | |
 
 ```bash
 flutter test        # Ejecutá todos los tests
@@ -214,5 +218,4 @@ Este proyecto es privado. Todos los derechos reservados.
 
 ---
 
-Hecho con ❤️ usando Flutter & Supabase •
-[Documentación completa](docs/es/README.md)
+Hecho con ❤️ usando Flutter & Supabase
