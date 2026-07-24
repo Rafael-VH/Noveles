@@ -22,12 +22,15 @@ The system MUST create a table `chapter_reads` with:
 
 ### Requirement: Mark chapter as read
 
-When a user opens a chapter in ChapterScreen, the system MUST insert a row into `chapter_reads`.
+When a user scrolls past 80% of a chapter's content in ChapterScreen, the system MUST insert a row into `chapter_reads`. The mark MUST fire at most once per chapter per session.
+(Previously: mark was triggered on initState — when the chapter first loaded, regardless of scroll.)
 
 | Scenario | GIVEN | WHEN | THEN |
 |----------|-------|------|------|
-| First read | user opens chapter for first time | chapter loads in ChapterScreen | `chapter_reads` row inserted |
-| Re-read | user opens chapter again | chapter loads | no duplicate row (PK conflict ignored) |
+| Scroll past threshold | user scrolls to 80%+ of chapter content | scroll position crosses 80% | `chapter_reads` row inserted (one time) |
+| Partial scroll | user scrolls to 50% then leaves | user navigates away | `chapter_reads` row NOT inserted |
+| Already read | user already read the chapter (row exists) | user scrolls past 80% again | no duplicate row (PK conflict ignored) |
+| Re-read from top | user reopens a read chapter, scrolls to 80% | scroll crosses 80% | no error — already-read is idempotent |
 
 ### Requirement: Get read chapter IDs by took
 
