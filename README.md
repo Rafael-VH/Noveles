@@ -6,8 +6,13 @@ role-based access, built with Flutter + Supabase.
 [![Flutter](https://img.shields.io/badge/Flutter-3.3%2B-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-3.3%2B-0175C2?logo=dart&logoColor=white)](https://dart.dev)
 [![Supabase](https://img.shields.io/badge/Supabase-3FCF8E?logo=supabase&logoColor=white)](https://supabase.com)
-[![Tests](https://img.shields.io/badge/tests-388-passing-brightgreen)](docs/en/testing/README.md)
-[![Español](https://img.shields.io/badge/🇪🇸-Español-green)](README.es.md)
+[![Tests](https://img.shields.io/badge/tests-471%20passing-brightgreen)](docs/en/testing/README.md)
+
+---
+
+**🌐 Idioma / Language**: [🇪🇸 Español](docs/README.es.md)
+
+> 📚 [Full documentation](docs/en/README.md)
 
 ---
 
@@ -89,16 +94,14 @@ without any framework dependency.
 ```text
 lib/
 ├── core/              # Cross-cutting: DI, errors, Supabase client, theme, utils
-├── features/          # 12 feature modules (domain/data/presentation each)
+├── features/          # 10 feature modules (domain/data/presentation each)
 │   ├── admin/         # Dashboard, analytics, user management
 │   ├── app/           # Shell, routing, NavigationDrawer, home screen
 │   ├── auth/          # Login, register, session management
-│   ├── books/         # Book CRUD, pagination, view tracking
+│   ├── books/         # Book CRUD, pagination, view tracking, favorites
 │   ├── chapters/      # Chapter reading, content management
-│   ├── favorites/     # Personal book favorites
 │   ├── genres/        # Genre classification
-│   ├── labels/        # Manual color-coded labels
-│   ├── label_rules/   # Automatic label assignment rules
+│   ├── labels/        # Manual color-coded labels + automatic rules
 │   ├── profiles/      # User profiles, role management
 │   ├── scan/          # Content creation panel
 │   └── tooks/         # Volumes/tomes within books
@@ -108,16 +111,16 @@ lib/
 
 ## 🧪 Testing
 
-**388 tests and counting** across all layers:
+**471 tests and counting** across all layers:
 
 | Category | Count | What's Covered |
 | :--- | :--- | :--- |
-| BLoC Tests | 14 | All BLoCs — state transitions, event handling |
+| BLoC Tests | 16 | All BLoCs — state transitions, event handling |
 | Entity Tests | 5 | Construction, equality, copyWith |
-| Repository Tests | 8 | Supabase queries, error mapping |
+| Repository Tests | 9 | Supabase queries, error mapping |
 | Use Case Tests | 7 | Business logic, Result handling |
-| Widget Tests | 20 | UI rendering, user interactions, role-based menus |
-| **Total** | **55** | |
+| Widget Tests | 26 | UI rendering, user interactions, role-based menus |
+| **Total** | **471** | |
 
 ```bash
 flutter test        # Run all tests
@@ -208,6 +211,4 @@ This project is private. All rights reserved.
 
 ---
 
-Built with ❤️ using Flutter & Supabase •
-[English Documentation](docs/en/README.md) •
-[Documentación en Español](docs/es/README.md)
+Built with ❤️ using Flutter & Supabase

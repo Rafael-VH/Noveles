@@ -74,7 +74,7 @@ class MyUseCase {
 | UpdateGenre(genre) | `FR<void>` | |
 | DeleteGenre(id) | `FR<void>` | |
 
-## Labels (7 use cases)
+## Labels + Label Rules (11 use cases)
 
 | Use Case | Returns | Notes |
 | --- | --- | --- |
@@ -85,15 +85,10 @@ class MyUseCase {
 | AssignLabelToBook(bookId,lblId) | `FR<void>` | |
 | RemoveLabelFromBook(bookId,lblId) | `FR<void>` | |
 | GetLabelsForBooks(bookIds) | `FR<M<int,SE<int>>>` | |
-
-## Label Rules (4 use cases)
-
-| Use Case | Returns | Notes |
-| ---------- | --------- | ------- |
-| GetRules() | `FR<L<LabelRuleEntity>>` | |
-| CreateRule(labelId,ruleType,params) | `FR<void>` | |
-| UpdateRule(ruleId,params) | `FR<void>` | |
-| DeleteRule(ruleId) | `FR<void>` | |
+| GetRules() | `FR<L<LabelRuleEntity>>` | Label rules |
+| CreateRule(labelId,ruleType,params) | `FR<void>` | Label rules |
+| UpdateRule(ruleId,params) | `FR<void>` | Label rules |
+| DeleteRule(ruleId) | `FR<void>` | Label rules |
 
 ## Profiles (6 use cases)
 
@@ -106,27 +101,16 @@ class MyUseCase {
 | ChangePassword(newPwd) | `FR<void>` | |
 | UpdateUserRole(userId,role) | `FR<UserEntity>` | |
 
-## Favorites — Repository Methods (3)
-
-Favorites uses repository methods directly instead of use case classes:
-
-| Method | Returns | Notes |
-| --- | --- | --- |
-| toggleFavorite(userId,bookId) | `FR<bool>` | |
-| getFavorites(userId) | `FR<L<FavoriteEntity>>` | |
-| isFavorite(userId,bookId) | `FR<bool>` | |
-
-**Source**: `lib/features/favorites/domain/favorite_repository.dart`
-
 ## Admin — Repository Methods (3)
 
-Admin analytics uses repository methods directly:
+Admin analytics uses repository methods directly with typed entities from
+`lib/features/admin/domain/analytics_entities.dart`:
 
 | Method | Returns | Notes |
 | --- | --- | --- |
-| getViewsTrend(daysBack) | `FR<`L<M<String,dyn>`>>` | |
-| getTopBooks(limitCount) | `FR<`L<M<String,dyn>`>>` | |
-| getOverview() | `FR<M<String,dyn>>` | |
+| getViewsTrend(daysBack) | `FR<List<AnalyticsTrendEntry>>` | Daily view counts |
+| getTopBooks(limitCount) | `FR<List<AnalyticsTopBook>>` | Most-viewed books |
+| getOverview() | `FR<AnalyticsOverview>` | Dashboard summary stats |
 
 **Source**: `lib/features/admin/domain/analytics_repository.dart`
 
@@ -139,11 +123,9 @@ Admin analytics uses repository methods directly:
 | Chapters | 7 | — | 7 |
 | Tooks | 6 | — | 6 |
 | Genres | 5 | — | 5 |
-| Labels | 7 | — | 7 |
-| Label Rules | 4 | — | 4 |
+| Labels + Label Rules | 11 | — | 11 |
 | Profiles | 6 | — | 6 |
-| Favorites | — | 3 | 3 |
 | Admin | — | 3 | 3 |
-| **Total** | **50** | **6** | **56** |
+| **Total** | **50** | **3** | **53** |
 
 ← Back to [index](../README.md)

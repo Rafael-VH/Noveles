@@ -1,6 +1,6 @@
 # Domain Entities
 
-> Complete catalog of all 10 domain entities with field definitions and
+> Complete catalog of all 13 domain entities with field definitions and
 relationships.
 
 ← [Back to index](../README.md)
@@ -13,12 +13,12 @@ relationships.
 | `BookWithRelations` | `book_with_relations.dart` | 25 (+3 lists) | shared |
 | `ChapterEntity` | `chapter_entity.dart` | 7 | chapters |
 | `ChapterRef` | `chapter_ref.dart` | 5 | chapters |
-| `TookEntity` | `lib/features/tooks/domain/took_entity.dart` | 9 | tooks |
+| `TookEntity` | `lib/features/tooks/domain/took_entity.dart` | 10 | tooks |
 | `GenreEntity` | `lib/features/genres/domain/genre_entity.dart` | 4 | genres |
 | `LabelEntity` | `lib/features/labels/domain/label_entity.dart` | 4 | labels |
-| `LabelRuleEntity` | `label_rule_entity.dart` | 6 (+1 enum) | label_rules |
+| `LabelRuleEntity` | `lib/features/labels/domain/label_rule_entity.dart` | 6 (+1 enum) | labels |
 | `UserEntity` | `user_entity.dart` | 6 (+4 getters) | profiles |
-| `FavoriteEntity` | `favorite_entity.dart` | 3 | favorites |
+| `FavoriteEntity` | `lib/features/books/favorites/domain/favorite_entity.dart` | 3 | books |
 
 ## BookEntity
 
@@ -124,7 +124,12 @@ tooks, and each took contains multiple chapters.
 | `chapterCount` | `int` | No | Number of chapters in this took |
 | `bookId` | `int` | No | Foreign key to parent Book |
 | `listChapterIds` | `List<int>` | No | Chapter IDs (default: `[]`) |
+| `chapters` | `List<ChapterEntity>` | No | Embedded chapter entities (default: `const []`) |
 | `createdBy` | `String?` | **Yes** | User ID of creator |
+
+> **Note**: `chapters` is a domain-layer embedded list for presentation
+> convenience, not a database column. Populated by the repository when
+> hydrating took data.
 
 ## GenreEntity
 
@@ -152,7 +157,7 @@ tooks, and each took contains multiple chapters.
 
 ## LabelRuleEntity
 
-**File**: `lib/features/label_rules/domain/label_rule_entity.dart`
+**File**: `lib/features/labels/domain/label_rule_entity.dart`
 **Extends**: `Equatable`
 
 | Field | Dart Type | Nullable | Description |
@@ -166,7 +171,7 @@ tooks, and each took contains multiple chapters.
 
 ### LabelRuleType Enum
 
-**File**: `lib/features/label_rules/domain/label_rule_entity.dart`
+**File**: `lib/features/labels/domain/label_rule_entity.dart`
 
 | Value | Display Name | Description |
 | ------- | ------------- | ------------- |
@@ -220,7 +225,7 @@ to `UserRole.user`.
 
 ## FavoriteEntity
 
-**File**: `lib/features/favorites/domain/favorite_entity.dart`
+**File**: `lib/features/books/favorites/domain/favorite_entity.dart`
 **Extends**: `Equatable`
 
 | Field | Dart Type | Nullable | Description |
@@ -228,6 +233,36 @@ to `UserRole.user`.
 | `userId` | `String` | No | Supabase Auth UUID of the user |
 | `bookId` | `int` | No | Foreign key to the book |
 | `createdAt` | `DateTime` | No | When the favorite was added |
+
+## Analytics Entities
+
+**File**: `lib/features/admin/domain/analytics_entities.dart`
+**Extends**: `Equatable`
+
+Typed entities for admin analytics, replacing raw `Map<String, dynamic>` returns.
+
+### AnalyticsOverview
+
+| Field | Type | Description |
+| ------- | ------ | ------------- |
+| `totalViews` | `int` | Total view count across all books |
+| `viewsToday` | `int` | Views received today |
+| `totalBooks` | `int` | Total book count |
+| `visibleBooks` | `int` | Books visible to regular users |
+
+### AnalyticsTrendEntry
+
+| Field | Type | Description |
+| ------- | ------ | ------------- |
+| `viewDate` | `String` | Date string (YYYY-MM-DD) |
+| `viewCount` | `int` | Number of views on that date |
+
+### AnalyticsTopBook
+
+| Field | Type | Description |
+| ------- | ------ | ------------- |
+| `bookName` | `String` | Book title |
+| `viewCount` | `int` | Number of views |
 
 ## Relationships
 
@@ -260,4 +295,4 @@ LabelRuleEntity ──(labelId)──→ LabelEntity
 
 ---
 
-> Last verified: 2026-07-21
+> Last verified: 2026-07-24
