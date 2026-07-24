@@ -87,7 +87,7 @@ inline.
 
 ## Registro en DI
 
-**Archivo**: `lib/core/di/injection_chapters.dart`
+**Archivo**: `lib/features/chapters/di/injection_chapters.dart`
 
 - `ChapterRepository` → `LazySingleton`
 - Todos los casos de uso → `LazySingleton`

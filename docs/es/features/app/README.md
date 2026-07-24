@@ -128,7 +128,7 @@ La app usa una combinación de rutas nombradas y navegación imperativa:
 - [Chapters](../../es/features/chapters/README.md) — `MarkChapterAsRead`,
   `GetReadChapterIds`, seguimiento de lectura
 - [Genres](../../es/features/genres/README.md) — `GenreBloc`, chips de género
-- [Favorites](../../es/features/favorites/README.md) — Pantalla de favoritos vía
+- [Books/Favorites](../../es/features/books/README.md) — Libros y favoritos vía
   drawer
 - [Auth](../../es/features/auth/README.md) — `AuthBloc` controla la visibilidad
   del drawer

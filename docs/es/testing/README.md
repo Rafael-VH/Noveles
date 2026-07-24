@@ -1,13 +1,13 @@
 # Estrategia de testing
 
-> 55 archivos de test en 5 categorías, cubriendo BLoCs, entidades,
+> 63 archivos de test en 5 categorías, cubriendo BLoCs, entidades,
 > repositorios, casos de uso y widgets.
 
 ← [Volver al índice](../README.md)
 
 ## Visión general
 
-Noveles tiene **55 archivos de test** organizados por capa. Los tests
+Noveles tiene **63 archivos de test** organizados por capa. Los tests
 usan `mocktail` para mocking y `bloc_test` para verificación de estado de
 BLoCs.
 
@@ -15,14 +15,14 @@ BLoCs.
 
 | Categoría | Cantidad | Ruta | Lo que se testea |
 | ---------- | ------- | ------ | --------------- |
-| Tests BLoC | 14 | test/bloc/ | Transiciones, eventos, mapeo de errores |
+| Tests BLoC | 16 | test/bloc/ | Transiciones, eventos, mapeo de errores |
 | Tests de Entidades | 5 | test/entities/ | copyWith, props, igualdad |
-| Tests de Repos | 8 | test/repositories/ | Queries Supabase, mapeo errores |
-| Tests de Casos de Uso | 3 | test/use_cases/ | Reglas de dominio, Result |
-| Tests de Widgets | 20 | `test/widgets/` | Renderizado e interacciones |
-| **Total** | **55** | | |
+| Tests de Repos | 9 | test/repositories/ | Queries Supabase, mapeo errores |
+| Tests de Casos de Uso | 7 | test/use_cases/ | Reglas de dominio, Result |
+| Tests de Widgets | 26 | `test/widgets/` | Renderizado e interacciones |
+| **Total** | **63** | | |
 
-### Tests BLoC (14 archivos)
+### Tests BLoC (16 archivos)
 
 | Archivo | BLoC testeado |
 | ------ | ------------- |
@@ -35,7 +35,9 @@ BLoCs.
 | `genre_bloc_test.dart` | `GenreBloc` |
 | `genre_cubit_test.dart` | `GenreCubit` |
 | `label_bloc_test.dart` | `LabelBloc` |
+| `popular_views_bloc_test.dart` | `PopularViewsBloc` |
 | `profile_bloc_test.dart` | `ProfileBloc` |
+| `recent_views_bloc_test.dart` | `RecentViewsBloc` |
 | `scan_book_bloc_test.dart` | `ScanBookBloc` |
 | `scan_chapter_bloc_test.dart` | `ScanChapterBloc` |
 | `scan_cover_bloc_test.dart` | `ScanCoverBloc` |
@@ -51,51 +53,62 @@ BLoCs.
 | `took_entity_test.dart` | `TookEntity` |
 | `user_role_test.dart` | enum `UserRole` |
 
-### Tests de Repositorios (8 archivos)
+### Tests de Repositorios (9 archivos)
 
 | Archivo | Repositorio testeado |
 | ------ | ------------------- |
 | `analytics_repository_test.dart` | `AnalyticsRepository` |
 | `auth_repository_test.dart` | `AuthRepository` |
 | `book_repository_test.dart` | `BookRepository` |
+| `chapter_cache_test.dart` | `ChapterCache` |
 | `chapter_repository_test.dart` | `ChapterRepository` |
 | `genre_repository_test.dart` | `GenreRepository` |
 | `label_repository_test.dart` | `LabelRepository` |
 | `profiles_repository_test.dart` | `ProfilesRepository` |
 | `took_repository_test.dart` | `TookRepository` |
 
-### Tests de Casos de Uso (3 archivos)
+### Tests de Casos de Uso (7 archivos)
 
 | Archivo | Casos de uso testeados |
 | ------ | ----------------- |
 | `get_all_profiles_test.dart` | `GetAllProfiles` |
+| `get_most_viewed_books_test.dart` | `GetMostViewedBooks` |
+| `get_read_chapter_ids_test.dart` | `GetReadChapterIds` |
+| `get_recent_views_test.dart` | `GetRecentViews` |
 | `label_use_cases_test.dart` | Casos de uso de etiquetas |
+| `mark_chapter_as_read_test.dart` | `MarkChapterAsRead` |
 | `track_book_view_test.dart` | `TrackBookView` |
 
-### Tests de Widgets (20 archivos)
+### Tests de Widgets (26 archivos)
 
 | Archivo | Componente testeado |
 | ------ | ----------------- |
-| `main_screen_sections_test.dart` | Secciones de pantalla principal |
-| `section_header_test.dart` | Widget de encabezado de sección |
-| `section_novedades_test.dart` | Sección de novedades |
-| `section_mas_vistos_test.dart` | Sección de más vistos |
-| `section_populares_test.dart` | Sección de populares |
-| `section_recent_views_test.dart` | Sección de vistas recientes |
-| `genre_chip_styled_test.dart` | Widget de chip de género estilizado |
+| `admin_main_screen_test.dart` | AdminDashScreen |
+| `app_drawer_test.dart` | AppDrawer (NavigationDrawer, menús por rol) |
 | `book_card_horizontal_test.dart` | Tarjeta de libro horizontal |
 | `book_card_vertical_test.dart` | Tarjeta de libro vertical |
 | `book_detail_content_test.dart` | Contenido de detalle de libro |
 | `book_took_list_test.dart` | Lista de tomos de libro |
+| `card_info_detail_test.dart` | Tarjeta de info detalle |
 | `carousel_dots_test.dart` | Indicador de puntos de carrusel |
 | `chapter_screen_read_test.dart` | Pantalla de lectura de capítulos |
-| `took_screen_test.dart` | Pantalla de tomo |
 | `confirmation_dialog_test.dart` | Diálogo de confirmación |
 | `empty_state_test.dart` | Widget de estado vacío |
+| `genre_chip_styled_test.dart` | Widget de chip de género estilizado |
+| `main_screen_sections_test.dart` | Secciones de pantalla principal |
+| `reading_settings_bar_test.dart` | Barra de ajustes de lectura |
+| `section_header_test.dart` | Widget de encabezado de sección |
+| `section_mas_vistos_test.dart` | Sección de más vistos |
+| `section_novedades_test.dart` | Sección de novedades |
+| `section_populares_test.dart` | Sección de populares |
+| `section_recent_views_test.dart` | Sección de vistas recientes |
+| `section_title_test.dart` | Widget de título de sección |
+| `sliver_app_bar_book_test.dart` | Sliver app bar para libros |
 | `snackbar_helper_test.dart` | Helper de snackbar |
-| `admin_main_screen_test.dart` | AdminDashScreen |
-| `app_drawer_test.dart` | AppDrawer (NavigationDrawer, menús por rol) |
-| `test_helpers.dart` | Utilidades de test compartidas (helper, no un test) |
+| `theme_test.dart` | Tests de tema |
+| `took_screen_test.dart` | Pantalla de tomo |
+| `took_sliver_header_test.dart` | Sliver header de tomo |
+| `visual_smoke_test.dart` | Tests visuales smoke |
 
 ## Patrones usados
 
@@ -154,11 +167,11 @@ testWidgets('renders correctly', (tester) async {
 
 | Área | Estado | Notas |
 | ------ | -------- | ------- |
-| Tests BLoC | ✅ 14/14 | Todos los BLoCs cubiertos |
-| Tests de Entidades | ⚠️ 5/9 | Faltan: GenreEntity, FavoriteEntity... |
-| Tests de Repositorios | ✅ 8/8 | Todos los repositorios cubiertos |
-| Tests de Casos de Uso | ⚠️ 3/46 | Solo 3 casos de uso testeados de 46 |
-| Tests de Widgets | ✅ 20/20 | Todos los widgets tienen tests ahora |
+| Tests BLoC | ✅ 16/16 | Todos los BLoCs cubiertos |
+| Tests de Entidades | ⚠️ 5/13 | Faltan: GenreEntity, FavoriteEntity, BookWithRelations, AnalyticsOverview, AnalyticsTrendEntry, AnalyticsTopBook, ... |
+| Tests de Repositorios | ✅ 9/9 | Todos los repositorios cubiertos |
+| Tests de Casos de Uso | ⚠️ 7/53 | Solo 7 casos de uso testeados de 53 |
+| Tests de Widgets | ✅ 26/26 | Todos los widgets tienen tests |
 | Tests de Integración | ❌ Ninguno | No hay directorio `integration_test/` |
 
 ### Casos de uso sin testear
@@ -172,7 +185,7 @@ funcionalidades **no tienen tests de casos de uso**:
 - Tooks (6 casos de uso sin testear)
 - Genres (5 casos de uso sin testear)
 - Profiles (6 sin testear de 6)
-- Favorites (3 métodos de repositorio sin testear)
+- Labels + Label Rules (4 sin testear de 11)
 
 ## Cómo ejecutar
 
@@ -194,4 +207,4 @@ open coverage/html/index.html
 
 ---
 
-> Última verificación: 2026-07-23
+> Última verificación: 2026-07-24

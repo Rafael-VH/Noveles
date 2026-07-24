@@ -74,7 +74,7 @@ las pantallas de scan y principal.
 
 ## Registro en DI
 
-**Archivo**: `lib/core/di/injection_genres.dart`
+**Archivo**: `lib/features/genres/di/injection_genres.dart`
 
 - `GenreRepository` → `LazySingleton`
 - Todos los casos de uso → `LazySingleton`

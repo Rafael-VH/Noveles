@@ -1,6 +1,6 @@
 # Entidades de Dominio
 
-> Catálogo completo de las 10 entidades de dominio con definiciones de campos y
+> Catálogo completo de las 13 entidades de dominio con definiciones de campos y
 > relaciones.
 
 ← [Volver al índice](../README.md)
@@ -13,12 +13,12 @@
 | `BookWithRelations` | `book_with_relations.dart` | 25 (+3 listas) | shared |
 | `ChapterEntity` | `chapter_entity.dart` | 7 | chapters |
 | `ChapterRef` | `chapter_ref.dart` | 5 | chapters |
-| `TookEntity` | `lib/features/tooks/domain/took_entity.dart` | 9 | tooks |
+| `TookEntity` | `lib/features/tooks/domain/took_entity.dart` | 10 | tooks |
 | `GenreEntity` | `lib/features/genres/domain/genre_entity.dart` | 4 | genres |
 | `LabelEntity` | `lib/features/labels/domain/label_entity.dart` | 4 | labels |
-| `LabelRuleEntity` | `label_rule_entity.dart` | 6 (+1 enum) | label_rules |
+| `LabelRuleEntity` | `lib/features/labels/domain/label_rule_entity.dart` | 6 (+1 enum) | labels |
 | `UserEntity` | `user_entity.dart` | 6 (+4 getters) | profiles |
-| `FavoriteEntity` | `favorite_entity.dart` | 3 | favorites |
+| `FavoriteEntity` | `lib/features/books/favorites/domain/favorite_entity.dart` | 3 | books |
 
 ## BookEntity
 
@@ -124,7 +124,12 @@ múltiples tomos, y cada tomo contiene múltiples capítulos.
 | `chapterCount` | `int` | No | Cantidad de capítulos en este tomo |
 | `bookId` | `int` | No | Clave foránea al libro padre |
 | `listChapterIds` | `List<int>` | No | IDs de capítulos (por defecto: `[]`) |
+| `chapters` | `List<ChapterEntity>` | No | Entidades de capítulo embebidas (por defecto: `const []`) |
 | `createdBy` | `String?` | **Sí** | ID de usuario del creador |
+
+> **Nota**: `chapters` es una lista embebida en la capa de dominio para
+> conveniencia de presentación, no es una columna de base de datos. Se
+> completa por el repositorio al hidratar datos de tooks.
 
 ## GenreEntity
 
@@ -152,7 +157,7 @@ múltiples tomos, y cada tomo contiene múltiples capítulos.
 
 ## LabelRuleEntity
 
-**Archivo**: `lib/features/label_rules/domain/label_rule_entity.dart`
+**Archivo**: `lib/features/labels/domain/label_rule_entity.dart`
 **Extiende**: `Equatable`
 
 | Campo | Tipo Dart | Nulable | Descripción |
@@ -166,7 +171,7 @@ múltiples tomos, y cada tomo contiene múltiples capítulos.
 
 ### Enum LabelRuleType
 
-**Archivo**: `lib/features/label_rules/domain/label_rule_entity.dart`
+**Archivo**: `lib/features/labels/domain/label_rule_entity.dart`
 
 | Valor | Nombre Visible | Descripción |
 | ----- | -------------- | ----------- |
@@ -220,7 +225,7 @@ desconocidos o nulos por defecto son `UserRole.user`.
 
 ## FavoriteEntity
 
-**Archivo**: `lib/features/favorites/domain/favorite_entity.dart`
+**Archivo**: `lib/features/books/favorites/domain/favorite_entity.dart`
 **Extiende**: `Equatable`
 
 | Campo | Tipo Dart | Nulable | Descripción |
@@ -228,6 +233,37 @@ desconocidos o nulos por defecto son `UserRole.user`.
 | `userId` | `String` | No | UUID de Supabase Auth del usuario |
 | `bookId` | `int` | No | Clave foránea al libro |
 | `createdAt` | `DateTime` | No | Cuándo se agregó el favorito |
+
+## Entidades de Analíticas
+
+**Archivo**: `lib/features/admin/domain/analytics_entities.dart`
+**Extiende**: `Equatable`
+
+Entidades tipadas para analíticas de admin, reemplazando devoluciones raw de
+`Map<String, dynamic>`.
+
+### AnalyticsOverview
+
+| Campo | Tipo | Descripción |
+| ----- | ---- | ----------- |
+| `totalViews` | `int` | Conteo total de vistas en todos los libros |
+| `viewsToday` | `int` | Vistas recibidas hoy |
+| `totalBooks` | `int` | Cantidad total de libros |
+| `visibleBooks` | `int` | Libros visibles para usuarios regulares |
+
+### AnalyticsTrendEntry
+
+| Campo | Tipo | Descripción |
+| ----- | ---- | ----------- |
+| `viewDate` | `String` | Fecha (AAAA-MM-DD) |
+| `viewCount` | `int` | Cantidad de vistas en esa fecha |
+
+### AnalyticsTopBook
+
+| Campo | Tipo | Descripción |
+| ----- | ---- | ----------- |
+| `bookName` | `String` | Título del libro |
+| `viewCount` | `int` | Cantidad de vistas |
 
 ## Relaciones
 
@@ -260,4 +296,4 @@ LabelRuleEntity ──(labelId)──→ LabelEntity
 
 ---
 
-> Última verificación: 2026-07-21
+> Última verificación: 2026-07-24

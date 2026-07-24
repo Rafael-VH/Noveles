@@ -61,7 +61,7 @@ lectura.
 
 ## Registro en DI
 
-**Archivo**: `lib/core/di/injection_tooks.dart`
+**Archivo**: `lib/features/tooks/di/injection_tooks.dart`
 
 - `TookRepository` → `LazySingleton`
 - Todos los casos de uso → `LazySingleton`

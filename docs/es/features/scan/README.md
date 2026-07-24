@@ -143,7 +143,7 @@ chapters), `UploadChapterContent`.
 
 ## Registro en DI
 
-**Archivo**: `lib/core/di/injection_scan.dart`
+**Archivo**: `lib/features/scan/di/injection_scan.dart`
 
 - `ScanBookBloc` → `Factory`
 - `ScanCoverBloc` → `Factory`

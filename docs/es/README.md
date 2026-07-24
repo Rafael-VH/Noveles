@@ -11,8 +11,8 @@ tres roles de usuario — **Admin**, **Scan** (creador de contenido) y
 contenido se almacena en Supabase (Postgres + Storage), y la app sigue
 Clean Architecture con manejo de estado BLoC.
 
-**Estadísticas clave**: 10 entidades, 54 casos de uso, 19 BLoCs, 19
-pantallas, 12 funcionalidades.
+**Estadísticas clave**: 13 entidades, 53 casos de uso, 19 BLoCs, 19
+pantallas, 10 funcionalidades.
 
 ## Stack tecnológico
 
@@ -35,17 +35,15 @@ pantallas, 12 funcionalidades.
 | **Arquitectura** | | |
 | Clean Architecture | [es/architecture/overview.md](es/architecture/overview.md) | Estructura de capas, flujo de dependencias, mapeo de carpetas |
 | **Dominio** | | |
-| Catálogo de entidades | [es/domain/entities.md](es/domain/entities.md) | 9 entidades con def... |
+| Catálogo de entidades | [es/domain/entities.md](es/domain/entities.md) | 13 entidades con definiciones de campos |
 | **Funcionalidades** | | |
 | Auth | [../../lib/features/auth/](../../lib/features/auth/) | Login, registro, gestión de sesión |
 | Books | [../../lib/features/books/](../../lib/features/books/) | CRUD de libros, carga de portada, visibilidad |
 | Chapters | [../../lib/features/chapters/](../../lib/features/chapters/) | Lectura de capítulos, almacenamiento de contenido |
 | Tooks | [../../lib/features/tooks/](../../lib/features/tooks/) | Volúmenes/tomos dentro de libros |
 | Genres | [../../lib/features/genres/](../../lib/features/genres/) | Clasificación por géneros |
-| Labels | [../../lib/features/labels/](../../lib/features/labels/) | Sistema de etiquetado |
-| Label Rules | [../../lib/features/label_rules/](../../lib/features/label_rules/) | Reglas automáticas de asignación de etiquetas, gestionadas por admin |
+| Labels | [../../lib/features/labels/](../../lib/features/labels/) | Sistema de etiquetado + reglas automáticas |
 | Profiles | [../../lib/features/profiles/](../../lib/features/profiles/) | Perfiles de usuario, gestión de roles |
-| Favorites | [../../lib/features/favorites/](../../lib/features/favorites/) | Favoritos de libros |
 | Admin | [../../lib/features/admin/](../../lib/features/admin/) | Panel de administración |
 | Scan | [../../lib/features/scan/](../../lib/features/scan/) | Creación de contenido |
 | App | [../../lib/features/app/](../../lib/features/app/) | Shell, routing, drawer (NavigationDrawer con AppDrawerHeader, DrawerSectionLabel, LogoutFooter, menús por rol), secciones de pantalla principal (carrusel, continuar leyendo, novedades, más vistos, populares, géneros) |
@@ -58,23 +56,21 @@ pantallas, 12 funcionalidades.
 | **Guías** | | |
 | Inicio rápido | [es/guides/getting-started.md](es/guides/getting-started.md) | Guía de configuración para desarrolladores |
 | **Testing** | | |
-| Estrategia de tests | [es/testing/README.md](es/testing/README.md) | 55 archivos de test, categorías, patrones |
+| Estrategia de tests | [es/testing/README.md](es/testing/README.md) | 63 archivos de test, categorías, patrones |
 
 ## Estructura del proyecto
 
 ```text
 lib/
 ├── core/              # Transversal: DI, errores, cliente Supabase, tema, utils
-├── features/          # 12 módulos de funcionalidad (domain/data/presentation c/u)
+├── features/          # 10 módulos de funcionalidad (domain/data/presentation c/u)
 │   ├── admin/
 │   ├── app/
 │   ├── auth/
 │   ├── books/
 │   ├── chapters/
-│   ├── favorites/
 │   ├── genres/
 │   ├── labels/
-│   ├── label_rules/
 │   ├── profiles/
 │   ├── scan/
 │   └── tooks/
@@ -82,8 +78,8 @@ lib/
 │   ├── domain/
 │   └── presentation/
 └── main.dart          # Punto de entrada
-```text
+```
 
 ---
 
-> Última verificación: 2026-07-23
+> Última verificación: 2026-07-24
