@@ -1,10 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/errors/result.dart';
-import 'package:noveles/features/label_rules/domain/get_rules.dart';
-import 'package:noveles/features/label_rules/domain/create_rule.dart';
-import 'package:noveles/features/label_rules/domain/delete_rule.dart';
-import 'package:noveles/features/label_rules/presentation/bloc/label_rules_event.dart';
-import 'package:noveles/features/label_rules/presentation/bloc/label_rules_state.dart';
+import 'package:noveles/features/labels/domain/get_rules.dart';
+import 'package:noveles/features/labels/domain/create_rule.dart';
+import 'package:noveles/features/labels/domain/delete_rule.dart';
+import 'package:noveles/features/labels/presentation/bloc/label_rules_event.dart';
+import 'package:noveles/features/labels/presentation/bloc/label_rules_state.dart';
 
 class LabelRulesBloc extends Bloc<LabelRulesEvent, LabelRulesState> {
   final GetRules getRules;

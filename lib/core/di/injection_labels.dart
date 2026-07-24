@@ -10,13 +10,13 @@ import 'package:noveles/features/labels/domain/assign_label_to_book.dart';
 import 'package:noveles/features/labels/domain/remove_label_from_book.dart';
 import 'package:noveles/features/labels/domain/get_labels_for_books.dart';
 import 'package:noveles/features/labels/presentation/bloc/label_bloc.dart';
-import 'package:noveles/features/label_rules/data/label_rule_repository_impl.dart';
-import 'package:noveles/features/label_rules/domain/label_rule_repository.dart';
-import 'package:noveles/features/label_rules/domain/get_rules.dart';
-import 'package:noveles/features/label_rules/domain/create_rule.dart';
-import 'package:noveles/features/label_rules/domain/update_rule.dart';
-import 'package:noveles/features/label_rules/domain/delete_rule.dart';
-import 'package:noveles/features/label_rules/presentation/bloc/label_rules_bloc.dart';
+import 'package:noveles/features/labels/data/label_rule_repository_impl.dart';
+import 'package:noveles/features/labels/domain/label_rule_repository.dart';
+import 'package:noveles/features/labels/domain/get_rules.dart';
+import 'package:noveles/features/labels/domain/create_rule.dart';
+import 'package:noveles/features/labels/domain/update_rule.dart';
+import 'package:noveles/features/labels/domain/delete_rule.dart';
+import 'package:noveles/features/labels/presentation/bloc/label_rules_bloc.dart';
 
 final getIt = GetIt.instance;
 

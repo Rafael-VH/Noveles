@@ -1,11 +1,11 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-export 'package:noveles/features/favorites/presentation/bloc/favorite_event.dart';
-export 'package:noveles/features/favorites/presentation/bloc/favorite_state.dart';
+export 'package:noveles/features/books/favorites/presentation/bloc/favorite_event.dart';
+export 'package:noveles/features/books/favorites/presentation/bloc/favorite_state.dart';
 import 'package:noveles/core/errors/result.dart';
-import 'package:noveles/features/favorites/domain/favorite_repository.dart';
-import 'package:noveles/features/favorites/presentation/bloc/favorite_event.dart';
-import 'package:noveles/features/favorites/presentation/bloc/favorite_state.dart';
+import 'package:noveles/features/books/favorites/domain/favorite_repository.dart';
+import 'package:noveles/features/books/favorites/presentation/bloc/favorite_event.dart';
+import 'package:noveles/features/books/favorites/presentation/bloc/favorite_state.dart';
 
 class FavoriteBloc extends Bloc<FavoriteEvent, FavoriteState> {
   final FavoriteRepository favoriteRepository;

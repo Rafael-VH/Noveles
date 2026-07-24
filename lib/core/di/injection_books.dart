@@ -15,6 +15,9 @@ import 'package:noveles/features/books/domain/track_book_view.dart';
 import 'package:noveles/features/books/domain/get_recent_views.dart';
 import 'package:noveles/features/books/domain/get_most_viewed_books.dart';
 import 'package:noveles/features/books/presentation/bloc/book_bloc.dart';
+import 'package:noveles/features/books/favorites/data/favorite_repository_impl.dart';
+import 'package:noveles/features/books/favorites/domain/favorite_repository.dart';
+import 'package:noveles/features/books/favorites/presentation/bloc/favorite_bloc.dart';
 
 final getIt = GetIt.instance;
 
@@ -66,6 +69,19 @@ void initBooksDependencies() {
     () => BookBloc(
       getBooks: getIt(),
       getBookById: getIt(),
+    ),
+  );
+
+  // Favorites
+  getIt.registerLazySingleton<FavoriteRepository>(
+    () => FavoriteRepositoryImpl(
+      getIt<SupabaseClientProvider>(),
+    ),
+  );
+
+  getIt.registerFactory(
+    () => FavoriteBloc(
+      favoriteRepository: getIt(),
     ),
   );
 }

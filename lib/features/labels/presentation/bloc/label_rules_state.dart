@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:noveles/features/label_rules/domain/label_rule_entity.dart';
+import 'package:noveles/features/labels/domain/label_rule_entity.dart';
 
 abstract class LabelRulesState extends Equatable {
   const LabelRulesState();

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:noveles/features/favorites/presentation/bloc/favorite_bloc.dart';
+import 'package:noveles/features/books/favorites/presentation/bloc/favorite_bloc.dart';
 
 class FavoriteButton extends StatefulWidget {
   final int bookId;

@@ -1,9 +1,9 @@
 import 'package:noveles/core/errors/failure.dart';
 import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/core/supabase/supabase_client.dart';
-import 'package:noveles/features/label_rules/data/label_rule_model.dart';
-import 'package:noveles/features/label_rules/domain/label_rule_entity.dart';
-import 'package:noveles/features/label_rules/domain/label_rule_repository.dart';
+import 'package:noveles/features/labels/data/label_rule_model.dart';
+import 'package:noveles/features/labels/domain/label_rule_entity.dart';
+import 'package:noveles/features/labels/domain/label_rule_repository.dart';
 
 class LabelRuleRepositoryImpl implements LabelRuleRepository {
   final SupabaseClientProvider _supabase;

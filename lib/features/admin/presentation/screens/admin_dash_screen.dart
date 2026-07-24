@@ -12,7 +12,7 @@ import 'package:noveles/features/admin/presentation/screens/books_tab.dart';
 import 'package:noveles/features/admin/presentation/screens/genres_tab.dart';
 import 'package:noveles/features/admin/presentation/screens/summary_tab.dart';
 import 'package:noveles/features/admin/presentation/screens/users_tab.dart';
-import 'package:noveles/features/label_rules/presentation/screens/label_rules_admin_tab.dart';
+import 'package:noveles/features/labels/presentation/screens/label_rules_admin_tab.dart';
 import 'package:noveles/features/app/presentation/widgets/app_drawer.dart';
 import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:noveles/features/profiles/domain/user_role.dart';

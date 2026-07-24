@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:noveles/features/favorites/presentation/bloc/favorite_bloc.dart';
+import 'package:noveles/features/books/favorites/presentation/bloc/favorite_bloc.dart';
 import 'package:noveles/features/books/presentation/screens/widgets/book_detail_content.dart';
 import 'package:noveles/features/app/presentation/widgets/book_card_vertical.dart';
 import 'package:noveles/features/app/presentation/widgets/book_card_horizontal.dart';

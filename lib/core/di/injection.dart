@@ -5,7 +5,6 @@ import 'injection_profiles.dart';
 import 'injection_auth.dart';
 import 'injection_books.dart';
 import 'injection_chapters.dart';
-import 'injection_favorites.dart';
 import 'injection_genres.dart';
 import 'injection_labels.dart';
 import 'injection_tooks.dart';
@@ -21,7 +20,6 @@ void setupDependencies() {
   initAuthDependencies();
   initBooksDependencies();
   initChaptersDependencies();
-  initFavoritesDependencies();
   initGenresDependencies();
   initLabelsDependencies();
   initTooksDependencies();

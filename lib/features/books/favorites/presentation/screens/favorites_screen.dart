@@ -5,7 +5,7 @@ import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:noveles/features/books/domain/book_repository.dart';
-import 'package:noveles/features/favorites/presentation/bloc/favorite_bloc.dart';
+import 'package:noveles/features/books/favorites/presentation/bloc/favorite_bloc.dart';
 import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 
 class FavoritesScreen extends StatefulWidget {

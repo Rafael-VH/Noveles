@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:noveles/features/favorites/domain/favorite_entity.dart';
+import 'package:noveles/features/books/favorites/domain/favorite_entity.dart';
 
 abstract class FavoriteState extends Equatable {
   @override
