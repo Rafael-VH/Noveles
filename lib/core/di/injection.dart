@@ -1,17 +1,16 @@
 import 'package:get_it/get_it.dart';
 import 'package:noveles/core/cover/cover_url_service.dart';
 import 'package:noveles/core/supabase/supabase_client.dart';
-import 'injection_profiles.dart';
-import 'injection_auth.dart';
-import 'injection_books.dart';
-import 'injection_chapters.dart';
-import 'injection_favorites.dart';
-import 'injection_genres.dart';
-import 'injection_labels.dart';
-import 'injection_tooks.dart';
-import 'injection_scan.dart';
-import 'injection_admin.dart';
-import 'injection_app.dart';
+import 'package:noveles/features/profiles/di/injection_profiles.dart';
+import 'package:noveles/features/auth/di/injection_auth.dart';
+import 'package:noveles/features/books/di/injection_books.dart';
+import 'package:noveles/features/chapters/di/injection_chapters.dart';
+import 'package:noveles/features/genres/di/injection_genres.dart';
+import 'package:noveles/features/labels/di/injection_labels.dart';
+import 'package:noveles/features/tooks/di/injection_tooks.dart';
+import 'package:noveles/features/scan/di/injection_scan.dart';
+import 'package:noveles/features/admin/di/injection_admin.dart';
+import 'package:noveles/features/app/di/injection_app.dart';
 
 final getIt = GetIt.instance;
 
@@ -21,7 +20,6 @@ void setupDependencies() {
   initAuthDependencies();
   initBooksDependencies();
   initChaptersDependencies();
-  initFavoritesDependencies();
   initGenresDependencies();
   initLabelsDependencies();
   initTooksDependencies();

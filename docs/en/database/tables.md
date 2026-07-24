@@ -121,7 +121,7 @@ labels ──M:N──> books (via books_labels)
 | Screen | `scan_book_edit_screen.dart` | Scan create/edit book |
 | DI | ``books`` | Registers BookRepository, TrackBookView, BookBloc |
 | DI | `injection_admin.dart` | Registers AdminBloc, AnalyticsRepository |
-| DI | `lib/core/di/injection_scan.dart` | Registers ScanBookBloc |
+| DI | `lib/features/scan/di/injection_scan.dart` | Registers ScanBookBloc |
 | Migration | `20260514220000_initial_schema.sql` | Creates books table |
 | Migration | fix_books_rls_scan_visibility.sql | Scan visibility fix |
 
@@ -194,7 +194,7 @@ and genres tabs.
 | Screen | `genres_tab.dart` | Admin genre CRUD |
 | Screen | `main_screen.dart` | Genre filter chips |
 | DI | `injection_genres.dart` | Registers GenreRepository, GenreBloc |
-| DI | `lib/core/di/injection_scan.dart` | Registers GenreCubit |
+| DI | `lib/features/scan/di/injection_scan.dart` | Registers GenreCubit |
 | Migration | `20260514220000_initial_schema.sql` | Creates genres table |
 
 ### Required Policies (Part 4)
@@ -318,8 +318,8 @@ and genres tabs.
 | BLoC | `scan_took_bloc.dart` | Scan CRUD for tooks |
 | Screen | `book_screen.dart` | Shows tooks list in "Took" tab |
 | Screen | `scan_took_edit_screen.dart` | Scan create/edit took |
-| DI | `lib/core/di/injection_tooks.dart` | Registers TookRepository |
-| DI | `lib/core/di/injection_scan.dart` | Registers ScanTookBloc |
+| DI | `lib/features/tooks/di/injection_tooks.dart` | Registers TookRepository |
+| DI | `lib/features/scan/di/injection_scan.dart` | Registers ScanTookBloc |
 | Migration | `20260514220000_initial_schema.sql` | Creates tooks table |
 
 ### Required Policies (Part 8)
@@ -357,7 +357,7 @@ and genres tabs.
 | Screen | `chapter_screen.dart` | Chapter reader |
 | Screen | `scan_chapter_edit_screen.dart` | Scan create/edit chapter |
 | DI | `injection_chapters.dart` | Registers ChapterRepository, ChapterBloc |
-| DI | `lib/core/di/injection_scan.dart` | Registers ScanChapterBloc |
+| DI | `lib/features/scan/di/injection_scan.dart` | Registers ScanChapterBloc |
 | Migration | `20260514220000_initial_schema.sql` | Creates chapters table |
 
 ### Required Policies (Part 9)
@@ -390,8 +390,8 @@ and genres tabs.
 | Repo Impl | `analytics_repository_impl.dart` | Reads via RPC functions |
 | BLoC | `admin_analytics_bloc.dart` | Loads analytics data |
 | Screen | `analytics_tab.dart` | Displays analytics dashboard |
-| DI | `lib/core/di/injection_books.dart` | Registers TrackBookView |
-| DI | `lib/core/di/injection_admin.dart` | Registers AnalyticsRepository |
+| DI | `lib/features/books/di/injection_books.dart` | Registers TrackBookView |
+| DI | `lib/features/admin/di/injection_admin.dart` | Registers AnalyticsRepository |
 | Migration | `20260523000000_admin_panels.sql` | Creates book_views table |
 | Migration | audit_fixes_v2.sql | Adds user_id, relaxes INSERT policy |
 | Migration | create_analytics_functions.sql | Creates analytics SQL funct... |

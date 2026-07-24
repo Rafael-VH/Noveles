@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:noveles/features/admin/domain/analytics_entities.dart';
 import 'package:noveles/features/admin/presentation/bloc/admin_analytics_bloc.dart';
 import 'package:noveles/features/admin/presentation/bloc/admin_analytics_event.dart';
 import 'package:noveles/features/admin/presentation/bloc/admin_analytics_state.dart';
@@ -70,10 +71,6 @@ class _AnalyticsTabContent extends StatelessWidget {
 
   Widget _buildLoaded(BuildContext context, AnalyticsLoaded state) {
     final overview = state.overview;
-    final totalViews = overview['total_views'] ?? 0;
-    final viewsToday = overview['views_today'] ?? 0;
-    final totalBooks = overview['total_books'] ?? 0;
-    final visibleBooks = overview['visible_books'] ?? 0;
 
     return RefreshIndicator(
       onRefresh: () async {
@@ -90,10 +87,10 @@ class _AnalyticsTabContent extends StatelessWidget {
           const SizedBox(height: 12),
           _buildMetricsGrid(
             context,
-            totalViews: totalViews,
-            viewsToday: viewsToday,
-            totalBooks: totalBooks,
-            visibleBooks: visibleBooks,
+            totalViews: overview.totalViews,
+            viewsToday: overview.viewsToday,
+            totalBooks: overview.totalBooks,
+            visibleBooks: overview.visibleBooks,
           ),
           const SizedBox(height: 24),
 
@@ -198,18 +195,19 @@ class _AnalyticsTabContent extends StatelessWidget {
     );
   }
 
-  Widget _buildTopBookCard(BuildContext context, int index, dynamic book) {
+  Widget _buildTopBookCard(
+      BuildContext context, int index, AnalyticsTopBook book) {
     return Card(
       child: ListTile(
         leading: CircleAvatar(
           child: Text('${index + 1}'),
         ),
         title: Text(
-          book['book_name']?.toString() ?? 'Sin nombre',
+          book.bookName.isNotEmpty ? book.bookName : 'Sin nombre',
           style: const TextStyle(fontWeight: FontWeight.w600),
         ),
         trailing: Text(
-          '${book['view_count'] ?? 0} vistas',
+          '${book.viewCount} vistas',
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Theme.of(context).colorScheme.primary,
                 fontWeight: FontWeight.w600,
@@ -221,14 +219,13 @@ class _AnalyticsTabContent extends StatelessWidget {
 }
 
 class _TrendBarChart extends StatelessWidget {
-  final List<dynamic> trend;
+  final List<AnalyticsTrendEntry> trend;
   const _TrendBarChart({required this.trend});
 
   @override
   Widget build(BuildContext context) {
     final maxCount = trend.fold<int>(0, (max, e) {
-      final count = e['view_count'] as int? ?? 0;
-      return count > max ? count : max;
+      return e.viewCount > max ? e.viewCount : max;
     });
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -256,8 +253,8 @@ class _TrendBarChart extends StatelessWidget {
             const SizedBox(height: 16),
             // Bars
             ...trend.asMap().entries.map((entry) {
-              final date = entry.value['view_date']?.toString() ?? '';
-              final count = (entry.value['view_count'] as int?) ?? 0;
+              final date = entry.value.viewDate;
+              final count = entry.value.viewCount;
               final fraction = maxCount > 0 ? count / maxCount : 0.0;
 
               return Padding(

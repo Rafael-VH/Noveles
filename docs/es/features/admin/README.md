@@ -22,12 +22,13 @@ features `books` y `profiles`.
 
 | Método | Firma | Propósito |
 | ------ | ----- | --------- |
-| getViewsTrend | `FR<L<M<S,dy>>>` call({int n}) | Vistas últimos N días |
-| getTopBooks | `FR<L<M<S,dy>>>` call({int n}) | Libros más vistos |
-| getOverview | `FR<M<S,dy>>` call() | Estadísticas resumidas del dashboard |
+| getViewsTrend | `FR<List<AnalyticsTrendEntry>>` call({int n}) | Vistas últimos N días |
+| getTopBooks | `FR<List<AnalyticsTopBook>>` call({int n}) | Libros más vistos |
+| getOverview | `FR<AnalyticsOverview>` call() | Estadísticas resumidas del dashboard |
 
 **Implementación**: `AnalyticsRepositoryImpl` llama a funciones RPC de Supabase
-(`get_views_trend`, `get_top_books`, `get_analytics_overview`).
+(`get_views_trend`, `get_top_books`, `get_analytics_overview`). Usa entidades
+tipadas de `lib/features/admin/domain/analytics_entities.dart`.
 
 ## BLoCs
 
@@ -81,7 +82,7 @@ Autoprotección: no puede cambiar su propio rol ni suspenderse a sí mismo.
 | ------ | ---- | ------ |
 | `AnalyticsInitial` | — | Inicial |
 | `AnalyticsLoading` | — | Obteniendo |
-| `AnalyticsLoaded` | `Map overview, List trend, List topBooks` | Cargado |
+| `AnalyticsLoaded` | `AnalyticsOverview overview, List<AnalyticsTrendEntry> trend, List<AnalyticsTopBook> topBooks` | Cargado |
 | `AnalyticsError` | `String message` | Error |
 
 ## Pantallas
@@ -101,7 +102,7 @@ Dashboard con pestañas:
 
 ## Registro en DI
 
-**Archivo**: `lib/core/di/injection_admin.dart`
+**Archivo**: `lib/features/admin/di/injection_admin.dart`
 
 - `AnalyticsRepository` → `LazySingleton`
 - `AdminBloc` → `Factory` (depende de casos de uso de books)

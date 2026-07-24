@@ -32,6 +32,7 @@ Cada funcionalidad sigue la misma estructura de tres capas:
 
 ```text
 lib/features/{feature}/
+├── di/                        # Registro DI de la funcionalidad (injection_{feature}.dart)
 ├── domain/
 │   ├── *_entity.dart          # Entidades de dominio (Equatable)
 │   ├── *_repository.dart      # Interfaz abstracta de repositorio
@@ -43,8 +44,8 @@ lib/features/{feature}/
     └── screens/               # Pantallas de UI y widgets
 ```text
 
-**11 módulos de funcionalidad**: `admin`, `app`, `auth`, `books`, `chapters`,
-`favorites`, `genres`, `labels`, `profiles`, `scan`, `tooks`.
+**10 módulos de funcionalidad**: `admin`, `app`, `auth`, `books`, `chapters`,
+`genres`, `labels`, `profiles`, `scan`, `tooks`.
 
 ### Capa Core (`lib/core/`)
 
@@ -55,7 +56,7 @@ Infraestructura compartida de la que dependen todas las funcionalidades:
 | `app/` | Widget `App`, routing, selección de home por rol |
 | `constants/` | Nombres de buckets de Storage (`StorageConstants`) |
 | `cover/` | Utilidades para imágenes de portada |
-| `di/` | Configuración de inyección de dependencias GetIt (11 módulos) |
+| `di/` | Punto de entrada central de DI (`injection.dart`) |
 | `errors/` | Clase sellada `Result<T>`, jerarquía de `Failure` |
 | `presentation/` | ThemeBloc, sistema de notificaciones, widgets compartidos |
 | `supabase/` | Proveedor de cliente Supabase, caché de capítulos |
@@ -88,8 +89,8 @@ sean testeables sin ninguna dependencia del framework.
 
 GetIt conecta las capas en tiempo de ejecución:
 
-1. `lib/core/di/injection.dart` llama a `setupDependencies()`
-2. Cada funcionalidad tiene `injection_{feature}.dart` registrando sus propias
+1. `lib/core/di/injection.dart` define `setupDependencies()`
+2. Cada funcionalidad tiene `lib/features/{feature}/di/injection_{feature}.dart` registrando sus propias
    dependencias
 3. Repositorios: `registerLazySingleton` (se crean una vez, se comparten)
 4. BLoCs: `registerFactory` (instancia nueva por solicitud)
@@ -117,4 +118,4 @@ error. Ver `lib/core/errors/result.dart` y `lib/core/errors/failure.dart`.
 
 ---
 
-> Última verificación: 2026-07-21
+> Última verificación: 2026-07-24

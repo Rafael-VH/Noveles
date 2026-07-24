@@ -72,7 +72,7 @@ table.
 
 ## DI Registration
 
-**File**: `lib/core/di/injection_genres.dart`
+**File**: `lib/features/genres/di/injection_genres.dart`
 
 - `GenreRepository` → `LazySingleton`
 - All use cases → `LazySingleton`

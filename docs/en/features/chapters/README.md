@@ -84,7 +84,7 @@ determines if a path is a storage reference or inline text.
 
 ## DI Registration
 
-**File**: `lib/core/di/injection_chapters.dart`
+**File**: `lib/features/chapters/di/injection_chapters.dart`
 
 - `ChapterRepository` → `LazySingleton`
 - All use cases → `LazySingleton`

@@ -13,7 +13,7 @@ each with tailored screens and permissions. Content is stored in Supabase
 (Postgres + Storage), and the app follows Clean Architecture with BLoC state
 management.
 
-**Key stats**: 10 entities, 54 use cases, 19 BLoCs, 19 screens, 12 features.
+**Key stats**: 13 entities, 53 use cases, 19 BLoCs, 19 screens, 10 features.
 
 ## Tech Stack
 
@@ -36,17 +36,15 @@ management.
 | **Architecture** | | |
 | Clean Architecture | [architecture/overview.md](architecture/overview.md) | Layer structure,dependency flow,folder mapping |
 | **Domain** | | |
-| E Catalog | [domain/entities.md](domain/entities.md) | 9 entities with fi... |
+| E Catalog | [domain/entities.md](domain/entities.md) | 13 entities with field definitions |
 | **Features** | | |
 | Auth | [../lib/features/auth/](../lib... | Login,register,session management |
 | Books | [../lib/features/books/](../l... | Book CRUD,cover upload,visibility |
 | Chapters | [../lib/features/chapters/](... | Chapter reading,content storage |
 | Tooks | [../lib/features/tooks/](../lib/feat... | Volumes/tomes within books |
 | Genres | [../lib/features/genres/](../lib/features... | Genre classification |
-| Labels | [../lib/features/labels/](../lib/features/labels/) | Tagging system |
-| Label Rules | [../lib/features/label_rules/](../lib/features/label_rules/) | Automatic label assignment rules, admin-managed |
-| Profiles | [../lib/features/profiles/](..... | User profiles,role management |
-| Favorites | [../lib/features/favorites/](../lib/feature... | Book favoriting |
+| Labels | [../lib/features/labels/](../lib/features/labels/) | Tagging system + automatic rules |
+| Profiles | [../lib/features/profiles/](../lib/features/profiles/) | User profiles, role management |
 | Admin | [../lib/features/admin/](../lib/features/admin/) | Admin dashboard |
 | Scan | [../lib/features/scan/](../lib/features/scan/) | Content creation |
 | App | [../lib/features/app/](../lib/features/app/) | Shell, routing, drawer (NavigationDrawer with AppDrawerHeader, DrawerSectionLabel, LogoutFooter, role-based menus), main screen sections (carousel, continuar leyendo, novedades, más vistos, populares, géneros) |
@@ -59,23 +57,21 @@ management.
 | **Guides** | | |
 | Getting Started | [guides/getting-started.md](gui... | Developer setup guide |
 | **Testing** | | |
-| Test Strategy | [testing/README.md](t... | 55 test files,categories,patterns |
+| Test Strategy | [testing/README.md](testing/README.md) | 63 test files, categories, patterns |
 
 ## Project Structure
 
 ```text
 lib/
 ├── core/              # Cross-cutting: DI, errors, Supabase client, theme, utils
-├── features/          # 12 feature modules (domain/data/presentation each)
+├── features/          # 10 feature modules (domain/data/presentation each)
 │   ├── admin/
 │   ├── app/
 │   ├── auth/
 │   ├── books/
 │   ├── chapters/
-│   ├── favorites/
 │   ├── genres/
 │   ├── labels/
-│   ├── label_rules/
 │   ├── profiles/
 │   ├── scan/
 │   └── tooks/
@@ -83,8 +79,8 @@ lib/
 │   ├── domain/
 │   └── presentation/
 └── main.dart          # Entry point
-```text
+```
 
 ---
 
-> Last verified: 2026-07-23
+> Last verified: 2026-07-24

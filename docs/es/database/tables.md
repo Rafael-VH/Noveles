@@ -121,7 +121,7 @@ labels ──M:N──> books (via books_labels)
 | Pantalla | `scan_book_edit_screen.dart` | Scan crear/editar libro |
 | DI | ``books`` | Registra BookRepository, TrackBookView, BookBloc |
 | DI | `injection_admin.dart` | Registra AdminBloc, AnalyticsRepository |
-| DI | `lib/core/di/injection_scan.dart` | Registra ScanBookBloc |
+| DI | `lib/features/scan/di/injection_scan.dart` | Registra ScanBookBloc |
 | Migración | `20260514220000_initial_schema.sql` | Crea tabla books |
 | Migración | fix_books_rls_scan_visibility.sql | Corrige visibilidad scan |
 
@@ -194,7 +194,7 @@ través de las pestañas de libros y géneros.
 | Pantalla | `genres_tab.dart` | CRUD de géneros admin |
 | Pantalla | `main_screen.dart` | Chips de filtro de géneros |
 | DI | `injection_genres.dart` | Registra GenreRepository, GenreBloc |
-| DI | `lib/core/di/injection_scan.dart` | Registra GenreCubit |
+| DI | `lib/features/scan/di/injection_scan.dart` | Registra GenreCubit |
 | Migración | `20260514220000_initial_schema.sql` | Crea tabla genres |
 
 ### Políticas Requeridas (Parte 4)
@@ -318,8 +318,8 @@ través de las pestañas de libros y géneros.
 | BLoC | `scan_took_bloc.dart` | Scan CRUD para tomos |
 | Pantalla | `book_screen.dart` | Muestra lista de tomos en pestaña "Took" |
 | Pantalla | `scan_took_edit_screen.dart` | Scan crear/editar tomo |
-| DI | `lib/core/di/injection_tooks.dart` | Registra TookRepository |
-| DI | `lib/core/di/injection_scan.dart` | Registra ScanTookBloc |
+| DI | `lib/features/tooks/di/injection_tooks.dart` | Registra TookRepository |
+| DI | `lib/features/scan/di/injection_scan.dart` | Registra ScanTookBloc |
 | Migración | `20260514220000_initial_schema.sql` | Crea tabla tooks |
 
 ### Políticas Requeridas (Parte 8)
@@ -357,7 +357,7 @@ través de las pestañas de libros y géneros.
 | Pantalla | `chapter_screen.dart` | Lector de capítulos |
 | Pantalla | `scan_chapter_edit_screen.dart` | Scan crear/editar capítulo |
 | DI | `injection_chapters.dart` | Registra ChapterRepository, ChapterBloc |
-| DI | `lib/core/di/injection_scan.dart` | Registra ScanChapterBloc |
+| DI | `lib/features/scan/di/injection_scan.dart` | Registra ScanChapterBloc |
 | Migración | `20260514220000_initial_schema.sql` | Crea tabla chapters |
 
 ### Políticas Requeridas (Parte 9)
@@ -390,8 +390,8 @@ través de las pestañas de libros y géneros.
 | Repo Impl | `analytics_repository_impl.dart` | Lee mediante funciones RPC |
 | BLoC | `admin_analytics_bloc.dart` | Carga datos de analytics |
 | Pantalla | `analytics_tab.dart` | Muestra panel de analytics |
-| DI | `lib/core/di/injection_books.dart` | Registra TrackBookView |
-| DI | `lib/core/di/injection_admin.dart` | Registra AnalyticsRepository |
+| DI | `lib/features/books/di/injection_books.dart` | Registra TrackBookView |
+| DI | `lib/features/admin/di/injection_admin.dart` | Registra AnalyticsRepository |
 | Migración | `20260523000000_admin_panels.sql` | Crea tabla book_views |
 | Migración | audit_fixes_v2.sql | Agrega user_id, relaja política INSERT |
 | Migración | create_analytics_functions.sql | Crea funciones SQL analytics |

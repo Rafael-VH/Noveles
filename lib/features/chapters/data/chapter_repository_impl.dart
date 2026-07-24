@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:noveles/core/errors/failure.dart';
 import 'package:noveles/core/errors/result.dart';
-import 'package:noveles/core/supabase/chapter_cache.dart';
+import 'package:noveles/features/chapters/data/chapter_cache.dart';
 import 'package:noveles/core/constants/storage_constants.dart';
 import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/chapters/data/chapter_model.dart';

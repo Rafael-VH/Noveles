@@ -66,7 +66,7 @@ The BLoC also listens to `ListenAuthState` stream and auto-dispatches
 
 ## DI Registration
 
-**File**: `lib/core/di/injection_auth.dart`
+**File**: `lib/features/auth/di/injection_auth.dart`
 
 - `AuthRepository` → `LazySingleton` (via `AuthRepositoryImpl`)
 - `Login`, `Register`, `Logout`, `GetCurrentUser`, `ListenAuthState` →

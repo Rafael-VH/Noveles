@@ -34,24 +34,23 @@ void _registerCore() {
 
 ## Módulos de Funcionalidad
 
-**12 módulos de funcionalidad** (con `label_rules` dentro de
-`injection_labels.dart`):
+**10 módulos de funcionalidad**:
 
 Cada funcionalidad tiene su propio archivo de inyección que registra
 repositorios, casos de uso y BLoCs:
 
 | Módulo | Archivo | Lo que Registra |
 | ------ | ------- | --------------- |
-| **Auth** | `injection_auth.dart` | `AuthRepository`, 5 UC, `AuthBloc` |
-| Books | `injection_books.dart` | `BookRepository`, 10 UC, `BookBloc` |
-| Chapters | ``chapters`` | `ChapterRepository`, 7 casos de uso, `ChapterBloc` |
-| **Tooks** | `injection_tooks.dart` | `TookRepository`, 6 UC (sin BLoC) |
-| Genres | ``genres`` | `GenreRepository`, 5 casos de uso, `GenreBloc` |
-| Labels | injection_labels.dart | LabelRepo+Bloc, LabelRuleRepo+RulesBloc |
-| Profiles | ``profiles`` | `ProfilesRepository`, 6 UC, `ProfileBloc` |
-| Favorites | ``favorites`` | FavoriteRepo, FavoriteBloc (sin casos de uso) |
-| Scan | `scan` | ScanBookB, ScanCoverB, GenreC, ScanTookB, ScanChapterB |
-| Admin | ``admin`` | `AnalyticsRepository`, `AdminBloc`, `AdminAnalyticsBloc` |
+| **Auth** | `features/auth/di/injection_auth.dart` | `AuthRepository`, 5 UC, `AuthBloc` |
+| Books | `features/books/di/injection_books.dart` | `BookRepository`, 10 UC, `BookBloc`, `FavoriteRepository`, `FavoriteBloc` |
+| Chapters | `features/chapters/di/injection_chapters.dart` | `ChapterRepository`, 7 casos de uso, `ChapterBloc` |
+| **Tooks** | `features/tooks/di/injection_tooks.dart` | `TookRepository`, 6 UC (sin BLoC) |
+| Genres | `features/genres/di/injection_genres.dart` | `GenreRepository`, 5 casos de uso, `GenreBloc` |
+| Labels | `features/labels/di/injection_labels.dart` | LabelRepo+Bloc, LabelRuleRepo+RulesBloc (7+4 UC) |
+| Profiles | `features/profiles/di/injection_profiles.dart` | `ProfilesRepository`, 6 UC, `ProfileBloc` |
+| Scan | `features/scan/di/injection_scan.dart` | ScanBookB, ScanCoverB, GenreC, ScanTookB, ScanChapterB |
+| Admin | `features/admin/di/injection_admin.dart` | `AnalyticsRepository`, `AdminBloc`, `AdminAnalyticsBloc` |
+| App | `features/app/di/injection_app.dart` | BLoCs de pantalla principal, dependencias del drawer |
 
 ## Tipos de Registro
 
@@ -94,12 +93,8 @@ necesita una instancia nueva por solicitud.
 1. `main()` llama a `setupDependencies()`
 2. `setupDependencies()` llama a `_registerCore()` primero
 3. Luego llama a cada `init*Dependencies()` de cada funcionalidad en orden:
-   - Profiles → Auth → Books → Chapters → Favorites → Genres → Labels → Tooks →
-     Scan → Admin
-
-> **Nota**: Las dependencias de `label_rules` se registran dentro de
-> `initLabelsDependencies()` (en `injection_labels.dart`, no en un archivo
-> separado).
+   - Profiles → Auth → Books → Chapters → Genres → Labels → Tooks →
+     Scan → Admin → App
 
 4. Cada función de funcionalidad registra sus propias dependencias usando `getIt`
 
@@ -110,12 +105,12 @@ void setupDependencies() {
   initAuthDependencies();
   initBooksDependencies();
   initChaptersDependencies();
-  initFavoritesDependencies();
   initGenresDependencies();
   initLabelsDependencies();
   initTooksDependencies();
   initScanDependencies();
   initAdminDependencies();
+  initAppDependencies();
 }
 ```text
 

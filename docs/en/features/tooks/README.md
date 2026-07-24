@@ -59,7 +59,7 @@ and loaded as part of `BookWithRelations` for reading views.
 
 ## DI Registration
 
-**File**: `lib/core/di/injection_tooks.dart`
+**File**: `lib/features/tooks/di/injection_tooks.dart`
 
 - `TookRepository` → `LazySingleton`
 - All use cases → `LazySingleton`

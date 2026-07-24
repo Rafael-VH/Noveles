@@ -1,7 +1,7 @@
 export 'package:noveles/features/books/domain/book_entity.dart';
 export 'package:noveles/shared/domain/entities/book_with_relations.dart';
 export 'package:noveles/features/books/domain/book_repository.dart';
-export 'package:noveles/core/utils/text_stats.dart';
+export 'package:noveles/features/books/domain/utils/text_stats.dart';
 export 'package:noveles/features/books/domain/create_book.dart';
 export 'package:noveles/features/books/domain/get_book.dart';
 export 'package:noveles/features/books/domain/get_book_by_id.dart';

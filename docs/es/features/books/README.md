@@ -97,9 +97,49 @@ Supabase con políticas RLS.
 
 - Subcomponentes de detalle del libro (metadatos, lista de tooks, etc.)
 
+## Favorites
+
+El feature Books incluye una subsección de Favorites en
+`lib/features/books/favorites/` para gestionar favoritos de libros por usuario.
+
+### FavoriteEntity
+
+**Archivo**: `lib/features/books/favorites/domain/favorite_entity.dart`
+
+| Campo | Tipo | Descripción |
+| ----- | ---- | ----------- |
+| `userId` | `String` | UUID del usuario autenticado |
+| `bookId` | `int` | ID del libro marcado como favorito |
+| `createdAt` | `DateTime` | Cuándo se agregó el favorito |
+
+### Métodos del Repositorio
+
+| Método | Firma | Propósito |
+| ------ | ----- | --------- |
+| toggleFavorite | `FR<bool>` call(uid,bid) | Agregar o quitar favorito |
+| getFavorites | `FR<L<FavoriteEntity>>` call(uid) | Obtener todos los favoritos |
+| isFavorite | `FR<bool>` call(uid,bid) | Verificar si es favorito |
+
+### FavoriteBloc
+
+**Archivo**: `lib/features/books/favorites/presentation/bloc/favorite_bloc.dart`
+
+| Evento | Descripción |
+| ------ | ----------- |
+| `ToggleFavorite` | Alternar estado de favorito para un libro |
+| `LoadFavorites` | Cargar todos los favoritos del usuario actual |
+| `CheckFavoriteStatus` | Verificar si un libro específico es favorito |
+
+### Componentes UI
+
+- **FavoritesScreen** (`lib/features/books/favorites/presentation/screens/favorites_screen.dart`)
+  — Lista de pantalla completa de libros favoritos
+- **FavoriteButton** (`lib/features/books/favorites/presentation/widgets/favorite_button.dart`)
+  — IconButton que alterna el estado de favorito
+
 ## Registro en DI
 
-**Archivo**: `lib/core/di/injection_books.dart`
+**Archivo**: `lib/features/books/di/injection_books.dart`
 
 - `BookRepository` → `LazySingleton`
 - Todos los casos de uso → `LazySingleton`

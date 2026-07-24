@@ -91,15 +91,14 @@ lib/
 │   ├── constants/         # StorageConstants
 │   ├── presentation/      # ThemeBloc, notifications, shared widgets
 │   └── utils/             # Colors, theme, parsing, logging
-├── features/              # 11 feature modules
+├── features/              # 10 feature modules
 │   ├── auth/              # Authentication (login, register)
-│   ├── books/             # Book CRUD and display
+│   ├── books/             # Book CRUD, display, and favorites
 │   ├── chapters/          # Chapter reading
 │   ├── tooks/             # Volumes/tomes
 │   ├── genres/            # Genre classification
-│   ├── labels/            # Tagging system
+│   ├── labels/            # Tagging system (includes label rules)
 │   ├── profiles/          # User profiles
-│   ├── favorites/         # Book favoriting
 │   ├── admin/             # Admin dashboard
 │   ├── scan/              # Content creation
 │   └── app/               # Shell (MainScreen, drawer)
@@ -112,9 +111,10 @@ Each feature module follows Clean Architecture:
 
 ```text
 features/{feature}/
-├── domain/     # Entities, use cases, repository interfaces
-├── data/       # Repository implementations (Supabase)
-└── presentation/  # BLoCs, screens, widgets
+├── di/           # Feature-specific DI registration
+├── domain/       # Entities, use cases, repository interfaces
+├── data/         # Repository implementations (Supabase)
+└── presentation/ # BLoCs, screens, widgets
 ```text
 
 ## Running Tests

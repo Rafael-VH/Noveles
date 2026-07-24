@@ -92,15 +92,14 @@ lib/
 │   ├── constants/         # StorageConstants
 │   ├── presentation/      # ThemeBloc, notificaciones, widgets compartidos
 │   └── utils/             # Colores, tema, parsing, logging
-├── features/              # 11 módulos de funcionalidad
+├── features/              # 10 módulos de funcionalidad
 │   ├── auth/              # Autenticación (login, registro)
-│   ├── books/             # CRUD y visualización de libros
+│   ├── books/             # CRUD, visualización y favoritos de libros
 │   ├── chapters/          # Lectura de capítulos
 │   ├── tooks/             # Volúmenes/tomos
 │   ├── genres/            # Clasificación por géneros
-│   ├── labels/            # Sistema de etiquetado
+│   ├── labels/            # Sistema de etiquetado (incluye reglas de etiquetas)
 │   ├── profiles/          # Perfiles de usuario
-│   ├── favorites/         # Favoritos de libros
 │   ├── admin/             # Panel de administración
 │   ├── scan/              # Creación de contenido
 │   └── app/               # Shell (MainScreen, drawer)
@@ -113,9 +112,10 @@ Cada módulo de funcionalidad sigue Clean Architecture:
 
 ```text
 features/{feature}/
-├── domain/     # Entidades, casos de uso, interfaces de repositorio
-├── data/       # Implementaciones de repositorio (Supabase)
-└── presentation/  # BLoCs, pantallas, widgets
+├── di/           # Registro de DI específico de la funcionalidad
+├── domain/       # Entidades, casos de uso, interfaces de repositorio
+├── data/         # Implementaciones de repositorio (Supabase)
+└── presentation/ # BLoCs, pantallas, widgets
 ```text
 
 ## Ejecutar tests

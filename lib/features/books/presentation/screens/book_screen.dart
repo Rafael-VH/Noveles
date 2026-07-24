@@ -13,7 +13,7 @@ import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 import 'package:noveles/features/books/presentation/screens/widgets/sliver_app_bar_book.dart';
 import 'package:noveles/features/books/presentation/screens/widgets/book_detail_content.dart';
 import 'package:noveles/features/books/presentation/screens/widgets/book_took_list.dart';
-import 'package:noveles/features/favorites/presentation/bloc/favorite_bloc.dart';
+import 'package:noveles/features/books/favorites/presentation/bloc/favorite_bloc.dart';
 import 'package:noveles/features/tooks/data/took_model.dart';
 import 'package:noveles/features/tooks/domain/took_entity.dart';
 

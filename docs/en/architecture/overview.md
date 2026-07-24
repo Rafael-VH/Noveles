@@ -31,6 +31,7 @@ Each feature follows the same three-layer structure:
 
 ```text
 lib/features/{feature}/
+├── di/                        # Feature DI registration (injection_{feature}.dart)
 ├── domain/
 │   ├── *_entity.dart          # Domain entities (Equatable)
 │   ├── *_repository.dart      # Abstract repository interface
@@ -42,8 +43,8 @@ lib/features/{feature}/
     └── screens/               # UI screens and widgets
 ```text
 
-**11 feature modules**: `admin`, `app`, `auth`, `books`, `chapters`,
-`favorites`, `genres`, `labels`, `profiles`, `scan`, `tooks`.
+**10 feature modules**: `admin`, `app`, `auth`, `books`, `chapters`,
+`genres`, `labels`, `profiles`, `scan`, `tooks`.
 
 ### Core Layer (`lib/core/`)
 
@@ -54,7 +55,7 @@ Shared infrastructure that all features depend on:
 | `app/` | `App` widget, routing, role-based home selection |
 | `constants/` | Storage bucket names (`StorageConstants`) |
 | `cover/` | Cover image utilities |
-| `di/` | GetIt dependency injection setup (11 modules) |
+| `di/` | Central DI entry point (`injection.dart`) |
 | `errors/` | ``Result<T>`` sealed class, `Failure` hierarchy |
 | `presentation/` | ThemeBloc, notification system, shared widgets |
 | `supabase/` | Supabase client provider, chapter caching |
@@ -87,8 +88,8 @@ framework dependency.
 
 GetIt connects the layers at runtime:
 
-1. `lib/core/di/injection.dart` calls `setupDependencies()`
-2. Each feature has `injection_{feature}.dart` registering its own dependencies
+1. `lib/core/di/injection.dart` defines `setupDependencies()`
+2. Each feature has `lib/features/{feature}/di/injection_{feature}.dart` registering its own dependencies
 3. Repositories: `registerLazySingleton` (created once, shared)
 4. BLoCs: `registerFactory` (new instance per request)
 
@@ -114,4 +115,4 @@ See `lib/core/errors/result.dart` and `lib/core/errors/failure.dart`.
 
 ---
 
-> Last verified: 2026-07-21
+> Last verified: 2026-07-24

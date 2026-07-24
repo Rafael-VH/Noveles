@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:noveles/core/utils/colors/color.dart';
+import 'package:noveles/core/utils/colors/dark_color.dart';
 
 /// Light-mode color tokens — mirrors [DarkColor] structure.
 class _LightColor {
@@ -26,7 +26,7 @@ class _LightColor {
   static const Color surface = Color(0xFFFFFFFF);
   static const Color surfaceLow = Color(0xFFF5F5F8);
   static const Color surfaceHigh = Color(0xFFFFFFFF);
-  static const Color surfaceHighest = Color(0xFF343450);
+  static const Color surfaceHighest = Color(0xFFECECF4);
 
   static const Color onSurface = Color(0xFF1A1A2E);
   static const Color onSurfaceVariant = Color(0xFF6B6B80);

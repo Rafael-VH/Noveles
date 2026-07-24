@@ -5,8 +5,8 @@ import 'package:noveles/features/app/presentation/widgets/drawer/app_drawer_head
 import 'package:noveles/features/app/presentation/widgets/drawer/drawer_section_label.dart';
 import 'package:noveles/features/app/presentation/widgets/drawer/logout_footer.dart';
 import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:noveles/features/favorites/presentation/bloc/favorite_bloc.dart';
-import 'package:noveles/features/favorites/presentation/screens/favorites_screen.dart';
+import 'package:noveles/features/books/favorites/presentation/bloc/favorite_bloc.dart';
+import 'package:noveles/features/books/favorites/presentation/screens/favorites_screen.dart';
 import 'package:noveles/features/labels/presentation/screens/label_management_screen.dart';
 import 'package:noveles/features/profiles/domain/user_entity.dart';
 import 'package:noveles/features/profiles/domain/user_role.dart';

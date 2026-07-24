@@ -79,7 +79,7 @@ tabla `profiles` y Supabase Auth.
 
 ## Registro en DI
 
-**Archivo**: `lib/core/di/injection_profiles.dart`
+**Archivo**: `lib/features/profiles/di/injection_profiles.dart`
 
 - `ProfilesRepository` → `LazySingleton`
 - Todos los casos de uso → `LazySingleton`

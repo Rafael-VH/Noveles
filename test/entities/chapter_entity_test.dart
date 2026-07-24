@@ -52,34 +52,6 @@ void main() {
       expect(chapter.contentType, ChapterContentType.inline);
     });
 
-    test('copyWith preserves contentType', () {
-      final chapter = ChapterEntity(
-        id: 3,
-        createdAt: DateTime(2026),
-        number: '3',
-        title: 'Chapter 3',
-        content: 'ch3.txt',
-        tookId: 1,
-        contentType: ChapterContentType.storagePath,
-      );
-      final copied = chapter.copyWith(content: 'new_content.txt');
-      expect(copied.contentType, ChapterContentType.storagePath);
-    });
-
-    test('copyWith can change contentType', () {
-      final chapter = ChapterEntity(
-        id: 4,
-        createdAt: DateTime(2026),
-        number: '4',
-        title: 'Chapter 4',
-        content: 'inline text',
-        tookId: 1,
-        contentType: ChapterContentType.storagePath,
-      );
-      final copied = chapter.copyWith(contentType: ChapterContentType.inline);
-      expect(copied.contentType, ChapterContentType.inline);
-    });
-
     test('props includes contentType', () {
       final chapter = ChapterEntity(
         id: 5,

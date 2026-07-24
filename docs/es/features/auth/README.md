@@ -68,7 +68,7 @@ token).
 
 ## Registro en DI
 
-**Archivo**: `lib/core/di/injection_auth.dart`
+**Archivo**: `lib/features/auth/di/injection_auth.dart`
 
 - `AuthRepository` → `LazySingleton` (vía `AuthRepositoryImpl`)
 - `Login`, `Register`, `Logout`, `GetCurrentUser`, `ListenAuthState` →

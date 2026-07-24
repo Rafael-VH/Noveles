@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:noveles/core/errors/failure.dart';
 import 'package:noveles/core/errors/result.dart';
+import 'package:noveles/features/admin/domain/analytics_entities.dart';
 import 'package:noveles/features/admin/domain/analytics_repository.dart';
 import 'package:noveles/features/admin/presentation/bloc/admin_analytics_bloc.dart';
 import 'package:noveles/features/admin/presentation/bloc/admin_analytics_event.dart';
@@ -13,20 +14,20 @@ class MockAnalyticsRepository extends Mock implements AnalyticsRepository {}
 void main() {
   late MockAnalyticsRepository mockRepository;
 
-  final overviewData = {
-    'total_views': 150,
-    'views_today': 12,
-    'total_books': 25,
-    'visible_books': 20,
-  };
+  final overviewData = const AnalyticsOverview(
+    totalViews: 150,
+    viewsToday: 12,
+    totalBooks: 25,
+    visibleBooks: 20,
+  );
 
-  final trendData = [
-    {'view_date': '2026-07-01', 'view_count': 5},
-    {'view_date': '2026-07-02', 'view_count': 8},
+  final trendData = const [
+    AnalyticsTrendEntry(viewDate: '2026-07-01', viewCount: 5),
+    AnalyticsTrendEntry(viewDate: '2026-07-02', viewCount: 8),
   ];
 
-  final topBooksData = [
-    {'book_id': 1, 'book_name': 'Top Book', 'view_count': 42},
+  final topBooksData = const [
+    AnalyticsTopBook(bookName: 'Top Book', viewCount: 42),
   ];
 
   setUp(() {
@@ -55,7 +56,7 @@ void main() {
       expect: () => [
         const AnalyticsLoading(),
         isA<AnalyticsLoaded>()
-            .having((s) => s.overview['total_views'], 'total_views', 150)
+            .having((s) => s.overview.totalViews, 'total_views', 150)
             .having((s) => s.trend.length, 'trend count', 2)
             .having((s) => s.topBooks.length, 'top books count', 1),
       ],
