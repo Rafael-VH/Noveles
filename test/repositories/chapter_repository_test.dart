@@ -5,6 +5,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/chapters/data/chapter_repository_impl.dart';
+import 'package:noveles/features/chapters/domain/chapter_content_type.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -382,8 +383,11 @@ void main() {
     });
 
     group('downloadContent', () {
-      test('returns path as-is when not a storage path', () async {
-        final result = await repository.downloadContent('inline text');
+      test('returns path as-is for inline content', () async {
+        final result = await repository.downloadContent(
+          'inline text',
+          contentType: ChapterContentType.inline,
+        );
 
         expect(result, isA<Ok<String>>());
         final value = (result as Ok<String>).value;
@@ -397,11 +401,55 @@ void main() {
               queryParams: any(named: 'queryParams'),
             )).thenThrow(Exception('Download failed'));
 
-        final result = await repository.downloadContent('ch1.txt');
+        final result = await repository.downloadContent(
+          'ch1.txt',
+          contentType: ChapterContentType.storagePath,
+        );
 
         expect(result, isA<Err<String>>());
         final error = (result as Err<String>).error;
         expect(error.message, contains('Error al descargar contenido'));
+      });
+
+      test('inline content does not attempt storage download', () async {
+        final result = await repository.downloadContent(
+          'plain text',
+          contentType: ChapterContentType.inline,
+        );
+
+        expect(result, isA<Ok<String>>());
+        verifyNever(() => mockStorageFileApi.download(
+              any(),
+              transform: any(named: 'transform'),
+              queryParams: any(named: 'queryParams'),
+            ));
+      });
+
+      test('storagePath uses default contentType when not specified', () async {
+        when(() => mockStorageFileApi.download(
+              any(),
+              transform: any(named: 'transform'),
+              queryParams: any(named: 'queryParams'),
+            )).thenThrow(Exception('Download failed'));
+
+        final result = await repository.downloadContent('ch1.txt');
+
+        expect(result, isA<Err<String>>());
+      });
+
+      test('inline content returns path verbatim without touching storage', () async {
+        final result = await repository.downloadContent(
+          'Hello world',
+          contentType: ChapterContentType.inline,
+        );
+
+        expect(result, isA<Ok<String>>());
+        expect((result as Ok<String>).value, 'Hello world');
+        verifyNever(() => mockStorageFileApi.download(
+              any(),
+              transform: any(named: 'transform'),
+              queryParams: any(named: 'queryParams'),
+            ));
       });
     });
 

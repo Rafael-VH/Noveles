@@ -7,6 +7,7 @@ import 'package:noveles/core/supabase/chapter_cache.dart';
 import 'package:noveles/core/constants/storage_constants.dart';
 import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/chapters/data/chapter_model.dart';
+import 'package:noveles/features/chapters/domain/chapter_content_type.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 import 'package:noveles/features/chapters/domain/chapter_repository.dart';
 
@@ -139,13 +140,10 @@ class ChapterRepositoryImpl implements ChapterRepository {
     }
   }
 
-  bool _isStoragePath(String s) =>
-      s.contains('/') || s.endsWith('.txt') || s.endsWith('.json');
-
   @override
-  Future<Result<String>> downloadContent(String path) async {
+  Future<Result<String>> downloadContent(String path, {ChapterContentType contentType = ChapterContentType.storagePath}) async {
     try {
-      if (!_isStoragePath(path)) return Ok(path);
+      if (contentType == ChapterContentType.inline) return Ok(path);
       final cached = await ChapterCache.read(path);
       if (cached != null) return Ok(cached);
       final bytes = await _supabase.client.storage.from(StorageConstants.chaptersBucket).download(path);

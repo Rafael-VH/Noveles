@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:noveles/features/chapters/domain/chapter_content_type.dart';
 
 class ChapterEntity extends Equatable {
   final int id;
@@ -8,6 +9,7 @@ class ChapterEntity extends Equatable {
   final String content;
   final int tookId;
   final String? createdBy;
+  final ChapterContentType contentType;
 
   const ChapterEntity({
     required this.id,
@@ -17,6 +19,7 @@ class ChapterEntity extends Equatable {
     required this.content,
     required this.tookId,
     this.createdBy,
+    this.contentType = ChapterContentType.storagePath,
   });
 
   ChapterEntity copyWith({
@@ -27,6 +30,7 @@ class ChapterEntity extends Equatable {
     String? content,
     int? tookId,
     String? createdBy,
+    ChapterContentType? contentType,
   }) {
     return ChapterEntity(
       id: id ?? this.id,
@@ -36,6 +40,7 @@ class ChapterEntity extends Equatable {
       content: content ?? this.content,
       tookId: tookId ?? this.tookId,
       createdBy: createdBy ?? this.createdBy,
+      contentType: contentType ?? this.contentType,
     );
   }
 
@@ -48,5 +53,6 @@ class ChapterEntity extends Equatable {
         content,
         tookId,
         createdBy,
+        contentType,
       ];
 }

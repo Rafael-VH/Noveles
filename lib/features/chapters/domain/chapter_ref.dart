@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:noveles/features/chapters/domain/chapter_content_type.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 
 /// Lightweight reference for chapter events.
@@ -11,6 +12,7 @@ class ChapterRef extends Equatable {
   final String number;
   final String title;
   final int tookId;
+  final ChapterContentType contentType;
 
   const ChapterRef({
     required this.id,
@@ -18,6 +20,7 @@ class ChapterRef extends Equatable {
     required this.number,
     required this.title,
     required this.tookId,
+    this.contentType = ChapterContentType.storagePath,
   });
 
   /// Create a [ChapterRef] from a [ChapterEntity].
@@ -27,8 +30,9 @@ class ChapterRef extends Equatable {
         number: entity.number,
         title: entity.title,
         tookId: entity.tookId,
+        contentType: entity.contentType,
       );
 
   @override
-  List<Object> get props => [id, content, number, title, tookId];
+  List<Object> get props => [id, content, number, title, tookId, contentType];
 }

@@ -1,4 +1,5 @@
 import 'package:noveles/core/errors/result.dart';
+import 'package:noveles/features/chapters/domain/chapter_content_type.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 
 abstract class ChapterRepository {
@@ -7,9 +8,12 @@ abstract class ChapterRepository {
   Future<Result<int>> createChapter(ChapterEntity chapter);
   Future<Result<void>> updateChapter(ChapterEntity chapter);
   Future<Result<void>> deleteChapter(int id);
-  /// Downloads content from a storage path, or returns inline content as-is.
-  /// The implementation determines if [path] is a storage reference or inline text.
-  Future<Result<String>> downloadContent(String path);
+
+  /// Downloads content based on [contentType].
+  ///
+  /// - [ChapterContentType.inline]: returns [path] as-is (the field is actual content).
+  /// - [ChapterContentType.storagePath]: downloads from Supabase Storage, with caching.
+  Future<Result<String>> downloadContent(String path, {ChapterContentType contentType = ChapterContentType.storagePath});
 
   /// Uploads a file (e.g. .md or .txt) to the chapters storage bucket.
   /// Returns the public URL of the uploaded file.
