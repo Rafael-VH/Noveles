@@ -61,62 +61,37 @@ class BookRepositoryImpl implements BookRepository {
   @override
   Future<Result<int>> createBook(BookEntity book) async {
     try {
-      int authorId = book.authorId;
-      if (authorId == 0 && book.author.isNotEmpty) {
-        final existing = await _supabase.client
-            .from('authors')
-            .select('id')
-            .eq('name', book.author)
-            .maybeSingle();
-        if (existing != null) {
-          authorId = existing['id'];
-        } else {
-          final result = await _supabase.client
-              .from('authors')
-              .insert({'name': book.author})
-              .select('id')
-              .single();
-          authorId = result['id'];
-        }
-      }
-      final result = await _supabase.client
-          .from('books')
-          .insert({
-            'created_at': book.createdAt.toIso8601String(),
-            'cover': book.cover,
-            'name': book.name,
-            'short': book.short,
-            'alternative': book.alternative,
-            'description': book.description,
-            'author_id': authorId,
-            'country': book.country,
-            'state': book.state,
-            'type': book.type,
-            'release': book.release,
-            'took_count': book.tookCount,
-            'chapter_count': book.chapterCount,
-            'source': book.source,
-            'link': book.link,
-            'is_favorite': book.isFavorite,
-            'created_by': _supabase.client.auth.currentUser?.id,
-          })
-          .select('id')
-          .single();
-      final newBookId = result['id'] as int;
-      if (book.listGenreIds.isNotEmpty) {
-        await _supabase.client.from('books_genres').insert(
-              book.listGenreIds.map((genreId) {
-                return {'book_id': newBookId, 'genre_id': genreId};
-              }).toList(),
-            );
-      }
-      if (book.listLabelIds.isNotEmpty) {
-        await _supabase.client.from('books_labels').insert(
-              book.listLabelIds.map((labelId) {
-                return {'book_id': newBookId, 'label_id': labelId};
-              }).toList(),
-            );
-      }
+      final bookJson = {
+        'created_at': book.createdAt.toIso8601String(),
+        'cover': book.cover,
+        'name': book.name,
+        'short': book.short,
+        'alternative': book.alternative,
+        'description': book.description,
+        'author_id': book.authorId,
+        'author': book.author,
+        'country': book.country,
+        'state': book.state,
+        'type': book.type,
+        'release': book.release,
+        'took_count': book.tookCount,
+        'chapter_count': book.chapterCount,
+        'source': book.source,
+        'link': book.link,
+        'is_favorite': book.isFavorite,
+        'is_visible': book.isVisible,
+        'created_by': _supabase.client.auth.currentUser?.id,
+      };
+
+      final newBookId = await _supabase.client.rpc(
+        'create_book_with_relations',
+        params: {
+          'p_book': bookJson,
+          'p_genre_ids': book.listGenreIds,
+          'p_label_ids': book.listLabelIds,
+        },
+      ) as int;
+
       return Ok(newBookId);
     } catch (e) {
       return Err(BookFailure('Error al crear libro', cause: e));
@@ -126,7 +101,8 @@ class BookRepositoryImpl implements BookRepository {
   @override
   Future<Result<void>> updateBook(BookEntity book) async {
     try {
-      await _supabase.client.from('books').update({
+      final bookJson = {
+        'id': book.id,
         'cover': book.cover,
         'name': book.name,
         'short': book.short,
@@ -143,29 +119,17 @@ class BookRepositoryImpl implements BookRepository {
         'link': book.link,
         'is_favorite': book.isFavorite,
         'is_visible': book.isVisible,
-      }).eq('id', book.id);
-      await _supabase.client
-          .from('books_genres')
-          .delete()
-          .eq('book_id', book.id);
-      if (book.listGenreIds.isNotEmpty) {
-        await _supabase.client.from('books_genres').insert(
-              book.listGenreIds.map((genreId) {
-                return {'book_id': book.id, 'genre_id': genreId};
-              }).toList(),
-            );
-      }
-      await _supabase.client
-          .from('books_labels')
-          .delete()
-          .eq('book_id', book.id);
-      if (book.listLabelIds.isNotEmpty) {
-        await _supabase.client.from('books_labels').insert(
-              book.listLabelIds.map((labelId) {
-                return {'book_id': book.id, 'label_id': labelId};
-              }).toList(),
-            );
-      }
+      };
+
+      await _supabase.client.rpc(
+        'update_book_with_relations',
+        params: {
+          'p_book': bookJson,
+          'p_genre_ids': book.listGenreIds,
+          'p_label_ids': book.listLabelIds,
+        },
+      );
+
       return const Ok(null);
     } catch (e) {
       return Err(BookFailure('Error al actualizar libro', cause: e));
