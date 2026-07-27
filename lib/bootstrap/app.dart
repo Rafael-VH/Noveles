@@ -5,9 +5,7 @@ import 'package:noveles/core/presentation/notification_listener.dart';
 import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:noveles/core/presentation/bloc/theme_bloc.dart';
 import 'package:noveles/features/admin/presentation/screens/admin_dash_screen.dart';
-import 'package:noveles/features/scan/presentation/screens/scan_main_screen.dart';
-import 'package:noveles/features/app/presentation/screens/main_screen.dart';
-import 'package:noveles/features/auth/presentation/screens/login_screen.dart';
+import 'package:noveles/features/app/presentation/screens/splash_screen.dart';
 import 'package:noveles/features/labels/presentation/screens/label_management_screen.dart';
 
 class App extends StatelessWidget {
@@ -44,28 +42,7 @@ class App extends StatelessWidget {
                     );
                   }
                 },
-                child: BlocBuilder<AuthBloc, AuthState>(
-                  builder: (context, authState) {
-                    if (authState is AuthLoading) {
-                      return const Scaffold(
-                        body: Center(child: CircularProgressIndicator()),
-                      );
-                    }
-                    if (authState is AuthAuthenticated) {
-                      if (authState.user.isAdmin) {
-                        return const AdminDashScreen();
-                      }
-                      if (authState.user.isScan) {
-                        return const ScanMainScreen();
-                      }
-                      if (authState.user.isUser) {
-                        return const MainScreen();
-                      }
-                      return const LoginScreen();
-                    }
-                    return const LoginScreen();
-                  },
-                ),
+                child: const SplashScreen(),
               ),
             ),
           );
