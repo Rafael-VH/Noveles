@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:noveles/shared/presentation/widgets/confirmation_dialog.dart';
 
 class LogoutFooter extends StatelessWidget {
-  const LogoutFooter({super.key});
+  final VoidCallback? onLogout;
+
+  const LogoutFooter({super.key, this.onLogout});
 
   @override
   Widget build(BuildContext context) {
@@ -33,8 +33,8 @@ class LogoutFooter extends StatelessWidget {
       confirmLabel: 'Cerrar Sesión',
       isDestructive: true,
     );
-    if (confirmed == true && context.mounted) {
-      context.read<AuthBloc>().add(LogoutRequested());
+    if (confirmed == true) {
+      onLogout?.call();
     }
   }
 }

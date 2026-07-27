@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:noveles/core/cover/cover_url_service.dart';
-import 'package:noveles/core/di/injection.dart';
+import 'package:noveles/bootstrap/injection.dart';
 import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 
 class BookCardVertical extends StatefulWidget {

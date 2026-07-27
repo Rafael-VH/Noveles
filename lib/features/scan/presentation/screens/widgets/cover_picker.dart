@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:noveles/core/cover/cover_url_service.dart';
-import 'package:noveles/core/di/injection.dart';
+import 'package:noveles/bootstrap/injection.dart';
 
 class CoverPicker extends StatelessWidget {
   final TextEditingController controller;

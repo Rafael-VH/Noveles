@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/errors/result.dart';
-import 'package:noveles/core/di/injection.dart';
+import 'package:noveles/bootstrap/injection.dart';
 import 'package:noveles/features/labels/domain/label_rule_entity.dart';
 import 'package:noveles/features/labels/presentation/bloc/label_rules_bloc.dart';
 import 'package:noveles/features/labels/presentation/bloc/label_rules_event.dart';

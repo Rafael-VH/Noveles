@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/cover/cover_url_service.dart';
-import 'package:noveles/core/di/injection.dart';
+import 'package:noveles/bootstrap/injection.dart';
 import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 import 'package:noveles/shared/presentation/widgets/empty_state.dart';
 import 'package:noveles/features/genres/domain/genre_entity.dart';
@@ -20,6 +20,10 @@ import 'package:noveles/features/app/presentation/bloc/recent_views/recent_views
 import 'package:noveles/features/app/presentation/bloc/popular_views/popular_views_bloc.dart';
 import 'package:noveles/features/app/presentation/widgets/section_recent_views.dart';
 import 'package:noveles/features/app/presentation/widgets/section_mas_vistos.dart';
+import 'package:noveles/features/books/favorites/presentation/bloc/favorite_bloc.dart';
+import 'package:noveles/features/books/favorites/presentation/screens/favorites_screen.dart';
+import 'package:noveles/features/labels/presentation/screens/label_management_screen.dart';
+import 'package:noveles/features/profiles/presentation/screens/profile_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -108,7 +112,39 @@ class _MainScreenState extends State<MainScreen> {
           builder: (context) {
             final authState = context.read<AuthBloc>().state;
             final user = authState is AuthAuthenticated ? authState.user : null;
-            return AppDrawer(user: user);
+            final role = user?.role;
+            return AppDrawer(
+              user: user,
+              role: role,
+              onNavigateToProfile: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ProfileScreen()),
+                );
+              },
+              onNavigateToFavorites: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => BlocProvider(
+                      create: (_) => getIt<FavoriteBloc>(),
+                      child: const FavoritesScreen(),
+                    ),
+                  ),
+                );
+              },
+              onNavigateToLabels: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const LabelManagementScreen(),
+                  ),
+                );
+              },
+              onLogout: () {
+                context.read<AuthBloc>().add(LogoutRequested());
+              },
+            );
           },
         ),
         body: BlocBuilder<BookBloc, BookState>(

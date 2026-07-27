@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:noveles/core/di/injection.dart';
+import 'package:noveles/bootstrap/injection.dart';
 import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 import 'package:noveles/features/chapters/domain/get_read_chapter_ids.dart';
 import 'package:noveles/features/chapters/presentation/bloc/chapter_bloc.dart';
 import 'package:noveles/features/chapters/presentation/screens/chapter_screen.dart';
-import 'package:noveles/features/tooks/data/took_model.dart';
 import 'package:noveles/features/tooks/domain/took_entity.dart';
 import 'package:noveles/features/tooks/presentation/screens/widgets/took_sliver_header.dart';
 
@@ -21,9 +20,7 @@ class TookScreen extends StatefulWidget {
 }
 
 class _TookScreenState extends State<TookScreen> {
-  /// Runtime cast: data layer hydrates TookModel with full chapters.
-  List<ChapterEntity> get _chapters =>
-      (widget.tooks is TookModel) ? (widget.tooks as TookModel).chapters : [];
+  List<ChapterEntity> get _chapters => widget.tooks.chapters;
 
   Set<int> _readChapterIds = {};
   bool _loadingReadIds = true;

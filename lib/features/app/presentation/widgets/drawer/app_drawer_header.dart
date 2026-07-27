@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:noveles/core/cover/cover_url_service.dart';
-import 'package:noveles/core/di/injection.dart';
+import 'package:noveles/bootstrap/injection.dart';
 import 'package:noveles/features/profiles/domain/user_entity.dart';
 
 class AppDrawerHeader extends StatelessWidget {

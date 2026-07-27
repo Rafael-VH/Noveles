@@ -1,56 +1,51 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:noveles/core/di/injection.dart';
 import 'package:noveles/features/app/presentation/widgets/drawer/app_drawer_header.dart';
 import 'package:noveles/features/app/presentation/widgets/drawer/drawer_section_label.dart';
 import 'package:noveles/features/app/presentation/widgets/drawer/logout_footer.dart';
-import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:noveles/features/books/favorites/presentation/bloc/favorite_bloc.dart';
-import 'package:noveles/features/books/favorites/presentation/screens/favorites_screen.dart';
-import 'package:noveles/features/labels/presentation/screens/label_management_screen.dart';
 import 'package:noveles/features/profiles/domain/user_entity.dart';
 import 'package:noveles/features/profiles/domain/user_role.dart';
-import 'package:noveles/features/profiles/presentation/screens/profile_screen.dart';
 
 class AppDrawer extends StatelessWidget {
   final UserEntity? user;
   final UserRole? role;
+  final VoidCallback? onNavigateToProfile;
+  final VoidCallback? onNavigateToFavorites;
+  final VoidCallback? onNavigateToLabels;
+  final VoidCallback? onLogout;
 
-  const AppDrawer({super.key, this.user, this.role});
+  const AppDrawer({
+    super.key,
+    this.user,
+    this.role,
+    this.onNavigateToProfile,
+    this.onNavigateToFavorites,
+    this.onNavigateToLabels,
+    this.onLogout,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AuthBloc, AuthState>(
-      builder: (context, authState) {
-        if (authState is AuthInitial || authState is AuthLoading) {
-          return const SizedBox.shrink();
-        }
+    if (role == null) {
+      return NavigationDrawer(
+        selectedIndex: 0,
+        onDestinationSelected: (index) => Navigator.pop(context),
+        children: [
+          const AppDrawerHeader.simplified(),
+          NavigationDrawerDestination(
+            icon: const Icon(Icons.login),
+            label: const Text('Iniciar Sesión'),
+          ),
+        ],
+      );
+    }
 
-        if (authState is AuthAuthenticated && !authState.user.isSuspended) {
-          final userRole = authState.user.role;
-          return NavigationDrawer(
-            selectedIndex: 0,
-            onDestinationSelected: (index) =>
-                _handleNavigation(index, userRole, context),
-            header: AppDrawerHeader(user: authState.user),
-            footer: const LogoutFooter(),
-            children: _buildDestinations(userRole),
-          );
-        }
-
-        // Unauthenticated or suspended
-        return NavigationDrawer(
-          selectedIndex: 0,
-          onDestinationSelected: (index) => Navigator.pop(context),
-          children: [
-            const AppDrawerHeader.simplified(),
-            NavigationDrawerDestination(
-              icon: Icon(Icons.login),
-              label: const Text('Iniciar Sesión'),
-            ),
-          ],
-        );
-      },
+    return NavigationDrawer(
+      selectedIndex: 0,
+      onDestinationSelected: (index) =>
+          _handleNavigation(index, role!, context),
+      header: AppDrawerHeader(user: user),
+      footer: LogoutFooter(onLogout: onLogout),
+      children: _buildDestinations(role!),
     );
   }
 
@@ -97,29 +92,13 @@ class AppDrawer extends StatelessWidget {
         Navigator.pushNamed(context, '/admin');
       case DrawerItemType.editProfile:
         Navigator.pop(context);
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => const ProfileScreen()),
-        );
+        onNavigateToProfile?.call();
       case DrawerItemType.favorites:
         Navigator.pop(context);
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => BlocProvider(
-              create: (_) => getIt<FavoriteBloc>(),
-              child: const FavoritesScreen(),
-            ),
-          ),
-        );
+        onNavigateToFavorites?.call();
       case DrawerItemType.labels:
         Navigator.pop(context);
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => const LabelManagementScreen(),
-          ),
-        );
+        onNavigateToLabels?.call();
     }
   }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:noveles/core/di/injection.dart';
+import 'package:noveles/bootstrap/injection.dart';
 import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:noveles/features/books/domain/track_book_view.dart';
@@ -17,7 +17,6 @@ import 'package:noveles/features/chapters/presentation/bloc/chapter_bloc.dart';
 import 'package:noveles/features/chapters/presentation/screens/chapter_screen.dart';
 import 'package:noveles/features/app/presentation/widgets/genre_chip_styled.dart';
 import 'package:noveles/shared/domain/entities/book_with_relations.dart';
-import 'package:noveles/features/tooks/data/took_model.dart';
 import 'package:noveles/features/tooks/domain/took_entity.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -53,8 +52,7 @@ class _BookScreenState extends State<BookScreen>
   }
 
   void _showTookBottomSheet(BuildContext context, TookEntity took) {
-    /// Runtime cast: data layer hydrates TookModel with full chapters.
-    final chapters = (took is TookModel) ? took.chapters : <ChapterEntity>[];
+    final chapters = took.chapters;
     if (chapters.isEmpty) return;
 
     showModalBottomSheet(
@@ -75,7 +73,7 @@ class _BookScreenState extends State<BookScreen>
   void _startFirstChapter(BuildContext context) {
     if (widget.book.listTook.isEmpty) return;
     final firstTook = widget.book.listTook.first;
-    final chapters = (firstTook is TookModel) ? firstTook.chapters : <ChapterEntity>[];
+    final chapters = firstTook.chapters;
     if (chapters.isEmpty) return;
 
     Navigator.push(
