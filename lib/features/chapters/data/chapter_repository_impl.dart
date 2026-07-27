@@ -16,6 +16,9 @@ class ChapterRepositoryImpl implements ChapterRepository {
 
   ChapterRepositoryImpl(this._supabase);
 
+  static const int _maxChapterSize = 10 * 1024 * 1024; // 10MB
+  static const _allowedExtensions = ['txt', 'html'];
+
   @override
   Future<Result<List<ChapterEntity>>> getChapters({int page = 1, int pageSize = 50}) async {
     try {
@@ -94,15 +97,28 @@ class ChapterRepositoryImpl implements ChapterRepository {
   @override
   Future<Result<String>> uploadContent(String filePath) async {
     try {
+      // Validar extensión
+      final ext = filePath.split('.').last.toLowerCase();
+      if (!_allowedExtensions.contains(ext)) {
+        return Err(ChapterFailure('Formato no permitido. Usa: TXT o HTML'));
+      }
+
+      // Validar tamaño
       final file = File(filePath);
-      final ext = filePath.split('.').last;
-      final userId = _supabase.client.auth.currentUser?.id ?? 'unknown';
+      final fileSize = await file.length();
+      if (fileSize > _maxChapterSize) {
+        return Err(ChapterFailure('El archivo es demasiado grande. Máximo: 10MB'));
+      }
+
+      final userId = _supabase.client.auth.currentUser?.id;
+      if (userId == null) return Err(ChapterFailure('No hay sesión activa'));
+
       final filename = '$userId/${DateTime.now().millisecondsSinceEpoch}.$ext';
       await _supabase.client.storage.from(StorageConstants.chaptersBucket).upload(filename, file);
       final url = _supabase.client.storage.from(StorageConstants.chaptersBucket).getPublicUrl(filename);
       return Ok(url);
     } catch (e) {
-      return Err(ChapterFailure('Error al subir contenido: $e', cause: e));
+      return Err(ChapterFailure('Error al subir contenido', cause: e));
     }
   }
 

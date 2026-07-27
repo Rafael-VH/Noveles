@@ -12,6 +12,9 @@ class ProfilesRepositoryImpl implements ProfilesRepository {
 
   ProfilesRepositoryImpl(this._supabase);
 
+  static const int _maxAvatarSize = 5 * 1024 * 1024; // 5MB
+  static const _allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+
   @override
   Future<Result<UserEntity>> getProfile() async {
     try {
@@ -57,9 +60,21 @@ class ProfilesRepositoryImpl implements ProfilesRepository {
     try {
       final user = _supabase.client.auth.currentUser;
       if (user == null) return Err(ProfileFailure('No hay sesión activa'));
-      final ext = filePath.split('.').last;
-      final path = '${user.id}/avatar.$ext';
+
+      // Validar extensión
+      final ext = filePath.split('.').last.toLowerCase();
+      if (!_allowedExtensions.contains(ext)) {
+        return Err(ProfileFailure('Formato no permitido. Usa: JPG, PNG, o WebP'));
+      }
+
+      // Validar tamaño
       final file = File(filePath);
+      final fileSize = await file.length();
+      if (fileSize > _maxAvatarSize) {
+        return Err(ProfileFailure('El archivo es demasiado grande. Máximo: 5MB'));
+      }
+
+      final path = '${user.id}/avatar.$ext';
       await _supabase.client.storage
           .from('avatars')
           .upload(path, file, fileOptions: const FileOptions(upsert: true));

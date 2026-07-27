@@ -80,7 +80,7 @@ class BookRepositoryImpl implements BookRepository {
         'link': book.link,
         'is_favorite': book.isFavorite,
         'is_visible': book.isVisible,
-        'created_by': _supabase.client.auth.currentUser?.id,
+        // created_by is set server-side by auth.uid() — never send from client
       };
 
       final newBookId = await _supabase.client.rpc(

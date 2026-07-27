@@ -65,15 +65,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     labelText: 'Correo electrónico',
                     prefixIcon: Icon(Icons.email_outlined),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Ingresa tu correo';
-                    }
-                    if (!value.contains('@')) {
-                      return 'Correo inválido';
-                    }
-                    return null;
-                  },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Ingresa tu correo';
+                      }
+                      final emailRegex = RegExp(r'^[\w\-\.]+@([\w\-]+\.)+[\w\-]{2,}$');
+                      if (!emailRegex.hasMatch(value)) {
+                        return 'Correo inválido';
+                      }
+                      return null;
+                    },
                 ),
                 const SizedBox(height: 16),
                 TextFormField(

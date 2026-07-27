@@ -80,7 +80,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       if (value == null || value.isEmpty) {
                         return 'Ingresa tu correo';
                       }
-                      if (!value.contains('@')) {
+                      final emailRegex = RegExp(r'^[\w\-\.]+@([\w\-]+\.)+[\w\-]{2,}$');
+                      if (!emailRegex.hasMatch(value)) {
                         return 'Correo inválido';
                       }
                       return null;
@@ -107,8 +108,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       if (value == null || value.isEmpty) {
                         return 'Ingresa tu contraseña';
                       }
-                      if (value.length < 6) {
-                        return 'Mínimo 6 caracteres';
+                      if (value.length < 8) {
+                        return 'Mínimo 8 caracteres';
+                      }
+                      if (!RegExp(r'[A-Z]').hasMatch(value)) {
+                        return 'Debe incluir una mayúscula';
+                      }
+                      if (!RegExp(r'[0-9]').hasMatch(value)) {
+                        return 'Debe incluir un número';
                       }
                       return null;
                     },
