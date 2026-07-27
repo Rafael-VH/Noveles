@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:noveles/features/books/favorites/domain/favorite_entity.dart';
+import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 
 abstract class FavoriteState extends Equatable {
   @override
@@ -11,7 +11,7 @@ class FavoriteInitial extends FavoriteState {}
 class FavoriteLoading extends FavoriteState {}
 
 class FavoriteLoaded extends FavoriteState {
-  final List<FavoriteEntity> favorites;
+  final List<BookWithRelations> favorites;
 
   FavoriteLoaded(this.favorites);
 

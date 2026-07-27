@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/cover/cover_url_service.dart';
-import 'package:noveles/core/di/injection.dart';
-import 'package:noveles/core/errors/result.dart';
+import 'package:noveles/bootstrap/injection.dart';
 import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:noveles/features/books/domain/book_repository.dart';
 import 'package:noveles/features/books/favorites/presentation/bloc/favorite_bloc.dart';
-import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key});
@@ -69,37 +66,19 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             return ListView.builder(
               itemCount: state.favorites.length,
               itemBuilder: (context, index) {
-                final favorite = state.favorites[index];
-                return FutureBuilder<BookWithRelations?>(
-                  future: _getBookById(favorite.bookId),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState ==
-                        ConnectionState.waiting) {
-                      return const ListTile(
-                        leading: CircularProgressIndicator(),
-                        title: Text('Cargando...'),
-                      );
-                    }
-
-                    final book = snapshot.data;
-                    if (book == null) {
-                      return const SizedBox.shrink();
-                    }
-
-                    return ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: book.cover.isNotEmpty
-                            ? NetworkImage(
-                                getIt<CoverUrlService>()(book.cover))
-                            : null,
-                        child: book.cover.isEmpty
-                            ? const Icon(Icons.book)
-                            : null,
-                      ),
-                      title: Text(book.name),
-                      subtitle: Text(book.author),
-                    );
-                  },
+                final book = state.favorites[index];
+                return ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage: book.cover.isNotEmpty
+                        ? NetworkImage(
+                            getIt<CoverUrlService>()(book.cover))
+                        : null,
+                    child: book.cover.isEmpty
+                        ? const Icon(Icons.book)
+                        : null,
+                  ),
+                  title: Text(book.name),
+                  subtitle: Text(book.author),
                 );
               },
             );
@@ -109,20 +88,5 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         },
       ),
     );
-  }
-
-  Future<BookWithRelations?> _getBookById(int bookId) async {
-    final authState = context.read<AuthBloc>().state;
-    if (authState is AuthAuthenticated) {
-      final booksRepository = getIt<BookRepository>();
-      final result = await booksRepository.getBookById(bookId);
-      switch (result) {
-        case Ok(:final value):
-          return value;
-        case Err():
-          return null;
-      }
-    }
-    return null;
   }
 }

@@ -17,11 +17,12 @@ import 'package:noveles/features/books/domain/get_most_viewed_books.dart';
 import 'package:noveles/features/books/presentation/bloc/book_bloc.dart';
 import 'package:noveles/features/books/favorites/data/favorite_repository_impl.dart';
 import 'package:noveles/features/books/favorites/domain/favorite_repository.dart';
+import 'package:noveles/features/books/favorites/domain/use_cases/get_favorites_use_case.dart';
+import 'package:noveles/features/books/favorites/domain/use_cases/is_favorite_use_case.dart';
+import 'package:noveles/features/books/favorites/domain/use_cases/toggle_favorite_use_case.dart';
 import 'package:noveles/features/books/favorites/presentation/bloc/favorite_bloc.dart';
 
-final getIt = GetIt.instance;
-
-void initBooksDependencies() {
+void initBooksDependencies(GetIt getIt) {
   getIt.registerLazySingleton<BookRepository>(
     () => BookRepositoryImpl(
       getIt<SupabaseClientProvider>(),
@@ -79,9 +80,21 @@ void initBooksDependencies() {
     ),
   );
 
+  getIt.registerLazySingleton(
+    () => ToggleFavorite(getIt()),
+  );
+  getIt.registerLazySingleton(
+    () => GetFavorites(getIt()),
+  );
+  getIt.registerLazySingleton(
+    () => IsFavorite(getIt()),
+  );
+
   getIt.registerFactory(
     () => FavoriteBloc(
-      favoriteRepository: getIt(),
+      toggleFavorite: getIt(),
+      getFavorites: getIt(),
+      isFavorite: getIt(),
     ),
   );
 }

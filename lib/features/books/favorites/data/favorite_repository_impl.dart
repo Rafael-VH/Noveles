@@ -1,8 +1,9 @@
 import 'package:noveles/core/errors/failure.dart';
 import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/core/supabase/supabase_client.dart';
-import 'package:noveles/features/books/favorites/domain/favorite_entity.dart';
+import 'package:noveles/features/books/data/book_model.dart';
 import 'package:noveles/features/books/favorites/domain/favorite_repository.dart';
+import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 
 class FavoriteRepositoryImpl implements FavoriteRepository {
   final SupabaseClientProvider _supabase;
@@ -39,23 +40,29 @@ class FavoriteRepositoryImpl implements FavoriteRepository {
   }
 
   @override
-  Future<Result<List<FavoriteEntity>>> getFavorites(String userId) async {
+  Future<Result<List<BookWithRelations>>> getFavorites(String userId) async {
     try {
       final response = await _supabase.client
           .from('user_favorites')
-          .select()
+          .select('book_id')
           .eq('user_id', userId)
           .order('created_at', ascending: false);
 
-      final favorites = response
-          .map((json) => FavoriteEntity(
-                userId: json['user_id'] as String,
-                bookId: json['book_id'] as int,
-                createdAt: DateTime.parse(json['created_at'] as String),
-              ))
+      if (response.isEmpty) return const Ok([]);
+
+      final bookIds = response.map((r) => r['book_id'] as int).toList();
+
+      final booksResponse = await _supabase.client
+          .from('books')
+          .select(
+              '*, authors(*), books_genres(genre_id, genres(*)), books_labels(*, labels(*)), tooks(*, chapters(*))')
+          .inFilter('id', bookIds);
+
+      final books = booksResponse
+          .map((json) => BookModel.fromJson(json))
           .toList();
 
-      return Ok(favorites);
+      return Ok(books);
     } catch (e) {
       return Err(FavoriteFailure('Error al obtener favoritos', cause: e));
     }

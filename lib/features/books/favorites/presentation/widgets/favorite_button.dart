@@ -63,7 +63,7 @@ class _FavoriteButtonState extends State<FavoriteButton> {
           final authState = context.read<AuthBloc>().state;
           if (authState is AuthAuthenticated) {
             context.read<FavoriteBloc>().add(
-                  ToggleFavorite(
+                  ToggleFavoriteEvent(
                     userId: authState.user.id,
                     bookId: widget.bookId,
                   ),
