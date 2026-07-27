@@ -18,7 +18,7 @@ void setupDependencies() {
   _registerCore();
   initProfilesDependencies();
   initAuthDependencies();
-  initBooksDependencies();
+  initBooksDependencies(getIt);
   initChaptersDependencies();
   initGenresDependencies();
   initLabelsDependencies();

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:noveles/core/app/app.dart';
-import 'package:noveles/core/di/injection.dart';
+import 'package:noveles/bootstrap/app.dart';
+import 'package:noveles/bootstrap/injection.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
