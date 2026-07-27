@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:noveles/core/di/injection.dart';
+import 'package:noveles/bootstrap/injection.dart';
 import 'package:noveles/shared/presentation/widgets/confirmation_dialog.dart';
 import 'package:noveles/shared/presentation/widgets/snackbar_helper.dart';
 import 'package:noveles/features/genres/domain/genre_entity.dart';
