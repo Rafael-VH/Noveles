@@ -1,18 +1,21 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:noveles/core/di/injection.dart';
+import 'package:noveles/bootstrap/injection.dart';
 import 'package:noveles/core/cover/cover_url_service.dart';
 import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 import 'package:noveles/shared/presentation/widgets/confirmation_dialog.dart';
 import 'package:noveles/shared/presentation/widgets/snackbar_helper.dart';
+import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:noveles/features/scan/presentation/bloc/scan_book_bloc.dart';
 import 'package:noveles/features/scan/presentation/bloc/scan_cover_bloc.dart';
 import 'package:noveles/features/scan/presentation/bloc/scan_took_bloc.dart';
 import 'package:noveles/features/app/presentation/widgets/app_drawer.dart';
 import 'package:noveles/features/profiles/domain/user_role.dart';
+import 'package:noveles/features/profiles/presentation/screens/profile_screen.dart';
 import 'package:noveles/features/genres/presentation/genre_cubit.dart';
 import 'package:noveles/features/scan/presentation/screens/scan_book_edit_screen.dart';
+import 'package:noveles/features/labels/presentation/screens/label_management_screen.dart';
 
 class ScanMainScreen extends StatefulWidget {
   const ScanMainScreen({super.key});
@@ -50,7 +53,26 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
           }
         },
         child: Scaffold(
-          drawer: const AppDrawer(role: UserRole.scan),
+          drawer: AppDrawer(
+            role: UserRole.scan,
+            onNavigateToProfile: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ProfileScreen()),
+              );
+            },
+            onNavigateToLabels: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const LabelManagementScreen(),
+                ),
+              );
+            },
+            onLogout: () {
+              context.read<AuthBloc>().add(LogoutRequested());
+            },
+          ),
           appBar: AppBar(
             title: Row(
               children: [
