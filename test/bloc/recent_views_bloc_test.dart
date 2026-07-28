@@ -18,10 +18,6 @@ void main() {
     recentViewsBloc = RecentViewsBloc(getRecentViews: mockGetRecentViews);
   });
 
-  tearDown(() {
-    recentViewsBloc.close();
-  });
-
   group('RecentViewsBloc', () {
     const testUserId = 'test-user-id';
 
@@ -54,6 +50,7 @@ void main() {
 
     test('initial state is RecentViewsInitial', () {
       expect(recentViewsBloc.state, equals(RecentViewsInitial()));
+      recentViewsBloc.close();
     });
 
     blocTest<RecentViewsBloc, RecentViewsState>(
