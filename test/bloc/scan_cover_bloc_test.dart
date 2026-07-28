@@ -19,13 +19,10 @@ void main() {
     );
   });
 
-  tearDown(() {
-    scanCoverBloc.close();
-  });
-
   group('ScanCoverBloc', () {
     test('initial state is ScanCoverInitial', () {
       expect(scanCoverBloc.state, equals(ScanCoverInitial()));
+      scanCoverBloc.close();
     });
 
     blocTest<ScanCoverBloc, ScanCoverState>(
