@@ -95,8 +95,72 @@ void main() {
       expect(withCreator.createdBy, 'user-uuid');
     });
 
-    test('props includes createdBy', () {
-      expect(baseBook.props.any((p) => p == null), isTrue);
+    test('equatable — same values are equal', () {
+      final same = BookEntity(
+        id: 1,
+        createdAt: DateTime(2026),
+        cover: 'cover.jpg',
+        name: 'Test Book',
+        short: 'Test',
+        alternative: '',
+        description: 'A test book',
+        authorId: 1,
+        author: 'Author',
+        country: 'US',
+        state: 'active',
+        type: 'novel',
+        release: '2026',
+        tookCount: 1,
+        chapterCount: 10,
+        source: 'web',
+        link: '',
+        isFavorite: false,
+        isVisible: true,
+        listGenreIds: const [],
+        listTookIds: const [],
+        listLabelIds: const [],
+        createdBy: null,
+      );
+      expect(baseBook == same, isTrue);
+      expect(baseBook.hashCode, same.hashCode);
+    });
+
+    test('equatable — different id is not equal', () {
+      final other = baseBook.copyWith(id: 999);
+      expect(baseBook == other, isFalse);
+    });
+
+    test('equatable — different name is not equal', () {
+      final other = baseBook.copyWith(name: 'Different');
+      expect(baseBook == other, isFalse);
+    });
+
+    test('props contains all fields', () {
+      expect(baseBook.props, [
+        baseBook.id,
+        baseBook.createdAt,
+        baseBook.cover,
+        baseBook.name,
+        baseBook.short,
+        baseBook.alternative,
+        baseBook.description,
+        baseBook.authorId,
+        baseBook.author,
+        baseBook.country,
+        baseBook.state,
+        baseBook.type,
+        baseBook.release,
+        baseBook.tookCount,
+        baseBook.chapterCount,
+        baseBook.source,
+        baseBook.link,
+        baseBook.isFavorite,
+        baseBook.isVisible,
+        baseBook.listGenreIds,
+        baseBook.listTookIds,
+        baseBook.listLabelIds,
+        baseBook.createdBy,
+      ]);
     });
 
     test('copyWith preserves fields', () {
@@ -105,8 +169,12 @@ void main() {
       expect(copied.name, baseBook.name);
     });
 
-    test('props includes listLabel', () {
-      expect(baseBook.props.contains(baseBook.listLabelIds), true);
+    test('copyWith changes only specified field', () {
+      final copied = baseBook.copyWith(name: 'Renamed');
+      expect(copied.name, 'Renamed');
+      expect(copied.id, baseBook.id);
+      expect(copied.author, baseBook.author);
     });
+
   });
 }
