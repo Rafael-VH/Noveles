@@ -63,7 +63,7 @@ void main() {
       expect(find.text('Editar Perfil'), findsOneWidget);
     });
 
-    testWidgets('admin NO ve Inicio, Mis Favoritos, Panel Scan ni Etiquetas',
+    testWidgets('admin NO ve Inicio, Mis Favoritos ni Panel Scan',
         (tester) async {
       when(() => authBloc.state).thenReturn(
         AuthAuthenticated(
@@ -76,10 +76,9 @@ void main() {
       expect(find.text('Inicio'), findsNothing);
       expect(find.text('Mis Favoritos'), findsNothing);
       expect(find.text('Panel Scan'), findsNothing);
-      expect(find.text('Etiquetas'), findsNothing);
     });
 
-    testWidgets('scan ve Panel Scan, Editar Perfil y Etiquetas',
+    testWidgets('scan ve Panel Scan y Editar Perfil',
         (tester) async {
       when(() => authBloc.state).thenReturn(
         AuthAuthenticated(
@@ -91,7 +90,6 @@ void main() {
 
       expect(find.text('Panel Scan'), findsOneWidget);
       expect(find.text('Editar Perfil'), findsOneWidget);
-      expect(find.text('Etiquetas'), findsOneWidget);
     });
 
     testWidgets('scan NO ve Inicio, Panel Admin ni Mis Favoritos',
@@ -185,15 +183,15 @@ void main() {
       expect(find.text('Iniciar Sesión'), findsOneWidget);
     });
 
-    testWidgets('loading state muestra SizedBox.shrink', (tester) async {
+    testWidgets('loading state muestra login drawer', (tester) async {
       when(() => authBloc.state).thenReturn(AuthLoading());
 
       await tester.pumpWidget(buildAppDrawer(authBloc: authBloc));
 
-      // No debe mostrar nada del drawer
-      expect(find.text('Iniciar Sesión'), findsNothing);
+      // El drawer muestra login cuando no hay role (independiente del estado AuthBloc)
+      expect(find.text('Iniciar Sesión'), findsOneWidget);
       expect(find.text('Panel Admin'), findsNothing);
-      expect(find.byType(NavigationDrawer), findsNothing);
+      expect(find.byType(NavigationDrawer), findsOneWidget);
     });
   });
 
@@ -211,7 +209,7 @@ void main() {
       expect(find.text('Perfil'), findsOneWidget);
     });
 
-    testWidgets('scan ve secciones "Navegación", "Perfil" y "Gestión"',
+    testWidgets('scan ve secciones "Navegación" y "Perfil"',
         (tester) async {
       when(() => authBloc.state).thenReturn(
         AuthAuthenticated(
@@ -223,7 +221,6 @@ void main() {
 
       expect(find.text('Navegación'), findsOneWidget);
       expect(find.text('Perfil'), findsOneWidget);
-      expect(find.text('Gestión'), findsOneWidget);
     });
 
     testWidgets('reader ve secciones "Navegación" y "Perfil"', (tester) async {
