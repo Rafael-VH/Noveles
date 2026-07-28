@@ -4,6 +4,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/admin/data/analytics_repository_impl.dart';
+import 'package:noveles/features/admin/domain/analytics_entities.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MockSupabaseClientProvider extends Mock
@@ -57,10 +58,10 @@ void main() {
 
         final result = await repository.getViewsTrend();
 
-        expect(result, isA<Ok<List<Map<String, dynamic>>>>());
-        final value = (result as Ok<List<Map<String, dynamic>>>).value;
+        expect(result, isA<Ok<List<AnalyticsTrendEntry>>>());
+        final value = (result as Ok<List<AnalyticsTrendEntry>>).value;
         expect(value.length, 1);
-        expect(value.first['view_count'], 5);
+        expect(value.first.viewCount, 5);
       });
 
       test('returns Err on error', () async {
@@ -69,7 +70,7 @@ void main() {
             .thenThrow(Exception('RPC error'));
 
         final result = await repository.getViewsTrend();
-        expect(result, isA<Err<List<Map<String, dynamic>>>>());
+        expect(result, isA<Err<List<AnalyticsTrendEntry>>>());
       });
     });
 
@@ -85,9 +86,9 @@ void main() {
 
         final result = await repository.getTopBooks();
 
-        expect(result, isA<Ok<List<Map<String, dynamic>>>>());
-        final value = (result as Ok<List<Map<String, dynamic>>>).value;
-        expect(value.first['book_name'], 'Book');
+        expect(result, isA<Ok<List<AnalyticsTopBook>>>());
+        final value = (result as Ok<List<AnalyticsTopBook>>).value;
+        expect(value.first.bookName, 'Book');
       });
 
       test('returns Err on error', () async {
@@ -96,7 +97,7 @@ void main() {
             .thenThrow(Exception('RPC error'));
 
         final result = await repository.getTopBooks();
-        expect(result, isA<Err<List<Map<String, dynamic>>>>());
+        expect(result, isA<Err<List<AnalyticsTopBook>>>());
       });
     });
 
@@ -116,10 +117,10 @@ void main() {
 
         final result = await repository.getOverview();
 
-        expect(result, isA<Ok<Map<String, dynamic>>>());
-        final value = (result as Ok<Map<String, dynamic>>).value;
-        expect(value['total_views'], 100);
-        expect(value['views_today'], 5);
+        expect(result, isA<Ok<AnalyticsOverview>>());
+        final value = (result as Ok<AnalyticsOverview>).value;
+        expect(value.totalViews, 100);
+        expect(value.viewsToday, 5);
       });
 
       test('returns Err on error', () async {
@@ -127,7 +128,7 @@ void main() {
             .thenThrow(Exception('RPC error'));
 
         final result = await repository.getOverview();
-        expect(result, isA<Err<Map<String, dynamic>>>());
+        expect(result, isA<Err<AnalyticsOverview>>());
       });
     });
   });
