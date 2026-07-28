@@ -102,14 +102,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     if (_manualLogoutInProgress) return;
     _manualLogoutInProgress = true;
-    emit(AuthLoading());
-    final result = await logout();
-    switch (result) {
-      case Ok():
-        emit(AuthUnauthenticated());
-      case Err(:final error):
-        emit(AuthError(error.message));
+    try {
+      emit(AuthLoading());
+      final result = await logout();
+      switch (result) {
+        case Ok():
+          emit(AuthUnauthenticated());
+        case Err(:final error):
+          emit(AuthError(error.message));
+      }
+    } finally {
+      _manualLogoutInProgress = false;
     }
-    _manualLogoutInProgress = false;
   }
 }
