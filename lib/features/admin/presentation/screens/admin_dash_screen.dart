@@ -145,6 +145,7 @@ class _AdminDashScreenState extends State<AdminDashScreen> {
   }
 
   void _confirmLogout(BuildContext context) {
+    final bloc = context.read<AuthBloc>();
     showConfirmationDialog(
       context: context,
       title: 'Cerrar Sesión',
@@ -153,7 +154,7 @@ class _AdminDashScreenState extends State<AdminDashScreen> {
       isDestructive: true,
     ).then((confirmed) {
       if (confirmed == true) {
-        context.read<AuthBloc>().add(LogoutRequested());
+        bloc.add(LogoutRequested());
       }
     });
   }

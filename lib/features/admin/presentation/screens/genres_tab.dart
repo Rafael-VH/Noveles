@@ -198,6 +198,7 @@ class GenreListContent extends StatelessWidget {
   }
 
   void _confirmDeleteGenre(BuildContext context, int genreId) {
+    final bloc = context.read<GenreBloc>();
     showConfirmationDialog(
       context: context,
       title: 'Eliminar género',
@@ -206,7 +207,7 @@ class GenreListContent extends StatelessWidget {
       isDestructive: true,
     ).then((confirmed) {
       if (confirmed == true) {
-        context.read<GenreBloc>().add(DeleteGenreEvent(genreId));
+        bloc.add(DeleteGenreEvent(genreId));
       }
     });
   }
