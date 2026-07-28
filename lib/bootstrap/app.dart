@@ -5,7 +5,10 @@ import 'package:noveles/core/presentation/notification_listener.dart';
 import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:noveles/core/presentation/bloc/theme_bloc.dart';
 import 'package:noveles/features/admin/presentation/screens/admin_dash_screen.dart';
+import 'package:noveles/features/scan/presentation/screens/scan_main_screen.dart';
+import 'package:noveles/features/app/presentation/screens/main_screen.dart';
 import 'package:noveles/features/app/presentation/screens/splash_screen.dart';
+import 'package:noveles/features/auth/presentation/screens/login_screen.dart';
 import 'package:noveles/features/labels/presentation/screens/label_management_screen.dart';
 
 class App extends StatelessWidget {
@@ -40,6 +43,16 @@ class App extends StatelessWidget {
                         backgroundColor: Theme.of(context).colorScheme.error,
                       ),
                     );
+                    return;
+                  }
+
+                  if (!SplashScreen.isReady) return;
+
+                  final destination = _resolveDestination(state);
+                  if (destination != null) {
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(builder: (_) => destination),
+                    );
                   }
                 },
                 child: const SplashScreen(),
@@ -49,5 +62,17 @@ class App extends StatelessWidget {
         },
       ),
     );
+  }
+
+  Widget? _resolveDestination(AuthState state) {
+    if (state is AuthAuthenticated) {
+      if (state.user.isAdmin) return const AdminDashScreen();
+      if (state.user.isScan) return const ScanMainScreen();
+      if (state.user.isUser) return const MainScreen();
+    }
+    if (state is AuthUnauthenticated) {
+      return const LoginScreen();
+    }
+    return null;
   }
 }
