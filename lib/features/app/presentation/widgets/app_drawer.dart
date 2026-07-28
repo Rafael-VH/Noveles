@@ -188,5 +188,11 @@ final Map<UserRole, List<(String, List<DrawerItemType>)>> _roleSections = {
         DrawerItemType.editProfile,
       ]
     ),
+    (
+      'Gestión',
+      [
+        DrawerItemType.labels,
+      ]
+    ),
   ],
 };

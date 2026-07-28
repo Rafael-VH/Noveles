@@ -13,6 +13,7 @@ import 'package:noveles/features/admin/presentation/screens/books_tab.dart';
 import 'package:noveles/features/admin/presentation/screens/genres_tab.dart';
 import 'package:noveles/features/admin/presentation/screens/summary_tab.dart';
 import 'package:noveles/features/admin/presentation/screens/users_tab.dart';
+import 'package:noveles/features/labels/presentation/screens/label_management_screen.dart';
 import 'package:noveles/features/labels/presentation/screens/label_rules_admin_tab.dart';
 import 'package:noveles/features/app/presentation/widgets/app_drawer.dart';
 import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
@@ -36,7 +37,15 @@ class _AdminDashScreenState extends State<AdminDashScreen> {
 
     return DoubleBackExit(
       child: Scaffold(
-        drawer: const AppDrawer(role: UserRole.admin),
+        drawer: AppDrawer(
+          role: UserRole.admin,
+          onNavigateToLabels: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const LabelManagementScreen()),
+            );
+          },
+        ),
         appBar: AppBar(
           title: const Text('Panel Admin'),
           actions: [
