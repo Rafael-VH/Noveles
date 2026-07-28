@@ -106,6 +106,7 @@ class GenreListContent extends StatelessWidget {
   }
 
   void _showAddGenreDialog(BuildContext context) {
+    final bloc = context.read<GenreBloc>();
     final controller = TextEditingController();
     showDialog(
       context: context,
@@ -121,19 +122,15 @@ class GenreListContent extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () {
-              controller.dispose();
-              Navigator.pop(ctx);
-            },
+            onPressed: () => Navigator.pop(ctx),
             child: const Text('Cancelar'),
           ),
           TextButton(
             onPressed: () {
               final name = controller.text.trim();
               if (name.isEmpty) return;
-              controller.dispose();
               Navigator.pop(ctx);
-              context.read<GenreBloc>().add(
+              bloc.add(
                     CreateGenreEvent(
                       GenreEntity(
                         id: 0,
@@ -148,10 +145,11 @@ class GenreListContent extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ).whenComplete(() => controller.dispose());
   }
 
   void _showEditGenreDialog(BuildContext context, GenreEntity genre) {
+    final bloc = context.read<GenreBloc>();
     final controller = TextEditingController(text: genre.name);
     showDialog(
       context: context,
@@ -167,19 +165,15 @@ class GenreListContent extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () {
-              controller.dispose();
-              Navigator.pop(ctx);
-            },
+            onPressed: () => Navigator.pop(ctx),
             child: const Text('Cancelar'),
           ),
           TextButton(
             onPressed: () {
               final name = controller.text.trim();
               if (name.isEmpty) return;
-              controller.dispose();
               Navigator.pop(ctx);
-              context.read<GenreBloc>().add(
+              bloc.add(
                     UpdateGenreEvent(
                       GenreEntity(
                         id: genre.id,
@@ -194,7 +188,7 @@ class GenreListContent extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ).whenComplete(() => controller.dispose());
   }
 
   void _confirmDeleteGenre(BuildContext context, int genreId) {
