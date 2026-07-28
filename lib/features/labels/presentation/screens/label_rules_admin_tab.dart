@@ -252,7 +252,10 @@ class _LabelRulesAdminTabState extends State<LabelRulesAdminTab> {
           ),
         ],
       ),
-    );
+    ).whenComplete(() {
+      limitController.dispose();
+      daysController.dispose();
+    });
   }
 }
 
