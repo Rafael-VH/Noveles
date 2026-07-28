@@ -47,6 +47,12 @@ void main() {
   });
 
   tearDown(() {
+    if (getIt.isRegistered<GetReadChapterIds>()) {
+      getIt.unregister<GetReadChapterIds>();
+    }
+    if (getIt.isRegistered<ChapterBloc>()) {
+      getIt.unregister<ChapterBloc>();
+    }
     authController.close();
   });
 
