@@ -58,13 +58,10 @@ void main() {
     );
   });
 
-  tearDown(() {
-    scanChapterBloc.close();
-  });
-
   group('ScanChapterBloc', () {
     test('initial state is ScanChapterInitial', () {
       expect(scanChapterBloc.state, equals(ScanChapterInitial()));
+      scanChapterBloc.close();
     });
 
     blocTest<ScanChapterBloc, ScanChapterState>(
