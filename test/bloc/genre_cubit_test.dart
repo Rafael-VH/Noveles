@@ -21,13 +21,10 @@ void main() {
     );
   });
 
-  tearDown(() {
-    genreCubit.close();
-  });
-
   group('GenreCubit', () {
     test('initial state is GenreInitial', () {
       expect(genreCubit.state, equals(GenreInitial()));
+      genreCubit.close();
     });
 
     blocTest<GenreCubit, GenreState>(
