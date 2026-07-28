@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:noveles/features/books/favorites/presentation/bloc/favorite_bloc.dart';
+import 'package:noveles/shared/presentation/widgets/snackbar_helper.dart';
 
 class FavoriteButton extends StatefulWidget {
   final int bookId;
@@ -52,6 +53,8 @@ class _FavoriteButtonState extends State<FavoriteButton> {
           setState(() {
             _isFavorite = state.isFavorite;
           });
+        } else if (state is FavoriteError) {
+          showErrorSnack(context, state.message);
         }
       },
       child: IconButton(
