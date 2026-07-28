@@ -189,6 +189,7 @@ class _UsersTabState extends State<UsersTab> {
       UserRole.admin: 'Admin',
     };
 
+    final bloc = context.read<AdminUsersBloc>();
     showDialog(
       context: context,
       builder: (context) => SimpleDialog(
@@ -198,7 +199,7 @@ class _UsersTabState extends State<UsersTab> {
               (role) => SimpleDialogOption(
                 onPressed: () {
                   Navigator.pop(context);
-                  context.read<AdminUsersBloc>().add(
+                  bloc.add(
                         ChangeUserRole(
                           targetUserId: user.id,
                           newRole: role.name,
