@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -189,17 +187,19 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
 
   // Navigate to took edit (save book first if it's new)
   Future<void> _addTook() async {
+    final bloc = context.read<ScanBookBloc>();
     int bookId;
     if (_bookId != null) {
       bookId = _bookId!;
     } else {
       // New book — save first to get a real book ID
       final saved = await _saveBook();
+      if (!mounted) return;
       if (saved == null || _bookId == null) return;
       bookId = _bookId!;
     }
-    final refreshed = await Navigator.push<bool>(
-      context,
+    final navigator = Navigator.of(context);
+    final refreshed = await navigator.push<bool>(
       MaterialPageRoute(
         builder: (_) => BlocProvider(
           create: (_) => getIt<ScanTookBloc>(),
@@ -208,7 +208,7 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
       ),
     );
     if (refreshed == true && mounted) {
-      context.read<ScanBookBloc>().add(LoadScanBooks());
+      bloc.add(LoadScanBooks());
     }
   }
 
@@ -523,6 +523,7 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
                   bookId: _bookId,
                   onAddTook: _addTook,
                   onEditTook: (took, bookId) async {
+                    final bloc = context.read<ScanBookBloc>();
                     final refreshed = await Navigator.push<bool>(
                       context,
                       MaterialPageRoute(
@@ -536,11 +537,13 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
                       ),
                     );
                     if (refreshed == true && mounted) {
-                      context.read<ScanBookBloc>().add(LoadScanBooks());
+                      bloc.add(LoadScanBooks());
                     }
                   },
                   onDeleteTook: (tookId) async {
                     final bloc = context.read<ScanTookBloc>();
+                    final messenger = ScaffoldMessenger.of(context);
+                    final theme = Theme.of(context);
                     final completer = Completer<ScanTookState>();
                     late StreamSubscription sub;
                     sub = bloc.stream.listen((s) {
@@ -556,32 +559,32 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
                       if (result is ScanTookLoaded && mounted) {
                         setState(() =>
                             _tooks.removeWhere((t) => t.id == tookId));
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        messenger.showSnackBar(
                           SnackBar(
                             content:
                                 Text(result.message ?? 'Tomo eliminado'),
                             backgroundColor:
-                                Theme.of(context).colorScheme.tertiary,
+                                theme.colorScheme.tertiary,
                           ),
                         );
                       } else if (result is ScanTookError && mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        messenger.showSnackBar(
                           SnackBar(
                             content: Text(result.message),
                             backgroundColor:
-                                Theme.of(context).colorScheme.error,
+                                theme.colorScheme.error,
                           ),
                         );
                       }
                     } on TimeoutException {
                       sub.cancel();
                       if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        messenger.showSnackBar(
                           SnackBar(
                             content:
                                 const Text('La operación tardó demasiado'),
                             backgroundColor:
-                                Theme.of(context).colorScheme.error,
+                                theme.colorScheme.error,
                           ),
                         );
                       }
