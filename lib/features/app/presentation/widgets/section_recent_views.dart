@@ -5,6 +5,7 @@ import 'package:noveles/features/app/presentation/widgets/book_card_vertical.dar
 import 'package:noveles/features/app/presentation/widgets/section_title.dart';
 import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:noveles/features/books/presentation/screens/book_screen.dart';
+import 'package:noveles/shared/presentation/widgets/snackbar_helper.dart';
 
 class SectionRecentViews extends StatefulWidget {
   const SectionRecentViews({super.key});
@@ -30,7 +31,11 @@ class _SectionRecentViewsState extends State<SectionRecentViews> {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<RecentViewsBloc, RecentViewsState>(
-      listener: (context, state) {},
+      listener: (context, state) {
+        if (state is RecentViewsError) {
+          showErrorSnack(context, state.message);
+        }
+      },
       builder: (context, state) {
         if (state is RecentViewsLoaded) {
           return Column(
