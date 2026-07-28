@@ -6,6 +6,7 @@ class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
   static bool isReady = false;
+  static VoidCallback? onReady;
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -18,6 +19,7 @@ class _SplashScreenState extends State<SplashScreen> {
     SplashScreen.isReady = false;
     Timer(const Duration(milliseconds: 1500), () {
       SplashScreen.isReady = true;
+      SplashScreen.onReady?.call();
     });
   }
 

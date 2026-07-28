@@ -11,8 +11,53 @@ import 'package:noveles/features/app/presentation/screens/splash_screen.dart';
 import 'package:noveles/features/auth/presentation/screens/login_screen.dart';
 import 'package:noveles/features/labels/presentation/screens/label_management_screen.dart';
 
-class App extends StatelessWidget {
+class App extends StatefulWidget {
   const App({super.key});
+
+  @override
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  @override
+  void initState() {
+    super.initState();
+    SplashScreen.onReady = _navigateIfNeeded;
+  }
+
+  @override
+  void dispose() {
+    SplashScreen.onReady = null;
+    super.dispose();
+  }
+
+  void _navigateIfNeeded() {
+    if (!mounted) return;
+    final state = context.read<AuthBloc>().state;
+    if (state is AuthLoading || state is AuthInitial) return;
+    _navigateTo(state);
+  }
+
+  void _navigateTo(AuthState state) {
+    final destination = _resolveDestination(state);
+    if (destination != null) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => destination),
+      );
+    }
+  }
+
+  Widget? _resolveDestination(AuthState state) {
+    if (state is AuthAuthenticated) {
+      if (state.user.isAdmin) return const AdminDashScreen();
+      if (state.user.isScan) return const ScanMainScreen();
+      if (state.user.isUser) return const MainScreen();
+    }
+    if (state is AuthUnauthenticated) {
+      return const LoginScreen();
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,13 +91,8 @@ class App extends StatelessWidget {
                     return;
                   }
 
-                  if (!SplashScreen.isReady) return;
-
-                  final destination = _resolveDestination(state);
-                  if (destination != null) {
-                    Navigator.of(context).pushReplacement(
-                      MaterialPageRoute(builder: (_) => destination),
-                    );
+                  if (SplashScreen.isReady) {
+                    _navigateTo(state);
                   }
                 },
                 child: const SplashScreen(),
@@ -62,17 +102,5 @@ class App extends StatelessWidget {
         },
       ),
     );
-  }
-
-  Widget? _resolveDestination(AuthState state) {
-    if (state is AuthAuthenticated) {
-      if (state.user.isAdmin) return const AdminDashScreen();
-      if (state.user.isScan) return const ScanMainScreen();
-      if (state.user.isUser) return const MainScreen();
-    }
-    if (state is AuthUnauthenticated) {
-      return const LoginScreen();
-    }
-    return null;
   }
 }
