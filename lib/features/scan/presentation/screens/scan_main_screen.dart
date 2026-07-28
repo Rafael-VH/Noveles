@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/bootstrap/injection.dart';
 import 'package:noveles/core/cover/cover_url_service.dart';
+import 'package:noveles/core/presentation/widgets/double_back_exit.dart';
 import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 import 'package:noveles/shared/presentation/widgets/confirmation_dialog.dart';
 import 'package:noveles/shared/presentation/widgets/snackbar_helper.dart';
@@ -41,163 +42,168 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: _scanBookBloc,
-      child: BlocListener<ScanBookBloc, ScanBookState>(
-        listener: (context, state) {
-          if (state is ScanBookError) {
-            showErrorSnack(context, state.message);
-          }
-          if (state is ScanBookLoaded && state.message != null) {
-            showSuccessSnack(context, state.message!);
-          }
-        },
-        child: Scaffold(
-          drawer: AppDrawer(
-            role: UserRole.scan,
-            onNavigateToProfile: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const ProfileScreen()),
-              );
-            },
-            onNavigateToLabels: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const LabelManagementScreen(),
-                ),
-              );
-            },
-            onLogout: () {
-              context.read<AuthBloc>().add(LogoutRequested());
-            },
-          ),
-          appBar: AppBar(
-            title: Row(
-              children: [
-                const Text('Panel Scan'),
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.tertiaryContainer,
-                    borderRadius: BorderRadius.circular(6),
+    return DoubleBackExit(
+      child: BlocProvider.value(
+        value: _scanBookBloc,
+        child: BlocListener<ScanBookBloc, ScanBookState>(
+          listener: (context, state) {
+            if (state is ScanBookError) {
+              showErrorSnack(context, state.message);
+            }
+            if (state is ScanBookLoaded && state.message != null) {
+              showSuccessSnack(context, state.message!);
+            }
+          },
+          child: Scaffold(
+            drawer: AppDrawer(
+              role: UserRole.scan,
+              onNavigateToProfile: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ProfileScreen()),
+                );
+              },
+              onNavigateToLabels: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const LabelManagementScreen(),
                   ),
-                  child: Text(
-                    'SCAN',
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onTertiaryContainer,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.2,
+                );
+              },
+              onLogout: () {
+                context.read<AuthBloc>().add(LogoutRequested());
+              },
+            ),
+            appBar: AppBar(
+              title: Row(
+                children: [
+                  const Text('Panel Scan'),
+                  const SizedBox(width: 8),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.tertiaryContainer,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      'SCAN',
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onTertiaryContainer,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 1.2,
+                          ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          body: BlocBuilder<ScanBookBloc, ScanBookState>(
-            builder: (context, state) {
-              // Loading
-              if (state is ScanBookLoading || state is ScanBookInitial) {
-                return const Center(child: CircularProgressIndicator());
-              }
+            body: BlocBuilder<ScanBookBloc, ScanBookState>(
+              builder: (context, state) {
+                // Loading
+                if (state is ScanBookLoading || state is ScanBookInitial) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-              // Error
-              if (state is ScanBookError) {
-                return Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.error_outline, size: 48,
-                          color: Theme.of(context).colorScheme.error),
-                      const SizedBox(height: 12),
-                      Text(state.message),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () =>
-                            context.read<ScanBookBloc>().add(LoadScanBooks()),
-                        child: const Text('Reintentar'),
-                      ),
-                    ],
-                  ),
-                );
-              }
+                // Error
+                if (state is ScanBookError) {
+                  return Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.error_outline,
+                            size: 48,
+                            color: Theme.of(context).colorScheme.error),
+                        const SizedBox(height: 12),
+                        Text(state.message),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () =>
+                              context.read<ScanBookBloc>().add(LoadScanBooks()),
+                          child: const Text('Reintentar'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
 
-              final books = switch (state) {
-                ScanBookLoaded(:final books) => books,
-                _ => null,
-              };
-              if (books == null) return const SizedBox.shrink();
+                final books = switch (state) {
+                  ScanBookLoaded(:final books) => books,
+                  _ => null,
+                };
+                if (books == null) return const SizedBox.shrink();
 
-              // Empty
-              if (books.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.menu_book_outlined, size: 64,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurfaceVariant
-                              .withAlpha(80)),
-                      const SizedBox(height: 12),
-                      Text('No hay libros',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium
-                              ?.copyWith(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurfaceVariant,
-                              )),
-                      const SizedBox(height: 4),
-                      Text('Tocá + para crear tu primer libro',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall
-                              ?.copyWith(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurfaceVariant,
-                              )),
-                    ],
-                  ),
-                );
-              }
+                // Empty
+                if (books.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.menu_book_outlined,
+                            size: 64,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurfaceVariant
+                                .withAlpha(80)),
+                        const SizedBox(height: 12),
+                        Text('No hay libros',
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium
+                                ?.copyWith(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
+                                )),
+                        const SizedBox(height: 4),
+                        Text('Tocá + para crear tu primer libro',
+                            style:
+                                Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                                    )),
+                      ],
+                    ),
+                  );
+                }
 
-              // Book list
-              return RefreshIndicator(
-                onRefresh: () async {
-                  context.read<ScanBookBloc>().add(LoadScanBooks());
-                  await context.read<ScanBookBloc>().stream.firstWhere(
-                        (s) => s is ScanBookLoaded || s is ScanBookError,
-                      );
-                },
-                child: ListView.builder(
-                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 80),
-                  itemCount: books.length,
-                  itemBuilder: (context, index) {
-                    final book = books[index];
-                    return _BookCard(
-                      book: book,
-                      onEdit: () => _editBook(context, book),
-                      onDelete: () =>
-                          _deleteBook(context, book.id, book.name),
-                      onToggleVisibility: (value) {
-                        context.read<ScanBookBloc>().add(
-                              ToggleScanBookVisibility(book.id, value),
-                            );
-                      },
-                    );
+                // Book list
+                return RefreshIndicator(
+                  onRefresh: () async {
+                    context.read<ScanBookBloc>().add(LoadScanBooks());
+                    await context.read<ScanBookBloc>().stream.firstWhere(
+                          (s) => s is ScanBookLoaded || s is ScanBookError,
+                        );
                   },
-                ),
-              );
-            },
-          ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () => _createBook(context),
-            child: const Icon(Icons.add),
+                  child: ListView.builder(
+                    padding: const EdgeInsets.fromLTRB(12, 8, 12, 80),
+                    itemCount: books.length,
+                    itemBuilder: (context, index) {
+                      final book = books[index];
+                      return _BookCard(
+                        book: book,
+                        onEdit: () => _editBook(context, book),
+                        onDelete: () =>
+                            _deleteBook(context, book.id, book.name),
+                        onToggleVisibility: (value) {
+                          context.read<ScanBookBloc>().add(
+                                ToggleScanBookVisibility(book.id, value),
+                              );
+                        },
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
+            floatingActionButton: FloatingActionButton(
+              onPressed: () => _createBook(context),
+              child: const Icon(Icons.add),
+            ),
           ),
         ),
       ),
@@ -300,8 +306,8 @@ class _BookCard extends StatelessWidget {
                     imageUrl: coverUrl,
                     errorWidget: (_, __, ___) => Container(
                       color: theme.colorScheme.surfaceContainerHighest,
-                      child: Icon(Icons.book, size: 28,
-                          color: theme.colorScheme.onSurfaceVariant),
+                      child: Icon(Icons.book,
+                          size: 28, color: theme.colorScheme.onSurfaceVariant),
                     ),
                   ),
                 ),
@@ -428,8 +434,8 @@ class _ActionMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<String>(
-      icon: Icon(Icons.more_vert, size: 18,
-          color: theme.colorScheme.onSurfaceVariant),
+      icon: Icon(Icons.more_vert,
+          size: 18, color: theme.colorScheme.onSurfaceVariant),
       padding: EdgeInsets.zero,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       onSelected: (value) {
@@ -445,7 +451,8 @@ class _ActionMenu extends StatelessWidget {
           value: 'edit',
           child: Row(
             children: [
-              Icon(Icons.edit_outlined, size: 18, color: theme.colorScheme.primary),
+              Icon(Icons.edit_outlined,
+                  size: 18, color: theme.colorScheme.primary),
               const SizedBox(width: 8),
               const Text('Editar'),
             ],
@@ -455,7 +462,8 @@ class _ActionMenu extends StatelessWidget {
           value: 'delete',
           child: Row(
             children: [
-              Icon(Icons.delete_outline, size: 18, color: theme.colorScheme.error),
+              Icon(Icons.delete_outline,
+                  size: 18, color: theme.colorScheme.error),
               const SizedBox(width: 8),
               Text('Eliminar',
                   style: TextStyle(color: theme.colorScheme.error)),

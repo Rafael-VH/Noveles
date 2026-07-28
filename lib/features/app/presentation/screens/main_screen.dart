@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/core/cover/cover_url_service.dart';
+import 'package:noveles/core/presentation/widgets/double_back_exit.dart';
 import 'package:noveles/bootstrap/injection.dart';
 import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 import 'package:noveles/shared/presentation/widgets/empty_state.dart';
@@ -84,126 +85,129 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider(
-          create: (_) {
-            final bloc = BookBloc(
-              getBooks: getIt(),
-              getBookById: getIt(),
-              onlyVisible: true,
-            )..add(LoadBooks());
-            _bookBloc = bloc;
-            return bloc;
-          },
-        ),
-        BlocProvider(
-          create: (_) => getIt<GenreBloc>()..add(LoadGenres()),
-        ),
-        BlocProvider(
-          create: (_) => getIt<RecentViewsBloc>(),
-        ),
-        BlocProvider(
-          create: (_) => getIt<PopularViewsBloc>(),
-        ),
-      ],
-      child: Scaffold(
-        drawer: Builder(
-          builder: (context) {
-            final authState = context.read<AuthBloc>().state;
-            final user = authState is AuthAuthenticated ? authState.user : null;
-            final role = user?.role;
-            return AppDrawer(
-              user: user,
-              role: role,
-              onNavigateToProfile: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const ProfileScreen()),
-                );
-              },
-              onNavigateToFavorites: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => BlocProvider(
-                      create: (_) => getIt<FavoriteBloc>(),
-                      child: const FavoritesScreen(),
-                    ),
-                  ),
-                );
-              },
-              onNavigateToLabels: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const LabelManagementScreen(),
-                  ),
-                );
-              },
-              onLogout: () {
-                context.read<AuthBloc>().add(LogoutRequested());
-              },
-            );
-          },
-        ),
-        body: BlocBuilder<BookBloc, BookState>(
-          builder: (context, bookState) {
-            return BlocBuilder<GenreBloc, GenreState>(
-              builder: (context, genreState) {
-                if (bookState is BookLoading || genreState is GenreLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                if (bookState is BookError) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('Error: ${bookState.message}'),
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: () =>
-                              context.read<BookBloc>().add(LoadBooks()),
-                          child: const Text('Reintentar'),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                if (genreState is GenreError) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('Error: ${genreState.message}'),
-                        const SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: () =>
-                              context.read<GenreBloc>().add(LoadGenres()),
-                          child: const Text('Reintentar'),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                if (bookState is BookLoaded && genreState is GenreLoaded) {
-                  final listBook = bookState.books;
-                  final listGenre = genreState.genres;
-                  return _buildContent(
+    return DoubleBackExit(
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (_) {
+              final bloc = BookBloc(
+                getBooks: getIt(),
+                getBookById: getIt(),
+                onlyVisible: true,
+              )..add(LoadBooks());
+              _bookBloc = bloc;
+              return bloc;
+            },
+          ),
+          BlocProvider(
+            create: (_) => getIt<GenreBloc>()..add(LoadGenres()),
+          ),
+          BlocProvider(
+            create: (_) => getIt<RecentViewsBloc>(),
+          ),
+          BlocProvider(
+            create: (_) => getIt<PopularViewsBloc>(),
+          ),
+        ],
+        child: Scaffold(
+          drawer: Builder(
+            builder: (context) {
+              final authState = context.read<AuthBloc>().state;
+              final user =
+                  authState is AuthAuthenticated ? authState.user : null;
+              final role = user?.role;
+              return AppDrawer(
+                user: user,
+                role: role,
+                onNavigateToProfile: () {
+                  Navigator.push(
                     context,
-                    listBook,
-                    listGenre,
-                    hasMore: bookState.hasMore,
+                    MaterialPageRoute(builder: (_) => const ProfileScreen()),
                   );
-                }
+                },
+                onNavigateToFavorites: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => BlocProvider(
+                        create: (_) => getIt<FavoriteBloc>(),
+                        child: const FavoritesScreen(),
+                      ),
+                    ),
+                  );
+                },
+                onNavigateToLabels: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const LabelManagementScreen(),
+                    ),
+                  );
+                },
+                onLogout: () {
+                  context.read<AuthBloc>().add(LogoutRequested());
+                },
+              );
+            },
+          ),
+          body: BlocBuilder<BookBloc, BookState>(
+            builder: (context, bookState) {
+              return BlocBuilder<GenreBloc, GenreState>(
+                builder: (context, genreState) {
+                  if (bookState is BookLoading || genreState is GenreLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                return const Center(child: CircularProgressIndicator());
-              },
-            );
-          },
+                  if (bookState is BookError) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Error: ${bookState.message}'),
+                          const SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: () =>
+                                context.read<BookBloc>().add(LoadBooks()),
+                            child: const Text('Reintentar'),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  if (genreState is GenreError) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Error: ${genreState.message}'),
+                          const SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: () =>
+                                context.read<GenreBloc>().add(LoadGenres()),
+                            child: const Text('Reintentar'),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  if (bookState is BookLoaded && genreState is GenreLoaded) {
+                    final listBook = bookState.books;
+                    final listGenre = genreState.genres;
+                    return _buildContent(
+                      context,
+                      listBook,
+                      listGenre,
+                      hasMore: bookState.hasMore,
+                    );
+                  }
+
+                  return const Center(child: CircularProgressIndicator());
+                },
+              );
+            },
+          ),
         ),
       ),
     );

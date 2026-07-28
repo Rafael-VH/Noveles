@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:noveles/bootstrap/injection.dart';
+import 'package:noveles/core/presentation/widgets/double_back_exit.dart';
 import 'package:noveles/shared/presentation/widgets/confirmation_dialog.dart';
 import 'package:noveles/shared/presentation/widgets/snackbar_helper.dart';
 import 'package:noveles/features/admin/presentation/bloc/admin_analytics_bloc.dart';
@@ -33,110 +34,112 @@ class _AdminDashScreenState extends State<AdminDashScreen> {
     final currentUserId = authState is AuthAuthenticated ? authState.user.id : '';
     final adminEmail = authState is AuthAuthenticated ? authState.user.email : '';
 
-    return Scaffold(
-      drawer: const AppDrawer(role: UserRole.admin),
-      appBar: AppBar(
-        title: const Text('Panel Admin'),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: Center(
-              child: Text(
-                adminEmail,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+    return DoubleBackExit(
+      child: Scaffold(
+        drawer: const AppDrawer(role: UserRole.admin),
+        appBar: AppBar(
+          title: const Text('Panel Admin'),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: Center(
+                child: Text(
+                  adminEmail,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                ),
               ),
             ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: 'Cerrar Sesión',
-            onPressed: () => _confirmLogout(context),
-          ),
-        ],
-      ),
-      body: MultiBlocProvider(
-        providers: [
-          BlocProvider(
-            create: (_) => getIt<AdminBloc>()..add(const LoadAdminBooks()),
-          ),
-          BlocProvider(
-            create: (_) => AdminUsersBloc(
-              getAllProfiles: getIt(),
-              updateUserRole: getIt(),
-              currentUserId: currentUserId,
-            )..add(const LoadAdminUsers()),
-          ),
-          BlocProvider(
-            create: (_) =>
-                getIt<AdminAnalyticsBloc>()..add(const LoadAnalytics()),
-          ),
-        ],
-        child: BlocListener<AdminUsersBloc, AdminUsersState>(
-          listener: (context, state) {
-            if (state is AdminUsersError) {
-              showErrorSnack(context, state.message);
-            }
-          },
-          child: BlocConsumer<AdminBloc, AdminState>(
+            IconButton(
+              icon: const Icon(Icons.logout),
+              tooltip: 'Cerrar Sesión',
+              onPressed: () => _confirmLogout(context),
+            ),
+          ],
+        ),
+        body: MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (_) => getIt<AdminBloc>()..add(const LoadAdminBooks()),
+            ),
+            BlocProvider(
+              create: (_) => AdminUsersBloc(
+                getAllProfiles: getIt(),
+                updateUserRole: getIt(),
+                currentUserId: currentUserId,
+              )..add(const LoadAdminUsers()),
+            ),
+            BlocProvider(
+              create: (_) =>
+                  getIt<AdminAnalyticsBloc>()..add(const LoadAnalytics()),
+            ),
+          ],
+          child: BlocListener<AdminUsersBloc, AdminUsersState>(
             listener: (context, state) {
-              if (state is AdminLoaded && state.message != null) {
-                showSuccessSnack(context, state.message!);
-              }
-              if (state is AdminError) {
+              if (state is AdminUsersError) {
                 showErrorSnack(context, state.message);
               }
             },
-            builder: (context, state) => IndexedStack(
-              index: _currentIndex,
-              children: [
-                const SummaryTab(),
-                BooksTab(state: state),
-                const GenresTab(),
-                const UsersTab(),
-                const LabelRulesAdminTab(),
-                const AnalyticsTab(),
-              ],
+            child: BlocConsumer<AdminBloc, AdminState>(
+              listener: (context, state) {
+                if (state is AdminLoaded && state.message != null) {
+                  showSuccessSnack(context, state.message!);
+                }
+                if (state is AdminError) {
+                  showErrorSnack(context, state.message);
+                }
+              },
+              builder: (context, state) => IndexedStack(
+                index: _currentIndex,
+                children: [
+                  const SummaryTab(),
+                  BooksTab(state: state),
+                  const GenresTab(),
+                  const UsersTab(),
+                  const LabelRulesAdminTab(),
+                  const AnalyticsTab(),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _currentIndex,
-        onDestinationSelected: (index) => setState(() => _currentIndex = index),
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.dashboard_outlined),
-            selectedIcon: Icon(Icons.dashboard),
-            label: 'Resumen',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.library_books_outlined),
-            selectedIcon: Icon(Icons.library_books),
-            label: 'Libros',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.category_outlined),
-            selectedIcon: Icon(Icons.category),
-            label: 'Géneros',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.people_outlined),
-            selectedIcon: Icon(Icons.people),
-            label: 'Usuarios',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.auto_awesome_outlined),
-            selectedIcon: Icon(Icons.auto_awesome),
-            label: 'Etiquetas',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.analytics_outlined),
-            selectedIcon: Icon(Icons.analytics),
-            label: 'Analíticas',
-          ),
-        ],
+        bottomNavigationBar: NavigationBar(
+          selectedIndex: _currentIndex,
+          onDestinationSelected: (index) => setState(() => _currentIndex = index),
+          destinations: const [
+            NavigationDestination(
+              icon: Icon(Icons.dashboard_outlined),
+              selectedIcon: Icon(Icons.dashboard),
+              label: 'Resumen',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.library_books_outlined),
+              selectedIcon: Icon(Icons.library_books),
+              label: 'Libros',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.category_outlined),
+              selectedIcon: Icon(Icons.category),
+              label: 'Géneros',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.people_outlined),
+              selectedIcon: Icon(Icons.people),
+              label: 'Usuarios',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.auto_awesome_outlined),
+              selectedIcon: Icon(Icons.auto_awesome),
+              label: 'Etiquetas',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.analytics_outlined),
+              selectedIcon: Icon(Icons.analytics),
+              label: 'Analíticas',
+            ),
+          ],
+        ),
       ),
     );
   }
