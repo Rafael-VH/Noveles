@@ -18,10 +18,6 @@ void main() {
     popularViewsBloc = PopularViewsBloc(getMostViewedBooks: mockGetMostViewedBooks);
   });
 
-  tearDown(() {
-    popularViewsBloc.close();
-  });
-
   group('PopularViewsBloc', () {
     final testBooks = [
       BookWithRelations(
@@ -52,6 +48,7 @@ void main() {
 
     test('initial state is PopularViewsInitial', () {
       expect(popularViewsBloc.state, equals(PopularViewsInitial()));
+      popularViewsBloc.close();
     });
 
     blocTest<PopularViewsBloc, PopularViewsState>(
