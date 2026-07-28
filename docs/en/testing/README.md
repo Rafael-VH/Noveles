@@ -96,7 +96,7 @@ mocking and `bloc_test` for BLoC state verification.
 | `genre_chip_styled_test.dart` | Genre chip styled widget |
 | `main_screen_sections_test.dart` | Main screen sections |
 | `reading_settings_bar_test.dart` | Reading settings bar |
-| `section_header_test.dart` | Section header widget |
+| `section_title_test.dart` | SectionTitle widget (merged from section_header_test + section_title_test) |
 | `section_mas_vistos_test.dart` | Más vistos section |
 | `section_novedades_test.dart` | Novedades section |
 | `section_populares_test.dart` | Populares section |

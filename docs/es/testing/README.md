@@ -97,7 +97,7 @@ BLoCs.
 | `genre_chip_styled_test.dart` | Widget de chip de género estilizado |
 | `main_screen_sections_test.dart` | Secciones de pantalla principal |
 | `reading_settings_bar_test.dart` | Barra de ajustes de lectura |
-| `section_header_test.dart` | Widget de encabezado de sección |
+| `section_title_test.dart` | Widget SectionTitle (antes en section_header_test + section_title_test) |
 | `section_mas_vistos_test.dart` | Sección de más vistos |
 | `section_novedades_test.dart` | Sección de novedades |
 | `section_populares_test.dart` | Sección de populares |
