@@ -4,6 +4,7 @@ import 'package:noveles/features/app/presentation/bloc/popular_views/popular_vie
 import 'package:noveles/features/app/presentation/widgets/book_card_vertical.dart';
 import 'package:noveles/features/app/presentation/widgets/section_title.dart';
 import 'package:noveles/features/books/presentation/screens/book_screen.dart';
+import 'package:noveles/shared/presentation/widgets/snackbar_helper.dart';
 
 class SectionMasVistos extends StatefulWidget {
   const SectionMasVistos({super.key});
@@ -22,7 +23,11 @@ class _SectionMasVistosState extends State<SectionMasVistos> {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<PopularViewsBloc, PopularViewsState>(
-      listener: (context, state) {},
+      listener: (context, state) {
+        if (state is PopularViewsError) {
+          showErrorSnack(context, state.message);
+        }
+      },
       builder: (context, state) {
         if (state is PopularViewsLoaded) {
           return Column(
