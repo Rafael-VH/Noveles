@@ -15,6 +15,13 @@ void main() {
     setupCoverUrlService();
   });
 
+  tearDown(() {
+    if (GetIt.instance.isRegistered<CoverUrlService>()) {
+      GetIt.instance.unregister<CoverUrlService>();
+    }
+    setupCoverUrlService();
+  });
+
   TookEntity makeTook({
     String cover = '',
     String title = 'Tomo de prueba',
@@ -105,9 +112,6 @@ void main() {
       // Fallback icon should NOT be shown (cover is present)
       expect(find.byIcon(Icons.menu_book), findsNothing);
 
-      // Restore default mock for other tests
-      getIt.unregister<CoverUrlService>();
-      setupCoverUrlService();
     });
   });
 }
