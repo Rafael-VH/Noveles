@@ -38,6 +38,7 @@ class _TookScreenState extends State<TookScreen> {
         widget.tooks.id,
         authState.user.id,
       );
+      if (!mounted) return;
       switch (result) {
         case Ok(:final value):
           setState(() {
