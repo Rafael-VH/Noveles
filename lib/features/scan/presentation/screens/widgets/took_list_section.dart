@@ -31,7 +31,11 @@ class TookListSection extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 8),
           child: Row(
             children: [
-              Icon(Icons.book_outlined, size: 18, color: theme.colorScheme.primary),
+              Icon(
+                Icons.book_outlined,
+                size: 18,
+                color: theme.colorScheme.primary,
+              ),
               const SizedBox(width: 8),
               Text(
                 'Tomos',

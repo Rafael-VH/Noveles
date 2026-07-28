@@ -69,11 +69,18 @@ class CoverPicker extends StatelessWidget {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.camera_alt, color: Colors.white, size: 16),
+                                Icon(
+                                  Icons.camera_alt,
+                                  color: Colors.white,
+                                  size: 16,
+                                ),
                                 SizedBox(width: 6),
                                 Text(
                                   'Tocá para cambiar',
-                                  style: TextStyle(color: Colors.white, fontSize: 13),
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 13,
+                                  ),
                                 ),
                               ],
                             ),
@@ -144,7 +151,11 @@ class _PlaceholderContent extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 48, color: theme.colorScheme.onSurfaceVariant.withAlpha(120)),
+          Icon(
+            icon,
+            size: 48,
+            color: theme.colorScheme.onSurfaceVariant.withAlpha(120),
+          ),
           const SizedBox(height: 8),
           Text(
             text,

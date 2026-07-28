@@ -192,7 +192,11 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
 
   // ─── Section helpers ───────────────────────────────────────────────
 
-  Widget _sectionCard({required String title, required IconData icon, required List<Widget> children}) {
+  Widget _sectionCard({
+    required String title,
+    required IconData icon,
+    required List<Widget> children,
+  }) {
     final theme = Theme.of(context);
     return Card(
       margin: EdgeInsets.zero,
@@ -205,7 +209,11 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
           children: [
             Row(
               children: [
-                Icon(icon, size: 18, color: theme.colorScheme.primary),
+                Icon(
+                  icon,
+                  size: 18,
+                  color: theme.colorScheme.primary,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   title,
@@ -235,7 +243,10 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
         ),
       );
     }
-    return TextButton(onPressed: _save, child: const Text('Guardar'));
+    return TextButton(
+      onPressed: _save,
+      child: const Text('Guardar'),
+    );
   }
 
   // ─── Build ─────────────────────────────────────────────────────────
@@ -309,7 +320,10 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
                       side: BorderSide(color: theme.colorScheme.outlineVariant),
                     ),
                     child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 4,
+                      ),
                       leading: Icon(
                         Icons.insert_drive_file,
                         color: theme.colorScheme.primary,

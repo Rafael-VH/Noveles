@@ -214,7 +214,11 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
 
   // ─── Section helpers ───────────────────────────────────────────────
 
-  Widget _sectionCard({required String title, required IconData icon, required List<Widget> children}) {
+  Widget _sectionCard({
+    required String title,
+    required IconData icon,
+    required List<Widget> children,
+  }) {
     final theme = Theme.of(context);
     return Card(
       margin: EdgeInsets.zero,
@@ -365,11 +369,26 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
                 ),
                 isExpanded: true,
                 items: const [
-                  DropdownMenuItem(value: '', child: Text('Seleccioná...')),
-                  DropdownMenuItem(value: 'Emisión', child: Text('Emisión')),
-                  DropdownMenuItem(value: 'Finalizado', child: Text('Finalizado')),
-                  DropdownMenuItem(value: 'Pausado', child: Text('Pausado')),
-                  DropdownMenuItem(value: 'Abandonado', child: Text('Abandonado')),
+                  DropdownMenuItem(
+                    value: '',
+                    child: Text('Seleccioná...'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'Emisión',
+                    child: Text('Emisión'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'Finalizado',
+                    child: Text('Finalizado'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'Pausado',
+                    child: Text('Pausado'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'Abandonado',
+                    child: Text('Abandonado'),
+                  ),
                 ],
                 onChanged: (v) => setState(() => _state = v ?? ''),
               ),
@@ -384,9 +403,18 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
                 ),
                 isExpanded: true,
                 items: const [
-                  DropdownMenuItem(value: '', child: Text('Seleccioná...')),
-                  DropdownMenuItem(value: 'Web', child: Text('Web Novel')),
-                  DropdownMenuItem(value: 'Ligera', child: Text('Light Novel')),
+                  DropdownMenuItem(
+                    value: '',
+                    child: Text('Seleccioná...'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'Web',
+                    child: Text('Web Novel'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'Ligera',
+                    child: Text('Light Novel'),
+                  ),
                 ],
                 onChanged: (v) => setState(() => _type = v ?? ''),
               ),
@@ -557,22 +585,20 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
                       final result = await completer.future
                           .timeout(const Duration(seconds: 10));
                       if (result is ScanTookLoaded && mounted) {
-                        setState(() =>
-                            _tooks.removeWhere((t) => t.id == tookId));
+                        setState(
+                          () => _tooks.removeWhere((t) => t.id == tookId),
+                        );
                         messenger.showSnackBar(
                           SnackBar(
-                            content:
-                                Text(result.message ?? 'Tomo eliminado'),
-                            backgroundColor:
-                                theme.colorScheme.tertiary,
+                            content: Text(result.message ?? 'Tomo eliminado'),
+                            backgroundColor: theme.colorScheme.tertiary,
                           ),
                         );
                       } else if (result is ScanTookError && mounted) {
                         messenger.showSnackBar(
                           SnackBar(
                             content: Text(result.message),
-                            backgroundColor:
-                                theme.colorScheme.error,
+                            backgroundColor: theme.colorScheme.error,
                           ),
                         );
                       }
@@ -581,10 +607,8 @@ class _ScanBookEditScreenState extends State<ScanBookEditScreen> {
                       if (mounted) {
                         messenger.showSnackBar(
                           SnackBar(
-                            content:
-                                const Text('La operación tardó demasiado'),
-                            backgroundColor:
-                                theme.colorScheme.error,
+                            content: const Text('La operación tardó demasiado'),
+                            backgroundColor: theme.colorScheme.error,
                           ),
                         );
                       }
