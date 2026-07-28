@@ -14,14 +14,23 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  Timer? _timer;
+
   @override
   void initState() {
     super.initState();
     SplashScreen.isReady = false;
-    Timer(const Duration(milliseconds: 5000), () {
+    _timer = Timer(const Duration(milliseconds: 5000), () {
+      if (!mounted) return;
       SplashScreen.isReady = true;
       context.read<AuthBloc>().add(CheckAuthSession());
     });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   @override
