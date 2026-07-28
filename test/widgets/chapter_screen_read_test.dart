@@ -75,6 +75,10 @@ void main() {
   });
 
   tearDown(() {
+    final getIt = GetIt.instance;
+    if (getIt.isRegistered<MarkChapterAsRead>()) {
+      getIt.unregister<MarkChapterAsRead>();
+    }
     authController.close();
     chapterController.close();
   });
