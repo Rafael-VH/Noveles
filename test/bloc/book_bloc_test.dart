@@ -26,10 +26,6 @@ void main() {
     );
   });
 
-  tearDown(() {
-    bookBloc.close();
-  });
-
   group('BookBloc', () {
     final testBooks = [
       BookWithRelations(
@@ -60,6 +56,7 @@ void main() {
 
     test('initial state is BookInitial', () {
       expect(bookBloc.state, equals(BookInitial()));
+      bookBloc.close();
     });
 
     blocTest<BookBloc, BookState>(
