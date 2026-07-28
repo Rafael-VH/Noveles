@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:noveles/features/auth/presentation/bloc/auth_bloc.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -16,8 +18,9 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     SplashScreen.isReady = false;
-    Timer(const Duration(milliseconds: 1500), () {
+    Timer(const Duration(milliseconds: 5000), () {
       SplashScreen.isReady = true;
+      context.read<AuthBloc>().add(CheckAuthSession());
     });
   }
 
