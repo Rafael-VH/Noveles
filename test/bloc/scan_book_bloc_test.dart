@@ -98,13 +98,10 @@ void main() {
     );
   });
 
-  tearDown(() {
-    scanBookBloc.close();
-  });
-
   group('ScanBookBloc', () {
     test('initial state is ScanBookInitial', () {
       expect(scanBookBloc.state, equals(ScanBookInitial()));
+      scanBookBloc.close();
     });
 
     blocTest<ScanBookBloc, ScanBookState>(
