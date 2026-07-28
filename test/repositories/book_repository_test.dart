@@ -84,6 +84,26 @@ class MockMapResultBuilder extends Mock
 /// Mock for PostgrestTransformBuilder<List<Map<String, dynamic>>> — returned
 /// by filterBuilder.select() before .single() is called.
 // ignore: must_be_immutable
+// ignore: must_be_immutable
+class MockRpcValueBuilder extends Mock
+    implements PostgrestFilterBuilder<dynamic> {
+  dynamic _data;
+
+  void thenReturns(dynamic data) {
+    _data = data;
+  }
+
+  @override
+  Future<U> then<U>(
+    FutureOr<U> Function(dynamic value) onValue, {
+    Function? onError,
+  }) async {
+    final result = onValue(_data);
+    if (result is Future<U>) return result;
+    return result;
+  }
+}
+
 class MockSelectBuilder extends Mock
     implements PostgrestTransformBuilder<List<Map<String, dynamic>>> {
   List<Map<String, dynamic>>? _data;
@@ -339,13 +359,11 @@ void main() {
 
     group('createBook', () {
       test('returns Ok on success', () async {
-        // CreateBook flow with authorId=1 (existing author)
-        // Stub the .select('id').single() chain
-        final mockSelectBuilder = MockSelectBuilder();
-        final mockSingleResult = MockMapResultBuilder();
-        when(() => mockFilter.select(any())).thenAnswer((_) => mockSelectBuilder);
-        when(() => mockSelectBuilder.single()).thenAnswer((_) => mockSingleResult);
-        mockSingleResult.thenReturns({'id': 1});
+        final mockRpcValue = MockRpcValueBuilder();
+        mockRpcValue.thenReturns(1);
+        when(() => mockClient.rpc('create_book_with_relations',
+            params: any(named: 'params')))
+            .thenAnswer((_) => mockRpcValue);
 
         final result = await repository.createBook(BookEntity(
           id: 0,
@@ -376,14 +394,14 @@ void main() {
         expect(result, isA<Ok<int>>());
         final value = (result as Ok<int>).value;
         expect(value, 1);
-        verify(() => mockClient.from('books')).called(1);
+        verify(() => mockClient.rpc('create_book_with_relations',
+            params: any(named: 'params'))).called(1);
       });
 
       test('returns Err on error', () async {
-        // The createBook flow with authorId=0 enters the author lookup branch
-        // and calls maybeSingle(). Stub it to throw to test the error path.
-        when(() => mockFilter.maybeSingle())
-            .thenThrow(Exception('Insert failed'));
+        when(() => mockClient.rpc('create_book_with_relations',
+            params: any(named: 'params')))
+            .thenThrow(Exception('RPC error'));
 
         final result = await repository.createBook(BookEntity(
           id: 0,
@@ -416,7 +434,12 @@ void main() {
 
     group('updateBook', () {
       test('returns Ok on success', () async {
-        mockFilter.thenReturns(<Map<String, dynamic>>[]);
+        final mockRpcValue = MockRpcValueBuilder();
+        mockRpcValue.thenReturns('');
+        when(() => mockClient.rpc('update_book_with_relations',
+            params: any(named: 'params')))
+            .thenAnswer((_) => mockRpcValue);
+
         final result = await repository.updateBook(
           BookEntity(
             id: 1,
@@ -445,12 +468,14 @@ void main() {
           ),
         );
         expect(result, isA<Ok<void>>());
-        verify(() => mockQueryBuilder.update(any())).called(1);
+        verify(() => mockClient.rpc('update_book_with_relations',
+            params: any(named: 'params'))).called(1);
       });
 
       test('returns Err on error', () async {
-        when(() => mockFilter.eq(any(), any()))
-            .thenThrow(Exception('Update failed'));
+        when(() => mockClient.rpc('update_book_with_relations',
+            params: any(named: 'params')))
+            .thenThrow(Exception('RPC error'));
 
         final result = await repository.updateBook(
           BookEntity(
