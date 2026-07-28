@@ -47,10 +47,6 @@ void main() {
     );
   });
 
-  tearDown(() {
-    genreBloc.close();
-  });
-
   group('GenreBloc', () {
     final testGenres = [
       GenreEntity(
@@ -70,6 +66,7 @@ void main() {
 
     test('initial state is GenreInitial', () {
       expect(genreBloc.state, equals(GenreInitial()));
+      genreBloc.close();
     });
 
     blocTest<GenreBloc, GenreState>(
