@@ -19,7 +19,7 @@ class ChapterLoaded extends ChapterState {
   final List<ChapterEntity> chapters;
   final int initialIndex;
 
-  ChapterLoaded(this.chapters, {this.initialIndex = 0});
+  const ChapterLoaded(this.chapters, {this.initialIndex = 0});
 
   @override
   List<Object> get props => [chapters, initialIndex];
@@ -29,7 +29,7 @@ class ChapterLoaded extends ChapterState {
 class ChapterError extends ChapterState {
   final String message;
 
-  ChapterError(this.message);
+  const ChapterError(this.message);
 
   @override
   List<Object> get props => [message];
