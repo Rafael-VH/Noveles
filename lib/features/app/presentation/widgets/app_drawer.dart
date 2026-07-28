@@ -103,36 +103,90 @@ class AppDrawer extends StatelessWidget {
   }
 }
 
-enum DrawerItemType { home, panelScan, panelAdmin, editProfile, favorites, labels }
+enum DrawerItemType {
+  home,
+  panelScan,
+  panelAdmin,
+  editProfile,
+  favorites,
+  labels
+}
 
-final Map<DrawerItemType,
-    (IconData, IconData, String)> _drawerItemConfig = {
-  DrawerItemType.home: (Icons.home_outlined, Icons.home, 'Inicio'),
-  DrawerItemType.panelScan:
-      (Icons.qr_code_scanner_outlined, Icons.qr_code_scanner, 'Panel Scan'),
+final Map<DrawerItemType, (IconData, IconData, String)> _drawerItemConfig = {
+  DrawerItemType.home: (
+    Icons.home_outlined,
+    Icons.home,
+    'Inicio',
+  ),
+  DrawerItemType.panelScan: (
+    Icons.qr_code_scanner_outlined,
+    Icons.qr_code_scanner,
+    'Panel Scan',
+  ),
   DrawerItemType.panelAdmin: (
     Icons.admin_panel_settings_outlined,
     Icons.admin_panel_settings,
     'Panel Admin',
   ),
-  DrawerItemType.editProfile: (Icons.person_outlined, Icons.person, 'Editar Perfil'),
-  DrawerItemType.favorites:
-      (Icons.favorite_outlined, Icons.favorite, 'Mis Favoritos'),
-  DrawerItemType.labels: (Icons.label_outlined, Icons.label, 'Etiquetas'),
+  DrawerItemType.editProfile: (
+    Icons.person_outlined,
+    Icons.person,
+    'Editar Perfil',
+  ),
+  DrawerItemType.favorites: (
+    Icons.favorite_outlined,
+    Icons.favorite,
+    'Mis Favoritos',
+  ),
+  DrawerItemType.labels: (
+    Icons.label_outlined,
+    Icons.label,
+    'Etiquetas',
+  ),
 };
 
 final Map<UserRole, List<(String, List<DrawerItemType>)>> _roleSections = {
   UserRole.user: [
-    ('Navegación', [DrawerItemType.home]),
-    ('Perfil', [DrawerItemType.editProfile, DrawerItemType.favorites]),
+    (
+      'Navegación',
+      [
+        DrawerItemType.home,
+      ],
+    ),
+    (
+      'Perfil',
+      [
+        DrawerItemType.editProfile,
+        DrawerItemType.favorites,
+      ]
+    ),
   ],
   UserRole.scan: [
-    ('Navegación', [DrawerItemType.panelScan]),
-    ('Perfil', [DrawerItemType.editProfile]),
-    ('Gestión', [DrawerItemType.labels]),
+    (
+      'Navegación',
+      [
+        DrawerItemType.panelScan,
+      ]
+    ),
+    (
+      'Perfil',
+      [
+        DrawerItemType.editProfile,
+      ]
+    ),
   ],
   UserRole.admin: [
-    ('Navegación', [DrawerItemType.panelAdmin]),
-    ('Perfil', [DrawerItemType.editProfile]),
+    (
+      'Navegación',
+      [
+        DrawerItemType.panelAdmin,
+      ]
+    ),
+    (
+      'Perfil',
+      [
+        DrawerItemType.editProfile,
+      ]
+    ),
   ],
 };

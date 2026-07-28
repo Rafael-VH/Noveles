@@ -16,7 +16,6 @@ import 'package:noveles/features/profiles/domain/user_role.dart';
 import 'package:noveles/features/profiles/presentation/screens/profile_screen.dart';
 import 'package:noveles/features/genres/presentation/genre_cubit.dart';
 import 'package:noveles/features/scan/presentation/screens/scan_book_edit_screen.dart';
-import 'package:noveles/features/labels/presentation/screens/label_management_screen.dart';
 
 class ScanMainScreen extends StatefulWidget {
   const ScanMainScreen({super.key});
@@ -63,14 +62,6 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
                   MaterialPageRoute(builder: (_) => const ProfileScreen()),
                 );
               },
-              onNavigateToLabels: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const LabelManagementScreen(),
-                  ),
-                );
-              },
               onLogout: () {
                 context.read<AuthBloc>().add(LogoutRequested());
               },
@@ -114,9 +105,11 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.error_outline,
-                            size: 48,
-                            color: Theme.of(context).colorScheme.error),
+                        Icon(
+                          Icons.error_outline,
+                          size: 48,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
                         const SizedBox(height: 12),
                         Text(state.message),
                         const SizedBox(height: 16),
@@ -149,23 +142,25 @@ class _ScanMainScreenState extends State<ScanMainScreen> {
                                 .onSurfaceVariant
                                 .withAlpha(80)),
                         const SizedBox(height: 12),
-                        Text('No hay libros',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
-                                )),
+                        Text(
+                          'No hay libros',
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                        ),
                         const SizedBox(height: 4),
-                        Text('Tocá + para crear tu primer libro',
-                            style:
-                                Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurfaceVariant,
-                                    )),
+                        Text(
+                          'Tocá + para crear tu primer libro',
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant,
+                                  ),
+                        ),
                       ],
                     ),
                   );
@@ -306,8 +301,11 @@ class _BookCard extends StatelessWidget {
                     imageUrl: coverUrl,
                     errorWidget: (_, __, ___) => Container(
                       color: theme.colorScheme.surfaceContainerHighest,
-                      child: Icon(Icons.book,
-                          size: 28, color: theme.colorScheme.onSurfaceVariant),
+                      child: Icon(
+                        Icons.book,
+                        size: 28,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
                     ),
                   ),
                 ),
@@ -406,7 +404,11 @@ class _StatChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 12, color: theme.colorScheme.onSurfaceVariant),
+          Icon(
+            icon,
+            size: 12,
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
           const SizedBox(width: 4),
           Text(
             label,
@@ -434,8 +436,11 @@ class _ActionMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<String>(
-      icon: Icon(Icons.more_vert,
-          size: 18, color: theme.colorScheme.onSurfaceVariant),
+      icon: Icon(
+        Icons.more_vert,
+        size: 18,
+        color: theme.colorScheme.onSurfaceVariant,
+      ),
       padding: EdgeInsets.zero,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       onSelected: (value) {
@@ -451,8 +456,11 @@ class _ActionMenu extends StatelessWidget {
           value: 'edit',
           child: Row(
             children: [
-              Icon(Icons.edit_outlined,
-                  size: 18, color: theme.colorScheme.primary),
+              Icon(
+                Icons.edit_outlined,
+                size: 18,
+                color: theme.colorScheme.primary,
+              ),
               const SizedBox(width: 8),
               const Text('Editar'),
             ],
@@ -462,11 +470,18 @@ class _ActionMenu extends StatelessWidget {
           value: 'delete',
           child: Row(
             children: [
-              Icon(Icons.delete_outline,
-                  size: 18, color: theme.colorScheme.error),
+              Icon(
+                Icons.delete_outline,
+                size: 18,
+                color: theme.colorScheme.error,
+              ),
               const SizedBox(width: 8),
-              Text('Eliminar',
-                  style: TextStyle(color: theme.colorScheme.error)),
+              Text(
+                'Eliminar',
+                style: TextStyle(
+                  color: theme.colorScheme.error,
+                ),
+              ),
             ],
           ),
         ),
