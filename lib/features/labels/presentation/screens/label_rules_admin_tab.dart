@@ -18,6 +18,7 @@ class LabelRulesAdminTab extends StatefulWidget {
 
 class _LabelRulesAdminTabState extends State<LabelRulesAdminTab> {
   late final GetLabels _getLabels;
+  late final LabelRulesBloc _bloc;
 
   @override
   void initState() {
@@ -28,7 +29,11 @@ class _LabelRulesAdminTabState extends State<LabelRulesAdminTab> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => getIt<LabelRulesBloc>()..add(const LoadLabelRules()),
+      create: (_) {
+        final bloc = getIt<LabelRulesBloc>()..add(const LoadLabelRules());
+        _bloc = bloc;
+        return bloc;
+      },
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Reglas de Etiquetas'),
@@ -236,7 +241,7 @@ class _LabelRulesAdminTabState extends State<LabelRulesAdminTab> {
                   ? {'days_since': int.tryParse(daysController.text) ?? 30}
                   : {'limit': int.tryParse(limitController.text) ?? 10};
 
-              context.read<LabelRulesBloc>().add(CreateLabelRule(
+              _bloc.add(CreateLabelRule(
                     labelId: label.id,
                     ruleType: type.value,
                     params: params,
