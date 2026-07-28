@@ -19,6 +19,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  late final ProfileBloc _bloc;
   final _displayNameController = TextEditingController();
   final _bioController = TextEditingController();
   final _newPasswordController = TextEditingController();
@@ -40,13 +41,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final picker = ImagePicker();
     final xFile = await picker.pickImage(source: ImageSource.gallery);
     if (xFile != null && mounted) {
-      context.read<ProfileBloc>().add(PickAvatar(xFile.path));
+      _bloc.add(PickAvatar(xFile.path));
     }
   }
 
   void _onSave() {
     if (_formKey.currentState?.validate() ?? false) {
-      context.read<ProfileBloc>().add(
+      _bloc.add(
             UpdateProfile(
               displayName: _displayNameController.text.trim(),
               bio: _bioController.text.trim(),
@@ -57,7 +58,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _onChangePassword() {
     if (_passwordFormKey.currentState?.validate() ?? false) {
-      context.read<ProfileBloc>().add(
+      _bloc.add(
             ChangePassword(_newPasswordController.text),
           );
       _newPasswordController.clear();
@@ -72,7 +73,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => getIt<ProfileBloc>()..add(LoadProfile()),
+      create: (_) {
+        final bloc = getIt<ProfileBloc>()..add(LoadProfile());
+        _bloc = bloc;
+        return bloc;
+      },
       child: Scaffold(
         appBar: AppBar(title: const Text('Perfil')),
         body: BlocConsumer<ProfileBloc, ProfileState>(
