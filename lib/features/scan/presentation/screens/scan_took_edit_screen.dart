@@ -151,7 +151,7 @@ class _ScanTookEditScreenState extends State<ScanTookEditScreen> {
   // Delete chapter
   Future<void> _deleteChapter(int chapterId) async {
     if (_isSaving) return;
-    final bloc = context.read<ScanChapterBloc>();
+    final bloc = getIt<ScanChapterBloc>();
     setState(() => _isSaving = true);
     final completer = Completer<ScanChapterState>();
     late StreamSubscription sub;
