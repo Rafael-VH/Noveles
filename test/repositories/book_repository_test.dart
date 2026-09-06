@@ -822,7 +822,7 @@ void main() {
         final value = (result as Ok<List<BookWithRelations>>).value;
         expect(value.length, 1);
         expect(value.first.name, 'Popular Book');
-        verify(() => mockClient.rpc('get_most_viewed_books',
+        verify(() => mockClient.rpc('get_most_viewed_books_public',
             params: any(named: 'params'))).called(1);
       });
 

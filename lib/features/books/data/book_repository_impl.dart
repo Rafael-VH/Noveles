@@ -299,8 +299,10 @@ class BookRepositoryImpl implements BookRepository {
   @override
   Future<Result<List<BookWithRelations>>> getMostViewedBooks() async {
     try {
+      // Public RPC for readers (visible books only). The admin-only
+      // get_most_viewed_books RPC is used by the analytics dashboard.
       final ids = await _supabase.client
-          .rpc('get_most_viewed_books', params: {'max_results': 6});
+          .rpc('get_most_viewed_books_public', params: {'max_results': 6});
       if (ids.isEmpty) return const Ok([]);
       final bookIdList = ids.map<int>((e) => e['book_id'] as int).toList();
       final response = await _supabase.client
