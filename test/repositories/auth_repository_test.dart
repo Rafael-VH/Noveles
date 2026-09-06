@@ -354,7 +354,7 @@ void main() {
         expect(events.first, AuthEvent.tokenRefreshed);
       });
 
-      test('handles stream errors by emitting signedOut', () async {
+      test('handles stream errors by emitting authError', () async {
         final controller = StreamController<AuthState>();
         when(() => mockAuth.onAuthStateChange).thenAnswer((_) => controller.stream);
 
@@ -365,7 +365,7 @@ void main() {
         await controller.close();
 
         final events = await futures;
-        expect(events.first, AuthEvent.signedOut);
+        expect(events.first, AuthEvent.authError);
       });
     });
   });

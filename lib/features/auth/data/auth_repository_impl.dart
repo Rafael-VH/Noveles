@@ -113,7 +113,7 @@ class AuthRepositoryImpl implements AuthRepository {
               _ => AuthEvent.userChanged,
             })
         .transform(StreamTransformer.fromHandlers(
-          handleError: (_, __, sink) => sink.add(AuthEvent.signedOut),
+          handleError: (_, __, sink) => sink.add(AuthEvent.authError),
         ));
   }
 
