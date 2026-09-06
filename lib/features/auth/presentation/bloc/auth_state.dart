@@ -21,6 +21,10 @@ class AuthAuthenticated extends AuthState {
 
 class AuthUnauthenticated extends AuthState {}
 
+/// The user has a valid session but their profile role is `suspended`
+/// (or `unknown`). The app should force a sign-out and show a blocking screen.
+class AuthSuspended extends AuthState {}
+
 class AuthError extends AuthState {
   final String message;
 

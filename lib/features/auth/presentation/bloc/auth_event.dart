@@ -34,3 +34,9 @@ class RegisterRequested extends AuthEvent {
 class LogoutRequested extends AuthEvent {
   const LogoutRequested();
 }
+
+/// Re-reads the current profile from the server (e.g. after a token refresh
+/// or a `userUpdated` event) so role changes propagate to the UI.
+class RefreshUser extends AuthEvent {
+  const RefreshUser();
+}

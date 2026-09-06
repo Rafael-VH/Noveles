@@ -21,13 +21,47 @@ class MockSupabaseStorageClient extends Mock implements SupabaseStorageClient {}
 
 class MockStorageFileApi extends Mock implements StorageFileApi {}
 
+/// Mock for the value returned by client.rpc(...) — PostgrestFilterBuilder<dynamic>.
+/// Overrides then() directly (Mocktail struggles with await-able Future types).
+// ignore: must_be_immutable
+class MockRpcValueBuilder extends Mock
+    implements PostgrestFilterBuilder<dynamic> {
+  dynamic _data;
+  Exception? _error;
+
+  void thenReturns(dynamic data) {
+    _data = data;
+  }
+
+  void thenThrows(Exception error) {
+    _error = error;
+  }
+
+  @override
+  Future<U> then<U>(
+    FutureOr<U> Function(dynamic value) onValue, {
+    Function? onError,
+  }) async {
+    final error = _error;
+    if (error != null) throw error;
+    final result = onValue(_data);
+    if (result is Future<U>) return result;
+    return result;
+  }
+}
+
 // ignore: must_be_immutable
 class MockFilterBuilder extends Mock
     implements PostgrestFilterBuilder<PostgrestList> {
   PostgrestList? _data;
+  Exception? _error;
 
   void thenReturns(PostgrestList data) {
     _data = data;
+  }
+
+  void thenThrows(Exception error) {
+    _error = error;
   }
 
   @override
@@ -35,6 +69,8 @@ class MockFilterBuilder extends Mock
     FutureOr<U> Function(PostgrestList value) onValue, {
     Function? onError,
   }) async {
+    final error = _error;
+    if (error != null) throw error;
     final result = onValue(_data!);
     if (result is Future<U>) return result;
     return result;
@@ -111,6 +147,7 @@ void main() {
   late MockGoTrueClient mockAuth;
   late MockSupabaseQueryBuilder mockQueryBuilder;
   late MockFilterBuilder mockFilter;
+  late MockRpcValueBuilder mockRpcBuilder;
   late MockTransformBuilder mockTransform;
   late MockSelectBuilder mockSelectBuilder;
   late MockSingleBuilder mockSingleBuilder;
@@ -130,6 +167,7 @@ void main() {
     mockAuth = MockGoTrueClient();
     mockQueryBuilder = MockSupabaseQueryBuilder();
     mockFilter = MockFilterBuilder();
+    mockRpcBuilder = MockRpcValueBuilder();
     mockTransform = MockTransformBuilder();
     mockSelectBuilder = MockSelectBuilder();
     mockSingleBuilder = MockSingleBuilder();
@@ -143,6 +181,8 @@ void main() {
     repository = ProfilesRepositoryImpl(mockProvider);
 
     when(() => mockClient.from(any())).thenAnswer((_) => mockQueryBuilder);
+    when(() => mockClient.rpc(any(), params: any(named: 'params')))
+        .thenAnswer((_) => mockRpcBuilder);
     when(() => mockQueryBuilder.select(any())).thenAnswer((_) => mockFilter);
     when(() => mockQueryBuilder.insert(
           any(),
@@ -166,6 +206,7 @@ void main() {
     when(() => mockFilter.select(any())).thenAnswer((_) => mockSelectBuilder);
     when(() => mockSelectBuilder.maybeSingle()).thenAnswer((_) => mockTransform);
     when(() => mockSelectBuilder.single()).thenAnswer((_) => mockSingleBuilder);
+    when(() => mockFilter.single()).thenAnswer((_) => mockSingleBuilder);
   });
 
   tearDown(() {
@@ -460,7 +501,33 @@ void main() {
     });
 
     group('updateUserRole', () {
-      test('returns updated UserEntity on success', () async {
+      test('routes suspension through admin_suspend_user RPC and returns updated profile',
+          () async {
+        mockRpcBuilder.thenReturns(<Map<String, dynamic>>[]);
+        mockSingleBuilder.thenReturns({
+          'id': 'user-2',
+          'email': 'scan@test.com',
+          'role': 'suspended',
+          'display_name': 'Scanner',
+          'bio': null,
+          'avatar_url': null,
+        });
+
+        final result = await repository.updateUserRole(
+          userId: 'user-2',
+          role: UserRole.suspended.name,
+        );
+
+        expect(result, isA<Ok<UserEntity>>());
+        final value = (result as Ok<UserEntity>).value;
+        expect(value.role, UserRole.suspended);
+        verify(() => mockClient.rpc('admin_suspend_user',
+            params: {'target_uid': 'user-2'})).called(1);
+      });
+
+      test('routes reactivation through admin_reactivate_user RPC and returns updated profile',
+          () async {
+        mockRpcBuilder.thenReturns(<Map<String, dynamic>>[]);
         mockSingleBuilder.thenReturns({
           'id': 'user-2',
           'email': 'scan@test.com',
@@ -477,14 +544,14 @@ void main() {
 
         expect(result, isA<Ok<UserEntity>>());
         final value = (result as Ok<UserEntity>).value;
-        expect(value.id, 'user-2');
         expect(value.role, UserRole.admin);
-        verify(() => mockFilter.eq('id', 'user-2')).called(1);
+        verify(() => mockClient.rpc('admin_reactivate_user',
+            params: {'target_uid': 'user-2', 'new_role': 'admin'})).called(1);
       });
 
-      test('returns Err on database error', () async {
-        when(() => mockSelectBuilder.single())
-            .thenThrow(Exception('DB error'));
+      test('returns Err on RPC error', () async {
+        when(() => mockClient.rpc(any(), params: any(named: 'params')))
+            .thenThrow(Exception('RPC error'));
 
         final result = await repository.updateUserRole(
           userId: 'user-2',

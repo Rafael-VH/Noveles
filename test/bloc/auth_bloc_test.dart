@@ -41,6 +41,18 @@ void main() {
     avatarUrl: null,
   );
 
+  const suspendedUser = UserEntity(
+    id: '2',
+    email: 'suspended@example.com',
+    role: UserRole.suspended,
+  );
+
+  const unknownRoleUser = UserEntity(
+    id: '3',
+    email: 'weird@example.com',
+    role: UserRole.unknown,
+  );
+
   setUp(() {
     mockLogin = MockLogin();
     mockRegister = MockRegister();
@@ -272,6 +284,54 @@ void main() {
       ],
     );
 
+    blocTest<AuthBloc, AuthState>(
+      'emits [AuthLoading, AuthSuspended] and signs out when login returns a suspended user',
+      build: () {
+        when(() => mockLogin('s@x.com', 'pass'))
+            .thenAnswer((_) async => const Ok(suspendedUser));
+        when(() => mockLogout()).thenAnswer((_) async => const Ok(null));
+        return AuthBloc(
+          login: mockLogin,
+          register: mockRegister,
+          logout: mockLogout,
+          getCurrentUser: mockGetCurrentUser,
+          listenAuthState: mockListenAuthState,
+        );
+      },
+      act: (bloc) => bloc.add(LoginRequested('s@x.com', 'pass')),
+      expect: () => [
+        isA<AuthLoading>(),
+        isA<AuthSuspended>(),
+        isA<AuthUnauthenticated>(),
+      ],
+      verify: (bloc) {
+        // A suspended user must be signed out so the stale session cannot be used.
+        verify(() => mockLogout()).called(1);
+      },
+    );
+
+    blocTest<AuthBloc, AuthState>(
+      'emits [AuthLoading, AuthSuspended] and signs out when the profile role is unknown',
+      build: () {
+        when(() => mockGetCurrentUser())
+            .thenAnswer((_) async => const Ok(unknownRoleUser));
+        when(() => mockLogout()).thenAnswer((_) async => const Ok(null));
+        return AuthBloc(
+          login: mockLogin,
+          register: mockRegister,
+          logout: mockLogout,
+          getCurrentUser: mockGetCurrentUser,
+          listenAuthState: mockListenAuthState,
+        );
+      },
+      act: (bloc) => bloc.add(CheckAuthSession()),
+      expect: () => [
+        isA<AuthLoading>(),
+        isA<AuthSuspended>(),
+        isA<AuthUnauthenticated>(),
+      ],
+    );
+
     // --- P0: C2 race condition guard ---
 
     test('second LogoutRequested during active logout is a no-op', () async {
@@ -337,5 +397,34 @@ void main() {
         verify(() => mockLogout()).called(1);
       },
     );
+
+    test('Stream userChanged event re-fetches the profile without logging out',
+        () async {
+      when(() => mockGetCurrentUser())
+          .thenAnswer((_) async => const Ok(testUser));
+
+      final bloc = AuthBloc(
+        login: mockLogin,
+        register: mockRegister,
+        logout: mockLogout,
+        getCurrentUser: mockGetCurrentUser,
+        listenAuthState: mockListenAuthState,
+      );
+
+      // Establish an authenticated session first.
+      bloc.add(CheckAuthSession());
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+      expect(bloc.state, isA<AuthAuthenticated>());
+
+      // Fire userChanged (e.g. profile update): must NOT sign out, but refetch.
+      authStateController.add(domain.AuthEvent.userChanged);
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+
+      expect(bloc.state, isA<AuthAuthenticated>());
+      verify(() => mockGetCurrentUser()).called(2);
+      verifyNever(() => mockLogout());
+
+      await bloc.close();
+    });
   });
 }

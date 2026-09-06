@@ -8,7 +8,9 @@ import 'package:noveles/features/scan/presentation/screens/scan_main_screen.dart
 import 'package:noveles/features/app/presentation/screens/main_screen.dart';
 import 'package:noveles/features/app/presentation/screens/splash_screen.dart';
 import 'package:noveles/features/auth/presentation/screens/login_screen.dart';
+import 'package:noveles/features/auth/presentation/screens/suspended_screen.dart';
 import 'package:noveles/features/labels/presentation/screens/label_management_screen.dart';
+import 'package:noveles/features/profiles/domain/user_role.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -31,9 +33,37 @@ class App extends StatelessWidget {
             title: 'NovelEs',
             theme: state.themeData,
             navigatorKey: navigatorKey,
-            routes: {
-              '/label-management': (_) => const LabelManagementScreen(),
-              '/admin': (_) => const AdminDashScreen(),
+            onGenerateRoute: (settings) {
+              // Role guards: never trust drawer visibility alone. The AuthBloc
+              // is created above (BlocProvider), so it is safe to read here.
+              final authState = context.read<AuthBloc>().state;
+              switch (settings.name) {
+                case '/admin':
+                  final user = (authState is AuthAuthenticated)
+                      ? authState.user
+                      : null;
+                  return MaterialPageRoute(
+                    builder: (_) =>
+                        (user != null && user.role == UserRole.admin)
+                            ? const AdminDashScreen()
+                            : _homeFor(authState),
+                  );
+                case '/label-management':
+                  final user = (authState is AuthAuthenticated)
+                      ? authState.user
+                      : null;
+                  final allowed =
+                      user?.role == UserRole.admin || user?.role == UserRole.scan;
+                  return MaterialPageRoute(
+                    builder: (_) => allowed
+                        ? const LabelManagementScreen()
+                        : _homeFor(authState),
+                  );
+                default:
+                  return MaterialPageRoute(
+                    builder: (_) => _homeFor(authState),
+                  );
+              }
             },
             builder: (context, child) {
               return BlocListener<AuthBloc, AuthState>(
@@ -51,26 +81,22 @@ class App extends StatelessWidget {
                     return;
                   }
 
-                  if (!SplashScreen.isReady) return;
-
-                  if (state is AuthAuthenticated) {
-                    Widget destination;
-                    if (state.user.isAdmin) {
-                      destination = const AdminDashScreen();
-                    } else if (state.user.isScan) {
-                      destination = const ScanMainScreen();
-                    } else if (state.user.isUser) {
-                      destination = const MainScreen();
-                    } else {
-                      destination = const LoginScreen();
-                    }
+                  if (state is AuthSuspended) {
                     nav.pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (_) => destination),
+                      MaterialPageRoute(
+                        builder: (_) => const SuspendedScreen(),
+                      ),
                       (_) => false,
                     );
-                  } else if (state is AuthUnauthenticated) {
+                    return;
+                  }
+
+                  if (!SplashScreen.isReady) return;
+
+                  if (state is AuthAuthenticated ||
+                      state is AuthUnauthenticated) {
                     nav.pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (_) => const LoginScreen()),
+                      MaterialPageRoute(builder: (_) => _homeFor(state)),
                       (_) => false,
                     );
                   }
@@ -83,5 +109,17 @@ class App extends StatelessWidget {
         },
       ),
     );
+  }
+
+  /// Single source of truth mapping an auth state to its home screen.
+  Widget _homeFor(AuthState state) {
+    if (state is AuthAuthenticated) {
+      if (state.user.isAdmin) return const AdminDashScreen();
+      if (state.user.isScan) return const ScanMainScreen();
+      if (state.user.isUser) return const MainScreen();
+      // suspended/unknown should not render content; login is a safe fallback.
+      return const LoginScreen();
+    }
+    return const LoginScreen();
   }
 }

@@ -4,6 +4,7 @@ import 'package:noveles/core/errors/result.dart';
 import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/profiles/data/profiles.dart';
 import 'package:noveles/features/profiles/domain/user_entity.dart';
+import 'package:noveles/features/profiles/domain/user_role.dart';
 import 'package:noveles/features/profiles/domain/profiles_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -113,12 +114,28 @@ class ProfilesRepositoryImpl implements ProfilesRepository {
     required String role,
   }) async {
     try {
-      final response = await _supabase.client
+      // Route role changes through the admin RPCs so suspending also revokes
+      // the user's active sessions server-side (see migration
+      // enforce_suspended_all_tables). Direct UPDATE of profiles.role is
+      // blocked by RLS column-level REVOKE anyway.
+      final Map<String, dynamic> response;
+      if (role == UserRole.suspended.name) {
+        await _supabase.client.rpc('admin_suspend_user', params: {
+          'target_uid': userId,
+        });
+      } else {
+        await _supabase.client.rpc('admin_reactivate_user', params: {
+          'target_uid': userId,
+          'new_role': role,
+        });
+      }
+
+      final profile = await _supabase.client
           .from('profiles')
-          .update({'role': role})
+          .select('*')
           .eq('id', userId)
-          .select()
           .single();
+      response = Map<String, dynamic>.from(profile);
       return Ok(UserModel.fromJson(response));
     } catch (e) {
       return Err(ProfileFailure('Error al cambiar rol', cause: e));
