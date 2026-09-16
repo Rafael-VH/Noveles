@@ -113,22 +113,40 @@
     .then(data => {
       const grid = document.getElementById('grid');
       const count = document.getElementById('count');
-      const list = (data && data.diagrams) ? data.diagrams : [];
-      count.textContent = list.length ? list.length + ' diagrama(s) disponible(s)' : '';
+      const groups = (data && Array.isArray(data.groups)) ? data.groups : [];
+      const total = groups.reduce((n, g) => n + ((g.diagrams || []).length), 0);
+      count.textContent = total ? total + ' diagrama(s) disponible(s)' : '';
       grid.innerHTML = '';
-      list.forEach(d => {
-        const a = document.createElement('a');
-        a.className = 'card';
-        a.href = d.file;
-        a.title = d.name;
-        a.innerHTML =
-          '<div class="icon">' + (d.icon || '📊') + '</div>' +
-          '<h2>' + d.name + '</h2>' +
-          '<p>' + (d.description || '') + '</p>' +
-          (d.tag ? '<span class="tag">' + d.tag + '</span>' : '');
-        grid.appendChild(a);
+      // Renderizá por grupo = una seccion por carpeta en docs/diagrams/<dominio>/.
+      groups.forEach(g => {
+        const sec = document.createElement('section');
+        sec.className = 'group';
+        sec.innerHTML = '<h2 class="groupTitle">' + (g.icon || '') + ' ' + g.name + '</h2>';
+        const cards = document.createElement('div');
+        cards.className = 'cards';
+        const list = (g.diagrams && g.diagrams.length) ? g.diagrams : [];
+        if (!list.length) {
+          const ph = document.createElement('p');
+          ph.className = 'groupEmpty';
+          ph.textContent = 'Sin diagramas todavía. Agregá el HTML en docs/diagrams/' + g.id + '/ y una entrada en manifest.json.';
+          cards.appendChild(ph);
+        }
+        list.forEach(d => {
+          const a = document.createElement('a');
+          a.className = 'card';
+          a.href = d.file;
+          a.title = d.name;
+          a.innerHTML =
+            '<div class="icon">' + (d.icon || '📊') + '</div>' +
+            '<h3>' + d.name + '</h3>' +
+            '<p>' + (d.description || '') + '</p>' +
+            (d.tag ? '<span class="tag">' + d.tag + '</span>' : '');
+          cards.appendChild(a);
+        });
+        sec.appendChild(cards);
+        grid.appendChild(sec);
       });
-      document.getElementById('empty').style.display = list.length ? 'none' : 'block';
+      document.getElementById('empty').style.display = total ? 'none' : 'block';
     })
     .catch(err => {
       document.getElementById('count').textContent = '⚠️ No se pudo cargar manifest.json — ' + err.message;
