@@ -1,38 +1,50 @@
 {
-  "title": "NovelEs — Diagramas",
-  "description": "Diagramas interactivos generados con ArchMan/archify. Agregá uno nuevo: creá el HTML con archify y sumá una entrada en este manifest.",
-  "groups": [
-    {
-      "id": "overview",
-      "name": "Visión General",
-      "icon": "🧭",
-      "diagrams": [
-        {
-          "id": "architecture",
-          "name": "Arquitectura Completa",
-          "description": "Clean Architecture · Flutter + Supabase. SVG interactivo: pan/zoom, temas, búsqueda, rutas y export.",
-          "file": "overview/architecture.html",
-          "tag": "core"
-        }
-      ]
-    },
-    {
-      "id": "backend",
-      "name": "Backend · Supabase",
-      "icon": "🗄️",
-      "diagrams": [{"id":"supabase","name":"SuperBackend","description":"Supabase: Auth (JWT+RLS) · Postgres con 13 tablas · Storage (covers/avatars) · Edge Function sync-labels (Deno). Generado desde supabase/migrations.","file":"backend/supabase.html","tag":"core"}]
-    },
-    {
-      "id": "client",
-      "name": "Cliente Flutter",
-      "icon": "📱",
-      "diagrams": [ { "id": "supabase", "name": "Supabase &#183; Backend", "description": "Postgres + RLS + Auth JWT + Storage (covers/avatars) + Edge Function sync-labels (Deno). 13 tablas, 17 funciones, RLS por dominio.", "file": "backend/supabase.html", "tag": "core" } ]
-    },
-    {
-      "id": "workflows",
-      "name": "Flujos de Trabajo",
-      "icon": "🔄",
-      "diagrams": []
-    }
-  ]
+    "title":  "NovelEs — Diagramas",
+    "description":  "Diagramas interactivos generados con ArchMan/archify. Agregá uno nuevo: creá el HTML con archify y sumá una entrada en este manifest.",
+    "groups":  [
+                   {
+                       "id":  "overview",
+                       "name":  "Visión General",
+                       "icon":  "🧭",
+                       "diagrams":  [
+                                        {
+                                            "id":  "architecture",
+                                            "name":  "Arquitectura Completa",
+                                            "description":  "Clean Architecture · Flutter + Supabase. SVG interactivo: pan/zoom, temas, búsqueda, rutas y export.",
+                                            "file":  "overview/architecture.html",
+                                            "tag":  "core"
+                                        }
+                                    ]
+                   },
+                   {
+                       "id":  "backend",
+                       "name":  "Backend · Supabase",
+                       "icon":  "🗄️",
+                       "diagrams":  [
+                                        {
+                                            "id":  "supabase",
+                                            "name":  "SuperBackend",
+                                            "description":  "Supabase: Auth (JWT+RLS) · Postgres con 13 tablas · Storage (covers/avatars) · Edge Function sync-labels (Deno). Generado desde supabase/migrations.",
+                                            "file":  "backend/supabase.html",
+                                            "tag":  "core"
+                                        }
+                                    ]
+                   },
+                   {
+                       "id":  "client",
+                       "name":  "Cliente Flutter",
+                       "icon":  "📱",
+                       "diagrams":  [
+
+                                    ]
+                   },
+                   {
+                       "id":  "workflows",
+                       "name":  "Flujos de Trabajo",
+                       "icon":  "🔄",
+                       "diagrams":  [
+
+                                    ]
+                   }
+               ]
 }
