@@ -128,7 +128,7 @@
         if (!list.length) {
           const ph = document.createElement('p');
           ph.className = 'groupEmpty';
-          ph.textContent = 'Sin diagramas todavía. Agregá el HTML en docs/diagrams/' + g.id + '/ y una entrada en manifest.json.';
+          ph.textContent = g.placeholder || ('Sin diagramas todavía. Agregá el HTML en docs/diagrams/' + g.id + '/ y una entrada en manifest.json.');
           cards.appendChild(ph);
         }
         list.forEach(d => {

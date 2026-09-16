@@ -30,21 +30,23 @@
                                         }
                                     ]
                    },
-                   {
-                       "id":  "client",
-                       "name":  "Cliente Flutter",
-                       "icon":  "📱",
-                       "diagrams":  [
+                    {
+                        "id":  "client",
+                        "name":  "Cliente Flutter",
+                        "icon":  "📱",
+                        "placeholder":  "Próximamente: arquitectura Flutter (Clean + Riverpod), pantallas, widgets y navegación.",
+                        "diagrams":  [
 
-                                    ]
-                   },
-                   {
-                       "id":  "workflows",
-                       "name":  "Flujos de Trabajo",
-                       "icon":  "🔄",
-                       "diagrams":  [
+                                     ]
+                    },
+                    {
+                        "id":  "workflows",
+                        "name":  "Flujos de Trabajo",
+                        "icon":  "🔄",
+                        "placeholder":  "Próximamente: auth, registro, gestión de novelas y sync de etiquetas.",
+                        "diagrams":  [
 
-                                    ]
-                   }
+                                     ]
+                    }
                ]
 }
