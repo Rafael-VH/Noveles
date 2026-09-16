@@ -26,7 +26,7 @@
       "id": "client",
       "name": "Cliente Flutter",
       "icon": "📱",
-      "diagrams": []
+      "diagrams": [ { "id": "supabase", "name": "Supabase &#183; Backend", "description": "Postgres + RLS + Auth JWT + Storage (covers/avatars) + Edge Function sync-labels (Deno). 13 tablas, 17 funciones, RLS por dominio.", "file": "backend/supabase.html", "tag": "core" } ]
     },
     {
       "id": "workflows",
