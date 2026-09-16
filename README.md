@@ -7,6 +7,7 @@ role-based access, built with Flutter + Supabase.
 [![Dart](https://img.shields.io/badge/Dart-3.3%2B-0175C2?logo=dart&logoColor=white)](https://dart.dev)
 [![Supabase](https://img.shields.io/badge/Supabase-3FCF8E?logo=supabase&logoColor=white)](https://supabase.com)
 [![Tests](https://img.shields.io/badge/tests-471%20passing-brightgreen)](docs/en/testing/README.md)
+[![Diagramas interactivos](https://img.shields.io/badge/Diagramas%20interactivos-ver%20online-26a69a?logo=githubpages&logoColor=white)](https://rafael-vh.github.io/Noveles/diagrams/)
 
 ---
 
@@ -66,6 +67,8 @@ novels. It supports **three user roles** — each with a tailored experience:
 ## 🏗️ Architecture at a Glance
 
 <img align="center" alt="NovelEs — Arquitectura Completa" src="docs/diagrams/overview/architecture.svg">
+
+> **Gran Novedad** - el [dashboard de diagramas interactivos](https://rafael-vh.github.io/Noveles/diagrams/) esta online: pan/zoom, busqueda, temas claro/oscuro, rutas y export a PNG/SVG. Agregar un diagrama = crear su HTML en docs/diagrams/<dominio>/ y sumar una entrada al manifest.json.
 
 > 🔍 **¿Querés explorarla?** Abrí la [versión interactiva](https://rafael-vh.github.io/Noveles/diagrams/) —
 > pan/zoom, temas claro/oscuro, búsqueda, seguimiento de rutas y export a PNG/SVG.
