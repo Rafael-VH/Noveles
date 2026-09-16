@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark" data-preset="classic">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="archify 2.17.0-dev.1">
+<title>NovelEs · Backend Supabase</title>
+<style>
+  :root{color-scheme:dark;--bg:#0f172a;--fg:#e2e8f0;--muted:#94a3b8;--accent:#38bdf8;--card:#1e293b;--border:#334155}
+  html,body{margin:0;height:100%}
+  body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;overflow:hidden}
+  #stage{position:fixed;inset:0;background:
+    radial-gradient(1200px 600px at 20% -10%, #1e3a5f55, transparent 60%),
+    radial-gradient(900px 500px at 110% 120%, #3b076455, transparent 55%), var(--bg);
+    display:grid;place-items:center}
+  #canvas{width:min(96vw,1500px);height:min(92vh,940px);cursor:grab}
+  #canvas:active{cursor:grabbing}
+  #canvas .frame{transform-origin:0 0}
+  #toolbar{position:fixed;top:14px;right:14px;display:flex;gap:6px;z-index:10}
+  #toolbar button{width:34px;height:34px;border-radius:10px;border:1px solid var(--border);background:rgba(30,41,59,.85);color:var(--fg);font:600 15px/1 system-ui;cursor:pointer;backdrop-filter:blur(6px)}
+  #toolbar button:hover{background:var(--card);border-color:var(--accent)}
+  #themeBtn{width:auto!important;padding:0 12px}
+  #status{position:fixed;bottom:12px;right:14px;font:500 12px/1 system-ui;color:var(--muted);z-index:10}
+  #legend{position:fixed;bottom:12px;left:14px;display:flex;flex-wrap:wrap;gap:8px 14px;font:500 11px/1 system-ui;color:var(--muted);z-index:10}
+  #legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+  svg text{user-select:none}
+  #cardTip{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:rgba(15,23,42,.9);border:1px solid var(--border);border-radius:999px;padding:8px 16px;font:500 13px/1 system-ui;color:var(--fg);z-index:20;opacity:0;transition:opacity .25s;pointer-events:none}
+</style>
+</head>
+<body>
+
+<div id="stage"><svg id="canvas" role="img" lang="es" aria-labelledby="sb-title"><g class="frame"></g></svg></div>
+
+<div id="toolbar" role="toolbar" aria-label="Controles del diagrama">
+  <button id="zoomIn" title="Acercar (&#43;)">&#43;</button>
+  <button id="zoomOut" title="Alejar (&#8722;)">&#8722;</button>
+  <button id="resetBtn" title="Restablecer vista (0)">&#8635;</button>
+  <button id="themeBtn" title="Alternar tema claro/oscuro (t)">&#9681;</button>
+</div>
+
+<div id="legend" aria-hidden="true">
+  <span><i style="background:#0ea5e9"></i>cliente / app</span>
+  <span><i style="background:#f59e0b"></i>edge function</span>
+  <span><i style="background:#8b5cf6"></i>seguridad / RLS</span>
+  <span><i style="background:#10b981"></i>tablas</span>
+</div>
+
+<div id="cardTip" role="status">tip: arrastr&#225; para panear &#183; rueda para zoom &#183; t tema &#183; 0 reset</div>
+
+<script>
+(function () {
+  var PORT = ''''; 
+  var canvas = document.getElementById('canvas');
+  var frame = canvas.querySelector('.frame');
+  var state = { x: 0, y: 0, k: 1 };
+  var dragging = false, last = null, tipTimer = null;
+
+  function apply() {
+    frame.setAttribute('transform', 'translate(' + state.x + ' ' + state.y + ') scale(' + state.k + ')');
+  }
+
+  function showTip() {
+    var tip = document.getElementById('cardTip');
+    tip.style.opacity = 1;
+    clearTimeout(tipTimer);
+    tipTimer = setTimeout(function () { tip.style.opacity = 0; }, 3200);
+  }
+
+  fetch('supabase.svg')
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
+    .then(function (svgText) {
+      var doc = new DOMParser().parseFromString(svgText, 'image/svg+xml');
+      var node = document.importNode(doc.documentElement, true);
+      node.removeAttribute('width'); node.removeAttribute('height');
+      node.setAttribute('viewBox', '0 0 1180 800');
+      frame.appendChild(node);
+      apply();
+      showTip();
+    })
+    .catch(function (e) {
+      document.getElementById('status').textContent = 'no se pudo cargar supabase.svg (' + e.message + ')';
+    });
+
+  ['mousedown'].forEach(function (ev) {
+    canvas.addEventListener(ev, function (e) {
+      dragging = true; last = { x: e.clientX, y: e.clientY };
+    });
+  });
+  window.addEventListener('mousemove', function (e) {
+    if (!dragging) return;
+    state.x += e.clientX - last.x; state.y += e.clientY - last.y;
+    last = { x: e.clientX, y: e.clientY }; apply();
+  });
+  window.addEventListener('mouseup', function () { dragging = false; last = null; });
+
+  canvas.addEventListener('wheel', function (e) {
+    e.preventDefault();
+    var f = e.deltaY < 0 ? 1.12 : 0.89;
+    state.k = Math.min(4, Math.max(0.35, state.k * f));
+    apply();
+  }, { passive: false });
+
+  document.getElementById('zoomIn').onclick = function () { state.k = Math.min(4, state.k * 1.25); apply(); };
+  document.getElementById('zoomOut').onclick = function () { state.k = Math.max(0.35, state.k / 1.25); apply(); };
+  document.getElementById('resetBtn').onclick = function () { state = { x: 0, y: 0, k: 1 }; apply(); };
+  document.getElementById('themeBtn').onclick = function () {
+    var b = document.body;
+    var dark = b.classList.toggle('light');
+    b.style.setProperty('--bg', dark ? '#f8fafc' : '#0f172a');
+    b.style.setProperty('--fg', dark ? '#0f172a' : '#e2e8f0');
+    b.style.setProperty('--muted', dark ? '#64748b' : '#94a3b8');
+    b.style.setProperty('--card', dark ? '#ffffff' : '#1e293b');
+    b.style.setProperty('--border', dark ? '#cbd5e1' : '#334155');
+  };
+  window.addEventListener('keydown', function (e) {
+    if (e.key === '+' || e.key === '=') { e.preventDefault(); state.k = Math.min(4, state.k * 1.25); apply(); }
+    else if (e.key === '-') { e.preventDefault(); state.k = Math.max(0.35, state.k / 1.25); apply(); }
+    else if (e.key === '0') { e.preventDefault(); state = { x: 0, y: 0, k: 1 }; apply(); }
+    else if (e.key === 'Escape') { window.location.href = PORT; }
+  });
+})();
+</script>
+
+<a id="back-to-dashboard" href="../index.html" role="button" title="Volver al dashboard de diagramas" style="position:fixed;bottom:12px;left:12px;z-index:2147483647;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;font:600 13px/1 system-ui,sans-serif;color:#1f2937;background:rgba(255,255,255,.92);border:1px solid #d1d5db;border-radius:999px;box-shadow:0 2px 8px rgba(0,0,0,.18);text-decoration:none;backdrop-filter:blur(4px);cursor:pointer;">&#8592; Volver al dashboard</a>
+
+</body>
+</html>
