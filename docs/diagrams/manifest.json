@@ -20,7 +20,7 @@
       "id": "backend",
       "name": "Backend · Supabase",
       "icon": "🗄️",
-      "diagrams": []
+      "diagrams": [{"id":"supabase","name":"SuperBackend","description":"Supabase: Auth (JWT+RLS) · Postgres con 13 tablas · Storage (covers/avatars) · Edge Function sync-labels (Deno). Generado desde supabase/migrations.","file":"backend/supabase.html","tag":"core"}]
     },
     {
       "id": "client",
