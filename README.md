@@ -65,9 +65,9 @@ novels. It supports **three user roles** — each with a tailored experience:
 
 ## 🏗️ Architecture at a Glance
 
-<img align="center" alt="NovelEs — Arquitectura Completa" src="docs/diagrams/architecture.svg">
+<img align="center" alt="NovelEs — Arquitectura Completa" src="docs/diagrams/overview/architecture.svg">
 
-> 🔍 **¿Querés explorarla?** Abrí la [versión interactiva](docs/diagrams/architecture.html) —
+> 🔍 **¿Querés explorarla?** Abrí la [versión interactiva](https://rafael-vh.github.io/Noveles/diagrams/) —
 > pan/zoom, temas claro/oscuro, búsqueda, seguimiento de rutas y export a PNG/SVG.
 
 **Clean Architecture** with three layers. The domain layer is **pure Dart** —

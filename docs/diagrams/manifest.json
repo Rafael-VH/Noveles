@@ -1,0 +1,38 @@
+{
+  "title": "NovelEs — Diagramas",
+  "description": "Diagramas interactivos generados con ArchMan/archify. Agregá uno nuevo: creá el HTML con archify y sumá una entrada en este manifest.",
+  "groups": [
+    {
+      "id": "overview",
+      "name": "Visión General",
+      "icon": "🧭",
+      "diagrams": [
+        {
+          "id": "architecture",
+          "name": "Arquitectura Completa",
+          "description": "Clean Architecture · Flutter + Supabase. SVG interactivo: pan/zoom, temas, búsqueda, rutas y export.",
+          "file": "overview/architecture.html",
+          "tag": "core"
+        }
+      ]
+    },
+    {
+      "id": "backend",
+      "name": "Backend · Supabase",
+      "icon": "🗄️",
+      "diagrams": []
+    },
+    {
+      "id": "client",
+      "name": "Cliente Flutter",
+      "icon": "📱",
+      "diagrams": []
+    },
+    {
+      "id": "workflows",
+      "name": "Flujos de Trabajo",
+      "icon": "🔄",
+      "diagrams": []
+    }
+  ]
+}
