@@ -47,3 +47,15 @@ GitHub Pages **rebuilda solo** con cada push a main. El deploy tarda ~1-2 min.
 - [ ] `manifest.json` es JSON válido (se refleja en el dashboard).
 - [ ] `file` apunta a `<dominio>/<nombre>.html` y ese archivo existe y está commiteado.
 - [ ] Después del push, abrí la URL online y verificá la card + el interactivo.
+
+## Regla obligatoria: boton de vuelta al dashboard
+
+Cada diagrama interactivo debe tener un link de regreso, si no el usuario queda atrapado en el diagrama y no puede volver a la grilla.
+
+Agregalo justo antes de </body> en tu <nombre>.html:
+
+``html
+<a id="back-to-dashboard" href="..\/index.html" role="button" style="position:fixed;bottom:12px;left:12px;z-index:2147483647;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;font:600 13px/1 system-ui,sans-serif;color:#1f2937;background:rgba(255,255,255,.92);border:1px solid #d1d5db;border-radius:999px;box-shadow:0 2px 8px rgba(0,0,0,.18);text-decoration:none;">&#8592; Volver al dashboard</a>
+``
+
+El dashboard vive en docs/diagrams/index.html, por eso el ../index.html. Si el diagrama esta mas profundo (ej. overview/sub/), ajusta la cantidad de ...
