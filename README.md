@@ -65,15 +65,10 @@ novels. It supports **three user roles** — each with a tailored experience:
 
 ## 🏗️ Architecture at a Glance
 
-```text
-┌─────────────────────────────────┐
-│       Presentation              │  BLoCs, Screens, Widgets
-├─────────────────────────────────┤
-│         Domain                  │  Entities, Use Cases, Repository interfaces
-├─────────────────────────────────┤
-│           Data                  │  Repository implementations, Supabase
-└─────────────────────────────────┘
-```
+<img align="center" alt="NovelEs — Arquitectura Completa" src="docs/diagrams/architecture.svg">
+
+> 🔍 **¿Querés explorarla?** Abrí la [versión interactiva](docs/diagrams/architecture.html) —
+> pan/zoom, temas claro/oscuro, búsqueda, seguimiento de rutas y export a PNG/SVG.
 
 **Clean Architecture** with three layers. The domain layer is **pure Dart** —
 no Flutter or Supabase imports. This makes entities and use cases testable
