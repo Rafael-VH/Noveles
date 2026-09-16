@@ -50,3 +50,5 @@ opencode.json
 
 # CommandCode CLI local config
 .commandcode/
+# Local AI runtime state
+.atl/
