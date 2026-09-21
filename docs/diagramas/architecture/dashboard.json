@@ -1,0 +1,5 @@
+{
+  "descripcion": "Arquitectura del cliente Flutter y la costura Ports & Adapters hacia Supabase: Data depende de tres gateways y el SDK vive solo en lib/core/backend/.",
+  "etiquetas": ["arquitectura", "flutter", "ports", "clean architecture"],
+  "destacado": true
+}

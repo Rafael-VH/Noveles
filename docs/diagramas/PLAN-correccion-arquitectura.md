@@ -153,3 +153,24 @@ Se ejecutó la **opción B** (parche manual del SVG y del SVG embebido en el HTM
   los atributos `data-*` que consume el runtime.
 - **Queda abierto**: regenerar con archify cuando esté disponible (los layouts hechos a mano no
   reemplazan una fuente), y sumar más casos a las listas de la guardia a medida que aparezcan.
+
+## 10. Cierre (2026-09-21): la opción A sí era posible y se ejecutó
+
+El punto "Queda abierto" quedó cerrado: archify **sí estaba disponible**
+(`~/.agents/skills/archify/bin/archify.mjs`) — la conclusión inversa de la auditoría fue un error
+de búsqueda, no un dato del entorno. Consecuencias:
+
+- **La fuente ya no son los HTML**: se autoraron las especificaciones
+  `architecture/architecture.json` y `supabase/supabase.json` a partir del inventario exacto de los
+  diagramas parcheados (nodos, kinds, posiciones y aristas extraídos programáticamente), se
+  validaron con `archify validate` hasta cero errores y se regeneraron con `archify deliver`
+  (9/9 artifact checks en ambos). El parche manual queda en este documento como historia.
+- **Casa nueva**: `docs/diagramas/<slug>/` según la skill `archify-diagrams-dashboard`, con
+  `tools/build-diagrams.mjs`, workflow de frescura en CI y publicación en GitHub Pages. La carpeta
+  `docs/diagrams/` (dashboard artesanal) fue eliminada.
+- **Guardia reorientada**: `diagrams_guard_test.dart` ahora escanea `docs/diagramas/` (incluye los
+  HTML archify, que llevan la spec embebida).
+- **Nota de contenido**: en el diagrama de backend, las cajas decorativas del SVG viejo se
+  reemplazaron por un boundary `security-group` "RLS everywhere" y dos conexiones decorativas sin
+  flujo real (Signed URL, auto-etiquetado) se movieron a sublabels/cards: archify rechaza aristas
+  que cruzan nodos o siguen bordes de zonas.

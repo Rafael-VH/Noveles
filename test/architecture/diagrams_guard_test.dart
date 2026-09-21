@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
-/// Guardia de la sección 8 del plan `docs/diagrams/PLAN-correccion-arquitectura.md`.
+/// Guardia de la sección 8 del plan `docs/diagramas/PLAN-correccion-arquitectura.md`.
 ///
-/// Los diagramas interactivos de `docs/diagrams/` describen la arquitectura con
+/// Los diagramas interactivos de `docs/diagramas/` describen la arquitectura con
 /// texto plano (nombres de capas, rutas y clases). Cuando el código cambia, los
 /// diagramas no se regeneran solos: esta guardia escanea el texto y falla si
 /// vuelve a aparecer una afirmación que el código ya no cumple.
@@ -13,7 +13,7 @@ import 'package:flutter_test/flutter_test.dart';
 /// código; la guardia solo cubre lo que se enumera explícitamente en las listas
 /// de abajo. Agregar un caso nuevo = agregar su string exacto a las listas.
 void main() {
-  final diagramsDir = Directory('docs/diagrams');
+  final diagramsDir = Directory('docs/diagramas');
   final diagrams = <File>[];
   if (diagramsDir.existsSync()) {
     diagrams.addAll(
@@ -25,7 +25,7 @@ void main() {
   }
 
   test('el directorio docs/diagrams existe y contiene diagramas', () {
-    expect(diagrams, isNotEmpty, reason: '¿Se movió docs/diagrams? Actualizá esta guardia.');
+    expect(diagrams, isNotEmpty, reason: '¿Se movió docs/diagramas? Actualizá esta guardia.');
   });
 
   test('ningún diagrama afirma que Data conoce al vendor de Supabase', () {

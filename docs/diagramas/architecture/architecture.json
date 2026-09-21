@@ -1,0 +1,392 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Noveles · Arquitectura",
+    "subtitle": "Cliente Flutter · Ports & Adapters hacia Supabase",
+    "locale": "en",
+    "visual_preset": "classic",
+    "quality_profile": "standard",
+    "viewBox": [
+      1540,
+      700
+    ]
+  },
+  "components": [
+    {
+      "id": "readers",
+      "type": "external",
+      "label": "Lectores",
+      "pos": [
+        38,
+        110
+      ],
+      "size": [
+        100,
+        50
+      ]
+    },
+    {
+      "id": "presentation",
+      "type": "frontend",
+      "label": "Presentation",
+      "sublabel": "Blocs + Screens · 10 features",
+      "pos": [
+        190,
+        110
+      ],
+      "size": [
+        200,
+        66
+      ]
+    },
+    {
+      "id": "admin",
+      "type": "frontend",
+      "label": "Admin Panel",
+      "sublabel": "usuarios · analytics · libros",
+      "pos": [
+        190,
+        245
+      ],
+      "size": [
+        130,
+        58
+      ]
+    },
+    {
+      "id": "scan",
+      "type": "frontend",
+      "label": "Módulo Scan",
+      "sublabel": "libro · portada · capítulo · toma",
+      "pos": [
+        190,
+        340
+      ],
+      "size": [
+        150,
+        58
+      ]
+    },
+    {
+      "id": "domain",
+      "type": "backend",
+      "label": "Domain",
+      "sublabel": "Use Cases + Entities (puro)",
+      "pos": [
+        500,
+        110
+      ],
+      "size": [
+        240,
+        84
+      ]
+    },
+    {
+      "id": "data",
+      "type": "backend",
+      "label": "Data",
+      "sublabel": "Repos + Models · Ports",
+      "pos": [
+        440,
+        420
+      ],
+      "size": [
+        240,
+        84
+      ]
+    },
+    {
+      "id": "ports",
+      "type": "backend",
+      "label": "Ports",
+      "sublabel": "DataGateway · AuthGateway · StorageGateway",
+      "pos": [
+        706,
+        420
+      ],
+      "size": [
+        160,
+        84
+      ]
+    },
+    {
+      "id": "adapters",
+      "type": "backend",
+      "label": "Adapters",
+      "sublabel": "core/backend/supabase/",
+      "pos": [
+        892,
+        420
+      ],
+      "size": [
+        140,
+        74
+      ]
+    },
+    {
+      "id": "cache",
+      "type": "database",
+      "label": "Local Cache",
+      "sublabel": "SharedPreferences",
+      "pos": [
+        500,
+        560
+      ],
+      "size": [
+        150,
+        58
+      ]
+    },
+    {
+      "id": "di",
+      "type": "frontend",
+      "label": "get_it — DI",
+      "sublabel": "composition root",
+      "pos": [
+        800,
+        240
+      ],
+      "size": [
+        150,
+        58
+      ]
+    },
+    {
+      "id": "sbauth",
+      "type": "security",
+      "label": "Supabase Auth",
+      "sublabel": "JWT · RLS · roles",
+      "pos": [
+        1060,
+        190
+      ],
+      "size": [
+        170,
+        64
+      ]
+    },
+    {
+      "id": "pg",
+      "type": "database",
+      "label": "PostgreSQL",
+      "sublabel": "13 tablas · RPC · RLS",
+      "pos": [
+        1060,
+        320
+      ],
+      "size": [
+        240,
+        96
+      ]
+    },
+    {
+      "id": "storage",
+      "type": "cloud",
+      "label": "Storage",
+      "sublabel": "buckets covers · chapters · avatars",
+      "pos": [
+        1060,
+        480
+      ],
+      "size": [
+        170,
+        64
+      ]
+    },
+    {
+      "id": "edge",
+      "type": "backend",
+      "label": "Edge Function",
+      "sublabel": "sync-labels · Deno",
+      "pos": [
+        1340,
+        360
+      ],
+      "size": [
+        170,
+        64
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "NovelEs App — Cliente Flutter",
+      "wraps": [
+        "readers",
+        "presentation",
+        "admin",
+        "scan",
+        "domain",
+        "data",
+        "ports",
+        "cache",
+        "di"
+      ]
+    },
+    {
+      "kind": "security-group",
+      "label": "Auth Trust Zone",
+      "wraps": [
+        "sbauth",
+        "pg"
+      ]
+    },
+    {
+      "kind": "region",
+      "label": "Backend — Supabase Platform",
+      "wraps": [
+        "adapters",
+        "sbauth",
+        "pg",
+        "storage",
+        "edge"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "use-ui",
+      "from": "readers",
+      "to": "presentation",
+      "label": "interactúa",
+      "variant": "emphasis",
+      "labelAt": [
+        164,
+        192
+      ]
+    },
+    {
+      "id": "bloc-usecase",
+      "from": "presentation",
+      "to": "domain",
+      "label": "bloc → use case"
+    },
+    {
+      "id": "admin-domain",
+      "from": "admin",
+      "to": "domain"
+    },
+    {
+      "id": "scan-domain",
+      "from": "scan",
+      "to": "domain"
+    },
+    {
+      "id": "di-reg",
+      "from": "di",
+      "to": "data",
+      "label": "registra impls",
+      "fromSide": "left",
+      "toSide": "top",
+      "via": [
+        [
+          560,
+          269
+        ]
+      ]
+    },
+    {
+      "id": "contracts",
+      "from": "domain",
+      "to": "data",
+      "label": "contratos → impls",
+      "labelDy": 24,
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "prefs",
+      "from": "cache",
+      "to": "data",
+      "label": "prefs locales",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "data-ports",
+      "from": "data",
+      "to": "ports",
+      "label": "usa",
+      "labelAt": [
+        688,
+        530
+      ]
+    },
+    {
+      "id": "ports-adapters",
+      "from": "ports",
+      "to": "adapters",
+      "label": "implementan",
+      "labelAt": [
+        870,
+        530
+      ]
+    },
+    {
+      "id": "adapters-pg",
+      "from": "adapters",
+      "to": "pg",
+      "label": "SQL",
+      "labelAt": [
+        950,
+        540
+      ]
+    },
+    {
+      "id": "adapters-storage",
+      "from": "adapters",
+      "to": "storage",
+      "label": "API de Storage",
+      "labelAt": [
+        995,
+        548
+      ]
+    },
+    {
+      "id": "adapters-auth",
+      "from": "adapters",
+      "to": "sbauth",
+      "label": "GoTrue",
+      "labelDy": -7,
+      "labelAt": [
+        1000,
+        330
+      ]
+    },
+    {
+      "id": "rls-roles",
+      "from": "sbauth",
+      "to": "pg",
+      "label": "RLS · roles",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "edge-sync",
+      "from": "edge",
+      "to": "pg",
+      "label": "service role · sync",
+      "labelDy": -54
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "La costura",
+      "items": [
+        "lib/ no importa supabase fuera de lib/core/backend/",
+        "Data depende de 3 ports; el SDK vive solo en Adapters"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Guardia en CI",
+      "items": [
+        "test/architecture/backend_seam_test.dart escanea todo lib/",
+        "diagrams_guard_test.dart vigila este diagrama"
+      ]
+    }
+  ]
+}

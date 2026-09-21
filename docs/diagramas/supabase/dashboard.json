@@ -1,0 +1,4 @@
+{
+  "descripcion": "Backend Supabase: 13 tablas con RLS por rol via JWT, funciones RPC, Auth con triggers de roles, Storage y Edge Functions.",
+  "etiquetas": ["backend", "supabase", "rls", "postgres"]
+}

@@ -1,0 +1,303 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Noveles · Backend Supabase",
+    "subtitle": "Postgres + RLS · Auth JWT · Storage · Edge Functions — fuente: supabase/migrations",
+    "locale": "en",
+    "visual_preset": "classic",
+    "quality_profile": "standard",
+    "viewBox": [
+      1180,
+      760
+    ]
+  },
+  "components": [
+    {
+      "id": "profiles",
+      "type": "database",
+      "brand": "postgresql",
+      "label": "profiles",
+      "sublabel": "rol user/scan/admin · suspensión",
+      "pos": [
+        60,
+        80
+      ],
+      "size": [
+        200,
+        64
+      ]
+    },
+    {
+      "id": "books",
+      "type": "database",
+      "brand": "postgresql",
+      "label": "books",
+      "sublabel": "estado · visibilidad escaneada",
+      "pos": [
+        60,
+        180
+      ],
+      "size": [
+        200,
+        64
+      ]
+    },
+    {
+      "id": "chapters",
+      "type": "database",
+      "brand": "postgresql",
+      "label": "chapters",
+      "sublabel": "contenido · tipo (inline/archivo)",
+      "pos": [
+        60,
+        280
+      ],
+      "size": [
+        200,
+        64
+      ]
+    },
+    {
+      "id": "tooks",
+      "type": "database",
+      "brand": "postgresql",
+      "label": "tooks",
+      "sublabel": "sumario/lectura por capítulo",
+      "pos": [
+        60,
+        380
+      ],
+      "size": [
+        200,
+        64
+      ]
+    },
+    {
+      "id": "analytics",
+      "type": "database",
+      "brand": "postgresql",
+      "label": "book_views · chapter_reads",
+      "sublabel": "analítica de lectura",
+      "pos": [
+        60,
+        480
+      ],
+      "size": [
+        200,
+        64
+      ]
+    },
+    {
+      "id": "labels",
+      "type": "database",
+      "brand": "postgresql",
+      "label": "labels · label_rules",
+      "sublabel": "auto-etiquetado",
+      "pos": [
+        60,
+        580
+      ],
+      "size": [
+        200,
+        64
+      ]
+    },
+    {
+      "id": "auth",
+      "type": "security",
+      "label": "Supabase Auth",
+      "sublabel": "email/password · session JWT",
+      "pos": [
+        420,
+        120
+      ],
+      "size": [
+        190,
+        72
+      ]
+    },
+    {
+      "id": "roles",
+      "type": "security",
+      "label": "roles / claims",
+      "sublabel": "is_admin · is_scan · is_user · is_suspended",
+      "pos": [
+        420,
+        260
+      ],
+      "size": [
+        190,
+        64
+      ]
+    },
+    {
+      "id": "funciones",
+      "type": "database",
+      "brand": "postgresql",
+      "label": "funciones SQL",
+      "sublabel": "top · más vistos · trends · admin (RPC)",
+      "pos": [
+        420,
+        400
+      ],
+      "size": [
+        190,
+        72
+      ]
+    },
+    {
+      "id": "edge",
+      "type": "backend",
+      "label": "Edge Functions",
+      "sublabel": "sync-labels · Deno · CRON/manual",
+      "pos": [
+        720,
+        120
+      ],
+      "size": [
+        190,
+        72
+      ]
+    },
+    {
+      "id": "storage",
+      "type": "cloud",
+      "label": "Storage",
+      "sublabel": "buckets covers · chapters · avatars",
+      "pos": [
+        720,
+        260
+      ],
+      "size": [
+        190,
+        64
+      ]
+    },
+    {
+      "id": "realtime",
+      "type": "external",
+      "label": "Realtime",
+      "sublabel": "sin publicación abierta",
+      "pos": [
+        720,
+        400
+      ],
+      "size": [
+        190,
+        64
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "security-group",
+      "label": "RLS everywhere — filas por rol via JWT + security definer",
+      "wraps": [
+        "profiles",
+        "books",
+        "chapters",
+        "tooks",
+        "analytics",
+        "labels",
+        "auth",
+        "roles",
+        "funciones"
+      ]
+    },
+    {
+      "kind": "region",
+      "label": "Supabase Platform",
+      "wraps": [
+        "profiles",
+        "books",
+        "chapters",
+        "tooks",
+        "analytics",
+        "labels",
+        "auth",
+        "roles",
+        "funciones",
+        "edge",
+        "storage",
+        "realtime"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "new-user",
+      "from": "auth",
+      "to": "profiles",
+      "label": "trigger handle_new_user"
+    },
+    {
+      "id": "claims",
+      "from": "auth",
+      "to": "roles",
+      "label": "JWT claims",
+      "labelDy": 24
+    },
+    {
+      "id": "definer",
+      "from": "roles",
+      "to": "funciones",
+      "label": "security definer",
+      "variant": "dashed",
+      "labelDy": 24
+    },
+    {
+      "id": "rpc",
+      "from": "funciones",
+      "to": "books",
+      "label": "top · más vistos · trends",
+      "variant": "emphasis"
+    },
+    {
+      "id": "rpc-tooks",
+      "from": "funciones",
+      "to": "tooks",
+      "label": "lectura",
+      "labelDy": 30
+    },
+    {
+      "id": "trends",
+      "from": "analytics",
+      "to": "funciones",
+      "label": "lectura agregada",
+      "variant": "dashed"
+    },
+    {
+      "id": "sync-labels",
+      "from": "edge",
+      "to": "labels",
+      "label": "invoke service_role",
+      "variant": "emphasis"
+    },
+    {
+      "id": "anti-esc",
+      "from": "roles",
+      "to": "auth",
+      "label": "anti-escalada de rol",
+      "variant": "dashed"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "RLS everywhere",
+      "items": [
+        "Toda fila se filtra por rol via JWT",
+        "Protección anti-escalada de rol en las policies"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Fuente y límites",
+      "items": [
+        "13 tablas en supabase/migrations",
+        "Realtime existe pero sin publicación abierta"
+      ]
+    }
+  ]
+}

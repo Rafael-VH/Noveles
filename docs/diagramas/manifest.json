@@ -1,0 +1,46 @@
+{
+  "generado_por": "tools/build-diagrams.mjs",
+  "total": 2,
+  "diagramas": [
+    {
+      "slug": "architecture",
+      "titulo": "Noveles · Arquitectura",
+      "tipo": "architecture",
+      "tipoTexto": "Arquitectura",
+      "descripcion": "Arquitectura del cliente Flutter y la costura Ports & Adapters hacia Supabase: Data depende de tres gateways y el SDK vive solo en lib/core/backend/.",
+      "etiquetas": [
+        "arquitectura",
+        "flutter",
+        "ports",
+        "clean architecture"
+      ],
+      "destacado": true,
+      "nodos": 14,
+      "relaciones": 14,
+      "capitulos": 0,
+      "actualizado": "2026-09-21",
+      "archivo": "diagramas/architecture/index.html",
+      "especificacion": "diagramas/architecture/architecture.json"
+    },
+    {
+      "slug": "supabase",
+      "titulo": "Noveles · Backend Supabase",
+      "tipo": "architecture",
+      "tipoTexto": "Arquitectura",
+      "descripcion": "Backend Supabase: 13 tablas con RLS por rol via JWT, funciones RPC, Auth con triggers de roles, Storage y Edge Functions.",
+      "etiquetas": [
+        "backend",
+        "supabase",
+        "rls",
+        "postgres"
+      ],
+      "destacado": false,
+      "nodos": 12,
+      "relaciones": 8,
+      "capitulos": 0,
+      "actualizado": "2026-09-21",
+      "archivo": "diagramas/supabase/index.html",
+      "especificacion": "diagramas/supabase/supabase.json"
+    }
+  ]
+}
