@@ -52,3 +52,6 @@ opencode.json
 .commandcode/
 # Local AI runtime state
 .atl/
+
+# Evidencia regenerable de los diagramas (ver docs/diagramas/README.md)
+docs/diagramas/**/*.visual-check.*

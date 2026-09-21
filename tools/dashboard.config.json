@@ -1,0 +1,10 @@
+{
+  "titulo": "Diagramas · Noveles",
+  "descripcion": "Diagramas interactivos del proyecto Noveles.",
+  "repoUrl": "https://github.com/Rafael-VH/Noveles",
+  "rama": "main",
+  "basePath": "/Noveles/",
+  "etiquetaBoton": "",
+  "hrefBoton": "../../index.html",
+  "inyector": ""
+}
