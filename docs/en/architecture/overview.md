@@ -37,7 +37,7 @@ lib/features/{feature}/
 │   ├── *_repository.dart      # Abstract repository interface
 │   └── *_use_case.dart        # Business logic use cases
 ├── data/
-│   └── *_repository_impl.dart # Repository implementation (Supabase calls)
+│   └── *_repository_impl.dart # Repository implementation (talks to the backend ports)
 └── presentation/
     ├── bloc/                  # BLoC / Cubit state management
     └── screens/               # UI screens and widgets
@@ -52,14 +52,15 @@ Shared infrastructure that all features depend on:
 
 | Folder | Purpose |
 | -------- | --------- |
-| `app/` | `App` widget, routing, role-based home selection |
+| `backend/` | Backend ports (data, auth, storage) plus the adapters that implement them — the only place that names a vendor |
 | `constants/` | Storage bucket names (`StorageConstants`) |
 | `cover/` | Cover image utilities |
-| `di/` | Central DI entry point (`injection.dart`) |
 | `errors/` | ``Result<T>`` sealed class, `Failure` hierarchy |
 | `presentation/` | ThemeBloc, notification system, shared widgets |
-| `supabase/` | Supabase client provider, chapter caching |
 | `utils/` | Colors, theme definitions, parsing, logging |
+
+The composition root lives outside `core/`, in `lib/bootstrap/`: `injection.dart`
+registers every dependency, and `app.dart` is the root widget.
 
 ### Shared Layer (`lib/shared/`)
 
@@ -75,7 +76,7 @@ Code reused across multiple features:
 ```text
 Presentation ──→ Domain ←── Data
       │              │           │
-      │              │           └── Repository impls call Supabase
+      │              │           └── Repository impls call the backend ports
       │              └── Pure Dart: entities, use cases, repo interfaces
       └── BLoCs call use cases, map `Result<T>` to state
 ```text
@@ -88,10 +89,11 @@ framework dependency.
 
 GetIt connects the layers at runtime:
 
-1. `lib/core/di/injection.dart` defines `setupDependencies()`
-2. Each feature has `lib/features/{feature}/di/injection_{feature}.dart` registering its own dependencies
-3. Repositories: `registerLazySingleton` (created once, shared)
-4. BLoCs: `registerFactory` (new instance per request)
+1. `lib/bootstrap/injection.dart` defines `setupDependencies()`
+2. It first calls `registerBackendDependencies()`, which binds the three ports to the adapters of the current backend
+3. Each feature has `lib/features/{feature}/di/injection_{feature}.dart` registering its own dependencies
+4. Repositories: `registerLazySingleton` (created once, shared)
+5. BLoCs: `registerFactory` (new instance per request)
 
 ## Error Handling
 
@@ -111,7 +113,7 @@ See `lib/core/errors/result.dart` and `lib/core/errors/failure.dart`.
 | DI | GetIt | Simple service locator, no code generation |
 | Entities | Equatable | Value equality for state comparisons |
 | Error handling | Result<T> sealed | Explicit error paths,no exceptions in UC |
-| Backend | Supabase | Auth + DB + Storage in one platform |
+| Backend | Supabase, behind ports | Auth + DB + Storage in one platform, replaceable without touching feature code |
 
 ---
 

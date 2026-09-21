@@ -20,10 +20,11 @@ profile row in `profiles`), logout, and real-time auth state listening. The
 | GetCurrentUser | `FR<UserEntity?>` call() | Get current session user |
 | ListenAuthState | `S<AuthEvent>` call() | Stream of auth events |
 
-**Repository**: `AuthRepository` → `AuthRepositoryImpl` uses
-`SupabaseClientProvider` to call `signInWithPassword`, `signUp`, `signOut`, and
-`onAuthStateChange`. On login/register, it fetches (or auto-creates) the
-`profiles` row.
+**Repository**: `AuthRepository` → `AuthRepositoryImpl` depends on `AuthGateway`
+(sign in, sign up, sign out, session state, password change) and on
+`DataGateway` for the `profiles` row. It maps the gateway's neutral
+`AuthIdentityEvent` onto the domain's `AuthEvent`, and on login/register it
+fetches (or auto-creates) the `profiles` row.
 
 ## BLoC
 

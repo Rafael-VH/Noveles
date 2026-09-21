@@ -886,7 +886,7 @@ crear
 ```dart
 void initAdminDependencies() {
   getIt.registerLazySingleton<AnalyticsRepository>(
-    () => AnalyticsRepositoryImpl(getIt<SupabaseClientProvider>()),
+    () => AnalyticsRepositoryImpl(getIt<DataGateway>()),
   );
   getIt.registerFactory(
     () => AdminBloc(

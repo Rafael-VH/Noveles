@@ -5,27 +5,27 @@
 ## Overview
 
 Noveles uses `GetIt` as a service locator for dependency injection. The central
-instance is defined in `lib/core/di/injection.dart` as `final getIt =
+instance is defined in `lib/bootstrap/injection.dart` as `final getIt =
 GetIt.instance;`. Dependencies are registered in a structured way: core services
 first, then per-feature modules via dedicated injection files.
 
 ## Core Registration
 
 Core services are registered in `_registerCore()` within
-`lib/core/di/injection.dart`:
+`lib/bootstrap/injection.dart`:
 
 | Service | Type | Registration |
 | --------- | ------ | -------------- |
-| SupabaseClientProvider | LazySingleton | Provides Supabase client instance |
-| CoverUrlService | LazySingleton | Generates cover URLs from storage paths |
+| DataGateway, AuthGateway, StorageGateway | LazySingleton | The backend ports, bound to the current backend's adapters |
+| CoverUrlService | LazySingleton | Generates cover URLs from storage paths (through `StorageGateway`) |
 
 ```dart
 void _registerCore() {
-  getIt.registerLazySingleton<SupabaseClientProvider>(
-    () => SupabaseClientProviderImpl(),
-  );
+  // Binds the three ports to the adapters of the current backend. Nothing
+  // above this line knows which vendor that is.
+  registerBackendDependencies(getIt);
   getIt.registerLazySingleton(
-    () => CoverUrlService(getIt<SupabaseClientProvider>().client),
+    () => CoverUrlService(getIt<StorageGateway>()),
   );
 }
 ```text
@@ -59,7 +59,10 @@ reused. The instance is created on first access:
 
 ```dart
 getIt.registerLazySingleton<AuthRepository>(
-  () => AuthRepositoryImpl(getIt<SupabaseClientProvider>()),
+  () => AuthRepositoryImpl(
+    getIt<AuthGateway>(),
+    getIt<DataGateway>(),
+  ),
 );
 ```text
 

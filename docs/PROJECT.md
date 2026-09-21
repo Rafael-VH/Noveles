@@ -77,7 +77,7 @@ los únicos que hablan con Supabase.
 | Repositorios (interfaz + impl) | 10 | Auth, Book, Favorite, Chapter, Genre, Label, LabelRule, Profiles, Took, Analytics |
 | Blocs / Cubits | 19 | 18 en features + `ThemeBloc` en core |
 | Pantallas (`*_screen.dart`) | 22 | + 5 tabs de admin |
-| Archivos de test | 64 | 63 tests + helper |
+| Archivos de test | 67 | 65 tests + 2 helpers |
 
 ### 3.2 Features, Blocs y pantallas
 
@@ -116,15 +116,17 @@ los únicos que hablan con Supabase.
 **`lib/main.dart`** (orden de arranque):
 
 1. `WidgetsFlutterBinding.ensureInitialized()`
-2. `dotenv.load(fileName: '.env')` (variables `SUPABASE_URL`, `SUPABASE_ANON_KEY`)
-3. `Supabase.initialize(url, anonKey)`
-4. `setupDependencies()` → registra todo en GetIt
-5. `SystemChrome` → modo inmersivo (`immersiveSticky`)
-6. `runApp(App())`
+2. `initializeBackend()` → resuelve las credenciales (`.env`, o `--dart-define`)
+   e inicializa el SDK del backend
+3. `setupDependencies()` → registra todo en GetIt
+4. `SystemChrome` → modo inmersivo (`immersiveSticky`)
+5. `runApp(App())`
 
 **`lib/bootstrap/injection.dart`** define el `GetIt` global y `setupDependencies()`,
-que ejecuta `_registerCore()` (`SupabaseClientProvider`, `CoverUrlService`) y luego
-los 10 `initXxxDependencies()` por feature. Convenciones:
+que ejecuta `_registerCore()` — que llama a `registerBackendDependencies()` (ata los
+tres ports de backend a los adaptadores del backend actual) y registra
+`CoverUrlService` — y luego los 10 `initXxxDependencies()` por feature. El vendor
+solo se nombra dentro de `lib/core/backend/`. Convenciones:
 
 - Repositorios y casos de uso → `registerLazySingleton`
 - Blocs → `registerFactory` (estado fresco por pantalla)
@@ -312,9 +314,10 @@ a scan la edición de libros propios.
 
 ## 8. Testing
 
-**64 archivos** de test (63 tests + helper), todos en español, con `mocktail`
-(mocking) y `bloc_test` (verificación de estados). La suite está en verde
-(475 tests aprobados; auditada y remediada en 2026-07 — ver
+**67 archivos** de test (65 tests + 2 helpers en `test/utils/` y `test/widgets/`),
+todos en español, con `mocktail` (mocking) y `bloc_test` (verificación de
+estados). La suite está en verde (**506 tests aprobados**; incluye la guardia de
+arquitectura que mantiene el SDK del vendor detrás de los ports — ver
 [es/testing/README.md](es/testing/README.md)).
 
 | Categoría | Archivos | Ruta |

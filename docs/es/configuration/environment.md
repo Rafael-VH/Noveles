@@ -19,31 +19,35 @@ SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your-anon-key-here
 ```text
 
-1. **Cargalo en `main.dart`** usando `flutter_dotenv`:
+1. **Arrancá el backend** — `main.dart` llama a un único punto de entrada que no
+   conoce el vendor:
 
 ```dart
-await dotenv.load(fileName: '.env');
+await initializeBackend();
 ```text
 
-1. **Inicializá Supabase** con las variables de entorno:
+Eso resuelve las credenciales e inicializa el SDK. Para builds de release podés
+saltear el `.env` por completo y pasar los valores en tiempo de compilación —
+`--dart-define` tiene precedencia:
 
-```dart
-await Supabase.initialize(
-  url: dotenv.env['SUPABASE_URL']!,
-  anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
-);
+```bash
+flutter run \
+  --dart-define=SUPABASE_URL=https://your-project.supabase.co \
+  --dart-define=SUPABASE_ANON_KEY=your-anon-key-here
 ```text
 
-**Fuente**: `lib/main.dart`
+**Fuente**: `lib/core/backend/supabase/supabase_config.dart` (resolución de
+credenciales) y `lib/core/backend/backend_module.dart` (arranque y registros),
+así que `main.dart` nunca nombra un vendor.
 
 ## Seguridad
 
 - `.env` está en `.gitignore` — nunca subas secretos al control de
   versiones
 - Usá `.env.example` como plantilla (subí este archivo)
-- El operador `!` en `dotenv.env['VAR']!` significa que la app fallará si
-  faltan variables — esto es intencional para detectar mala configuración
-  temprano
+- El operador `!` en `dotenv.env['VAR']!` (dentro de `supabase_config.dart`)
+  significa que la app fallará si faltan variables — esto es intencional para
+  detectar mala configuración temprano
 - La clave anónima de Supabase es segura para uso del lado del cliente
   (las políticas RLS controlan el acceso a los datos)
 

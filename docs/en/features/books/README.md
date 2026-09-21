@@ -57,8 +57,11 @@ genre, took, and label data for presentation.
 | GetRecentViews | `FR<L<BWR>>` call(String userId) | Recently viewed books |
 | GetMostViewedBooks | `FR<L<BWR>>` call() | Globally most viewed books |
 
-**Repository**: `BookRepository` → `BookRepositoryImpl` uses Supabase queries
-with RLS policies.
+**Repository**: `BookRepository` → `BookRepositoryImpl` reads through the
+`DataGateway`, whose six named aggregate reads resolve a book's relation tree
+(authors, genres, labels, tooks, chapters) inside the adapter, and writes through
+its two `rpc` functions. Authorization is not in the repository: the database's
+RLS policies decide what each caller may see.
 
 ## BLoC
 

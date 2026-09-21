@@ -57,13 +57,13 @@ management.
 | **Guides** | | |
 | Getting Started | [guides/getting-started.md](gui... | Developer setup guide |
 | **Testing** | | |
-| Test Strategy | [testing/README.md](testing/README.md) | 63 test files, categories, patterns |
+| Test Strategy | [testing/README.md](testing/README.md) | 65 test files, categories, patterns |
 
 ## Project Structure
 
 ```text
 lib/
-├── core/              # Cross-cutting: DI, errors, Supabase client, theme, utils
+├── core/              # Cross-cutting: DI, errors, backend ports, theme, utils
 ├── features/          # 10 feature modules (domain/data/presentation each)
 │   ├── admin/
 │   ├── app/

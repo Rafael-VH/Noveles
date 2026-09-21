@@ -21,10 +21,11 @@ raíz que maneja el ruteo basado en roles en `App`.
 | GetCurrentUser | `FR<UserEntity?>` call() | Obtener usuario de la sesión |
 | ListenAuthState | `S<AuthEvent>` call() | Stream de eventos de auth |
 
-**Repositorio**: `AuthRepository` → `AuthRepositoryImpl` usa
-`SupabaseClientProvider` para llamar a `signInWithPassword`, `signUp`, `signOut`
-y `onAuthStateChange`. Al iniciar sesión o registrarse, obtiene (o crea
-automáticamente) la fila de `profiles`.
+**Repositorio**: `AuthRepository` → `AuthRepositoryImpl` depende de `AuthGateway`
+(iniciar y cerrar sesión, registro, estado de sesión, cambio de contraseña) y de
+`DataGateway` para la fila de `profiles`. Mapea el `AuthIdentityEvent` neutro del
+gateway al `AuthEvent` del dominio, y al iniciar sesión o registrarse obtiene (o
+crea automáticamente) la fila de `profiles`.
 
 ## BLoC
 

@@ -17,7 +17,7 @@ Noveles uses 14 runtime dependencies and 3 dev dependencies. All are managed via
 | | `flutter_bloc` | `^8.1.6` | Flutter BLoC widgets |
 | | `equatable` | `^2.0.5` | Value equality for states/events |
 | **Backend** | | | |
-| | `supabase_flutter` | `^2.10.0` | Supabase client (Auth, Database, Storage) |
+| | `supabase_flutter` | `^2.10.0` | Supabase client (Auth, Database, Storage) — imported only inside `lib/core/backend/` |
 | **Dependency Injection** | | | |
 | | `get_it` | `^7.6.0` | Service locator / DI container |
 | **UI** | | | |

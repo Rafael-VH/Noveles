@@ -789,7 +789,7 @@ sequenceDiagram
     CS-->>U: Display chapter text
 ```
 
-**Archivo**: `lib/core/supabase/chapter_cache.dart` (42 líneas)
+**Archivo**: `lib/features/chapters/data/chapter_cache.dart` (69 líneas)
 
 Cache local de capítulos para lectura offline:
 
@@ -1402,7 +1402,7 @@ operación de escritura sobre el contenido de la plataforma.
 
 ```dart
 getIt.registerLazySingleton<BookRepository>(
-  () => BookRepositoryImpl(getIt<SupabaseClientProvider>()),
+  () => BookRepositoryImpl(getIt<DataGateway>(), getIt<StorageGateway>()),
 );
 getIt.registerLazySingleton(() => GetBooks(getIt()));
 getIt.registerLazySingleton(() => GetBookById(getIt()));
@@ -1418,7 +1418,7 @@ crea una instancia nueva. En `MainScreen`, se crea con `onlyVisible: true`.
 
 ```dart
 getIt.registerLazySingleton<ChapterRepository>(
-  () => ChapterRepositoryImpl(getIt<SupabaseClientProvider>()),
+  () => ChapterRepositoryImpl(getIt<DataGateway>(), getIt<StorageGateway>()),
 );
 getIt.registerLazySingleton(() => GetChapterContent(getIt()));
 getIt.registerFactory(
@@ -1426,11 +1426,11 @@ getIt.registerFactory(
 );
 ```
 
-#### injection_favorites.dart
+#### favorites (registrado en injection_books.dart)
 
 ```dart
 getIt.registerLazySingleton<FavoriteRepository>(
-  () => FavoriteRepositoryImpl(getIt<SupabaseClientProvider>()),
+  () => FavoriteRepositoryImpl(getIt<DataGateway>()),
 );
 getIt.registerFactory(
   () => FavoriteBloc(favoriteRepository: getIt()),
@@ -1441,7 +1441,11 @@ getIt.registerFactory(
 
 ```dart
 getIt.registerLazySingleton<ProfilesRepository>(
-  () => ProfilesRepositoryImpl(getIt<SupabaseClientProvider>()),
+  () => ProfilesRepositoryImpl(
+    getIt<DataGateway>(),
+    getIt<StorageGateway>(),
+    getIt<AuthGateway>(),
+  ),
 );
 getIt.registerLazySingleton(() => GetProfile(getIt()));
 getIt.registerLazySingleton(() => UpdateProfile(getIt()));
@@ -1464,7 +1468,7 @@ pero NO son usados por el usuario regular.
 
 ```dart
 getIt.registerLazySingleton<GenreRepository>(
-  () => GenreRepositoryImpl(getIt<SupabaseClientProvider>()),
+  () => GenreRepositoryImpl(getIt<DataGateway>()),
 );
 getIt.registerLazySingleton(() => GetGenre(getIt()));
 getIt.registerFactory(
@@ -1622,15 +1626,18 @@ lib/features/auth/domain/use_cases/listen_auth_state.dart
 ### 14.9 Core / Infraestructura
 
 ```text
-lib/core/app/app.dart                                           (76 líneas)
-lib/core/di/injection.dart                                      (38 líneas)
-lib/features/books/di/injection_books.dart                                (63 líneas)
-lib/features/chapters/di/injection_chapters.dart                             (48 líneas)
-lib/features/books/di/injection_favorites.dart                            (21 líneas)
-lib/features/profiles/di/injection_profiles.dart                             (50 líneas)
-lib/features/genres/di/injection_genres.dart                               (45 líneas)
-lib/core/supabase/chapter_cache.dart                            (42 líneas)
-lib/core/supabase/supabase_client.dart
+lib/bootstrap/app.dart (125 líneas)
+lib/bootstrap/injection.dart (39 líneas)
+lib/features/books/di/injection_books.dart (102 líneas)
+lib/features/chapters/di/injection_chapters.dart (58 líneas)
+lib/features/profiles/di/injection_profiles.dart (54 líneas)
+lib/features/genres/di/injection_genres.dart (45 líneas)
+lib/features/chapters/data/chapter_cache.dart (69 líneas)
+lib/core/backend/data_gateway.dart (117 líneas)
+lib/core/backend/auth_gateway.dart (39 líneas)
+lib/core/backend/storage_gateway.dart (34 líneas)
+lib/core/backend/auth_identity.dart (21 líneas)
+lib/core/backend/backend_module.dart (42 líneas)
 lib/core/cover/cover_url_service.dart
 lib/core/constants/storage_constants.dart
 lib/core/errors/result.dart

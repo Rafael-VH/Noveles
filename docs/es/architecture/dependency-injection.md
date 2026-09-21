@@ -6,7 +6,7 @@
 ## Resumen
 
 Noveles usa `GetIt` como localizador de servicios para la inyección de
-dependencias. La instancia central se define en `lib/core/di/injection.dart`
+dependencias. La instancia central se define en `lib/bootstrap/injection.dart`
 como `final getIt = GetIt.instance;`. Las dependencias se registran de forma
 estructurada: primero los servicios core, luego los módulos por funcionalidad
 mediante archivos de inyección dedicados.
@@ -14,20 +14,20 @@ mediante archivos de inyección dedicados.
 ## Registro Core
 
 Los servicios core se registran en `_registerCore()` dentro de
-`lib/core/di/injection.dart`:
+`lib/bootstrap/injection.dart`:
 
 | Servicio | Tipo | Registro |
 | -------- | ---- | -------- |
-| SupabaseClientProvider | LazySingleton | Provee instancia cliente Supabase |
-| CoverUrlService | LazySingleton | Genera URLs de portada desde storage |
+| DataGateway, AuthGateway, StorageGateway | LazySingleton | Los ports de backend, atados a los adaptadores del backend actual |
+| CoverUrlService | LazySingleton | Genera URLs de portada desde storage (a través de `StorageGateway`) |
 
 ```dart
 void _registerCore() {
-  getIt.registerLazySingleton<SupabaseClientProvider>(
-    () => SupabaseClientProviderImpl(),
-  );
+  // Ata los tres ports a los adaptadores del backend actual. Nada por encima
+  // de esta línea sabe qué vendor es.
+  registerBackendDependencies(getIt);
   getIt.registerLazySingleton(
-    () => CoverUrlService(getIt<SupabaseClientProvider>().client),
+    () => CoverUrlService(getIt<StorageGateway>()),
   );
 }
 ```text
@@ -61,7 +61,10 @@ reutilizarse. La instancia se crea en el primer acceso:
 
 ```dart
 getIt.registerLazySingleton<AuthRepository>(
-  () => AuthRepositoryImpl(getIt<SupabaseClientProvider>()),
+  () => AuthRepositoryImpl(
+    getIt<AuthGateway>(),
+    getIt<DataGateway>(),
+  ),
 );
 ```text
 

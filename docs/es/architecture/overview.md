@@ -38,7 +38,7 @@ lib/features/{feature}/
 │   ├── *_repository.dart      # Interfaz abstracta de repositorio
 │   └── *_use_case.dart        # Casos de uso de lógica de negocio
 ├── data/
-│   └── *_repository_impl.dart # Implementación de repositorio (llamadas Supabase)
+│   └── *_repository_impl.dart # Implementación de repositorio (habla con los ports)
 └── presentation/
     ├── bloc/                  # Gestión de estado BLoC / Cubit
     └── screens/               # Pantallas de UI y widgets
@@ -53,14 +53,15 @@ Infraestructura compartida de la que dependen todas las funcionalidades:
 
 | Carpeta | Propósito |
 | ------- | --------- |
-| `app/` | Widget `App`, routing, selección de home por rol |
+| `backend/` | Ports de backend (datos, auth, storage) más los adaptadores que los implementan — el único lugar que nombra un vendor |
 | `constants/` | Nombres de buckets de Storage (`StorageConstants`) |
 | `cover/` | Utilidades para imágenes de portada |
-| `di/` | Punto de entrada central de DI (`injection.dart`) |
 | `errors/` | Clase sellada `Result<T>`, jerarquía de `Failure` |
 | `presentation/` | ThemeBloc, sistema de notificaciones, widgets compartidos |
-| `supabase/` | Proveedor de cliente Supabase, caché de capítulos |
 | `utils/` | Colores, definiciones de tema, parseo, logging |
+
+El composition root vive fuera de `core/`, en `lib/bootstrap/`:
+`injection.dart` registra todas las dependencias y `app.dart` es el widget raíz.
 
 ### Capa Compartida (`lib/shared/`)
 
@@ -76,7 +77,7 @@ Código reutilizado entre varias funcionalidades:
 ```text
 Presentation ──→ Domain ←── Data
       │              │           │
-      │              │           └── Las implementaciones de Repo llaman a Supabase
+      │              │           └── Las implementaciones de Repo llaman a los ports
       │              └── Dart puro: entidades, casos de uso, interfaces de repo
       └── Los BLoCs llaman casos de uso, mapean `Result<T>` a estado
 ```text
@@ -89,11 +90,13 @@ sean testeables sin ninguna dependencia del framework.
 
 GetIt conecta las capas en tiempo de ejecución:
 
-1. `lib/core/di/injection.dart` define `setupDependencies()`
-2. Cada funcionalidad tiene `lib/features/{feature}/di/injection_{feature}.dart` registrando sus propias
+1. `lib/bootstrap/injection.dart` define `setupDependencies()`
+2. Primero llama a `registerBackendDependencies()`, que ata los tres ports a los
+   adaptadores del backend actual
+3. Cada funcionalidad tiene `lib/features/{feature}/di/injection_{feature}.dart` registrando sus propias
    dependencias
-3. Repositorios: `registerLazySingleton` (se crean una vez, se comparten)
-4. BLoCs: `registerFactory` (instancia nueva por solicitud)
+4. Repositorios: `registerLazySingleton` (se crean una vez, se comparten)
+5. BLoCs: `registerFactory` (instancia nueva por solicitud)
 
 ## Manejo de Errores
 
@@ -114,7 +117,7 @@ error. Ver `lib/core/errors/result.dart` y `lib/core/errors/failure.dart`.
 | DI | GetIt | Localizador de servicios simple, sin generación de código |
 | Entidades | Equatable | Igualdad por valor para comparaciones de estado |
 | Manejo de errores | Result<T> sellado | Errores explícitos, sin excepciones |
-| Backend | Supabase | Auth + BD + Storage en una sola plataforma |
+| Backend | Supabase, detrás de ports | Auth + BD + Storage en una sola plataforma, reemplazable sin tocar las features |
 
 ---
 

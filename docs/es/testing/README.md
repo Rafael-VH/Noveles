@@ -1,26 +1,37 @@
 # Estrategia de testing
 
-> 63 archivos de test en 5 categorías, cubriendo BLoCs, entidades,
-> repositorios, casos de uso y widgets.
+> 65 archivos de test en 6 categorías, cubriendo la guardia de arquitectura,
+> BLoCs, entidades, repositorios, casos de uso y widgets.
 
 ← [Volver al índice](../README.md)
 
 ## Visión general
 
-Noveles tiene **63 archivos de test** organizados por capa. Los tests
-usan `mocktail` para mocking y `bloc_test` para verificación de estado de
-BLoCs.
+Noveles tiene **65 archivos de test** organizados por capa, más helpers
+compartidos en `test/utils/` y `test/widgets/`. Los tests usan `mocktail` para
+mocking y `bloc_test` para verificación de estado de BLoCs.
 
 ## Categorías de test
 
 | Categoría | Cantidad | Ruta | Lo que se testea |
 | ---------- | ------- | ------ | --------------- |
+| Tests de Arquitectura | 1 | test/architecture/ | El seam del backend: el SDK del vendor queda detrás de los ports |
 | Tests BLoC | 16 | test/bloc/ | Transiciones, eventos, mapeo de errores |
 | Tests de Entidades | 5 | test/entities/ | copyWith, props, igualdad |
-| Tests de Repos | 9 | test/repositories/ | Queries Supabase, mapeo errores |
+| Tests de Repos | 9 | test/repositories/ | Queries a los gateways, mapeo de errores, aserciones de payload |
 | Tests de Casos de Uso | 7 | test/use_cases/ | Reglas de dominio, Result |
-| Tests de Widgets | 26 | `test/widgets/` | Renderizado e interacciones |
-| **Total** | **63** | | |
+| Tests de Widgets | 27 | `test/widgets/` | Renderizado e interacciones |
+| **Total** | **65** | | |
+
+Cuidado con los conteos al agregar archivos: `test/widgets/test_helpers.dart` y
+`test/utils/backend_mocks.dart` son helpers compartidos, no archivos de test, y
+la suite no los ejecuta.
+
+### Tests de Arquitectura (1 archivo)
+
+| Archivo | Qué custodia |
+| ------ | -------- |
+| `backend_seam_test.dart` | Que el SDK del vendor quede detrás de los ports — nada fuera de `lib/core/backend/` lo importa ni nombra un tipo del vendor, las lecturas agregadas quedan dentro del adaptador, y los tests de repositorios doblan los ports en vez del SDK |
 
 ### Tests BLoC (16 archivos)
 
@@ -67,6 +78,11 @@ BLoCs.
 | `profiles_repository_test.dart` | `ProfilesRepository` |
 | `took_repository_test.dart` | `TookRepository` |
 
+Todos hablan con los **ports de backend**, no con Supabase: stubean
+`DataGateway`, `AuthGateway` y `StorageGateway` a través de los dobles en
+`test/utils/backend_mocks.dart`. Ver
+[Patrón de test de Repositorios](#patrón-de-test-de-repositorios) más abajo.
+
 ### Tests de Casos de Uso (7 archivos)
 
 | Archivo | Casos de uso testeados |
@@ -79,7 +95,7 @@ BLoCs.
 | `mark_chapter_as_read_test.dart` | `MarkChapterAsRead` |
 | `track_book_view_test.dart` | `TrackBookView` |
 
-### Tests de Widgets (26 archivos)
+### Tests de Widgets (27 archivos)
 
 | Archivo | Componente testeado |
 | ------ | ----------------- |
@@ -88,6 +104,7 @@ BLoCs.
 | `book_card_horizontal_test.dart` | Tarjeta de libro horizontal |
 | `book_card_vertical_test.dart` | Tarjeta de libro vertical |
 | `book_detail_content_test.dart` | Contenido de detalle de libro |
+| `book_metadata_grid_test.dart` | Grilla de metadatos del libro |
 | `book_took_list_test.dart` | Lista de tomos de libro |
 | `card_info_detail_test.dart` | Tarjeta de info detalle |
 | `carousel_dots_test.dart` | Indicador de puntos de carrusel |
@@ -97,12 +114,12 @@ BLoCs.
 | `genre_chip_styled_test.dart` | Widget de chip de género estilizado |
 | `main_screen_sections_test.dart` | Secciones de pantalla principal |
 | `reading_settings_bar_test.dart` | Barra de ajustes de lectura |
+| `scan_chapter_edit_screen_test.dart` | Editor de capítulos (tipo de contenido: archivo en storage vs texto inline) |
 | `section_title_test.dart` | Widget SectionTitle (antes en section_header_test + section_title_test) |
 | `section_mas_vistos_test.dart` | Sección de más vistos |
 | `section_novedades_test.dart` | Sección de novedades |
 | `section_populares_test.dart` | Sección de populares |
 | `section_recent_views_test.dart` | Sección de vistas recientes |
-| `section_title_test.dart` | Widget de título de sección |
 | `sliver_app_bar_book_test.dart` | Sliver app bar para libros |
 | `snackbar_helper_test.dart` | Helper de snackbar |
 | `theme_test.dart` | Tests de tema |
@@ -147,6 +164,30 @@ test('copyWith', () {
 });
 ```text
 
+### Patrón de test de Repositorios
+
+Los repositorios dependen de los ports de backend, así que sus tests doblan los
+ports — no el SDK del vendor. `FakeBackend` cablea un builder de query por tabla
+más los dobles de auth y storage:
+
+```dart
+final backend = FakeBackend();
+final repository = GenreRepositoryImpl(backend.data);
+
+backend.rows('genres', [
+  {'id': 1, 'name': 'Fantasy'},
+]);
+
+final result = await repository.getGenres();
+expect(result, isA<Ok<List<GenreEntity>>>());
+```text
+
+- Stubeá solo el terminal que te importa (`rows`, `maybeRow`, `oneRow`,
+  `update`, `delete`); la cadena fluida ya viene cableada
+- Usá `capturedInsert` / `capturedUpdate` / `capturedRpcParams` para aseverar el
+  payload — así se verifican la autoría (`created_by`) y el `content_type`
+- `backend_seam_test.dart` falla el build si un test de repositorio importa el SDK
+
 ### Patrón de test de Widgets
 
 ```dart
@@ -167,11 +208,12 @@ testWidgets('renders correctly', (tester) async {
 
 | Área | Estado | Notas |
 | ------ | -------- | ------- |
+| Tests de Arquitectura | ✅ 1/1 | Custodia el seam del backend |
 | Tests BLoC | ✅ 16/16 | Todos los BLoCs cubiertos |
 | Tests de Entidades | ⚠️ 5/13 | Faltan: GenreEntity, FavoriteEntity, BookWithRelations, AnalyticsOverview, AnalyticsTrendEntry, AnalyticsTopBook, ... |
 | Tests de Repositorios | ✅ 9/9 | Todos los repositorios cubiertos |
 | Tests de Casos de Uso | ⚠️ 7/53 | Solo 7 casos de uso testeados de 53 |
-| Tests de Widgets | ✅ 26/26 | Todos los widgets tienen tests |
+| Tests de Widgets | ✅ 27/27 | Todos los widgets tienen tests |
 | Tests de Integración | ❌ Ninguno | No hay directorio `integration_test/` |
 
 ### Casos de uso sin testear
@@ -207,4 +249,4 @@ open coverage/html/index.html
 
 ---
 
-> Última verificación: 2026-07-24
+> Última verificación: 2026-09-21

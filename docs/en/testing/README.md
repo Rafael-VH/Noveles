@@ -1,25 +1,37 @@
 # Testing Strategy
 
-> 63 test files across 5 categories, covering BLoCs, entities, repositories, use
-cases, and widgets.
+> 65 test files across 6 categories, covering the architecture guard, BLoCs,
+entities, repositories, use cases, and widgets.
 
 ← [Back to index](../README.md)
 
 ## Overview
 
-Noveles has **63 test files** organized by layer. Tests use `mocktail` for
-mocking and `bloc_test` for BLoC state verification.
+Noveles has **65 test files** organized by layer, plus shared helpers in
+`test/utils/` and `test/widgets/`. Tests use `mocktail` for mocking and
+`bloc_test` for BLoC state verification.
 
 ## Test Categories
 
 | Category | Count | Path | What's Tested |
 | ---------- | ------- | ------ | --------------- |
+| Architecture Tests | 1 | test/architecture/ | The backend seam: the vendor SDK stays behind the ports |
 | BLoC Tests | 16 | test/bloc/ | State transitions, event handling, error mapping |
 | Entity Tests | 5 | test/entities/ | Entity construction, copyWith, props, equality |
-| Repo Tests | 9 | test/repositories/ | Data layer: Supabase queries, error mapping |
+| Repo Tests | 9 | test/repositories/ | Data layer: gateway queries, error mapping, payload assertions |
 | Use Case Tests | 7 | test/use_cases/ | Business logic: domain rules, Result handling |
-| Widget Tests | 26 | `test/widgets/` | UI rendering, user interactions |
-| **Total** | **63** | | |
+| Widget Tests | 27 | `test/widgets/` | UI rendering, user interactions |
+| **Total** | **65** | | |
+
+Beware of the counts when adding files: `test/widgets/test_helpers.dart` and
+`test/utils/backend_mocks.dart` are shared helpers, not test files, and the
+suite does not run them.
+
+### Architecture Tests (1 file)
+
+| File | Guards |
+| ------ | -------- |
+| `backend_seam_test.dart` | That the vendor SDK stays behind the ports — nothing outside `lib/core/backend/` imports it or names a vendor type, aggregate reads stay inside the adapter, and repository tests double the ports instead of the SDK |
 
 ### BLoC Tests (16 files)
 
@@ -66,6 +78,11 @@ mocking and `bloc_test` for BLoC state verification.
 | `profiles_repository_test.dart` | `ProfilesRepository` |
 | `took_repository_test.dart` | `TookRepository` |
 
+All of them talk to the **backend ports**, not to Supabase: they stub
+`DataGateway`, `AuthGateway` and `StorageGateway` through the doubles in
+`test/utils/backend_mocks.dart`. See
+[Repository Test Pattern](#repository-test-pattern) below.
+
 ### Use Case Tests (7 files)
 
 | File | Use Cases Tested |
@@ -78,7 +95,7 @@ mocking and `bloc_test` for BLoC state verification.
 | `mark_chapter_as_read_test.dart` | `MarkChapterAsRead` |
 | `track_book_view_test.dart` | `TrackBookView` |
 
-### Widget Tests (26 files)
+### Widget Tests (27 files)
 
 | File | Component Tested |
 | ------ | ----------------- |
@@ -87,6 +104,7 @@ mocking and `bloc_test` for BLoC state verification.
 | `book_card_horizontal_test.dart` | Horizontal book card |
 | `book_card_vertical_test.dart` | Vertical book card |
 | `book_detail_content_test.dart` | Book detail content |
+| `book_metadata_grid_test.dart` | Book metadata grid |
 | `book_took_list_test.dart` | Book took list |
 | `card_info_detail_test.dart` | Card info detail |
 | `carousel_dots_test.dart` | Carousel dots indicator |
@@ -96,12 +114,12 @@ mocking and `bloc_test` for BLoC state verification.
 | `genre_chip_styled_test.dart` | Genre chip styled widget |
 | `main_screen_sections_test.dart` | Main screen sections |
 | `reading_settings_bar_test.dart` | Reading settings bar |
+| `scan_chapter_edit_screen_test.dart` | Chapter editor (content type: storage file vs inline text) |
 | `section_title_test.dart` | SectionTitle widget (merged from section_header_test + section_title_test) |
 | `section_mas_vistos_test.dart` | Más vistos section |
 | `section_novedades_test.dart` | Novedades section |
 | `section_populares_test.dart` | Populares section |
 | `section_recent_views_test.dart` | Recent views section |
-| `section_title_test.dart` | Section title widget |
 | `sliver_app_bar_book_test.dart` | Sliver app bar for books |
 | `snackbar_helper_test.dart` | Snackbar helper |
 | `theme_test.dart` | Theme tests |
@@ -146,6 +164,30 @@ test('copyWith', () {
 });
 ```text
 
+### Repository Test Pattern
+
+Repositories depend on the backend ports, so their tests double the ports — not
+the vendor SDK. `FakeBackend` wires one query builder per table plus the auth and
+storage doubles:
+
+```dart
+final backend = FakeBackend();
+final repository = GenreRepositoryImpl(backend.data);
+
+backend.rows('genres', [
+  {'id': 1, 'name': 'Fantasy'},
+]);
+
+final result = await repository.getGenres();
+expect(result, isA<Ok<List<GenreEntity>>>());
+```text
+
+- Stub only the terminal you care about (`rows`, `maybeRow`, `oneRow`, `update`,
+  `delete`); the fluent chain is already wired
+- Use `capturedInsert` / `capturedUpdate` / `capturedRpcParams` to assert the
+  payload — that is how ownership (`created_by`) and `content_type` are verified
+- `backend_seam_test.dart` fails the build if a repository test imports the SDK
+
 ### Widget Test Pattern
 
 ```dart
@@ -166,11 +208,12 @@ testWidgets('renders correctly', (tester) async {
 
 | Area | Status | Notes |
 | ------ | -------- | ------- |
+| Architecture tests | ✅ 1/1 | Guards the backend seam |
 | BLoC tests | ✅ 16/16 | All BLoCs covered |
 | Entity tests | ⚠️ 5/13 | Missing: GenreEntity, FavoriteEntity, BookWithRelations, AnalyticsOverview, AnalyticsTrendEntry, AnalyticsTopBook, ... |
 | Repository tests | ✅ 9/9 | All repositories covered |
 | Use case tests | ⚠️ 7/53 | Only 7 use cases tested out of 53 |
-| Widget tests | ✅ 26/26 | All widgets have tests |
+| Widget tests | ✅ 27/27 | All widgets have tests |
 | Integration tests | ❌ None | No `integration_test/` directory |
 
 ### Missing Use Case Tests
@@ -206,4 +249,4 @@ open coverage/html/index.html
 
 ---
 
-> Last verified: 2026-07-24
+> Last verified: 2026-09-21

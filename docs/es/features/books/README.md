@@ -58,8 +58,12 @@ presentación.
 | GetRecentViews | `FR<L<BWR>>` call(String userId) | Últimos libros vistos |
 | GetMostViewedBooks | `FR<L<BWR>>` call() | Libros más vistos globalmente |
 
-**Repositorio**: `BookRepository` → `BookRepositoryImpl` usa consultas a
-Supabase con políticas RLS.
+**Repositorio**: `BookRepository` → `BookRepositoryImpl` lee a través del
+`DataGateway`, cuyas seis lecturas agregadas con nombre resuelven el árbol de
+relaciones de un libro (autores, géneros, etiquetas, tomos, capítulos) dentro del
+adaptador, y escribe a través de sus dos funciones `rpc`. La autorización no está
+en el repositorio: las políticas RLS de la base deciden qué puede ver cada
+llamador.
 
 ## BLoC
 
