@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:noveles/features/chapters/domain/chapter_content_type.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
 import 'package:noveles/features/scan/presentation/bloc/scan_chapter_bloc.dart';
 
@@ -21,19 +22,27 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
   late TextEditingController _numberCtrl;
   late TextEditingController _titleCtrl;
   late TextEditingController _contentCtrl;
+  late TextEditingController _inlineCtrl;
   String _uploadedFileName = '';
   bool _isSaving = false;
+  late ChapterContentType _contentType;
 
   bool get _isEditing => widget.chapter != null;
+
+  bool get _isStorage => _contentType == ChapterContentType.storagePath;
 
   @override
   void initState() {
     super.initState();
     final c = widget.chapter;
+    _contentType = c?.contentType ?? ChapterContentType.storagePath;
+
+    final storedContent = c?.content ?? '';
     _numberCtrl = TextEditingController(text: c?.number ?? '');
     _titleCtrl = TextEditingController(text: c?.title ?? '');
-    _contentCtrl = TextEditingController(text: c?.content ?? '');
-    _uploadedFileName = _extractFileName(c?.content ?? '');
+    _contentCtrl = TextEditingController(text: _isStorage ? storedContent : '');
+    _inlineCtrl = TextEditingController(text: _isStorage ? '' : storedContent);
+    _uploadedFileName = _isStorage ? _extractFileName(storedContent) : '';
   }
 
   @override
@@ -41,6 +50,7 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
     _numberCtrl.dispose();
     _titleCtrl.dispose();
     _contentCtrl.dispose();
+    _inlineCtrl.dispose();
     super.dispose();
   }
 
@@ -55,6 +65,15 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
     if (value.endsWith('.txt')) return value;
     // Otherwise it's inline content — show nothing special
     return '';
+  }
+
+  /// Switch between inline text and Storage-backed content.
+  void _onContentTypeChanged(Set<ChapterContentType> selection) {
+    if (selection.isEmpty) return;
+    setState(() {
+      _contentType = selection.first;
+      if (_isStorage) _uploadedFileName = _extractFileName(_contentCtrl.text);
+    });
   }
 
   // Pick and upload content file via BLoC
@@ -145,8 +164,9 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
       createdAt: widget.chapter?.createdAt ?? DateTime.now(),
       number: _numberCtrl.text.trim(),
       title: _titleCtrl.text.trim(),
-      content: _contentCtrl.text,
+      content: _isStorage ? _contentCtrl.text : _inlineCtrl.text,
       tookId: widget.tookId,
+      contentType: _contentType,
     );
 
     // Save chapter
@@ -308,11 +328,53 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
 
             // ── Content section ──
             _sectionCard(
-              title: 'Archivo de contenido',
+              title: 'Contenido del capítulo',
               icon: Icons.description_outlined,
               children: [
-                // File status
-                if (hasContent)
+                // Storage file vs inline text
+                SegmentedButton<ChapterContentType>(
+                  segments: const [
+                    ButtonSegment(
+                      value: ChapterContentType.storagePath,
+                      icon: Icon(Icons.cloud_upload_outlined),
+                      label: Text('Archivo'),
+                    ),
+                    ButtonSegment(
+                      value: ChapterContentType.inline,
+                      icon: Icon(Icons.edit_note),
+                      label: Text('Texto inline'),
+                    ),
+                  ],
+                  selected: {_contentType},
+                  onSelectionChanged: _onContentTypeChanged,
+                  showSelectedIcon: false,
+                  style: const ButtonStyle(
+                    visualDensity: VisualDensity.compact,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Inline mode: the chapter text lives in the content column
+                if (!_isStorage)
+                  TextFormField(
+                    controller: _inlineCtrl,
+                    minLines: 8,
+                    maxLines: 20,
+                    keyboardType: TextInputType.multiline,
+                    textAlignVertical: TextAlignVertical.top,
+                    decoration: const InputDecoration(
+                      labelText: 'Texto del capítulo',
+                      hintText: 'Escribí o pegá el contenido del capítulo',
+                      border: OutlineInputBorder(),
+                      alignLabelWithHint: true,
+                    ),
+                    validator: (v) => (v ?? '').trim().isEmpty
+                        ? 'El contenido no puede estar vacío'
+                        : null,
+                  ),
+
+                // Storage mode: pick and upload a .md/.txt file
+                if (_isStorage && hasContent)
                   Card(
                     elevation: 0,
                     shape: RoundedRectangleBorder(
@@ -339,8 +401,8 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
                         child: const Text('Reemplazar'),
                       ),
                     ),
-                  )
-                else
+                  ),
+                if (_isStorage && !hasContent)
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 24),
@@ -365,19 +427,20 @@ class _ScanChapterEditScreenState extends State<ScanChapterEditScreen> {
                       ],
                     ),
                   ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: _pickContentFile,
-                    icon: const Icon(Icons.upload_file),
-                    label: const Text('Seleccionar archivo .md o .txt'),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                if (_isStorage) const SizedBox(height: 12),
+                if (_isStorage)
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: _pickContentFile,
+                      icon: const Icon(Icons.upload_file),
+                      label: const Text('Seleccionar archivo .md o .txt'),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
                     ),
                   ),
-                ),
-                if (!hasContent)
+                if (_isStorage && !hasContent)
                   Padding(
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(
