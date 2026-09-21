@@ -314,9 +314,10 @@ a scan la edición de libros propios.
 
 ## 8. Testing
 
-**67 archivos** de test (65 tests + 2 helpers en `test/utils/` y `test/widgets/`),
+**68 archivos** de test (66 tests + 2 helpers en `test/utils/` y `test/widgets/`),
 todos en español, con `mocktail` (mocking) y `bloc_test` (verificación de
-estados). La suite está en verde (**506 tests aprobados**; incluye la guardia de
+todos en español, con `mocktail` (mocking) y `bloc_test` (verificación de
+estados). La suite está en verde (**509 tests aprobados**; incluye la guardia de
 arquitectura que mantiene el SDK del vendor detrás de los ports — ver
 [es/testing/README.md](es/testing/README.md)).
 

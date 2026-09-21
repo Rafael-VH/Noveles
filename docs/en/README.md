@@ -57,7 +57,7 @@ management.
 | **Guides** | | |
 | Getting Started | [guides/getting-started.md](gui... | Developer setup guide |
 | **Testing** | | |
-| Test Strategy | [testing/README.md](testing/README.md) | 65 test files, categories, patterns |
+| Test Strategy | [testing/README.md](testing/README.md) | 66 test files, categories, patterns |
 
 ## Project Structure
 

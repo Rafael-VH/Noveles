@@ -1,13 +1,13 @@
 # Estrategia de testing
 
-> 65 archivos de test en 6 categorías, cubriendo la guardia de arquitectura,
+> 66 archivos de test en 6 categorías, cubriendo las guardias de arquitectura,
 > BLoCs, entidades, repositorios, casos de uso y widgets.
 
 ← [Volver al índice](../README.md)
 
 ## Visión general
 
-Noveles tiene **65 archivos de test** organizados por capa, más helpers
+Noveles tiene **66 archivos de test** organizados por capa, más helpers
 compartidos en `test/utils/` y `test/widgets/`. Los tests usan `mocktail` para
 mocking y `bloc_test` para verificación de estado de BLoCs.
 
@@ -15,7 +15,7 @@ mocking y `bloc_test` para verificación de estado de BLoCs.
 
 | Categoría | Cantidad | Ruta | Lo que se testea |
 | ---------- | ------- | ------ | --------------- |
-| Tests de Arquitectura | 1 | test/architecture/ | El seam del backend: el SDK del vendor queda detrás de los ports |
+| Tests de Arquitectura | 2 | test/architecture/ | El seam del backend y la guardia de diagramas: el SDK del vendor queda detrás de los ports y los diagramas no describen código que ya no existe |
 | Tests BLoC | 16 | test/bloc/ | Transiciones, eventos, mapeo de errores |
 | Tests de Entidades | 5 | test/entities/ | copyWith, props, igualdad |
 | Tests de Repos | 9 | test/repositories/ | Queries a los gateways, mapeo de errores, aserciones de payload |

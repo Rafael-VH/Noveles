@@ -6,7 +6,7 @@ novelas con acceso basado en roles, construida con Flutter + Supabase.
 [![Flutter](https://img.shields.io/badge/Flutter-3.3%2B-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-3.3%2B-0175C2?logo=dart&logoColor=white)](https://dart.dev)
 [![Supabase](https://img.shields.io/badge/Supabase-3FCF8E?logo=supabase&logoColor=white)](https://supabase.com)
-[![Tests](https://img.shields.io/badge/tests-506-passing-brightgreen)](es/testing/README.md)
+[![Tests](https://img.shields.io/badge/tests-509-passing-brightgreen)](es/testing/README.md)
 
 ---
 
@@ -117,17 +117,17 @@ lib/
 
 ## 🧪 Testing
 
-**506 tests, todos pasando**, repartidos en 65 archivos:
+**509 tests, todos pasando**, repartidos en 66 archivos:
 
 | Categoría | Archivos | Lo que cubre |
 | :--- | :--- | :--- |
-| Arquitectura | 1 | El seam del backend — falla si una feature esquiva los ports |
+| Arquitectura | 2 | El seam del backend y la guardia de diagramas — falla si una feature esquiva los ports o un diagrama describe código que ya no existe |
 | Tests BLoC | 16 | Todos los BLoCs: transiciones y manejo de eventos |
 | Tests de Entidades | 5 | Construcción, igualdad, copyWith |
 | Tests de Repositorios | 9 | Queries a los gateways, mapeo de errores, asignación de autoría |
 | Tests de Casos de Uso | 7 | Lógica de negocio, Result |
 | Tests de Widgets | 27 | Renderizado UI, interacciones y menús por rol |
-| **Total** | **65 archivos** | **506 tests** |
+| **Total** | **66 archivos** | **509 tests** |
 
 ```bash
 flutter test        # Ejecutá todos los tests

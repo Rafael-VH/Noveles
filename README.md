@@ -6,8 +6,8 @@ role-based access, built with Flutter + Supabase.
 [![Flutter](https://img.shields.io/badge/Flutter-3.3%2B-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-3.3%2B-0175C2?logo=dart&logoColor=white)](https://dart.dev)
 [![Supabase](https://img.shields.io/badge/Supabase-3FCF8E?logo=supabase&logoColor=white)](https://supabase.com)
-[![Tests](https://img.shields.io/badge/tests-506%20passing-brightgreen)](docs/en/testing/README.md)
-[![Diagramas interactivos](https://img.shields.io/badge/Diagramas%20interactivos-ver%20online-26a69a?logo=githubpages&logoColor=white)](https://rafael-vh.github.io/Noveles/diagrams/)
+[![Tests](https://img.shields.io/badge/tests-509%20passing-brightgreen)](docs/en/testing/README.md)
+[![Diagramas interactivos](https://img.shields.io/badge/Diagramas%20interactivos-ver%20online-26a69a?logo=githubpages&logoColor=white)](https://rafael-vh.github.io/Noveles/)
 
 ---
 
@@ -66,12 +66,13 @@ novels. It supports **three user roles** — each with a tailored experience:
 
 ## 🏗️ Architecture at a Glance
 
-<img align="center" alt="NovelEs — Arquitectura Completa" src="docs/diagrams/overview/architecture.svg">
-
-> **Gran Novedad** - el [dashboard de diagramas interactivos](https://rafael-vh.github.io/Noveles/diagrams/) esta online: pan/zoom, busqueda, temas claro/oscuro, rutas y export a PNG/SVG. Agregar un diagrama = crear su HTML en docs/diagrams/<dominio>/ y sumar una entrada al manifest.json.
-
-> 🔍 **¿Querés explorarla?** Abrí la [versión interactiva](https://rafael-vh.github.io/Noveles/diagrams/) —
-> pan/zoom, temas claro/oscuro, búsqueda, seguimiento de rutas y export a PNG/SVG.
+> 🔍 **Diagramas interactivos online**: [dashboard](https://rafael-vh.github.io/Noveles/) —
+> arquitectura del cliente y backend Supabase con pan/zoom, temas claro/oscuro,
+> búsqueda de nodos y export a PNG/SVG.
+>
+> Para agregar o actualizar un diagrama: editar su spec en `docs/diagramas/<slug>/<slug>.json`,
+> regenerarlo con archify y correr `node tools/build-diagrams.mjs` (el dashboard se deriva
+> de las especificaciones; CI falla si queda desactualizado).
 
 **Clean Architecture** with three layers. The domain layer is **pure Dart** —
 no Flutter or Supabase imports. This makes entities and use cases testable
@@ -109,17 +110,17 @@ lib/
 
 ## 🧪 Testing
 
-**506 tests, all passing**, spread over 65 files:
+**509 tests, all passing**, spread over 66 files:
 
 | Category | Files | What's Covered |
 | :--- | :--- | :--- |
-| Architecture | 1 | The backend seam — fails if a feature reaches past the ports |
+| Architecture | 2 | The backend seam and the diagrams guard — vendor SDK stays behind the ports, diagrams stay truthful |
 | BLoC Tests | 16 | All BLoCs — state transitions, event handling |
 | Entity Tests | 5 | Construction, equality, copyWith |
 | Repository Tests | 9 | Gateway queries, error mapping, ownership stamping |
 | Use Case Tests | 7 | Business logic, Result handling |
 | Widget Tests | 27 | UI rendering, user interactions, role-based menus |
-| **Total** | **65 files** | **506 tests** |
+| **Total** | **66 files** | **509 tests** |
 
 ```bash
 flutter test        # Run all tests

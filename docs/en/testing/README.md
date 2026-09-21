@@ -1,13 +1,13 @@
 # Testing Strategy
 
-> 65 test files across 6 categories, covering the architecture guard, BLoCs,
+> 66 test files across 6 categories, covering the architecture guards, BLoCs,
 entities, repositories, use cases, and widgets.
 
 ← [Back to index](../README.md)
 
 ## Overview
 
-Noveles has **65 test files** organized by layer, plus shared helpers in
+Noveles has **66 test files** organized by layer, plus shared helpers in
 `test/utils/` and `test/widgets/`. Tests use `mocktail` for mocking and
 `bloc_test` for BLoC state verification.
 
@@ -15,7 +15,7 @@ Noveles has **65 test files** organized by layer, plus shared helpers in
 
 | Category | Count | Path | What's Tested |
 | ---------- | ------- | ------ | --------------- |
-| Architecture Tests | 1 | test/architecture/ | The backend seam: the vendor SDK stays behind the ports |
+| Architecture Tests | 2 | test/architecture/ | The backend seam and the diagrams guard: the vendor SDK stays behind the ports, and diagrams stay truthful to the code |
 | BLoC Tests | 16 | test/bloc/ | State transitions, event handling, error mapping |
 | Entity Tests | 5 | test/entities/ | Entity construction, copyWith, props, equality |
 | Repo Tests | 9 | test/repositories/ | Data layer: gateway queries, error mapping, payload assertions |

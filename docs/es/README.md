@@ -56,7 +56,7 @@ pantallas, 10 funcionalidades.
 | **Guías** | | |
 | Inicio rápido | [es/guides/getting-started.md](es/guides/getting-started.md) | Guía de configuración para desarrolladores |
 | **Testing** | | |
-| Estrategia de tests | [es/testing/README.md](es/testing/README.md) | 65 archivos de test, categorías, patrones |
+| Estrategia de tests | [es/testing/README.md](es/testing/README.md) | 66 archivos de test, categorías, patrones |
 
 ## Estructura del proyecto
 
