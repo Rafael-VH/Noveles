@@ -24,7 +24,7 @@
         <rect width="100%" height="100%" fill="url(#grid)" />
 
         <!-- Boundaries (behind everything) -->
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="region" data-composition-frame-id="0" data-composition-frame-label="NovelEs App — Cliente Flutter" x="172" y="85" width="796" height="493" rx="12" class="c-region" stroke-width="1"/>
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="region" data-composition-frame-id="0" data-composition-frame-label="NovelEs App — Cliente Flutter" x="172" y="85" width="904" height="493" rx="12" class="c-region" stroke-width="1"/>
 
         <rect data-graph-role="structural-frame" data-composition-frame-kind="region" data-composition-frame-id="1" data-composition-frame-label="Backend — Supabase Platform" x="1022" y="66" width="496" height="498" rx="12" class="c-region" stroke-width="1"/>
 
@@ -35,13 +35,16 @@
         <path data-edge-from="presentation" data-edge-to="domain" data-edge-label="bloc → use case" data-edge-key="1" data-edge-id="pres-domain" data-composition-points="390,143;414,143;414,168;476,168;476,152;500,152" d="M 390 143 L 406 143 Q 414 143 414 151 L 414 160 Q 414 168 422 168 L 468 168 Q 476 168 476 160 L 476 160 Q 476 152 484 152 L 500 152" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
         <path data-edge-from="admin" data-edge-to="domain" data-edge-key="2" data-edge-id="admin-domain" data-composition-points="320,274;410,274;410,145;500,145" d="M 320 274 L 402 274 Q 410 274 410 266 L 410 153 Q 410 145 418 145 L 500 145" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
         <path data-edge-from="scan" data-edge-to="domain" data-edge-key="3" data-edge-id="scan-domain" data-composition-points="340,369;420,369;420,159;500,159" d="M 340 369 L 412 369 Q 420 369 420 361 L 420 167 Q 420 159 428 159 L 500 159" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="domain" data-edge-to="data" data-edge-label="contratos → impls" data-edge-key="4" data-edge-id="dom-data" data-composition-points="620,194;620,380" d="M 620 194 L 620 380" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="cache" data-edge-to="data" data-edge-label="prefs locales" data-edge-key="5" data-edge-id="cache-data" data-composition-points="575,500;575,482;620,482;620,464" d="M 575 500 L 575 490 Q 575 482 583 482 L 612 482 Q 620 482 620 474 L 620 464" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="di" data-edge-to="data" data-edge-label="registra impls" data-edge-key="6" data-edge-id="di-data" data-composition-points="800,269;770,269;770,422;740,422" d="M 800 269 L 778 269 Q 770 269 770 277 L 770 414 Q 770 422 762 422 L 740 422" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="data" data-edge-to="pg" data-edge-label="PostgREST · SQL" data-edge-key="7" data-edge-id="data-pg" data-composition-points="740,422;890,422;890,368;1040,368" d="M 740 422 L 882 422 Q 890 422 890 414 L 890 376 Q 890 368 898 368 L 1040 368" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
-        <path data-edge-from="data" data-edge-to="storage" data-edge-label="sube / baja" data-edge-key="8" data-edge-id="data-storage" data-composition-points="740,422;890,422;890,512;1040,512" d="M 740 422 L 882 422 Q 890 422 890 430 L 890 504 Q 890 512 898 512 L 1040 512" class="a-dashed" stroke-width="1.5" marker-end="url(#arrowhead-dashed)"/>
-        <path data-edge-from="sbauth" data-edge-to="pg" data-edge-label="RLS · roles" data-edge-key="9" data-edge-id="auth-pg" data-composition-points="1125,174;1125,247;1160,247;1160,320" d="M 1125 174 L 1125 239 Q 1125 247 1133 247 L 1152 247 Q 1160 247 1160 255 L 1160 320" class="a-security" stroke-width="1.5" marker-end="url(#arrowhead-security)"/>
-        <path data-edge-from="edge" data-edge-to="pg" data-edge-label="service role · sync" data-edge-key="10" data-edge-id="edge-pg" data-composition-points="1330,392;1305,392;1305,368;1280,368" d="M 1330 392 L 1313 392 Q 1305 392 1305 384 L 1305 376 Q 1305 368 1297 368 L 1280 368" class="a-dashed" stroke-width="1.5" marker-end="url(#arrowhead-dashed)"/>
+        <path data-edge-from="domain" data-edge-to="data" data-edge-label="contratos → impls" data-edge-key="4" data-edge-id="dom-data" data-composition-points="620,194;620,420" d="M 620 194 L 620 420" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="cache" data-edge-to="data" data-edge-label="prefs locales" data-edge-key="5" data-edge-id="cache-data" data-composition-points="575,560;575,542;620,542;620,524" d="M 575 560 L 575 550 Q 575 542 583 542 L 612 542 Q 620 542 620 534 L 620 524" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="di" data-edge-to="data" data-edge-label="registra impls" data-edge-key="6" data-edge-id="di-data" data-composition-points="800,269;770,269;770,462;740,462" d="M 800 269 L 778 269 Q 770 269 770 277 L 770 454 Q 770 462 762 462 L 740 462" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="data" data-edge-to="ports" data-edge-label="usa" data-edge-key="7" data-edge-id="data-ports" data-composition-points="740,462;854,462" d="M 740 462 L 854 462" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="ports" data-edge-to="adapters" data-edge-label="implementan" data-edge-key="8" data-edge-id="ports-adapters" data-composition-points="854,462;874,462" d="M 854 462 L 874 462" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="adapters" data-edge-to="pg" data-edge-label="PostgREST · SQL" data-edge-key="9" data-edge-id="adapters-pg" data-composition-points="1014,456;1028,456;1028,392;1040,392" d="M 1014 456 L 1020 456 Q 1028 456 1028 448 L 1028 400 Q 1028 392 1036 392 L 1040 392" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="adapters" data-edge-to="storage" data-edge-label="API de Storage" data-edge-key="10" data-edge-id="adapters-storage" data-composition-points="944,494;944,512;1040,512" d="M 944 494 L 944 504 Q 944 512 952 512 L 1040 512" class="a-dashed" stroke-width="1.5" marker-end="url(#arrowhead-dashed)"/>
+        <path data-edge-from="adapters" data-edge-to="sbauth" data-edge-label="GoTrue" data-edge-key="11" data-edge-id="adapters-sbauth" data-composition-points="944,420;944,222;1040,222" d="M 944 420 L 944 230 Q 944 222 952 222 L 1040 222" class="a-dashed" stroke-width="1.5" marker-end="url(#arrowhead-dashed)"/>
+        <path data-edge-from="sbauth" data-edge-to="pg" data-edge-label="RLS · roles" data-edge-key="12" data-edge-id="auth-pg" data-composition-points="1125,254;1125,287;1160,287;1160,320" d="M 1125 254 L 1125 279 Q 1125 287 1133 287 L 1152 287 Q 1160 287 1160 295 L 1160 320" class="a-security" stroke-width="1.5" marker-end="url(#arrowhead-security)"/>
+        <path data-edge-from="edge" data-edge-to="pg" data-edge-label="service role · sync" data-edge-key="13" data-edge-id="edge-pg" data-composition-points="1330,392;1305,392;1305,368;1280,368" d="M 1330 392 L 1313 392 Q 1305 392 1305 384 L 1305 376 Q 1305 368 1297 368 L 1280 368" class="a-dashed" stroke-width="1.5" marker-end="url(#arrowhead-dashed)"/>
 
         <!-- Components -->
         <g id="node-readers" data-node-id="readers" data-node-label="Lectores" tabindex="0" role="button" aria-label="Focus Lectores, Architecture component" aria-pressed="false" data-node-kind="external" data-node-context="Architecture component">
@@ -55,8 +58,8 @@
           <text data-node-label="" x="58" y="139" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Lectores</text>
         </g>
 
-        <g id="node-presentation" data-node-id="presentation" data-node-label="Presentation" tabindex="0" role="button" aria-label="Focus Presentation, Blocs + Screens · 13 features, NovelEs App — Cliente Flutter" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="Blocs + Screens · 13 features" data-node-context="NovelEs App — Cliente Flutter">
-          <title>Presentation · Blocs + Screens · 13 features · NovelEs App — Cliente Flutter</title>
+        <g id="node-presentation" data-node-id="presentation" data-node-label="Presentation" tabindex="0" role="button" aria-label="Focus Presentation, Blocs + Screens · 10 features, NovelEs App — Cliente Flutter" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="Blocs + Screens · 10 features" data-node-context="NovelEs App — Cliente Flutter">
+          <title>Presentation · Blocs + Screens · 10 features · NovelEs App — Cliente Flutter</title>
           <rect x="190" y="110" width="200" height="66" rx="6" class="c-mask"/>
           <rect x="190" y="110" width="200" height="66" rx="6" class="c-frontend" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(196 116) scale(0.6875)">
@@ -66,7 +69,7 @@
             <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
           </g>
           <text data-node-label="" data-detail-anchor="" x="290" y="141" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Presentation</text>
-        <text data-detail="context" x="290" y="157" class="t-muted" font-size="9" text-anchor="middle">Blocs + Screens · 13 features</text>
+        <text data-detail="context" x="290" y="157" class="t-muted" font-size="9" text-anchor="middle">Blocs + Screens · 10 features</text>
         </g>
 
         <g id="node-admin" data-node-id="admin" data-node-label="Admin Panel" tabindex="0" role="button" aria-label="Focus Admin Panel, usuarios · analytics · libros, NovelEs App — Cliente Flutter" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="usuarios · analytics · libros" data-node-context="NovelEs App — Cliente Flutter">
@@ -108,27 +111,50 @@
         <text data-detail="context" x="620" y="166" class="t-muted" font-size="9" text-anchor="middle">Use Cases + Entities (puro)</text>
         </g>
 
-        <g id="node-data" data-node-id="data" data-node-label="Data" tabindex="0" role="button" aria-label="Focus Data, Repos + Models · Supabase client, NovelEs App — Cliente Flutter" aria-pressed="false" data-node-kind="backend" data-node-sublabel="Repos + Models · Supabase client" data-node-context="NovelEs App — Cliente Flutter">
-          <title>Data · Repos + Models · Supabase client · NovelEs App — Cliente Flutter</title>
-          <rect x="500" y="380" width="240" height="84" rx="6" class="c-mask"/>
-          <rect x="500" y="380" width="240" height="84" rx="6" class="c-backend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(506 386) scale(0.6875)">
+        <g id="node-data" data-node-id="data" data-node-label="Data" tabindex="0" role="button" aria-label="Focus Data, Repos + Models · Ports, NovelEs App — Cliente Flutter" aria-pressed="false" data-node-kind="backend" data-node-sublabel="Repos + Models · Ports" data-node-context="NovelEs App — Cliente Flutter">
+          <title>Data · Repos + Models · Ports · NovelEs App — Cliente Flutter</title>
+          <rect x="500" y="420" width="240" height="84" rx="6" class="c-mask"/>
+          <rect x="500" y="420" width="240" height="84" rx="6" class="c-backend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(506 426) scale(0.6875)">
             <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="620" y="420" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Data</text>
-        <text data-detail="context" x="620" y="436" class="t-muted" font-size="9" text-anchor="middle">Repos + Models · Supabase client</text>
+          <text data-node-label="" data-detail-anchor="" x="620" y="460" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Data</text>
+        <text data-detail="context" x="620" y="476" class="t-muted" font-size="9" text-anchor="middle">Repos + Models · Ports</text>
+        </g>
+
+        <g id="node-ports" data-node-id="ports" data-node-label="Ports" tabindex="0" role="button" aria-label="Focus Ports, DataGateway · AuthGateway · StorageGateway, NovelEs App — Cliente Flutter" aria-pressed="false" data-node-kind="backend" data-node-sublabel="DataGateway · AuthGateway · StorageGateway" data-node-context="NovelEs App — Cliente Flutter">
+          <title>Ports · DataGateway · AuthGateway · StorageGateway · NovelEs App — Cliente Flutter</title>
+          <rect x="694" y="420" width="160" height="84" rx="6" class="c-mask"/>
+          <rect x="694" y="420" width="160" height="84" rx="6" class="c-backend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(700 426) scale(0.6875)">
+            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="774" y="460" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Ports</text>
+        <text data-detail="context" x="774" y="476" class="t-muted" font-size="7.5" text-anchor="middle">DataGateway · AuthGateway · StorageGateway</text>
+        </g>
+
+        <g id="node-adapters" data-node-id="adapters" data-node-label="Adapters" tabindex="0" role="button" aria-label="Focus Adapters, lib/core/backend/supabase/ · único lugar con el SDK, Backend — Supabase Platform" aria-pressed="false" data-node-kind="backend" data-node-sublabel="lib/core/backend/supabase/ · único lugar con el SDK" data-node-context="Backend — Supabase Platform">
+          <title>Adapters · lib/core/backend/supabase/ · único lugar con el SDK · Backend — Supabase Platform</title>
+          <rect x="874" y="420" width="140" height="74" rx="6" class="c-mask"/>
+          <rect x="874" y="420" width="140" height="74" rx="6" class="c-backend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(880 426) scale(0.6875)">
+            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="944" y="450" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Adapters</text>
+        <text data-detail="context" x="944" y="466" class="t-muted" font-size="7.5" text-anchor="middle">core/backend/supabase/</text>
+        <text data-detail="context" x="944" y="479" class="t-muted" font-size="7.5" text-anchor="middle">único lugar con el SDK</text>
         </g>
 
         <g id="node-cache" data-node-id="cache" data-node-label="Local Cache" tabindex="0" role="button" aria-label="Focus Local Cache, SharedPreferences, NovelEs App — Cliente Flutter" aria-pressed="false" data-node-kind="database" data-node-sublabel="SharedPreferences" data-node-context="NovelEs App — Cliente Flutter">
           <title>Local Cache · SharedPreferences · NovelEs App — Cliente Flutter</title>
-          <rect x="500" y="500" width="150" height="58" rx="6" class="c-mask"/>
-          <rect x="500" y="500" width="150" height="58" rx="6" class="c-database" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(506 506) scale(0.6875)">
+          <rect x="500" y="560" width="150" height="58" rx="6" class="c-mask"/>
+          <rect x="500" y="560" width="150" height="58" rx="6" class="c-database" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(506 566) scale(0.6875)">
             <ellipse cx="8" cy="4" rx="5" ry="2"/>
             <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="575" y="527" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Local Cache</text>
-        <text data-detail="context" x="575" y="543" class="t-muted" font-size="9" text-anchor="middle">SharedPreferences</text>
+          <text data-node-label="" data-detail-anchor="" x="575" y="587" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Local Cache</text>
+        <text data-detail="context" x="575" y="603" class="t-muted" font-size="9" text-anchor="middle">SharedPreferences</text>
         </g>
 
         <g id="node-di" data-node-id="di" data-node-label="get_it — DI" tabindex="0" role="button" aria-label="Focus get_it — DI, composition root, NovelEs App — Cliente Flutter" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="composition root" data-node-context="NovelEs App — Cliente Flutter">
@@ -147,18 +173,18 @@
 
         <g id="node-sbauth" data-node-id="sbauth" data-node-label="Supabase Auth" tabindex="0" role="button" aria-label="Focus Supabase Auth, JWT · RLS · roles, Backend — Supabase Platform › Auth Trust Zone" aria-pressed="false" data-node-kind="security" data-node-sublabel="JWT · RLS · roles" data-node-context="Backend — Supabase Platform › Auth Trust Zone">
           <title>Supabase Auth · JWT · RLS · roles · Backend — Supabase Platform › Auth Trust Zone</title>
-          <rect x="1040" y="110" width="170" height="64" rx="6" class="c-mask"/>
-          <rect x="1040" y="110" width="170" height="64" rx="6" class="c-security" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(1046 116) scale(0.6875)">
+          <rect x="1040" y="190" width="170" height="64" rx="6" class="c-mask"/>
+          <rect x="1040" y="190" width="170" height="64" rx="6" class="c-security" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(1046 196) scale(0.6875)">
             <path d="M8 2.2 13 4v3.5c0 3.1-1.8 5.4-5 6.5-3.2-1.1-5-3.4-5-6.5V4Z"/>
             <path d="m5.8 8 1.5 1.5 3-3"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="1125" y="140" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Supabase Auth</text>
-        <text data-detail="context" x="1125" y="156" class="t-muted" font-size="9" text-anchor="middle">JWT · RLS · roles</text>
+          <text data-node-label="" data-detail-anchor="" x="1125" y="220" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Supabase Auth</text>
+        <text data-detail="context" x="1125" y="236" class="t-muted" font-size="9" text-anchor="middle">JWT · RLS · roles</text>
         </g>
 
-        <g id="node-pg" data-node-id="pg" data-node-label="PostgreSQL" tabindex="0" role="button" aria-label="Focus PostgreSQL, books · chapters · labels · profiles · RPC, Backend — Supabase Platform › Auth Trust Zone" aria-pressed="false" data-node-kind="database" data-node-sublabel="books · chapters · labels · profiles · RPC" data-node-context="Backend — Supabase Platform › Auth Trust Zone">
-          <title>PostgreSQL · books · chapters · labels · profiles · RPC · Backend — Supabase Platform › Auth Trust Zone</title>
+        <g id="node-pg" data-node-id="pg" data-node-label="PostgreSQL" tabindex="0" role="button" aria-label="Focus PostgreSQL, 13 tablas · RPC · RLS, Backend — Supabase Platform › Auth Trust Zone" aria-pressed="false" data-node-kind="database" data-node-sublabel="13 tablas · RPC · RLS" data-node-context="Backend — Supabase Platform › Auth Trust Zone">
+          <title>PostgreSQL · 13 tablas · RPC · RLS · Backend — Supabase Platform › Auth Trust Zone</title>
           <rect x="1040" y="320" width="240" height="96" rx="6" class="c-mask"/>
           <rect x="1040" y="320" width="240" height="96" rx="6" class="c-database" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(1046 326) scale(0.6875)">
@@ -166,18 +192,18 @@
             <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
           </g>
           <text data-node-label="" data-detail-anchor="" x="1160" y="366" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">PostgreSQL</text>
-        <text data-detail="context" x="1160" y="382" class="t-muted" font-size="9" text-anchor="middle">books · chapters · labels · profiles · RPC</text>
+        <text data-detail="context" x="1160" y="382" class="t-muted" font-size="9" text-anchor="middle">13 tablas · RPC · RLS</text>
         </g>
 
-        <g id="node-storage" data-node-id="storage" data-node-label="Storage" tabindex="0" role="button" aria-label="Focus Storage, buckets covers · chapters, Backend — Supabase Platform" aria-pressed="false" data-node-kind="cloud" data-node-sublabel="buckets covers · chapters" data-node-context="Backend — Supabase Platform">
-          <title>Storage · buckets covers · chapters · Backend — Supabase Platform</title>
+        <g id="node-storage" data-node-id="storage" data-node-label="Storage" tabindex="0" role="button" aria-label="Focus Storage, buckets covers · chapters · avatars, Backend — Supabase Platform" aria-pressed="false" data-node-kind="cloud" data-node-sublabel="buckets covers · chapters · avatars" data-node-context="Backend — Supabase Platform">
+          <title>Storage · buckets covers · chapters · avatars · Backend — Supabase Platform</title>
           <rect x="1040" y="480" width="170" height="64" rx="6" class="c-mask"/>
           <rect x="1040" y="480" width="170" height="64" rx="6" class="c-cloud" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="cloud" class="semantic-sigil s-cloud" transform="translate(1046 486) scale(0.6875)">
             <path d="M4.3 12.5h7.3a2.4 2.4 0 0 0 .2-4.8 4 4 0 0 0-7.5-1.3A3.1 3.1 0 0 0 4.3 12.5Z"/>
           </g>
           <text data-node-label="" data-detail-anchor="" x="1125" y="510" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Storage</text>
-        <text data-detail="context" x="1125" y="526" class="t-muted" font-size="9" text-anchor="middle">buckets covers · chapters</text>
+        <text data-detail="context" x="1125" y="526" class="t-muted" font-size="9" text-anchor="middle">buckets covers · chapters · avatars</text>
         </g>
 
         <g id="node-edge" data-node-id="edge" data-node-label="Edge Function" tabindex="0" role="button" aria-label="Focus Edge Function, sync-labels · Deno, Backend — Supabase Platform" aria-pressed="false" data-node-kind="backend" data-node-sublabel="sync-labels · Deno" data-node-context="Backend — Supabase Platform">
@@ -201,32 +227,43 @@
           <text x="445" y="108" class="t-muted" font-size="8" text-anchor="middle">bloc → use case</text>
         </g>
 
-
         <g data-detail="context" data-edge-from="domain" data-edge-to="data" data-edge-label="contratos → impls" data-edge-key="4" data-edge-id="dom-data">
           <rect x="582.2" y="230" width="91.6" height="14" rx="3" class="c-mask"/>
           <text x="628" y="240" class="t-muted" font-size="8" text-anchor="middle">contratos → impls</text>
         </g>
         <g data-detail="context" data-edge-from="cache" data-edge-to="data" data-edge-label="prefs locales" data-edge-key="5" data-edge-id="cache-data">
-          <rect x="548.8" y="468" width="72.4" height="14" rx="3" class="c-mask"/>
-          <text x="585" y="478" class="t-muted" font-size="8" text-anchor="middle">prefs locales</text>
+          <rect x="548.8" y="542" width="72.4" height="14" rx="3" class="c-mask"/>
+          <text x="585" y="552" class="t-muted" font-size="8" text-anchor="middle">prefs locales</text>
         </g>
         <g data-detail="context" data-edge-from="di" data-edge-to="data" data-edge-label="registra impls" data-edge-key="6" data-edge-id="di-data">
-          <rect x="709.4" y="462" width="77.2" height="14" rx="3" class="c-mask"/>
-          <text x="748" y="472" class="t-muted" font-size="8" text-anchor="middle">registra impls</text>
+          <rect x="709.4" y="502" width="77.2" height="14" rx="3" class="c-mask"/>
+          <text x="748" y="512" class="t-muted" font-size="8" text-anchor="middle">registra impls</text>
         </g>
-        <g data-detail="context" data-edge-from="data" data-edge-to="pg" data-edge-label="PostgREST · SQL" data-edge-key="7" data-edge-id="data-pg">
-          <rect x="849" y="392" width="82" height="14" rx="3" class="c-mask"/>
-          <text x="890" y="402" class="t-backend" font-size="8" text-anchor="middle">PostgREST · SQL</text>
+        <g data-detail="context" data-edge-from="data" data-edge-to="ports" data-edge-label="usa" data-edge-key="7" data-edge-id="data-ports">
+          <rect x="784" y="448" width="30" height="14" rx="3" class="c-mask"/>
+          <text x="799" y="458" class="t-muted" font-size="8" text-anchor="middle">usa</text>
         </g>
-        <g data-detail="context" data-edge-from="data" data-edge-to="storage" data-edge-label="sube / baja" data-edge-key="8" data-edge-id="data-storage">
-          <rect x="858.6" y="447" width="62.8" height="14" rx="3" class="c-mask"/>
-          <text x="890" y="457" class="t-messagebus" font-size="8" text-anchor="middle">sube / baja</text>
+        <g data-detail="context" data-edge-from="ports" data-edge-to="adapters" data-edge-label="implementan" data-edge-key="8" data-edge-id="ports-adapters">
+          <rect x="824" y="448" width="70" height="14" rx="3" class="c-mask"/>
+          <text x="859" y="458" class="t-muted" font-size="8" text-anchor="middle">implementan</text>
         </g>
-        <g data-detail="context" data-edge-from="sbauth" data-edge-to="pg" data-edge-label="RLS · roles" data-edge-key="9" data-edge-id="auth-pg">
-          <rect x="1103.6" y="240" width="62.8" height="14" rx="3" class="c-mask"/>
-          <text x="1135" y="250" class="t-security" font-size="8" text-anchor="middle">RLS · roles</text>
+        <g data-detail="context" data-edge-from="adapters" data-edge-to="pg" data-edge-label="PostgREST · SQL" data-edge-key="9" data-edge-id="adapters-pg">
+          <rect x="988" y="452" width="82" height="14" rx="3" class="c-mask"/>
+          <text x="1029" y="462" class="t-backend" font-size="8" text-anchor="middle">PostgREST · SQL</text>
         </g>
-        <g data-detail="context" data-edge-from="edge" data-edge-to="pg" data-edge-label="service role · sync" data-edge-key="10" data-edge-id="edge-pg">
+        <g data-detail="context" data-edge-from="adapters" data-edge-to="storage" data-edge-label="API de Storage" data-edge-key="10" data-edge-id="adapters-storage">
+          <rect x="913" y="517" width="78" height="14" rx="3" class="c-mask"/>
+          <text x="952" y="527" class="t-messagebus" font-size="8" text-anchor="middle">API de Storage</text>
+        </g>
+        <g data-detail="context" data-edge-from="adapters" data-edge-to="sbauth" data-edge-label="GoTrue" data-edge-key="11" data-edge-id="adapters-sbauth">
+          <rect x="905" y="215" width="46" height="14" rx="3" class="c-mask"/>
+          <text x="928" y="225" class="t-messagebus" font-size="8" text-anchor="middle">GoTrue</text>
+        </g>
+        <g data-detail="context" data-edge-from="sbauth" data-edge-to="pg" data-edge-label="RLS · roles" data-edge-key="12" data-edge-id="auth-pg">
+          <rect x="1093.6" y="280" width="62.8" height="14" rx="3" class="c-mask"/>
+          <text x="1125" y="290" class="t-security" font-size="8" text-anchor="middle">RLS · roles</text>
+        </g>
+        <g data-detail="context" data-edge-from="edge" data-edge-to="pg" data-edge-label="service role · sync" data-edge-key="13" data-edge-id="edge-pg">
           <rect x="1254.4" y="430" width="101.2" height="14" rx="3" class="c-mask"/>
           <text x="1305" y="440" class="t-messagebus" font-size="8" text-anchor="middle">service role · sync</text>
         </g>

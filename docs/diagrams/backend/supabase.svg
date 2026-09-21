@@ -47,7 +47,7 @@
   <rect x="792" y="520" width="304" height="26" class="box"/><text x="806" y="537" class="bt">invoke con service_role</text><text x="950" y="537" class="bs">CRON / manual</text>
   <text x="792" y="590" class="sub">Storage</text>
   <rect x="792" y="598" width="304" height="52" class="box"/>
-  <text x="806" y="615" class="bt">buckets: covers &#183; avatars</text>
+  <text x="806" y="615" class="bt">buckets: covers &#183; chapters &#183; avatars</text>
   <text x="806" y="630" class="bs">path &#8594; tipo de contenido; lecturas via</text>
   <text x="806" y="643" class="bs">Signed URL / RLS storage</text>
   <rect x="792" y="658" width="304" height="26" class="box-s"/><text x="806" y="675" class="bt">Realtime</text><text x="858" y="675" class="bs">(sin publicaci&#243;n abierta &#8212; no dibujado)</text>
