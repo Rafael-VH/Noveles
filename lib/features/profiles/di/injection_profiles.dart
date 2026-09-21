@@ -1,5 +1,7 @@
 import 'package:get_it/get_it.dart';
-import 'package:noveles/core/supabase/supabase_client.dart';
+import 'package:noveles/core/backend/auth_gateway.dart';
+import 'package:noveles/core/backend/data_gateway.dart';
+import 'package:noveles/core/backend/storage_gateway.dart';
 import 'package:noveles/features/profiles/data/profiles_repository_impl.dart';
 import 'package:noveles/features/profiles/domain/profiles_repository.dart';
 import 'package:noveles/features/profiles/domain/get_profile.dart';
@@ -16,7 +18,9 @@ final getIt = GetIt.instance;
 void initProfilesDependencies() {
   getIt.registerLazySingleton<ProfilesRepository>(
     () => ProfilesRepositoryImpl(
-      getIt<SupabaseClientProvider>(),
+      getIt<DataGateway>(),
+      getIt<StorageGateway>(),
+      getIt<AuthGateway>(),
     ),
   );
 

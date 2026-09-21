@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
-import 'package:noveles/core/supabase/supabase_client.dart';
+import 'package:noveles/core/backend/data_gateway.dart';
+import 'package:noveles/core/backend/storage_gateway.dart';
 import 'package:noveles/features/books/data/book_repository_impl.dart';
 import 'package:noveles/features/books/domain/book_repository.dart';
 import 'package:noveles/features/books/domain/create_book.dart';
@@ -25,7 +26,8 @@ import 'package:noveles/features/books/favorites/presentation/bloc/favorite_bloc
 void initBooksDependencies(GetIt getIt) {
   getIt.registerLazySingleton<BookRepository>(
     () => BookRepositoryImpl(
-      getIt<SupabaseClientProvider>(),
+      getIt<DataGateway>(),
+      getIt<StorageGateway>(),
     ),
   );
 
@@ -76,7 +78,7 @@ void initBooksDependencies(GetIt getIt) {
   // Favorites
   getIt.registerLazySingleton<FavoriteRepository>(
     () => FavoriteRepositoryImpl(
-      getIt<SupabaseClientProvider>(),
+      getIt<DataGateway>(),
     ),
   );
 

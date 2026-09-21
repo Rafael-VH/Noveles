@@ -1,5 +1,5 @@
 import 'package:get_it/get_it.dart';
-import 'package:noveles/core/supabase/supabase_client.dart';
+import 'package:noveles/core/backend/data_gateway.dart';
 import 'package:noveles/features/genres/data/genre_repository_impl.dart';
 import 'package:noveles/features/genres/domain/genre_repository.dart';
 import 'package:noveles/features/genres/domain/create_genre.dart';
@@ -14,7 +14,7 @@ final getIt = GetIt.instance;
 void initGenresDependencies() {
   getIt.registerLazySingleton<GenreRepository>(
     () => GenreRepositoryImpl(
-      getIt<SupabaseClientProvider>(),
+      getIt<DataGateway>(),
     ),
   );
 

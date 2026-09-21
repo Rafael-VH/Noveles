@@ -1,17 +1,20 @@
 import 'dart:io';
+
+import 'package:noveles/core/backend/data_gateway.dart';
+import 'package:noveles/core/backend/storage_gateway.dart';
+import 'package:noveles/core/constants/storage_constants.dart';
 import 'package:noveles/core/errors/failure.dart';
 import 'package:noveles/core/errors/result.dart';
-import 'package:noveles/core/constants/storage_constants.dart';
-import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/books/data/book_model.dart';
 import 'package:noveles/features/books/domain/book_entity.dart';
 import 'package:noveles/features/books/domain/book_repository.dart';
 import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 
 class BookRepositoryImpl implements BookRepository {
-  final SupabaseClientProvider _supabase;
+  final DataGateway _data;
+  final StorageGateway _storage;
 
-  BookRepositoryImpl(this._supabase);
+  BookRepositoryImpl(this._data, this._storage);
 
   @override
   Future<Result<List<BookWithRelations>>> getBooks({
@@ -21,20 +24,13 @@ class BookRepositoryImpl implements BookRepository {
   }) async {
     try {
       final offset = (page - 1) * pageSize;
-
-      var query = _supabase.client.from('books').select(
-          '*, authors(*), books_genres(genre_id, genres(*)), books_labels(*, labels(*)), tooks(*, chapters(*))');
-
-      if (onlyVisible) {
-        query = query.eq('is_visible', true);
-      }
-
-      final response = await query
-          .order('id')
-          .limit(pageSize)
-          .range(offset, offset + pageSize - 1);
-
-      final books = response.map((json) => BookModel.fromJson(json)).toList();
+      // Aggregate read: the relation tree is resolved by the adapter.
+      final rows = await _data.booksWithRelations(
+        onlyVisible: onlyVisible,
+        limit: pageSize,
+        offset: offset,
+      );
+      final books = rows.map((json) => BookModel.fromJson(json)).toList();
       return Ok(books);
     } catch (e) {
       return Err(BookFailure('Error al obtener libros', cause: e));
@@ -44,15 +40,9 @@ class BookRepositoryImpl implements BookRepository {
   @override
   Future<Result<BookWithRelations?>> getBookById(int id) async {
     try {
-      final response = await _supabase.client
-          .from('books')
-          .select(
-              '*, authors(*), books_genres(genre_id, genres(*)), books_labels(*, labels(*)), tooks(*, chapters(*))')
-          .eq('id', id)
-          .maybeSingle();
-
-      if (response == null) return const Ok(null);
-      return Ok(BookModel.fromJson(response));
+      final row = await _data.bookWithRelationsById(id);
+      if (row == null) return const Ok(null);
+      return Ok(BookModel.fromJson(row));
     } catch (e) {
       return Err(BookFailure('Error al obtener libro', cause: e));
     }
@@ -83,7 +73,9 @@ class BookRepositoryImpl implements BookRepository {
         // created_by is set server-side by auth.uid() — never send from client
       };
 
-      final newBookId = await _supabase.client.rpc(
+      // Server-side function: creating a book also inserts its genres and
+      // labels atomically.
+      final newBookId = await _data.rpc(
         'create_book_with_relations',
         params: {
           'p_book': bookJson,
@@ -121,7 +113,7 @@ class BookRepositoryImpl implements BookRepository {
         'is_visible': book.isVisible,
       };
 
-      await _supabase.client.rpc(
+      await _data.rpc(
         'update_book_with_relations',
         params: {
           'p_book': bookJson,
@@ -140,68 +132,61 @@ class BookRepositoryImpl implements BookRepository {
   Future<Result<void>> deleteBook(int id) async {
     try {
       // 1. Get book data to know cover and tooks/chapters
-      final bookData = await _supabase.client
-          .from('books')
-          .select('cover, tooks(chapters(content), cover)')
-          .eq('id', id)
-          .maybeSingle();
+      final bookData = await _data.bookContentTree(id);
 
       // 2. Clean up storage files
       if (bookData != null) {
         // Clean took covers
         for (final took in (bookData['tooks'] as List? ?? [])) {
           if (took['cover'] != null && (took['cover'] as String).isNotEmpty) {
-            await _safeDeleteStorage(StorageConstants.coversBucket, took['cover'] as String);
+            await _safeRemove(StorageConstants.coversBucket, took['cover'] as String);
           }
           // Clean chapter content files
           for (final chapter in (took['chapters'] as List? ?? [])) {
             final content = chapter['content'] as String?;
             if (content != null && content.startsWith('http')) {
-              await _safeDeleteStorageFromUrl(StorageConstants.chaptersBucket, content);
+              await _safeRemoveFromUrl(StorageConstants.chaptersBucket, content);
             }
           }
         }
         // Clean book cover
         final cover = bookData['cover'] as String?;
         if (cover != null && cover.isNotEmpty) {
-          await _safeDeleteStorage(StorageConstants.coversBucket, cover);
+          await _safeRemove(StorageConstants.coversBucket, cover);
         }
       }
 
       // 3. Delete book record (CASCADE deletes tooks, chapters, etc.)
-      await _supabase.client.from('books').delete().eq('id', id);
+      await _data.from('books').eq('id', id).delete();
       return const Ok(null);
     } catch (e) {
       return Err(BookFailure('Error al eliminar libro', cause: e));
     }
   }
 
-  Future<void> _safeDeleteStorage(String bucket, String path) async {
+  Future<void> _safeRemove(String bucket, String path) async {
     try {
-      await _supabase.client.storage.from(bucket).remove([path]);
+      await _storage.remove(bucket, [path]);
     } catch (_) {
       // Log but don't fail — file may not exist
     }
   }
 
-  Future<void> _safeDeleteStorageFromUrl(String bucket, String url) async {
+  Future<void> _safeRemoveFromUrl(String bucket, String url) async {
     try {
-      final uri = Uri.parse(url);
-      final pathSegments = uri.pathSegments;
-      final bucketIndex = pathSegments.indexOf(bucket);
-      if (bucketIndex != -1) {
-        final filePath = pathSegments.sublist(bucketIndex + 1).join('/');
-        await _safeDeleteStorage(bucket, filePath);
-      }
+      // The adapter knows its own URL shape, so parsing stays out of here.
+      final path = _storage.pathFromUrl(bucket, url);
+      if (path != null) await _safeRemove(bucket, path);
     } catch (_) {}
   }
 
   @override
   Future<Result<void>> toggleBookVisibility(int bookId, bool isVisible) async {
     try {
-      await _supabase.client
+      await _data
           .from('books')
-          .update({'is_visible': isVisible}).eq('id', bookId);
+          .eq('id', bookId)
+          .update({'is_visible': isVisible});
       return const Ok(null);
     } catch (e) {
       return Err(BookFailure('Error al cambiar visibilidad', cause: e));
@@ -233,11 +218,9 @@ class BookRepositoryImpl implements BookRepository {
         ));
       }
 
-      final userId = _supabase.client.auth.currentUser?.id ?? 'unknown';
+      final userId = _data.identity?.id ?? 'unknown';
       final filename = '$userId/${DateTime.now().millisecondsSinceEpoch}.$ext';
-      await _supabase.client.storage
-          .from(StorageConstants.coversBucket)
-          .upload(filename, file);
+      await _storage.upload(StorageConstants.coversBucket, filename, file);
       return Ok(filename);
     } catch (e) {
       return Err(BookFailure('Error al subir cover', cause: e));
@@ -250,10 +233,8 @@ class BookRepositoryImpl implements BookRepository {
     try {
       if (books.isEmpty) return const Ok({});
       final ids = books.map((b) => b.id).toList();
-      final rows = await _supabase.client
-          .from('books_labels')
-          .select()
-          .filter('book_id', 'in', ids);
+      final rows =
+          await _data.from('books_labels').inList('book_id', ids).rows();
       final map = <int, Set<int>>{};
       for (final row in rows) {
         map.putIfAbsent(row['book_id'], () => {}).add(row['label_id']);
@@ -267,10 +248,10 @@ class BookRepositoryImpl implements BookRepository {
   @override
   Future<Result<void>> trackBookView(int bookId) async {
     try {
-      await _supabase.client.from('book_views').insert({
+      await _data.insert('book_views', {
         'book_id': bookId,
         'viewed_at': DateTime.now().toUtc().toIso8601String(),
-        'user_id': _supabase.client.auth.currentUser?.id,
+        'user_id': _data.identity?.id,
       });
       return const Ok(null);
     } catch (e) {
@@ -281,15 +262,14 @@ class BookRepositoryImpl implements BookRepository {
   @override
   Future<Result<List<BookWithRelations>>> getRecentViews(String userId) async {
     try {
-      final ids = await _supabase.client
-          .rpc('get_user_recent_views', params: {'uid': userId, 'max_results': 6});
+      final ids = await _data.rpc(
+        'get_user_recent_views',
+        params: {'uid': userId, 'max_results': 6},
+      );
       if (ids.isEmpty) return const Ok([]);
       final bookIdList = ids.map<int>((e) => e['book_id'] as int).toList();
-      final response = await _supabase.client
-          .from('books')
-          .select('*, authors(*), books_genres(genre_id, genres(*)), books_labels(*, labels(*)), tooks(*, chapters(*))')
-          .inFilter('id', bookIdList);
-      final books = response.map((json) => BookModel.fromJson(json)).toList();
+      final rows = await _data.booksWithRelationsByIds(bookIdList);
+      final books = rows.map((json) => BookModel.fromJson(json)).toList();
       return Ok(books);
     } catch (e) {
       return Err(BookFailure('Error al obtener vistas recientes', cause: e));
@@ -301,15 +281,14 @@ class BookRepositoryImpl implements BookRepository {
     try {
       // Public RPC for readers (visible books only). The admin-only
       // get_most_viewed_books RPC is used by the analytics dashboard.
-      final ids = await _supabase.client
-          .rpc('get_most_viewed_books_public', params: {'max_results': 6});
+      final ids = await _data.rpc(
+        'get_most_viewed_books_public',
+        params: {'max_results': 6},
+      );
       if (ids.isEmpty) return const Ok([]);
       final bookIdList = ids.map<int>((e) => e['book_id'] as int).toList();
-      final response = await _supabase.client
-          .from('books')
-          .select('*, authors(*), books_genres(genre_id, genres(*)), books_labels(*, labels(*)), tooks(*, chapters(*))')
-          .inFilter('id', bookIdList);
-      final books = response.map((json) => BookModel.fromJson(json)).toList();
+      final rows = await _data.booksWithRelationsByIds(bookIdList);
+      final books = rows.map((json) => BookModel.fromJson(json)).toList();
       return Ok(books);
     } catch (e) {
       return Err(BookFailure('Error al obtener libros más vistos', cause: e));

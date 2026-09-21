@@ -1,5 +1,5 @@
 import 'package:get_it/get_it.dart';
-import 'package:noveles/core/supabase/supabase_client.dart';
+import 'package:noveles/core/backend/data_gateway.dart';
 import 'package:noveles/features/labels/data/label_repository_impl.dart';
 import 'package:noveles/features/labels/domain/label_repository.dart';
 import 'package:noveles/features/labels/domain/create_label.dart';
@@ -23,7 +23,7 @@ final getIt = GetIt.instance;
 void initLabelsDependencies() {
   getIt.registerLazySingleton<LabelRepository>(
     () => LabelRepositoryImpl(
-      getIt<SupabaseClientProvider>(),
+      getIt<DataGateway>(),
     ),
   );
 
@@ -62,7 +62,7 @@ void initLabelsDependencies() {
 
   // Label Rules
   getIt.registerLazySingleton<LabelRuleRepository>(
-    () => LabelRuleRepositoryImpl(getIt<SupabaseClientProvider>()),
+    () => LabelRuleRepositoryImpl(getIt<DataGateway>()),
   );
 
   getIt.registerLazySingleton(() => GetRules(getIt()));

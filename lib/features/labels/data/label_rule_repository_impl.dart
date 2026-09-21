@@ -1,23 +1,21 @@
+import 'package:noveles/core/backend/data_gateway.dart';
 import 'package:noveles/core/errors/failure.dart';
 import 'package:noveles/core/errors/result.dart';
-import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/labels/data/label_rule_model.dart';
 import 'package:noveles/features/labels/domain/label_rule_entity.dart';
 import 'package:noveles/features/labels/domain/label_rule_repository.dart';
 
 class LabelRuleRepositoryImpl implements LabelRuleRepository {
-  final SupabaseClientProvider _supabase;
+  final DataGateway _data;
 
-  LabelRuleRepositoryImpl(this._supabase);
+  LabelRuleRepositoryImpl(this._data);
 
   @override
   Future<Result<List<LabelRuleEntity>>> getRules() async {
     try {
-      final response = await _supabase.client
-          .from('label_rules')
-          .select('*')
-          .order('id');
-      final rules = response.map((json) => LabelRuleModel.fromJson(json)).toList();
+      final rows = await _data.from('label_rules').order('id').rows();
+      final rules =
+          rows.map((json) => LabelRuleModel.fromJson(json)).toList();
       return Ok(rules);
     } catch (e) {
       return Err(LabelFailure('Error al obtener reglas', cause: e));
@@ -31,7 +29,7 @@ class LabelRuleRepositoryImpl implements LabelRuleRepository {
     required Map<String, dynamic> params,
   }) async {
     try {
-      await _supabase.client.from('label_rules').insert({
+      await _data.insert('label_rules', {
         'label_id': labelId,
         'rule_type': ruleType,
         'params': params,
@@ -48,10 +46,9 @@ class LabelRuleRepositoryImpl implements LabelRuleRepository {
     required Map<String, dynamic> params,
   }) async {
     try {
-      await _supabase.client
-          .from('label_rules')
-          .update({'params': params})
-          .eq('id', ruleId);
+      await _data.from('label_rules').eq('id', ruleId).update({
+        'params': params,
+      });
       return const Ok(null);
     } catch (e) {
       return Err(LabelFailure('Error al actualizar regla', cause: e));
@@ -61,7 +58,7 @@ class LabelRuleRepositoryImpl implements LabelRuleRepository {
   @override
   Future<Result<void>> deleteRule(int ruleId) async {
     try {
-      await _supabase.client.from('label_rules').delete().eq('id', ruleId);
+      await _data.from('label_rules').eq('id', ruleId).delete();
       return const Ok(null);
     } catch (e) {
       return Err(LabelFailure('Error al eliminar regla', cause: e));

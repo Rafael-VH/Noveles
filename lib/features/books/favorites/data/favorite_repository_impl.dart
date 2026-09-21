@@ -1,34 +1,34 @@
+import 'package:noveles/core/backend/data_gateway.dart';
 import 'package:noveles/core/errors/failure.dart';
 import 'package:noveles/core/errors/result.dart';
-import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/books/data/book_model.dart';
 import 'package:noveles/features/books/favorites/domain/favorite_repository.dart';
 import 'package:noveles/shared/domain/entities/book_with_relations.dart';
 
 class FavoriteRepositoryImpl implements FavoriteRepository {
-  final SupabaseClientProvider _supabase;
+  final DataGateway _data;
 
-  FavoriteRepositoryImpl(this._supabase);
+  FavoriteRepositoryImpl(this._data);
 
   @override
   Future<Result<bool>> toggleFavorite(String userId, int bookId) async {
     try {
-      final existing = await _supabase.client
+      final existing = await _data
           .from('user_favorites')
           .select('user_id')
           .eq('user_id', userId)
           .eq('book_id', bookId)
-          .maybeSingle();
+          .maybeRow();
 
       if (existing != null) {
-        await _supabase.client
+        await _data
             .from('user_favorites')
-            .delete()
             .eq('user_id', userId)
-            .eq('book_id', bookId);
+            .eq('book_id', bookId)
+            .delete();
         return const Ok(false);
       } else {
-        await _supabase.client.from('user_favorites').insert({
+        await _data.insert('user_favorites', {
           'user_id': userId,
           'book_id': bookId,
         });
@@ -42,21 +42,19 @@ class FavoriteRepositoryImpl implements FavoriteRepository {
   @override
   Future<Result<List<BookWithRelations>>> getFavorites(String userId) async {
     try {
-      final response = await _supabase.client
+      final favorites = await _data
           .from('user_favorites')
           .select('book_id')
           .eq('user_id', userId)
-          .order('created_at', ascending: false);
+          .order('created_at', ascending: false)
+          .rows();
 
-      if (response.isEmpty) return const Ok([]);
+      if (favorites.isEmpty) return const Ok([]);
 
-      final bookIds = response.map((r) => r['book_id'] as int).toList();
+      final bookIds = favorites.map((r) => r['book_id'] as int).toList();
 
-      final booksResponse = await _supabase.client
-          .from('books')
-          .select(
-              '*, authors(*), books_genres(genre_id, genres(*)), books_labels(*, labels(*)), tooks(*, chapters(*))')
-          .inFilter('id', bookIds);
+      // Aggregate read: the relation tree is resolved by the backend adapter.
+      final booksResponse = await _data.booksWithRelationsByIds(bookIds);
 
       final books = booksResponse
           .map((json) => BookModel.fromJson(json))
@@ -71,12 +69,12 @@ class FavoriteRepositoryImpl implements FavoriteRepository {
   @override
   Future<Result<bool>> isFavorite(String userId, int bookId) async {
     try {
-      final response = await _supabase.client
+      final response = await _data
           .from('user_favorites')
           .select('user_id')
           .eq('user_id', userId)
           .eq('book_id', bookId)
-          .maybeSingle();
+          .maybeRow();
 
       return Ok(response != null);
     } catch (e) {

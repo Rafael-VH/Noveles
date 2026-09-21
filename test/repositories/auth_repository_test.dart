@@ -1,136 +1,35 @@
 import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:noveles/core/backend/auth_gateway.dart';
+import 'package:noveles/core/backend/auth_identity.dart';
 import 'package:noveles/core/errors/result.dart';
-import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/auth/data/auth_repository_impl.dart';
 import 'package:noveles/features/auth/domain/entities/auth_event.dart';
 import 'package:noveles/features/profiles/domain/user_entity.dart';
 import 'package:noveles/features/profiles/domain/user_role.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
-class MockSupabaseClientProvider extends Mock implements SupabaseClientProvider {}
-
-class MockSupabaseClient extends Mock implements SupabaseClient {}
-
-class MockGoTrueClient extends Mock implements GoTrueClient {}
-
-class MockSupabaseQueryBuilder extends Mock implements SupabaseQueryBuilder {}
-
-// ignore: must_be_immutable
-class MockFilterBuilder extends Mock
-    implements PostgrestFilterBuilder<PostgrestList> {
-  PostgrestList? _data;
-
-  void thenReturns(PostgrestList data) {
-    _data = data;
-  }
-
-  @override
-  Future<U> then<U>(
-    FutureOr<U> Function(PostgrestList value) onValue, {
-    Function? onError,
-  }) async {
-    final result = onValue(_data!);
-    if (result is Future<U>) return result;
-    return result;
-  }
-}
-
-// ignore: must_be_immutable
-class MockTransformBuilder extends Mock
-    implements PostgrestTransformBuilder<Map<String, dynamic>?> {
-  final _queue = <Map<String, dynamic>?>[];
-  int _callIndex = 0;
-
-  void thenReturns(Map<String, dynamic>? data) {
-    _queue.add(data);
-  }
-
-  @override
-  Future<U> then<U>(
-    FutureOr<U> Function(Map<String, dynamic>? value) onValue, {
-    Function? onError,
-  }) async {
-    final data =
-        _callIndex < _queue.length ? _queue[_callIndex] : _queue.last;
-    _callIndex++;
-    final result = onValue(data);
-    if (result is Future<U>) return result;
-    return result;
-  }
-}
+import '../utils/backend_mocks.dart';
 
 void main() {
-  late MockSupabaseClientProvider mockProvider;
-  late MockSupabaseClient mockClient;
-  late MockGoTrueClient mockAuth;
-  late MockSupabaseQueryBuilder mockQueryBuilder;
-  late MockFilterBuilder mockFilter;
-  late MockTransformBuilder mockTransform;
+  late FakeBackend backend;
   late AuthRepositoryImpl repository;
 
+  const identity = AuthIdentity(id: 'user-1', email: 'test@example.com');
+  const profileRow = {'id': 'user-1', 'role': 'user'};
+
   setUp(() {
-    mockProvider = MockSupabaseClientProvider();
-    mockClient = MockSupabaseClient();
-    mockAuth = MockGoTrueClient();
-    mockQueryBuilder = MockSupabaseQueryBuilder();
-    mockFilter = MockFilterBuilder();
-    mockTransform = MockTransformBuilder();
-
-    when(() => mockProvider.client).thenReturn(mockClient);
-    when(() => mockClient.auth).thenReturn(mockAuth);
-
-    repository = AuthRepositoryImpl(mockProvider);
-
-    when(() => mockClient.from(any())).thenAnswer((_) => mockQueryBuilder);
-    when(() => mockQueryBuilder.select(any())).thenAnswer((_) => mockFilter);
-    when(() => mockQueryBuilder.insert(
-          any(),
-          defaultToNull: any(named: 'defaultToNull'),
-        )).thenAnswer((_) => mockFilter);
-    when(() => mockFilter.eq(any(), any())).thenAnswer((_) => mockFilter);
-    when(() => mockFilter.maybeSingle()).thenAnswer((_) => mockTransform);
-  });
-
-  tearDown(() {
-    // No cleanup needed - setUp reinitializes all mocks
+    backend = FakeBackend();
+    repository = AuthRepositoryImpl(backend.auth, backend.data);
   });
 
   group('AuthRepositoryImpl', () {
-    final gotrueUser = User(
-      id: 'user-1',
-      appMetadata: {},
-      userMetadata: null,
-      aud: '',
-      createdAt: '2024-01-01T00:00:00.000',
-      email: 'test@example.com',
-      role: '',
-      isAnonymous: false,
-    );
-
-    final gotrueSession = Session(
-      accessToken: 'token',
-      tokenType: 'bearer',
-      user: User(
-        id: 'user-1',
-        appMetadata: {},
-        userMetadata: null,
-        aud: '',
-        createdAt: '2024-01-01T00:00:00.000',
-        email: 'test@example.com',
-        role: '',
-        isAnonymous: false,
-      ),
-    );
-
     group('login', () {
       test('returns UserEntity on success', () async {
-        when(() => mockAuth.signInWithPassword(
-              email: any(named: 'email'),
-              password: any(named: 'password'),
-            )).thenAnswer((_) async => AuthResponse(user: gotrueUser));
-        mockTransform.thenReturns({
+        when(() => backend.auth.signIn('test@example.com', 'password'))
+            .thenAnswer((_) async => identity);
+        backend.maybeRow('profiles', {
           'id': 'user-1',
           'email': 'test@example.com',
           'role': 'user',
@@ -145,11 +44,9 @@ void main() {
         expect(value.role, UserRole.user);
       });
 
-      test('returns Err when user is null', () async {
-        when(() => mockAuth.signInWithPassword(
-              email: any(named: 'email'),
-              password: any(named: 'password'),
-            )).thenAnswer((_) async => AuthResponse(user: null));
+      test('returns Err when the backend reports no user', () async {
+        when(() => backend.auth.signIn(any(), any()))
+            .thenAnswer((_) async => null);
 
         final result = await repository.login('test@example.com', 'password');
 
@@ -158,20 +55,15 @@ void main() {
         expect(error.message, contains('Error al iniciar sesión'));
       });
 
-      test('creates profile on first login when profile is null', () async {
-        when(() => mockAuth.signInWithPassword(
-              email: any(named: 'email'),
-              password: any(named: 'password'),
-            )).thenAnswer((_) async => AuthResponse(user: gotrueUser));
-        // Call 1 maybeSingle: no profile exists
-        mockTransform.thenReturns(null);
-        // Call 3 maybeSingle: verification after insert returns new profile
-        mockTransform.thenReturns({
-          'id': 'user-1',
-          'role': 'user',
-        });
-        // insert() returns mockFilter; resolve the await with empty list
-        mockFilter.thenReturns(<Map<String, dynamic>>[]);
+      test('creates the profile on first login when it is missing', () async {
+        when(() => backend.auth.signIn('test@example.com', 'password'))
+            .thenAnswer((_) async => identity);
+        // Read 1: no profile yet. Read 2: the verification after the insert.
+        final reads = <Map<String, dynamic>?>[null, profileRow];
+        var read = 0;
+        when(() => backend.query('profiles').maybeRow())
+            .thenAnswer((_) async => reads[read++]);
+        backend.insertOk('profiles');
 
         final result = await repository.login('test@example.com', 'password');
 
@@ -179,18 +71,14 @@ void main() {
         final value = (result as Ok<UserEntity>).value;
         expect(value.id, 'user-1');
         expect(value.role, UserRole.user);
-        // Profile insert should have been called
-        verify(() => mockQueryBuilder.insert(
-              any(),
-              defaultToNull: any(named: 'defaultToNull'),
-            )).called(1);
+        final created = backend.capturedInsert('profiles');
+        expect(created['id'], 'user-1');
+        expect(created['role'], UserRole.user.name);
       });
 
       test('returns Err on auth failure', () async {
-        when(() => mockAuth.signInWithPassword(
-              email: any(named: 'email'),
-              password: any(named: 'password'),
-            )).thenThrow(Exception('Auth error'));
+        when(() => backend.auth.signIn(any(), any()))
+            .thenThrow(Exception('Auth error'));
 
         final result = await repository.login('test@example.com', 'password');
 
@@ -202,11 +90,9 @@ void main() {
 
     group('register', () {
       test('returns UserEntity on success', () async {
-        when(() => mockAuth.signUp(
-              email: any(named: 'email'),
-              password: any(named: 'password'),
-            )).thenAnswer((_) async => AuthResponse(user: gotrueUser));
-        mockTransform.thenReturns({
+        when(() => backend.auth.signUp('test@example.com', 'password'))
+            .thenAnswer((_) async => identity);
+        backend.maybeRow('profiles', {
           'id': 'user-1',
           'email': 'test@example.com',
           'role': 'user',
@@ -220,11 +106,9 @@ void main() {
         expect(value.email, 'test@example.com');
       });
 
-      test('returns Err when user is null', () async {
-        when(() => mockAuth.signUp(
-              email: any(named: 'email'),
-              password: any(named: 'password'),
-            )).thenAnswer((_) async => AuthResponse(user: null));
+      test('returns Err when the backend reports no user', () async {
+        when(() => backend.auth.signUp(any(), any()))
+            .thenAnswer((_) async => null);
 
         final result = await repository.register('test@example.com', 'password');
 
@@ -234,10 +118,8 @@ void main() {
       });
 
       test('returns Err on auth failure', () async {
-        when(() => mockAuth.signUp(
-              email: any(named: 'email'),
-              password: any(named: 'password'),
-            )).thenThrow(Exception('Auth error'));
+        when(() => backend.auth.signUp(any(), any()))
+            .thenThrow(Exception('Auth error'));
 
         final result = await repository.register('test@example.com', 'password');
 
@@ -249,16 +131,17 @@ void main() {
 
     group('logout', () {
       test('returns Ok on success', () async {
-        when(() => mockAuth.signOut()).thenAnswer((_) async => Future.value());
+        when(() => backend.auth.signOut()).thenAnswer((_) async {});
 
         final result = await repository.logout();
 
         expect(result, isA<Ok<void>>());
-        verify(() => mockAuth.signOut()).called(1);
+        verify(() => backend.auth.signOut()).called(1);
       });
 
       test('returns Err on error', () async {
-        when(() => mockAuth.signOut()).thenThrow(Exception('Logout error'));
+        when(() => backend.auth.signOut())
+            .thenThrow(Exception('Logout error'));
 
         final result = await repository.logout();
 
@@ -269,10 +152,9 @@ void main() {
     });
 
     group('getCurrentUser', () {
-      test('returns UserEntity when logged in', () async {
-        when(() => mockAuth.currentSession).thenReturn(gotrueSession);
-        when(() => mockAuth.currentUser).thenReturn(gotrueUser);
-        mockTransform.thenReturns({
+      test('returns UserEntity when there is a session', () async {
+        backend.signedInAs('user-1', email: 'test@example.com');
+        backend.maybeRow('profiles', {
           'id': 'user-1',
           'email': 'test@example.com',
           'role': 'user',
@@ -286,21 +168,16 @@ void main() {
         expect(value!.id, 'user-1');
       });
 
-      test('returns null when not logged in', () async {
-        when(() => mockAuth.currentSession).thenReturn(null);
-        when(() => mockAuth.currentUser).thenReturn(null);
-
+      test('returns null when there is no session', () async {
         final result = await repository.getCurrentUser();
 
         expect(result, isA<Ok<UserEntity?>>());
-        final value = (result as Ok<UserEntity?>).value;
-        expect(value, isNull);
+        expect((result as Ok<UserEntity?>).value, isNull);
       });
 
       test('returns Err on profile error', () async {
-        when(() => mockAuth.currentSession).thenReturn(gotrueSession);
-        when(() => mockAuth.currentUser).thenReturn(gotrueUser);
-        when(() => mockFilter.eq(any(), any()))
+        backend.signedInAs('user-1', email: 'test@example.com');
+        when(() => backend.query('profiles').eq(any(), any()))
             .thenThrow(Exception('Profile error'));
 
         final result = await repository.getCurrentUser();
@@ -312,60 +189,54 @@ void main() {
     });
 
     group('onAuthStateChange', () {
+      late StreamController<AuthIdentityEvent> controller;
+
+      setUp(() {
+        controller = StreamController<AuthIdentityEvent>();
+        when(() => backend.auth.stateChanges())
+            .thenAnswer((_) => controller.stream);
+      });
+
+      tearDown(() => controller.close());
+
       test('maps signedIn event', () async {
-        final controller = StreamController<AuthState>();
-        when(() => mockAuth.onAuthStateChange).thenAnswer((_) => controller.stream);
+        final events = repository.onAuthStateChange().take(1).toList();
 
-        final stream = repository.onAuthStateChange();
-        final futures = stream.take(1).toList();
+        controller.add(AuthIdentityEvent.signedIn);
 
-        controller.add(AuthState(AuthChangeEvent.signedIn, null));
-        await controller.close();
-
-        final events = await futures;
-        expect(events.first, AuthEvent.signedIn);
+        expect((await events).first, AuthEvent.signedIn);
       });
 
       test('maps signedOut event', () async {
-        final controller = StreamController<AuthState>();
-        when(() => mockAuth.onAuthStateChange).thenAnswer((_) => controller.stream);
+        final events = repository.onAuthStateChange().take(1).toList();
 
-        final stream = repository.onAuthStateChange();
-        final futures = stream.take(1).toList();
+        controller.add(AuthIdentityEvent.signedOut);
 
-        controller.add(AuthState(AuthChangeEvent.signedOut, null));
-        await controller.close();
-
-        final events = await futures;
-        expect(events.first, AuthEvent.signedOut);
+        expect((await events).first, AuthEvent.signedOut);
       });
 
       test('maps tokenRefreshed event', () async {
-        final controller = StreamController<AuthState>();
-        when(() => mockAuth.onAuthStateChange).thenAnswer((_) => controller.stream);
+        final events = repository.onAuthStateChange().take(1).toList();
 
-        final stream = repository.onAuthStateChange();
-        final futures = stream.take(1).toList();
+        controller.add(AuthIdentityEvent.tokenRefreshed);
 
-        controller.add(AuthState(AuthChangeEvent.tokenRefreshed, null));
-        await controller.close();
+        expect((await events).first, AuthEvent.tokenRefreshed);
+      });
 
-        final events = await futures;
-        expect(events.first, AuthEvent.tokenRefreshed);
+      test('maps unknown events to userChanged', () async {
+        final events = repository.onAuthStateChange().take(1).toList();
+
+        controller.add(AuthIdentityEvent.unknown);
+
+        expect((await events).first, AuthEvent.userChanged);
       });
 
       test('handles stream errors by emitting authError', () async {
-        final controller = StreamController<AuthState>();
-        when(() => mockAuth.onAuthStateChange).thenAnswer((_) => controller.stream);
-
-        final stream = repository.onAuthStateChange();
-        final futures = stream.take(1).toList();
+        final events = repository.onAuthStateChange().take(1).toList();
 
         controller.addError(Exception('Stream error'));
-        await controller.close();
 
-        final events = await futures;
-        expect(events.first, AuthEvent.authError);
+        expect((await events).first, AuthEvent.authError);
       });
     });
   });

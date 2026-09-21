@@ -1,212 +1,51 @@
-import 'dart:async';
-import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:noveles/core/errors/result.dart';
-import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/chapters/data/chapter_repository_impl.dart';
 import 'package:noveles/features/chapters/domain/chapter_content_type.dart';
 import 'package:noveles/features/chapters/domain/chapter_entity.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
-class MockSupabaseClientProvider extends Mock implements SupabaseClientProvider {}
-
-class MockSupabaseClient extends Mock implements SupabaseClient {}
-
-class MockSupabaseQueryBuilder extends Mock implements SupabaseQueryBuilder {}
-
-/// Mock for PostgrestFilterBuilder<PostgrestList>.
-/// Overrides then() directly to avoid Mocktail's difficulty with Future methods.
-/// Error tests use Mocktail's thenThrow on chain methods instead of going
-/// through the await mechanism (which triggers zone error reporting).
-// ignore: must_be_immutable
-class MockFilterBuilder extends Mock
-    implements PostgrestFilterBuilder<PostgrestList> {
-  PostgrestList? _data;
-
-  void thenReturns(PostgrestList data) {
-    _data = data;
-  }
-
-  @override
-  Future<U> then<U>(
-    FutureOr<U> Function(PostgrestList value) onValue, {
-    Function? onError,
-  }) async {
-    final result = onValue(_data!);
-    if (result is Future<U>) return result;
-    return result;
-  }
-}
-
-/// Mock for PostgrestTransformBuilder<Map<String, dynamic>?> (returned by
-/// maybeSingle()). Also overrides then() for await support.
-// ignore: must_be_immutable
-class MockTransformBuilder extends Mock
-    implements PostgrestTransformBuilder<Map<String, dynamic>?> {
-  Map<String, dynamic>? _data;
-
-  void thenReturns(Map<String, dynamic>? data) {
-    _data = data;
-  }
-
-  @override
-  Future<U> then<U>(
-    FutureOr<U> Function(Map<String, dynamic>? value) onValue, {
-    Function? onError,
-  }) async {
-    final result = onValue(_data);
-    if (result is Future<U>) return result;
-    return result;
-  }
-}
-
-class MockGoTrueClient extends Mock implements GoTrueClient {}
-
-class MockSupabaseStorageClient extends Mock implements SupabaseStorageClient {}
-
-class MockStorageFileApi extends Mock implements StorageFileApi {}
-
-/// Mock for PostgrestTransformBuilder<List<Map<String, dynamic>>> — returned
-/// by filterBuilder.select() before .single() is called.
-// ignore: must_be_immutable
-class MockSelectBuilder extends Mock
-    implements PostgrestTransformBuilder<List<Map<String, dynamic>>> {
-  List<Map<String, dynamic>>? _data;
-
-  void thenReturns(List<Map<String, dynamic>> data) {
-    _data = data;
-  }
-
-  @override
-  Future<U> then<U>(
-    FutureOr<U> Function(List<Map<String, dynamic>> value) onValue, {
-    Function? onError,
-  }) async {
-    final result = onValue(_data!);
-    if (result is Future<U>) return result;
-    return result;
-  }
-}
-
-/// Mock for PostgrestTransformBuilder<Map<String, dynamic>> — returned by
-/// .select('id').single() chain in createBook.
-// ignore: must_be_immutable
-class MockMapResultBuilder extends Mock
-    implements PostgrestTransformBuilder<Map<String, dynamic>> {
-  Map<String, dynamic>? _data;
-
-  void thenReturns(Map<String, dynamic> data) {
-    _data = data;
-  }
-
-  @override
-  Future<U> then<U>(
-    FutureOr<U> Function(Map<String, dynamic> value) onValue, {
-    Function? onError,
-  }) async {
-    final result = onValue(_data!);
-    if (result is Future<U>) return result;
-    return result;
-  }
-}
+import '../utils/backend_mocks.dart';
 
 void main() {
-  late MockSupabaseClientProvider mockProvider;
-  late MockSupabaseClient mockClient;
-  late MockSupabaseQueryBuilder mockQueryBuilder;
-  late MockFilterBuilder mockFilter;
-  late MockFilterBuilder mockReadFilter;
-  late MockTransformBuilder mockTransform;
-  late MockSelectBuilder mockSelectBuilder;
-  late MockMapResultBuilder mockMapResult;
-  late MockGoTrueClient mockAuth;
-  late MockSupabaseStorageClient mockStorage;
-  late MockStorageFileApi mockStorageFileApi;
+  late FakeBackend backend;
   late ChapterRepositoryImpl repository;
 
-  setUpAll(() {
-    registerFallbackValue(ChapterEntity(
-      id: 0,
-      createdAt: DateTime(2024),
-      number: '',
-      title: '',
-      content: '',
-      tookId: 0,
-    ));
-    registerFallbackValue(File(''));
-  });
+  Map<String, dynamic> chapterJson({int id = 1, String title = 'Chapter 1'}) => {
+        'id': id,
+        'created_at': '2024-01-01T00:00:00.000',
+        'number': '1',
+        'title': title,
+        'content': 'ch1.txt',
+        'took_id': 1,
+      };
+
+  ChapterEntity chapter({
+    int id = 0,
+    String title = 'Chapter 1',
+    String content = '',
+    ChapterContentType contentType = ChapterContentType.storagePath,
+  }) =>
+      ChapterEntity(
+        id: id,
+        createdAt: DateTime(2024),
+        number: '1',
+        title: title,
+        content: content,
+        tookId: 1,
+        createdBy: null,
+        contentType: contentType,
+      );
 
   setUp(() {
-    mockProvider = MockSupabaseClientProvider();
-    mockClient = MockSupabaseClient();
-    mockQueryBuilder = MockSupabaseQueryBuilder();
-    mockFilter = MockFilterBuilder();
-    mockReadFilter = MockFilterBuilder();
-    mockTransform = MockTransformBuilder();
-    mockSelectBuilder = MockSelectBuilder();
-    mockMapResult = MockMapResultBuilder();
-    mockAuth = MockGoTrueClient();
-    mockStorage = MockSupabaseStorageClient();
-    mockStorageFileApi = MockStorageFileApi();
-
-    when(() => mockProvider.client).thenReturn(mockClient);
-    when(() => mockClient.auth).thenReturn(mockAuth);
-    when(() => mockAuth.currentUser).thenReturn(null);
-    when(() => mockClient.storage).thenReturn(mockStorage);
-    when(() => mockStorage.from(any())).thenReturn(mockStorageFileApi);
-
-    repository = ChapterRepositoryImpl(mockProvider);
-
-    when(() => mockClient.from(any())).thenAnswer((_) => mockQueryBuilder);
-    when(() => mockQueryBuilder.select(any())).thenAnswer((_) => mockFilter);
-    when(() => mockQueryBuilder.insert(
-          any(),
-          defaultToNull: any(named: 'defaultToNull'),
-        )).thenAnswer((_) => mockFilter);
-    when(() => mockQueryBuilder.update(any())).thenAnswer((_) => mockFilter);
-    when(() => mockQueryBuilder.delete()).thenAnswer((_) => mockFilter);
-    when(() => mockFilter.eq(any(), any())).thenAnswer((_) => mockFilter);
-    when(() => mockFilter.inFilter(any(), any())).thenAnswer((_) => mockFilter);
-    when(() => mockReadFilter.eq(any(), any())).thenAnswer((_) => mockReadFilter);
-    when(() => mockReadFilter.inFilter(any(), any())).thenAnswer((_) => mockReadFilter);
-    when(() => mockFilter.order(
-          any(),
-          ascending: any(named: 'ascending'),
-          nullsFirst: any(named: 'nullsFirst'),
-          referencedTable: any(named: 'referencedTable'),
-        )).thenAnswer((_) => mockFilter);
-    when(() => mockFilter.limit(
-          any(),
-          referencedTable: any(named: 'referencedTable'),
-        )).thenAnswer((_) => mockFilter);
-    when(() => mockFilter.range(
-          any(),
-          any(),
-        )).thenAnswer((_) => mockFilter);
-    when(() => mockFilter.maybeSingle()).thenAnswer((_) => mockTransform);
-    // Mock the .select('id').single() chain for createChapter
-    when(() => mockFilter.select(any())).thenAnswer((_) => mockSelectBuilder);
-    when(() => mockSelectBuilder.single()).thenAnswer((_) => mockMapResult);
-  });
-
-  tearDown(() {
-    // No cleanup needed - setUp reinitializes all mocks
+    backend = FakeBackend();
+    repository = ChapterRepositoryImpl(backend.data, backend.storage);
   });
 
   group('ChapterRepositoryImpl', () {
     group('getChapters', () {
       test('returns list of ChapterEntity on success', () async {
-        mockFilter.thenReturns([
-          {
-            'id': 1,
-            'created_at': '2024-01-01T00:00:00.000',
-            'number': '1',
-            'title': 'Chapter 1',
-            'content': 'ch1.txt',
-            'took_id': 1,
-          }
-        ]);
+        backend.rows('chapters', [chapterJson()]);
 
         final result = await repository.getChapters();
 
@@ -214,18 +53,23 @@ void main() {
         final value = (result as Ok<List<ChapterEntity>>).value;
         expect(value.length, 1);
         expect(value.first.title, 'Chapter 1');
-        verify(() => mockClient.from('chapters')).called(1);
+        verify(() => backend.data.from('chapters')).called(1);
+      });
+
+      test('pages with an explicit range', () async {
+        backend.rows('chapters', []);
+
+        await repository.getChapters(page: 3, pageSize: 10);
+
+        verify(() => backend.query('chapters').range(20, 29)).called(1);
       });
 
       test('returns Err on error', () async {
-        when(() => mockFilter.order(
-              any(),
-              ascending: any(named: 'ascending'),
-              nullsFirst: any(named: 'nullsFirst'),
-              referencedTable: any(named: 'referencedTable'),
-            )).thenThrow(Exception('DB error'));
+        when(() => backend.query('chapters').rows())
+            .thenThrow(Exception('DB error'));
 
         final result = await repository.getChapters();
+
         expect(result, isA<Err<List<ChapterEntity>>>());
         final error = (result as Err<List<ChapterEntity>>).error;
         expect(error.message, contains('Error al obtener capítulos'));
@@ -234,14 +78,7 @@ void main() {
 
     group('getChapterById', () {
       test('returns ChapterEntity when found', () async {
-        mockTransform.thenReturns({
-          'id': 1,
-          'created_at': '2024-01-01T00:00:00.000',
-          'number': '1',
-          'title': 'Chapter 1',
-          'content': 'ch1.txt',
-          'took_id': 1,
-        });
+        backend.maybeRow('chapters', chapterJson());
 
         final result = await repository.getChapterById(1);
 
@@ -252,20 +89,20 @@ void main() {
       });
 
       test('returns null when not found', () async {
-        mockTransform.thenReturns(null);
+        backend.maybeRow('chapters', null);
 
         final result = await repository.getChapterById(999);
 
         expect(result, isA<Ok<ChapterEntity?>>());
-        final value = (result as Ok<ChapterEntity?>).value;
-        expect(value, isNull);
+        expect((result as Ok<ChapterEntity?>).value, isNull);
       });
 
       test('returns Err on error', () async {
-        when(() => mockFilter.eq(any(), any()))
+        when(() => backend.query('chapters').eq(any(), any()))
             .thenThrow(Exception('DB error'));
 
         final result = await repository.getChapterById(1);
+
         expect(result, isA<Err<ChapterEntity?>>());
         final error = (result as Err<ChapterEntity?>).error;
         expect(error.message, contains('Error al obtener capítulo'));
@@ -273,88 +110,100 @@ void main() {
     });
 
     group('createChapter', () {
-      test('returns Ok with new ID on success', () async {
-        // Mock the .select('id').single() chain
-        mockMapResult.thenReturns({'id': 42});
+      test('returns the new id and asks for it back', () async {
+        backend.insertReturnsId('chapters', 42);
 
         final result = await repository.createChapter(
-          ChapterEntity(
-            id: 0,
-            createdAt: DateTime(2024),
-            number: '1',
-            title: 'New Chapter',
-            content: '',
-            tookId: 1,
-            createdBy: null,
-          ),
+          chapter(title: 'New Chapter'),
         );
 
         expect(result, isA<Ok<int>>());
         expect((result as Ok<int>).value, 42);
-        verify(() => mockQueryBuilder.insert(
-              any(),
-              defaultToNull: any(named: 'defaultToNull'),
-            )).called(1);
+        verify(() => backend.data.insert('chapters', any(), returning: 'id'))
+            .called(1);
       });
 
       test('returns Err on error', () async {
-        when(() => mockQueryBuilder.insert(
+        when(() => backend.data.insert(
               any(),
-              defaultToNull: any(named: 'defaultToNull'),
+              any(),
+              returning: any(named: 'returning'),
             )).thenThrow(Exception('Insert failed'));
 
-        final result = await repository.createChapter(
-          ChapterEntity(
-            id: 0,
-            createdAt: DateTime(2024),
-            number: '1',
-            title: '',
-            content: '',
-            tookId: 1,
-            createdBy: null,
-          ),
-        );
-        expect(result, isA<Err<void>>());
-        final error = (result as Err<void>).error;
+        final result = await repository.createChapter(chapter());
+
+        expect(result, isA<Err<int>>());
+        final error = (result as Err<int>).error;
         expect(error.message, contains('Error al crear capítulo'));
+      });
+
+      test('persists content_type inline', () async {
+        backend.insertReturnsId('chapters', 7);
+
+        await repository.createChapter(chapter(
+          title: 'Capítulo inline',
+          content: 'texto directo',
+          contentType: ChapterContentType.inline,
+        ));
+
+        final values = backend.capturedInsertReturning('chapters');
+        expect(values['content_type'], 'inline');
+        expect(values['content'], 'texto directo');
+      });
+
+      test('defaults content_type to storagePath', () async {
+        backend.insertReturnsId('chapters', 8);
+
+        await repository.createChapter(chapter(content: 'userId/123.txt'));
+
+        final values = backend.capturedInsertReturning('chapters');
+        expect(values['content_type'], 'storagePath');
+      });
+
+      test('stamps ownership from the acting identity', () async {
+        backend.signedInAs('user-3');
+        backend.insertReturnsId('chapters', 9);
+
+        await repository.createChapter(chapter());
+
+        expect(backend.capturedInsertReturning('chapters')['created_by'],
+            'user-3');
       });
     });
 
     group('updateChapter', () {
-      test('returns Ok on success', () async {
-        mockFilter.thenReturns(<Map<String, dynamic>>[]);
+      test('returns Ok and targets the chapter id', () async {
+        backend.updateOk('chapters');
 
         final result = await repository.updateChapter(
-          ChapterEntity(
-            id: 1,
-            createdAt: DateTime(2024),
-            number: '1',
-            title: 'Updated',
-            content: '',
-            tookId: 1,
-            createdBy: null,
-          ),
+          chapter(id: 1, title: 'Updated'),
         );
 
         expect(result, isA<Ok<void>>());
-        verify(() => mockQueryBuilder.update(any())).called(1);
+        verify(() => backend.query('chapters').eq('id', 1)).called(1);
+        expect(backend.capturedUpdate('chapters')['title'], 'Updated');
+      });
+
+      test('persists content_type', () async {
+        backend.updateOk('chapters');
+
+        final result = await repository.updateChapter(chapter(
+          id: 1,
+          title: 'Capítulo inline',
+          content: 'texto directo',
+          contentType: ChapterContentType.inline,
+        ));
+
+        expect(result, isA<Ok<void>>());
+        expect(backend.capturedUpdate('chapters')['content_type'], 'inline');
       });
 
       test('returns Err on error', () async {
-        when(() => mockFilter.eq(any(), any()))
+        when(() => backend.query('chapters').eq(any(), any()))
             .thenThrow(Exception('Update failed'));
 
-        final result = await repository.updateChapter(
-          ChapterEntity(
-            id: 1,
-            createdAt: DateTime(2024),
-            number: '1',
-            title: '',
-            content: '',
-            tookId: 1,
-            createdBy: null,
-          ),
-        );
+        final result = await repository.updateChapter(chapter(id: 1));
+
         expect(result, isA<Err<void>>());
         final error = (result as Err<void>).error;
         expect(error.message, contains('Error al actualizar capítulo'));
@@ -363,19 +212,20 @@ void main() {
 
     group('deleteChapter', () {
       test('returns Ok on success', () async {
-        mockFilter.thenReturns(<Map<String, dynamic>>[]);
+        backend.deleteOk('chapters');
 
         final result = await repository.deleteChapter(1);
 
         expect(result, isA<Ok<void>>());
-        verify(() => mockFilter.eq('id', 1)).called(1);
+        verify(() => backend.query('chapters').eq('id', 1)).called(1);
       });
 
       test('returns Err on error', () async {
-        when(() => mockFilter.eq(any(), any()))
+        when(() => backend.query('chapters').eq(any(), any()))
             .thenThrow(Exception('Delete failed'));
 
         final result = await repository.deleteChapter(1);
+
         expect(result, isA<Err<void>>());
         final error = (result as Err<void>).error;
         expect(error.message, contains('Error al eliminar capítulo'));
@@ -383,23 +233,44 @@ void main() {
     });
 
     group('downloadContent', () {
-      test('returns path as-is for inline content', () async {
+      test('returns inline content verbatim without touching storage',
+          () async {
         final result = await repository.downloadContent(
-          'inline text',
+          'Hello world',
           contentType: ChapterContentType.inline,
         );
 
         expect(result, isA<Ok<String>>());
-        final value = (result as Ok<String>).value;
-        expect(value, 'inline text');
+        expect((result as Ok<String>).value, 'Hello world');
+        verifyNever(() => backend.storage.download(any(), any()));
+      });
+
+      test('reads storage for a storagePath chapter', () async {
+        when(() => backend.storage.download('chapters', any()))
+            .thenAnswer((_) async => [72, 105]);
+
+        final result = await repository.downloadContent(
+          'ch1.txt',
+          contentType: ChapterContentType.storagePath,
+        );
+
+        expect(result, isA<Ok<String>>());
+        expect((result as Ok<String>).value, 'Hi');
+      });
+
+      test('defaults to the storagePath branch', () async {
+        when(() => backend.storage.download('chapters', any()))
+            .thenAnswer((_) async => [72]);
+
+        final result = await repository.downloadContent('ch1.txt');
+
+        expect(result, isA<Ok<String>>());
+        verify(() => backend.storage.download('chapters', 'ch1.txt')).called(1);
       });
 
       test('returns Err on storage download error', () async {
-        when(() => mockStorageFileApi.download(
-              any(),
-              transform: any(named: 'transform'),
-              queryParams: any(named: 'queryParams'),
-            )).thenThrow(Exception('Download failed'));
+        when(() => backend.storage.download(any(), any()))
+            .thenThrow(Exception('Download failed'));
 
         final result = await repository.downloadContent(
           'ch1.txt',
@@ -410,66 +281,29 @@ void main() {
         final error = (result as Err<String>).error;
         expect(error.message, contains('Error al descargar contenido'));
       });
-
-      test('inline content does not attempt storage download', () async {
-        final result = await repository.downloadContent(
-          'plain text',
-          contentType: ChapterContentType.inline,
-        );
-
-        expect(result, isA<Ok<String>>());
-        verifyNever(() => mockStorageFileApi.download(
-              any(),
-              transform: any(named: 'transform'),
-              queryParams: any(named: 'queryParams'),
-            ));
-      });
-
-      test('storagePath uses default contentType when not specified', () async {
-        when(() => mockStorageFileApi.download(
-              any(),
-              transform: any(named: 'transform'),
-              queryParams: any(named: 'queryParams'),
-            )).thenThrow(Exception('Download failed'));
-
-        final result = await repository.downloadContent('ch1.txt');
-
-        expect(result, isA<Err<String>>());
-      });
-
-      test('inline content returns path verbatim without touching storage', () async {
-        final result = await repository.downloadContent(
-          'Hello world',
-          contentType: ChapterContentType.inline,
-        );
-
-        expect(result, isA<Ok<String>>());
-        expect((result as Ok<String>).value, 'Hello world');
-        verifyNever(() => mockStorageFileApi.download(
-              any(),
-              transform: any(named: 'transform'),
-              queryParams: any(named: 'queryParams'),
-            ));
-      });
     });
 
     group('markChapterAsRead', () {
-      test('returns Ok on success', () async {
-        mockFilter.thenReturns(<Map<String, dynamic>>[]);
+      test('returns Ok and records the reader', () async {
+        backend.insertOk('chapter_reads');
 
         final result = await repository.markChapterAsRead(1, 'user1');
 
         expect(result, isA<Ok<void>>());
-        verify(() => mockClient.from('chapter_reads')).called(1);
+        final values = backend.capturedInsert('chapter_reads');
+        expect(values['chapter_id'], 1);
+        expect(values['user_id'], 'user1');
       });
 
       test('returns Err on error', () async {
-        when(() => mockQueryBuilder.insert(
+        when(() => backend.data.insert(
               any(),
-              defaultToNull: any(named: 'defaultToNull'),
+              any(),
+              returning: any(named: 'returning'),
             )).thenThrow(Exception('Insert failed'));
 
         final result = await repository.markChapterAsRead(1, 'user1');
+
         expect(result, isA<Err<void>>());
         final error = (result as Err<void>).error;
         expect(error.message, contains('Error al marcar capítulo como leído'));
@@ -477,48 +311,40 @@ void main() {
     });
 
     group('getReadChapterIds', () {
-      test('returns set of chapter IDs on success', () async {
-        // First query: chapters table to get chapter IDs for this took
-        mockFilter.thenReturns([
+      test('scopes the read chapters of a took to the current user', () async {
+        backend.rows('chapters', [
           {'id': 10},
           {'id': 11},
         ]);
-        // Second query: chapter_reads to get read chapters
-        mockReadFilter.thenReturns([
+        backend.rows('chapter_reads', [
           {'chapter_id': 10},
         ]);
-        // Stub the second from() call to return a fresh filter for chapter_reads
-        when(() => mockClient.from('chapter_reads'))
-            .thenAnswer((_) {
-          final qb = MockSupabaseQueryBuilder();
-          when(() => qb.select(any())).thenAnswer((_) => mockReadFilter);
-          return qb;
-        });
 
         final result = await repository.getReadChapterIds(5, 'user1');
 
         expect(result, isA<Ok<Set<int>>>());
-        final value = (result as Ok<Set<int>>).value;
-        expect(value, {10});
-        verify(() => mockClient.from('chapters')).called(1);
-        verify(() => mockClient.from('chapter_reads')).called(1);
+        expect((result as Ok<Set<int>>).value, {10});
+        verify(() => backend.query('chapters').eq('took_id', 5)).called(1);
+        verify(() => backend.query('chapter_reads').inList('chapter_id', [10, 11]))
+            .called(1);
       });
 
-      test('returns empty set when no chapters for this took', () async {
-        mockFilter.thenReturns(<Map<String, dynamic>>[]);
+      test('skips the second read when the took has no chapters', () async {
+        backend.rows('chapters', []);
 
         final result = await repository.getReadChapterIds(999, 'user1');
 
         expect(result, isA<Ok<Set<int>>>());
-        final value = (result as Ok<Set<int>>).value;
-        expect(value, isEmpty);
+        expect((result as Ok<Set<int>>).value, isEmpty);
+        verifyNever(() => backend.data.from('chapter_reads'));
       });
 
       test('returns Err on error', () async {
-        when(() => mockFilter.eq(any(), any()))
+        when(() => backend.query('chapters').eq(any(), any()))
             .thenThrow(Exception('Query failed'));
 
         final result = await repository.getReadChapterIds(1, 'user1');
+
         expect(result, isA<Err<Set<int>>>());
         final error = (result as Err<Set<int>>).error;
         expect(error.message, contains('Error al obtener capítulos leídos'));

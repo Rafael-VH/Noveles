@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
-import 'package:noveles/core/supabase/supabase_client.dart';
+import 'package:noveles/core/backend/data_gateway.dart';
+import 'package:noveles/core/backend/storage_gateway.dart';
 import 'package:noveles/features/chapters/data/chapter_repository_impl.dart';
 import 'package:noveles/features/chapters/domain/chapter_repository.dart';
 import 'package:noveles/features/chapters/domain/create_chapter.dart';
@@ -18,7 +19,8 @@ final getIt = GetIt.instance;
 void initChaptersDependencies() {
   getIt.registerLazySingleton<ChapterRepository>(
     () => ChapterRepositoryImpl(
-      getIt<SupabaseClientProvider>(),
+      getIt<DataGateway>(),
+      getIt<StorageGateway>(),
     ),
   );
 

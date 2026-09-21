@@ -1,264 +1,94 @@
-import 'dart:async';
 import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:noveles/core/errors/result.dart';
-import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/books/data/book_repository_impl.dart';
 import 'package:noveles/features/books/domain/book_entity.dart';
 import 'package:noveles/shared/domain/entities/book_with_relations.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
-class MockSupabaseClientProvider extends Mock implements SupabaseClientProvider {}
-
-class MockSupabaseClient extends Mock implements SupabaseClient {}
-
-class MockSupabaseQueryBuilder extends Mock implements SupabaseQueryBuilder {}
-
-/// Mock for PostgrestFilterBuilder<PostgrestList> (the type returned by
-/// select(), insert(), update(), delete(), and used for eq/order/limit chains).
-/// Overrides then() directly instead of stubbing it because Mocktail has
-/// difficulty with methods from Future for await-able types.
-// ignore: must_be_immutable
-class MockFilterBuilder extends Mock
-    implements PostgrestFilterBuilder<PostgrestList> {
-  PostgrestList? _data;
-
-  void thenReturns(PostgrestList data) {
-    _data = data;
-  }
-
-  @override
-  Future<U> then<U>(
-    FutureOr<U> Function(PostgrestList value) onValue, {
-    Function? onError,
-  }) async {
-    final result = onValue(_data!);
-    if (result is Future<U>) return result;
-    return result;
-  }
-}
-
-// ignore: must_be_immutable
-class MockTransformBuilder extends Mock
-    implements PostgrestTransformBuilder<Map<String, dynamic>?> {
-  Map<String, dynamic>? _data;
-
-  void thenReturns(Map<String, dynamic>? data) {
-    _data = data;
-  }
-
-  @override
-  Future<U> then<U>(
-    FutureOr<U> Function(Map<String, dynamic>? value) onValue, {
-    Function? onError,
-  }) async {
-    final result = onValue(_data);
-    if (result is Future<U>) return result;
-    return result;
-  }
-}
-
-/// Mock for PostgrestTransformBuilder<Map<String, dynamic>> — used by the
-/// ".select('id').single()" chain in createBook.
-// ignore: must_be_immutable
-class MockMapResultBuilder extends Mock
-    implements PostgrestTransformBuilder<Map<String, dynamic>> {
-  Map<String, dynamic>? _data;
-
-  void thenReturns(Map<String, dynamic> data) {
-    _data = data;
-  }
-
-  @override
-  Future<U> then<U>(
-    FutureOr<U> Function(Map<String, dynamic> value) onValue, {
-    Function? onError,
-  }) async {
-    final result = onValue(_data!);
-    if (result is Future<U>) return result;
-    return result;
-  }
-}
-
-/// Mock for PostgrestTransformBuilder<List<Map<String, dynamic>>> — returned
-/// by filterBuilder.select() before .single() is called.
-// ignore: must_be_immutable
-// ignore: must_be_immutable
-class MockRpcValueBuilder extends Mock
-    implements PostgrestFilterBuilder<dynamic> {
-  dynamic _data;
-
-  void thenReturns(dynamic data) {
-    _data = data;
-  }
-
-  @override
-  Future<U> then<U>(
-    FutureOr<U> Function(dynamic value) onValue, {
-    Function? onError,
-  }) async {
-    final result = onValue(_data);
-    if (result is Future<U>) return result;
-    return result;
-  }
-}
-
-class MockSelectBuilder extends Mock
-    implements PostgrestTransformBuilder<List<Map<String, dynamic>>> {
-  List<Map<String, dynamic>>? _data;
-
-  void thenReturns(List<Map<String, dynamic>> data) {
-    _data = data;
-  }
-
-  @override
-  Future<U> then<U>(
-    FutureOr<U> Function(List<Map<String, dynamic>> value) onValue, {
-    Function? onError,
-  }) async {
-    final result = onValue(_data!);
-    if (result is Future<U>) return result;
-    return result;
-  }
-}
-
-class MockGoTrueClient extends Mock implements GoTrueClient {}
-
-class MockSupabaseStorageClient extends Mock implements SupabaseStorageClient {}
-
-class MockStorageFileApi extends Mock implements StorageFileApi {}
+import '../utils/backend_mocks.dart';
 
 void main() {
-  late MockSupabaseClientProvider mockProvider;
-  late MockSupabaseClient mockClient;
-  late MockSupabaseQueryBuilder mockQueryBuilder;
-  late MockFilterBuilder mockFilter;
-  late MockFilterBuilder mockRpcFilter;
-  late MockGoTrueClient mockAuth;
-  late MockSupabaseStorageClient mockStorage;
-  late MockStorageFileApi mockStorageFileApi;
+  late FakeBackend backend;
   late BookRepositoryImpl repository;
 
-  setUpAll(() {
-    registerFallbackValue(BookEntity(
-      id: 0,
-      createdAt: DateTime(2024),
-      cover: '',
-      name: '',
-      short: '',
-      alternative: '',
-      description: '',
-      authorId: 0,
-      author: '',
-      country: '',
-      state: '',
-      type: '',
-      release: '',
-      tookCount: 0,
-      chapterCount: 0,
-      source: '',
-      link: '',
-      isFavorite: false,
-      isVisible: true,
-      listGenreIds: const [],
-      listTookIds: const [],
-      listLabelIds: const [],
-      createdBy: null,
-    ));
-    registerFallbackValue(File(''));
-  });
+  /// A row as the adapter returns it: the book plus its resolved relations.
+  Map<String, dynamic> bookJson({int id = 1, String name = 'Test Book'}) => {
+        'id': id,
+        'created_at': '2024-01-01T00:00:00.000',
+        'cover': 'cover.jpg',
+        'name': name,
+        'short': '',
+        'alternative': '',
+        'description': '',
+        'author_id': 1,
+        'author': 'Author',
+        'country': 'JP',
+        'state': 'ongoing',
+        'type': 'novel',
+        'release': '2024',
+        'took_count': 5,
+        'chapter_count': 10,
+        'source': '',
+        'link': '',
+        'is_favorite': false,
+        'is_visible': true,
+        'authors': {'id': 1, 'name': 'Author', 'created_at': '2024-01-01'},
+        'books_genres': <Map<String, dynamic>>[],
+        'books_labels': <Map<String, dynamic>>[],
+        'tooks': <Map<String, dynamic>>[],
+      };
+
+  BookEntity book({
+    int id = 0,
+    String name = 'Test Book',
+    String cover = '',
+    bool isVisible = true,
+  }) =>
+      BookEntity(
+        id: id,
+        createdAt: DateTime(2024),
+        cover: cover,
+        name: name,
+        short: '',
+        alternative: '',
+        description: '',
+        authorId: 1,
+        author: 'Author',
+        country: '',
+        state: '',
+        type: '',
+        release: '',
+        tookCount: 0,
+        chapterCount: 0,
+        source: '',
+        link: '',
+        isFavorite: false,
+        isVisible: isVisible,
+        listGenreIds: const [],
+        listTookIds: const [],
+        listLabelIds: const [],
+        createdBy: null,
+      );
+
+  /// Stubs the aggregate read used by `getBooks`.
+  void stubBooksWithRelations(List<Map<String, dynamic>> rows) =>
+      when(() => backend.data.booksWithRelations(
+            onlyVisible: any(named: 'onlyVisible'),
+            limit: any(named: 'limit'),
+            offset: any(named: 'offset'),
+          )).thenAnswer((_) async => rows);
 
   setUp(() {
-    mockProvider = MockSupabaseClientProvider();
-    mockClient = MockSupabaseClient();
-    mockQueryBuilder = MockSupabaseQueryBuilder();
-    mockFilter = MockFilterBuilder();
-    mockRpcFilter = MockFilterBuilder();
-    mockAuth = MockGoTrueClient();
-    mockStorage = MockSupabaseStorageClient();
-    mockStorageFileApi = MockStorageFileApi();
-
-    when(() => mockProvider.client).thenReturn(mockClient);
-    when(() => mockClient.auth).thenReturn(mockAuth);
-    when(() => mockAuth.currentUser).thenReturn(null);
-    when(() => mockClient.storage).thenReturn(mockStorage);
-    when(() => mockStorage.from(any())).thenReturn(mockStorageFileApi);
-
-    repository = BookRepositoryImpl(mockProvider);
-
-    // RPC returns a separate filter instance
-    when(() => mockClient.rpc(any(), params: any(named: 'params')))
-        .thenAnswer((_) => mockRpcFilter);
-
-    // Default chain: from() → queryBuilder
-    when(() => mockClient.from(any())).thenAnswer((_) => mockQueryBuilder);
-    when(() => mockQueryBuilder.select(any())).thenAnswer((_) => mockFilter);
-    when(() => mockQueryBuilder.insert(
-          any(),
-          defaultToNull: any(named: 'defaultToNull'),
-        )).thenAnswer((_) => mockFilter);
-    when(() => mockQueryBuilder.update(any())).thenAnswer((_) => mockFilter);
-    when(() => mockQueryBuilder.delete()).thenAnswer((_) => mockFilter);
-
-    // Default chain: filter methods return filter
-    when(() => mockFilter.eq(any(), any())).thenAnswer((_) => mockFilter);
-    when(() => mockFilter.inFilter(any(), any())).thenAnswer((_) => mockFilter);
-    when(() => mockFilter.filter(any(), any(), any())).thenAnswer((_) => mockFilter);
-    when(() => mockFilter.order(
-          any(),
-          ascending: any(named: 'ascending'),
-          nullsFirst: any(named: 'nullsFirst'),
-          referencedTable: any(named: 'referencedTable'),
-        )).thenAnswer((_) => mockFilter);
-    when(() => mockFilter.limit(
-          any(),
-          referencedTable: any(named: 'referencedTable'),
-        )).thenAnswer((_) => mockFilter);
-    when(() => mockFilter.range(
-          any(),
-          any(),
-          referencedTable: any(named: 'referencedTable'),
-        )).thenAnswer((_) => mockFilter);
+    backend = FakeBackend();
+    repository = BookRepositoryImpl(backend.data, backend.storage);
   });
-
-  tearDown(() {
-    // No cleanup needed - setUp reinitializes all mocks
-  });
-
-  // Uses mockFilter.thenReturns() and mockFilter.thenThrows() instead of
-  // stubbing then() on the mock — Mocktail has difficulty with Future methods.
 
   group('BookRepositoryImpl', () {
     group('getBooks', () {
-      test('returns list of BookEntity on success', () async {
-        mockFilter.thenReturns([
-          {
-            'id': 1,
-            'created_at': '2024-01-01T00:00:00.000',
-            'cover': 'cover.jpg',
-            'name': 'Test Book',
-            'short': '',
-            'alternative': '',
-            'description': '',
-            'author_id': 1,
-            'author': 'Author',
-            'country': 'JP',
-            'state': 'ongoing',
-            'type': 'novel',
-            'release': '2024',
-            'took_count': 5,
-            'chapter_count': 10,
-            'source': '',
-            'link': '',
-            'is_favorite': false,
-            'is_visible': true,
-            'authors': {'id': 1, 'name': 'Author', 'created_at': '2024-01-01'},
-            'books_genres': <Map<String, dynamic>>[],
-            'books_labels': <Map<String, dynamic>>[],
-            'tooks': <Map<String, dynamic>>[],
-          }
-        ]);
+      test('returns list of BookWithRelations via the aggregate read', () async {
+        stubBooksWithRelations([bookJson()]);
 
         final result = await repository.getBooks();
 
@@ -266,26 +96,29 @@ void main() {
         final value = (result as Ok<List<BookWithRelations>>).value;
         expect(value.length, 1);
         expect(value.first.name, 'Test Book');
-        verify(() => mockClient.from('books')).called(1);
       });
 
-      test('filters visible books when onlyVisible is true', () async {
-        mockFilter.thenReturns(<Map<String, dynamic>>[]);
+      test('forwards visibility and pagination to the backend', () async {
+        stubBooksWithRelations([]);
 
-        await repository.getBooks(onlyVisible: true);
+        await repository.getBooks(onlyVisible: true, page: 3, pageSize: 10);
 
-        verify(() => mockFilter.eq('is_visible', true)).called(1);
+        verify(() => backend.data.booksWithRelations(
+              onlyVisible: true,
+              limit: 10,
+              offset: 20,
+            )).called(1);
       });
 
       test('returns Err on error', () async {
-        when(() => mockFilter.order(
-              any(),
-              ascending: any(named: 'ascending'),
-              nullsFirst: any(named: 'nullsFirst'),
-              referencedTable: any(named: 'referencedTable'),
+        when(() => backend.data.booksWithRelations(
+              onlyVisible: any(named: 'onlyVisible'),
+              limit: any(named: 'limit'),
+              offset: any(named: 'offset'),
             )).thenThrow(Exception('DB error'));
 
         final result = await repository.getBooks();
+
         expect(result, isA<Err<List<BookWithRelations>>>());
         final error = (result as Err<List<BookWithRelations>>).error;
         expect(error.message, contains('Error al obtener libros'));
@@ -293,37 +126,9 @@ void main() {
     });
 
     group('getBookById', () {
-      test('returns BookEntity when found', () async {
-        // We need a MockTransformBuilder for maybeSingle
-        // Override the default eq chain to support maybeSingle
-        final mockTransformGetBook = MockTransformBuilder();
-        when(() => mockFilter.maybeSingle()).thenAnswer((_) => mockTransformGetBook);
-
-        mockTransformGetBook.thenReturns({
-          'id': 1,
-          'created_at': '2024-01-01T00:00:00.000',
-          'cover': 'cover.jpg',
-          'name': 'Test Book',
-          'short': '',
-          'alternative': '',
-          'description': '',
-          'author_id': 1,
-          'author': 'Author',
-          'country': 'JP',
-          'state': 'ongoing',
-          'type': 'novel',
-          'release': '2024',
-          'took_count': 5,
-          'chapter_count': 10,
-          'source': '',
-          'link': '',
-          'is_favorite': false,
-          'is_visible': true,
-          'authors': {'id': 1, 'name': 'Author', 'created_at': '2024-01-01'},
-          'books_genres': <Map<String, dynamic>>[],
-          'books_labels': <Map<String, dynamic>>[],
-          'tooks': <Map<String, dynamic>>[],
-        });
+      test('returns BookWithRelations when found', () async {
+        when(() => backend.data.bookWithRelationsById(1))
+            .thenAnswer((_) async => bookJson());
 
         final result = await repository.getBookById(1);
 
@@ -335,22 +140,21 @@ void main() {
       });
 
       test('returns null when not found', () async {
-        final mockTransformGetBook = MockTransformBuilder();
-        when(() => mockFilter.maybeSingle()).thenAnswer((_) => mockTransformGetBook);
-        mockTransformGetBook.thenReturns(null);
+        when(() => backend.data.bookWithRelationsById(999))
+            .thenAnswer((_) async => null);
 
         final result = await repository.getBookById(999);
 
         expect(result, isA<Ok<BookWithRelations?>>());
-        final value = (result as Ok<BookWithRelations?>).value;
-        expect(value, isNull);
+        expect((result as Ok<BookWithRelations?>).value, isNull);
       });
 
       test('returns Err on error', () async {
-        when(() => mockFilter.eq(any(), any()))
+        when(() => backend.data.bookWithRelationsById(any()))
             .thenThrow(Exception('DB error'));
 
         final result = await repository.getBookById(1);
+
         expect(result, isA<Err<BookWithRelations?>>());
         final error = (result as Err<BookWithRelations?>).error;
         expect(error.message, contains('Error al obtener libro'));
@@ -358,152 +162,55 @@ void main() {
     });
 
     group('createBook', () {
-      test('returns Ok on success', () async {
-        final mockRpcValue = MockRpcValueBuilder();
-        mockRpcValue.thenReturns(1);
-        when(() => mockClient.rpc('create_book_with_relations',
-            params: any(named: 'params')))
-            .thenAnswer((_) => mockRpcValue);
+      test('routes creation through the relations function', () async {
+        when(() => backend.data.rpc('create_book_with_relations',
+                params: any(named: 'params')))
+            .thenAnswer((_) async => 1);
 
-        final result = await repository.createBook(BookEntity(
-          id: 0,
-          createdAt: DateTime(2024),
-          cover: '',
-          name: 'New Book',
-          short: '',
-          alternative: '',
-          description: '',
-          authorId: 1,
-          author: 'Existing Author',
-          country: '',
-          state: '',
-          type: '',
-          release: '',
-          tookCount: 0,
-          chapterCount: 0,
-          source: '',
-          link: '',
-          isFavorite: false,
-          isVisible: true,
-          listGenreIds: const [],
-          listTookIds: const [],
-          listLabelIds: const [],
-          createdBy: null,
-        ));
+        final result = await repository.createBook(book(name: 'New Book'));
 
         expect(result, isA<Ok<int>>());
-        final value = (result as Ok<int>).value;
-        expect(value, 1);
-        verify(() => mockClient.rpc('create_book_with_relations',
-            params: any(named: 'params'))).called(1);
+        expect((result as Ok<int>).value, 1);
+        final params = backend.capturedRpcParams('create_book_with_relations');
+        expect((params['p_book'] as Map)['name'], 'New Book');
+        expect(params['p_genre_ids'], isEmpty);
+        expect(params['p_label_ids'], isEmpty);
       });
 
       test('returns Err on error', () async {
-        when(() => mockClient.rpc('create_book_with_relations',
-            params: any(named: 'params')))
+        when(() => backend.data.rpc('create_book_with_relations',
+                params: any(named: 'params')))
             .thenThrow(Exception('RPC error'));
 
-        final result = await repository.createBook(BookEntity(
-          id: 0,
-          createdAt: DateTime(2024),
-          cover: '',
-          name: 'New',
-          short: '',
-          alternative: '',
-          description: '',
-          authorId: 0,
-          author: 'Test Author',
-          country: '',
-          state: '',
-          type: '',
-          release: '',
-          tookCount: 0,
-          chapterCount: 0,
-          source: '',
-          link: '',
-          isFavorite: false,
-          isVisible: true,
-          listGenreIds: const [],
-          listTookIds: const [],
-          listLabelIds: const [],
-          createdBy: null,
-        ));
+        final result = await repository.createBook(book());
+
         expect(result, isA<Err<int>>());
+        final error = (result as Err<int>).error;
+        expect(error.message, contains('Error al crear libro'));
       });
     });
 
     group('updateBook', () {
-      test('returns Ok on success', () async {
-        final mockRpcValue = MockRpcValueBuilder();
-        mockRpcValue.thenReturns('');
-        when(() => mockClient.rpc('update_book_with_relations',
-            params: any(named: 'params')))
-            .thenAnswer((_) => mockRpcValue);
+      test('routes the update through the relations function', () async {
+        when(() => backend.data.rpc('update_book_with_relations',
+                params: any(named: 'params')))
+            .thenAnswer((_) async => '');
 
-        final result = await repository.updateBook(
-          BookEntity(
-            id: 1,
-            createdAt: DateTime(2024),
-            cover: '',
-            name: 'Updated',
-            short: '',
-            alternative: '',
-            description: '',
-            authorId: 1,
-            author: '',
-            country: '',
-            state: '',
-            type: '',
-            release: '',
-            tookCount: 0,
-            chapterCount: 0,
-            source: '',
-            link: '',
-            isFavorite: false,
-            isVisible: true,
-            listGenreIds: const [],
-            listTookIds: const [],
-            listLabelIds: const [],
-            createdBy: null,
-          ),
-        );
+        final result = await repository.updateBook(book(id: 1, name: 'Updated'));
+
         expect(result, isA<Ok<void>>());
-        verify(() => mockClient.rpc('update_book_with_relations',
-            params: any(named: 'params'))).called(1);
+        final params = backend.capturedRpcParams('update_book_with_relations');
+        expect((params['p_book'] as Map)['id'], 1);
+        expect((params['p_book'] as Map)['name'], 'Updated');
       });
 
       test('returns Err on error', () async {
-        when(() => mockClient.rpc('update_book_with_relations',
-            params: any(named: 'params')))
+        when(() => backend.data.rpc('update_book_with_relations',
+                params: any(named: 'params')))
             .thenThrow(Exception('RPC error'));
 
-        final result = await repository.updateBook(
-          BookEntity(
-            id: 1,
-            createdAt: DateTime(2024),
-            cover: '',
-            name: 'Updated',
-            short: '',
-            alternative: '',
-            description: '',
-            authorId: 1,
-            author: '',
-            country: '',
-            state: '',
-            type: '',
-            release: '',
-            tookCount: 0,
-            chapterCount: 0,
-            source: '',
-            link: '',
-            isFavorite: false,
-            isVisible: true,
-            listGenreIds: const [],
-            listTookIds: const [],
-            listLabelIds: const [],
-            createdBy: null,
-          ),
-        );
+        final result = await repository.updateBook(book(id: 1));
+
         expect(result, isA<Err<void>>());
         final error = (result as Err<void>).error;
         expect(error.message, contains('Error al actualizar libro'));
@@ -511,72 +218,90 @@ void main() {
     });
 
     group('deleteBook', () {
-      test('returns Ok on success', () async {
-        // Mock maybeSingle() for the pre-delete book data fetch
-        final mockMaybeSingle = MockTransformBuilder();
-        when(() => mockFilter.maybeSingle())
-            .thenAnswer((_) => mockMaybeSingle);
-        mockMaybeSingle.thenReturns({
-          'cover': 'covers/test.jpg',
-          'tooks': [
-            {
-              'cover': 'covers/took.jpg',
-              'chapters': [
-                {'content': 'https://supabase.example.com/storage/v1/object/public/chapters/content/1/ch1.pdf'},
+      test('cleans covers and storage-backed chapter content, then deletes',
+          () async {
+        when(() => backend.data.bookContentTree(1)).thenAnswer((_) async => {
+              'cover': 'covers/test.jpg',
+              'tooks': [
+                {
+                  'cover': 'covers/took.jpg',
+                  'chapters': [
+                    {
+                      'content':
+                          'https://cdn.example.com/chapters/content/1/ch1.pdf',
+                    },
+                  ],
+                },
               ],
-            },
-          ],
-        });
-        // The delete chain also goes through mockFilter.then()
-        mockFilter.thenReturns(<Map<String, dynamic>>[]);
-        // Mock storage remove for each file cleanup call
-        when(() => mockStorageFileApi.remove(any()))
-            .thenAnswer((_) async => []);
+            });
+        when(() => backend.storage.pathFromUrl('chapters', any()))
+            .thenReturn('content/1/ch1.pdf');
+        backend.removeOk();
+        backend.deleteOk('books');
 
         final result = await repository.deleteBook(1);
 
         expect(result, isA<Ok<void>>());
-        // First call: maybeSingle for book data
-        verify(() => mockFilter.maybeSingle()).called(1);
-        // Storage cleanup: took cover + chapter content + book cover
-        verify(() => mockStorage.from('covers')).called(greaterThanOrEqualTo(1));
-        verify(() => mockStorage.from('chapters')).called(1);
+        verify(() => backend.storage.remove('covers', ['covers/test.jpg']))
+            .called(1);
+        verify(() => backend.storage.remove('covers', ['covers/took.jpg']))
+            .called(1);
+        verify(() => backend.storage.remove('chapters', ['content/1/ch1.pdf']))
+            .called(1);
+        verify(() => backend.query('books').eq('id', 1)).called(1);
       });
 
-      test('returns Ok even when book has no cover or tooks', () async {
-        final mockMaybeSingle = MockTransformBuilder();
-        when(() => mockFilter.maybeSingle())
-            .thenAnswer((_) => mockMaybeSingle);
-        mockMaybeSingle.thenReturns({
-          'cover': '',
-          'tooks': <Map<String, dynamic>>[],
-        });
-        mockFilter.thenReturns(<Map<String, dynamic>>[]);
-        when(() => mockStorageFileApi.remove(any()))
-            .thenAnswer((_) async => []);
+      test('leaves inline chapter content alone', () async {
+        when(() => backend.data.bookContentTree(1)).thenAnswer((_) async => {
+              'cover': '',
+              'tooks': [
+                {
+                  'cover': '',
+                  'chapters': [
+                    {'content': 'texto inline, no es un archivo'},
+                  ],
+                },
+              ],
+            });
+        backend.removeOk();
+        backend.deleteOk('books');
 
         final result = await repository.deleteBook(1);
 
         expect(result, isA<Ok<void>>());
+        verifyNever(() => backend.storage.remove(any(), any()));
       });
 
-      test('returns Ok even when maybeSingle returns null', () async {
-        final mockMaybeSingle = MockTransformBuilder();
-        when(() => mockFilter.maybeSingle())
-            .thenAnswer((_) => mockMaybeSingle);
-        mockMaybeSingle.thenReturns(null);
-        mockFilter.thenReturns(<Map<String, dynamic>>[]);
+      test('returns Ok when the book has no cover or tooks', () async {
+        when(() => backend.data.bookContentTree(1)).thenAnswer((_) async => {
+              'cover': '',
+              'tooks': <Map<String, dynamic>>[],
+            });
+        backend.deleteOk('books');
 
         final result = await repository.deleteBook(1);
 
         expect(result, isA<Ok<void>>());
+        verifyNever(() => backend.storage.remove(any(), any()));
+      });
+
+      test('returns Ok even when the book data is missing', () async {
+        when(() => backend.data.bookContentTree(1))
+            .thenAnswer((_) async => null);
+        backend.deleteOk('books');
+
+        final result = await repository.deleteBook(1);
+
+        expect(result, isA<Ok<void>>());
+        verify(() => backend.query('books').delete()).called(1);
       });
 
       test('returns Err on error', () async {
-        when(() => mockFilter.eq(any(), any()))
+        when(() => backend.data.bookContentTree(any()))
             .thenThrow(Exception('Delete failed'));
 
         final result = await repository.deleteBook(1);
+
         expect(result, isA<Err<void>>());
         final error = (result as Err<void>).error;
         expect(error.message, contains('Error al eliminar libro'));
@@ -584,19 +309,22 @@ void main() {
     });
 
     group('toggleBookVisibility', () {
-      test('returns Ok on success', () async {
-        mockFilter.thenReturns(<Map<String, dynamic>>[]);
+      test('returns Ok and writes the new flag', () async {
+        backend.updateOk('books');
+
         final result = await repository.toggleBookVisibility(1, true);
 
         expect(result, isA<Ok<void>>());
-        verify(() => mockQueryBuilder.update(any())).called(1);
+        verify(() => backend.query('books').eq('id', 1)).called(1);
+        expect(backend.capturedUpdate('books'), {'is_visible': true});
       });
 
       test('returns Err on error', () async {
-        when(() => mockFilter.eq(any(), any()))
+        when(() => backend.query('books').eq(any(), any()))
             .thenThrow(Exception('Toggle failed'));
 
         final result = await repository.toggleBookVisibility(1, true);
+
         expect(result, isA<Err<void>>());
         final error = (result as Err<void>).error;
         expect(error.message, contains('Error al cambiar visibilidad'));
@@ -604,39 +332,50 @@ void main() {
     });
 
     group('uploadImage', () {
-      late File tempFile;
+      late Directory tempDir;
 
-      setUp(() async {
-        tempFile = File('${Directory.systemTemp.path}/test_cover.jpg');
-        await tempFile.writeAsBytes(List.filled(100, 0)); // 100 bytes dummy file
+      setUp(() {
+        tempDir = Directory.systemTemp.createTempSync('cover_test_');
       });
 
-      tearDown(() async {
-        if (await tempFile.exists()) await tempFile.delete();
-      });
+      tearDown(() => tempDir.deleteSync(recursive: true));
 
-      test('returns URL on success', () async {
-        when(() => mockStorageFileApi.upload(
-              any(),
-              any(),
-            )).thenAnswer((_) async => 'covers/test.jpg');
-        when(() => mockStorageFileApi.getPublicUrl(any()))
-            .thenReturn('https://example.com/covers/test.jpg');
+      File writeCover(String extension) {
+        final file = File('${tempDir.path}/cover.$extension');
+        file.writeAsBytesSync(List.filled(100, 0));
+        return file;
+      }
 
-        final result = await repository.uploadImage(tempFile.path);
+      test('returns the stored path on success', () async {
+        backend.signedInAs('user-1');
+        backend.uploadOk();
+
+        final result = await repository.uploadImage(writeCover('jpg').path);
 
         expect(result, isA<Ok<String>>());
         final value = (result as Ok<String>).value;
+        expect(value, startsWith('user-1/'));
         expect(value, endsWith('.jpg'));
+        verify(() => backend.storage.upload('covers', value, any())).called(1);
       });
 
-      test('returns Err on error', () async {
-        when(() => mockStorageFileApi.upload(
-              any(),
-              any(),
-            )).thenThrow(Exception('Upload failed'));
+      test('returns Err for a rejected extension', () async {
+        backend.signedInAs('user-1');
 
-        final result = await repository.uploadImage(tempFile.path);
+        final result = await repository.uploadImage(writeCover('gif').path);
+
+        expect(result, isA<Err<String>>());
+        final error = (result as Err<String>).error;
+        expect(error.message, contains('Formato no permitido'));
+      });
+
+      test('returns Err on storage error', () async {
+        backend.signedInAs('user-1');
+        when(() => backend.storage.upload(any(), any(), any()))
+            .thenThrow(Exception('Upload failed'));
+
+        final result = await repository.uploadImage(writeCover('jpg').path);
+
         expect(result, isA<Err<String>>());
         final error = (result as Err<String>).error;
         expect(error.message, contains('Error al subir cover'));
@@ -644,50 +383,35 @@ void main() {
     });
 
     group('getBookLabels', () {
-      final testBooksForLabels = [
-        BookEntity(
-          id: 1,
-          createdAt: DateTime(2024),
-          cover: '',
-          name: 'Book 1',
-          short: '',
-          alternative: '',
-          description: '',
-          authorId: 1,
-          author: '',
-          country: '',
-          state: '',
-          type: '',
-          release: '',
-          tookCount: 0,
-          chapterCount: 0,
-          source: '',
-          link: '',
-          isFavorite: false,
-          isVisible: true,
-          listGenreIds: const [],
-          listTookIds: const [],
-          listLabelIds: const [],
-          createdBy: null,
-        ),
-      ];
-
-      test('returns map of book labels on success', () async {
-        mockFilter.thenReturns([
+      test('returns a map of label ids per book', () async {
+        backend.rows('books_labels', [
           {'book_id': 1, 'label_id': 2},
-        ] as PostgrestList);
+        ]);
 
-        final result = await repository.getBookLabels(testBooksForLabels);
+        final result = await repository.getBookLabels([book(id: 1)]);
+
         expect(result, isA<Ok<Map<int, Set<int>>>>());
-        final value = (result as Ok<Map<int, Set<int>>>).value;
-        expect(value, {1: {2}});
+        expect((result as Ok<Map<int, Set<int>>>).value, {
+          1: {2},
+        });
+        verify(() => backend.query('books_labels').inList('book_id', [1]))
+            .called(1);
+      });
+
+      test('skips the query for an empty book list', () async {
+        final result = await repository.getBookLabels([]);
+
+        expect(result, isA<Ok<Map<int, Set<int>>>>());
+        expect((result as Ok<Map<int, Set<int>>>).value, isEmpty);
+        verifyNever(() => backend.data.from(any()));
       });
 
       test('returns Err on error', () async {
-        when(() => mockFilter.filter(any(), any(), any()))
+        when(() => backend.query('books_labels').inList(any(), any()))
             .thenThrow(Exception('Label query failed'));
 
-        final result = await repository.getBookLabels(testBooksForLabels);
+        final result = await repository.getBookLabels([book(id: 1)]);
+
         expect(result, isA<Err<Map<int, Set<int>>>>());
         final error = (result as Err<Map<int, Set<int>>>).error;
         expect(error.message, contains('Error al obtener etiquetas de libros'));
@@ -695,21 +419,35 @@ void main() {
     });
 
     group('trackBookView', () {
-      test('returns Ok on success', () async {
-        mockFilter.thenReturns(<Map<String, dynamic>>[]);
+      test('returns Ok and records the view', () async {
+        backend.insertOk('book_views');
+
         final result = await repository.trackBookView(42);
 
         expect(result, isA<Ok<void>>());
-        verify(() => mockClient.from('book_views')).called(1);
+        final values = backend.capturedInsert('book_views');
+        expect(values['book_id'], 42);
+        expect(values['user_id'], isNull);
+      });
+
+      test('attributes the view to the reader when signed in', () async {
+        backend.signedInAs('user-7');
+        backend.insertOk('book_views');
+
+        await repository.trackBookView(42);
+
+        expect(backend.capturedInsert('book_views')['user_id'], 'user-7');
       });
 
       test('returns Err on error', () async {
-        when(() => mockQueryBuilder.insert(
+        when(() => backend.data.insert(
               any(),
-              defaultToNull: any(named: 'defaultToNull'),
+              any(),
+              returning: any(named: 'returning'),
             )).thenThrow(Exception('Insert failed'));
 
         final result = await repository.trackBookView(1);
+
         expect(result, isA<Err<void>>());
         final error = (result as Err<void>).error;
         expect(error.message, contains('Error tracking view'));
@@ -717,40 +455,14 @@ void main() {
     });
 
     group('getRecentViews', () {
-      test('returns list of BookWithRelations on success', () async {
-        // RPC returns IDs
-        mockRpcFilter.thenReturns([
-          {'book_id': 1},
-          {'book_id': 2},
-        ]);
-        // Follow-up select returns book data
-        mockFilter.thenReturns([
-          {
-            'id': 1,
-            'created_at': '2024-01-01T00:00:00.000',
-            'cover': 'cover.jpg',
-            'name': 'Recent Book 1',
-            'short': '',
-            'alternative': '',
-            'description': '',
-            'author_id': 1,
-            'author': 'Author',
-            'country': 'JP',
-            'state': 'ongoing',
-            'type': 'novel',
-            'release': '2024',
-            'took_count': 5,
-            'chapter_count': 10,
-            'source': '',
-            'link': '',
-            'is_favorite': false,
-            'is_visible': true,
-            'authors': {'id': 1, 'name': 'Author', 'created_at': '2024-01-01'},
-            'books_genres': <Map<String, dynamic>>[],
-            'books_labels': <Map<String, dynamic>>[],
-            'tooks': <Map<String, dynamic>>[],
-          },
-        ]);
+      test('resolves the returned ids through the aggregate read', () async {
+        when(() => backend.data.rpc('get_user_recent_views',
+            params: any(named: 'params'))).thenAnswer((_) async => [
+              {'book_id': 1},
+              {'book_id': 2},
+            ]);
+        when(() => backend.data.booksWithRelationsByIds([1, 2]))
+            .thenAnswer((_) async => [bookJson(name: 'Recent Book 1')]);
 
         final result = await repository.getRecentViews('user1');
 
@@ -758,25 +470,27 @@ void main() {
         final value = (result as Ok<List<BookWithRelations>>).value;
         expect(value.length, 1);
         expect(value.first.name, 'Recent Book 1');
-        verify(() => mockClient.rpc('get_user_recent_views',
-            params: any(named: 'params'))).called(1);
+        verify(() => backend.data.rpc('get_user_recent_views',
+            params: {'uid': 'user1', 'max_results': 6})).called(1);
       });
 
-      test('returns empty list when RPC returns no IDs', () async {
-        mockRpcFilter.thenReturns(<Map<String, dynamic>>[]);
+      test('returns an empty list when the function returns no ids', () async {
+        when(() => backend.data.rpc('get_user_recent_views',
+            params: any(named: 'params'))).thenAnswer((_) async => []);
 
         final result = await repository.getRecentViews('user1');
 
         expect(result, isA<Ok<List<BookWithRelations>>>());
-        final value = (result as Ok<List<BookWithRelations>>).value;
-        expect(value, isEmpty);
+        expect((result as Ok<List<BookWithRelations>>).value, isEmpty);
+        verifyNever(() => backend.data.booksWithRelationsByIds(any()));
       });
 
       test('returns Err on error', () async {
-        when(() => mockClient.rpc(any(), params: any(named: 'params')))
+        when(() => backend.data.rpc(any(), params: any(named: 'params')))
             .thenThrow(Exception('RPC failed'));
 
         final result = await repository.getRecentViews('user1');
+
         expect(result, isA<Err<List<BookWithRelations>>>());
         final error = (result as Err<List<BookWithRelations>>).error;
         expect(error.message, contains('Error al obtener vistas recientes'));
@@ -784,37 +498,13 @@ void main() {
     });
 
     group('getMostViewedBooks', () {
-      test('returns list of BookWithRelations on success', () async {
-        mockRpcFilter.thenReturns([
-          {'book_id': 3},
-        ]);
-        mockFilter.thenReturns([
-          {
-            'id': 3,
-            'created_at': '2024-01-01T00:00:00.000',
-            'cover': 'popular.jpg',
-            'name': 'Popular Book',
-            'short': '',
-            'alternative': '',
-            'description': '',
-            'author_id': 1,
-            'author': 'Author',
-            'country': 'JP',
-            'state': 'ongoing',
-            'type': 'novel',
-            'release': '2024',
-            'took_count': 3,
-            'chapter_count': 6,
-            'source': '',
-            'link': '',
-            'is_favorite': false,
-            'is_visible': true,
-            'authors': {'id': 1, 'name': 'Author', 'created_at': '2024-01-01'},
-            'books_genres': <Map<String, dynamic>>[],
-            'books_labels': <Map<String, dynamic>>[],
-            'tooks': <Map<String, dynamic>>[],
-          },
-        ]);
+      test('uses the reader-facing function', () async {
+        when(() => backend.data.rpc('get_most_viewed_books_public',
+            params: any(named: 'params'))).thenAnswer((_) async => [
+              {'book_id': 3},
+            ]);
+        when(() => backend.data.booksWithRelationsByIds([3]))
+            .thenAnswer((_) async => [bookJson(id: 3, name: 'Popular Book')]);
 
         final result = await repository.getMostViewedBooks();
 
@@ -822,25 +512,26 @@ void main() {
         final value = (result as Ok<List<BookWithRelations>>).value;
         expect(value.length, 1);
         expect(value.first.name, 'Popular Book');
-        verify(() => mockClient.rpc('get_most_viewed_books_public',
-            params: any(named: 'params'))).called(1);
+        verify(() => backend.data.rpc('get_most_viewed_books_public',
+            params: {'max_results': 6})).called(1);
       });
 
-      test('returns empty list when RPC returns no IDs', () async {
-        mockRpcFilter.thenReturns(<Map<String, dynamic>>[]);
+      test('returns an empty list when the function returns no ids', () async {
+        when(() => backend.data.rpc('get_most_viewed_books_public',
+            params: any(named: 'params'))).thenAnswer((_) async => []);
 
         final result = await repository.getMostViewedBooks();
 
         expect(result, isA<Ok<List<BookWithRelations>>>());
-        final value = (result as Ok<List<BookWithRelations>>).value;
-        expect(value, isEmpty);
+        expect((result as Ok<List<BookWithRelations>>).value, isEmpty);
       });
 
       test('returns Err on error', () async {
-        when(() => mockClient.rpc(any(), params: any(named: 'params')))
+        when(() => backend.data.rpc(any(), params: any(named: 'params')))
             .thenThrow(Exception('RPC failed'));
 
         final result = await repository.getMostViewedBooks();
+
         expect(result, isA<Err<List<BookWithRelations>>>());
         final error = (result as Err<List<BookWithRelations>>).error;
         expect(error.message, contains('Error al obtener libros más vistos'));

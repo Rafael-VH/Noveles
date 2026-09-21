@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
+import 'package:noveles/core/backend/backend_module.dart';
+import 'package:noveles/core/backend/storage_gateway.dart';
 import 'package:noveles/core/cover/cover_url_service.dart';
-import 'package:noveles/core/supabase/supabase_client.dart';
 import 'package:noveles/features/profiles/di/injection_profiles.dart';
 import 'package:noveles/features/auth/di/injection_auth.dart';
 import 'package:noveles/features/books/di/injection_books.dart';
@@ -29,10 +30,10 @@ void setupDependencies() {
 }
 
 void _registerCore() {
-  getIt.registerLazySingleton<SupabaseClientProvider>(
-    () => SupabaseClientProviderImpl(),
-  );
+  // The backend ports come first: everything below them depends on the
+  // gateways, and nothing here needs to know which vendor backs them.
+  registerBackendDependencies(getIt);
   getIt.registerLazySingleton(
-    () => CoverUrlService(getIt<SupabaseClientProvider>().client),
+    () => CoverUrlService(getIt<StorageGateway>()),
   );
 }
