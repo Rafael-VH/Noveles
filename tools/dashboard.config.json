@@ -6,5 +6,5 @@
   "basePath": "/Noveles/",
   "etiquetaBoton": "",
   "hrefBoton": "../../index.html",
-  "inyector": ""
+  "inyector": "tools/inject-ui.mjs"
 }
