@@ -1,0 +1,4 @@
+{
+  "descripcion": "Estados por los que pasa un usuario: registro crea user, el admin promueve a scan o admin, cualquiera puede quedar suspended (sin sesion) y se reactiva siempre a un rol activo: no hay estados terminales.",
+  "etiquetas": ["roles", "suspension", "admin", "flutter", "supabase"]
+}

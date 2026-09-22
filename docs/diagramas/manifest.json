@@ -1,6 +1,6 @@
 {
   "generado_por": "tools/build-diagrams.mjs",
-  "total": 4,
+  "total": 5,
   "diagramas": [
     {
       "slug": "architecture",
@@ -21,6 +21,27 @@
       "actualizado": "2026-09-22",
       "archivo": "diagramas/architecture/index.html",
       "especificacion": "diagramas/architecture/architecture.json"
+    },
+    {
+      "slug": "ciclo-de-vida",
+      "titulo": "Ciclo de vida de roles",
+      "tipo": "lifecycle",
+      "tipoTexto": "Ciclo de vida",
+      "descripcion": "Estados por los que pasa un usuario: registro crea user, el admin promueve a scan o admin, cualquiera puede quedar suspended (sin sesion) y se reactiva siempre a un rol activo: no hay estados terminales.",
+      "etiquetas": [
+        "roles",
+        "suspension",
+        "admin",
+        "flutter",
+        "supabase"
+      ],
+      "destacado": false,
+      "nodos": 4,
+      "relaciones": 8,
+      "capitulos": 3,
+      "actualizado": "2026-09-22",
+      "archivo": "diagramas/ciclo-de-vida/index.html",
+      "especificacion": "diagramas/ciclo-de-vida/ciclo-de-vida.json"
     },
     {
       "slug": "secuencia-clave",

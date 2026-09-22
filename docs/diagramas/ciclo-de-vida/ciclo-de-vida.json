@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "diagram_type": "lifecycle",
+  "meta": {
+    "title": "Ciclo de vida de roles",
+    "subtitle": "user → scan · admin · suspended — suspensión siempre recuperable, sin terminales",
+    "output": "docs/diagramas/ciclo-de-vida/ciclo-de-vida.html",
+    "viewBox": [1100, 680],
+    "animation": "trace",
+    "quality_profile": "showcase",
+    "views": [
+      { "id": "promocion", "label": "Promoción de roles", "focus": ["user", "scan", "admin"], "note": "El admin promueve user → scan/admin con UpdateUserRole." },
+      { "id": "suspension", "label": "Suspensión", "focus": ["user", "scan", "admin", "suspended"], "note": "Suspender borra sesiones activas; suspended nunca llega a una pantalla autenticada." },
+      { "id": "reactivacion", "label": "Reactivación", "focus": ["suspended", "user", "scan", "admin"], "note": "No hay terminales: la reactivación vuelve siempre a un rol activo." }
+    ]
+  },
+  "lanes": [
+    { "id": "main", "label": "Roles activos" },
+    { "id": "terminal", "label": "Suspensión (recuperable)" }
+  ],
+  "states": [
+    { "id": "user", "type": "start", "label": "user", "sublabel": "registro crea profile", "lane": "main", "col": 0, "step": "01", "tag": "inicial" },
+    { "id": "scan", "type": "active", "label": "scan", "sublabel": "ingesta + editorial", "lane": "main", "col": 1, "step": "02" },
+    { "id": "admin", "type": "active", "label": "admin", "sublabel": "roles + catálogo", "lane": "main", "col": 2, "step": "03" },
+    { "id": "suspended", "type": "waiting", "label": "suspended", "sublabel": "sin sesión · sin acceso", "lane": "terminal", "col": 1, "tag": "recuperable" }
+  ],
+  "transitions": [
+    { "id": "promote-scan", "from": "user", "to": "scan", "label": "promover a scan", "variant": "emphasis", "labelAt": [171, 202], "labelDx": -43 },
+    { "id": "promote-admin", "from": "user", "to": "admin", "label": "promover a admin", "variant": "emphasis", "fromSide": "bottom", "toSide": "bottom", "via": [[94, 230], [402, 230]] },
+    { "id": "suspend-user", "from": "user", "to": "suspended", "label": "suspender", "variant": "security", "fromSide": "bottom", "toSide": "top", "via": [[94, 300], [556, 300]] },
+    { "id": "suspend-scan", "from": "scan", "to": "suspended", "variant": "security", "fromSide": "bottom", "toSide": "top", "via": [[248, 300], [556, 300]] },
+    { "id": "suspend-admin", "from": "admin", "to": "suspended", "variant": "security", "fromSide": "bottom", "toSide": "top", "via": [[402, 340], [556, 340]] },
+    { "id": "reactivate", "from": "suspended", "to": "user", "label": "reactivar", "variant": "emphasis", "fromSide": "bottom", "toSide": "bottom", "via": [[556, 560], [94, 560]] },
+    { "id": "reactivate-scan", "from": "suspended", "to": "scan", "label": "a scan", "variant": "default", "fromSide": "left", "toSide": "bottom", "via": [[260, 479], [260, 210], [248, 210]] },
+    { "id": "reactivate-admin", "from": "suspended", "to": "admin", "label": "a admin", "variant": "default", "fromSide": "right", "toSide": "bottom", "via": [[439, 479], [439, 210], [402, 210]] }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Roles activos",
+      "items": [
+        "El registro crea el profile con role user (trigger de roles)",
+        "El admin promueve user → scan o admin con UpdateUserRole"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Suspensión",
+      "items": [
+        "Suspender marca role='suspended' y borra sesiones activas (re-login forzado) - AdminUsersBloc._onSuspendUser",
+        "Suspended y unknown nunca llegan a una pantalla autenticada (AuthSuspended + logout)",
+        "El routing de un suspendido cae en LoginScreen"
+      ]
+    },
+    {
+      "dot": "orange",
+      "title": "Recuperación",
+      "items": [
+        "No hay estados terminales: suspended siempre es recuperable",
+        "El toggle del panel admin reactiva a user; el RPC admin_reactivate_user permite user/scan/admin",
+        "RLS RESTRICTIVE 'Deny suspended users' bloquea todas las tablas"
+      ]
+    }
+  ]
+}
