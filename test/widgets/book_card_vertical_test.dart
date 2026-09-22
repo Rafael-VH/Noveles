@@ -59,6 +59,7 @@ void main() {
 
     testWidgets('es StatefulWidget con AnimatedScale', (tester) async {
       final book = createTestBook();
+      // ignore: unused_local_variable
       bool tapped = false;
 
       await tester.pumpWidget(wrapWithMaterial(

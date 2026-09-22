@@ -47,6 +47,7 @@ void main() {
 
   /// Scroll down enough to make the widget content visible
   /// (avoids CustomScrollView/Viewport null-check issues in tests).
+  // ignore: unused_element
   Future<void> pumpScrolled(WidgetTester tester, Widget widget) async {
     await tester.pumpWidget(widget);
     await tester.pump();
