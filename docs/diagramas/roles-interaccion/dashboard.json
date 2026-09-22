@@ -1,0 +1,12 @@
+{
+  "id": "roles-interaccion",
+  "tipo": "workflow",
+  "titulo": "Interacción por rol",
+  "descripcion": "Qué ve y qué hace cada rol sobre la misma plataforma: el contraste RLS es visible por lane (is_visible=true para user, created_by=auth.uid() para scan, is_admin() para admin) y el acceso suspendido cae en LoginScreen.",
+  "etiquetas": ["roles", "suspension", "admin", "rls", "flutter", "supabase"],
+  "meta": {
+    "pantallas": 22,
+    "acciones": 18,
+    "views": 4
+  }
+}

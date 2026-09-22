@@ -1,0 +1,479 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Interacción por rol en Noveles",
+    "subtitle": "Qué ve y qué hace cada rol sobre la misma plataforma — permisos RLS diferenciados por lane",
+    "locale": "en",
+    "visual_preset": "classic",
+    "quality_profile": "standard",
+    "animation": "trace",
+    "viewBox": [
+      1620,
+      1080
+    ],
+    "views": [
+      {
+        "id": "lectura",
+        "label": "Rol user · lector",
+        "focus": [
+          "login_user",
+          "main_user",
+          "favoritos",
+          "recientes",
+          "perfil_user",
+          "db_user"
+        ],
+        "note": "El lector ve solo libros con is_visible = true y gestiona favoritos, recientes, marcado de leído y su perfil."
+      },
+      {
+        "id": "ingesta",
+        "label": "Rol scan · ingesta",
+        "focus": [
+          "login_scan",
+          "scan_main",
+          "tooks",
+          "capitulos",
+          "upload",
+          "covers",
+          "db_scan"
+        ],
+        "note": "El scan crea y edita contenido propio: libros, tooks, capítulos con upload al bucket y portadas."
+      },
+      {
+        "id": "gestion",
+        "label": "Rol admin · gestión",
+        "focus": [
+          "login_admin",
+          "admin_dash",
+          "usuarios",
+          "generos",
+          "etiquetas",
+          "analytics",
+          "db_admin"
+        ],
+        "note": "El admin gestiona usuarios (roles y suspensión), géneros, etiquetas y analytics de book_views."
+      },
+      {
+        "id": "suspension",
+        "label": "Acceso suspendido",
+        "focus": [
+          "suspended",
+          "login_sus",
+          "login_user",
+          "login_scan",
+          "login_admin"
+        ],
+        "note": "Un rol suspendido pierde la sesión (RESTRICTIVE RLS) y cae de nuevo en LoginScreen."
+      }
+    ]
+  },
+  "lanes": [
+    {
+      "id": "user_lane",
+      "label": "Rol user · lector"
+    },
+    {
+      "id": "scan_lane",
+      "label": "Rol scan · ingesta"
+    },
+    {
+      "id": "admin_lane",
+      "label": "Rol admin · gestión"
+    },
+    {
+      "id": "sus_lane",
+      "label": "Rol suspended · sin acceso",
+      "variant": "exception"
+    },
+    {
+      "id": "storage_lane",
+      "label": "Supabase Storage"
+    },
+    {
+      "id": "db_lane",
+      "label": "Postgres · RLS"
+    }
+  ],
+  "mainPath": [
+    "login_user",
+    "main_user",
+    "favoritos",
+    "db_user"
+  ],
+  "semanticChecks": {
+    "allowedRoots": [
+      "login_user",
+      "login_scan",
+      "login_admin",
+      "suspended"
+    ],
+    "allowedTerminals": [
+      "db_user",
+      "db_scan",
+      "db_admin",
+      "upload",
+      "covers",
+      "recientes",
+      "perfil_user",
+      "generos",
+      "etiquetas",
+      "analytics",
+      "login_sus"
+    ],
+    "requiredEdges": [
+      {
+        "from": "login_user",
+        "to": "main_user"
+      },
+      {
+        "from": "login_scan",
+        "to": "scan_main"
+      },
+      {
+        "from": "login_admin",
+        "to": "admin_dash"
+      },
+      {
+        "from": "suspended",
+        "to": "login_sus"
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "id": "login_user",
+      "lane": "user_lane",
+      "col": 0,
+      "type": "frontend",
+      "label": "LoginScreen",
+      "sublabel": "auth · is_user()",
+      "width": 170
+    },
+    {
+      "id": "main_user",
+      "lane": "user_lane",
+      "col": 1,
+      "type": "frontend",
+      "label": "MainScreen",
+      "sublabel": "libros visibles",
+      "width": 170
+    },
+    {
+      "id": "favoritos",
+      "lane": "user_lane",
+      "col": 2,
+      "type": "frontend",
+      "label": "Favoritos",
+      "sublabel": "user_favorites",
+      "width": 150
+    },
+    {
+      "id": "recientes",
+      "lane": "user_lane",
+      "col": 3,
+      "type": "frontend",
+      "label": "Recientes",
+      "sublabel": "chapter_reads",
+      "width": 150
+    },
+    {
+      "id": "perfil_user",
+      "lane": "user_lane",
+      "col": 4,
+      "type": "frontend",
+      "label": "Editar perfil",
+      "sublabel": "profile",
+      "width": 150
+    },
+    {
+      "id": "db_user",
+      "lane": "db_lane",
+      "col": 3,
+      "type": "database",
+      "label": "books · reads · favorites",
+      "sublabel": "is_visible = true",
+      "width": 210
+    },
+    {
+      "id": "login_scan",
+      "lane": "scan_lane",
+      "col": 0,
+      "type": "frontend",
+      "label": "LoginScreen",
+      "sublabel": "auth · is_scan()",
+      "width": 170
+    },
+    {
+      "id": "scan_main",
+      "lane": "scan_lane",
+      "col": 1,
+      "type": "frontend",
+      "label": "ScanMainScreen",
+      "sublabel": "CRUD libros propios",
+      "width": 180
+    },
+    {
+      "id": "tooks",
+      "lane": "scan_lane",
+      "col": 2,
+      "type": "frontend",
+      "label": "Tooks",
+      "sublabel": "own",
+      "width": 130
+    },
+    {
+      "id": "capitulos",
+      "lane": "scan_lane",
+      "col": 3,
+      "type": "frontend",
+      "label": "Capítulos",
+      "sublabel": "upload .md/.txt",
+      "width": 150
+    },
+    {
+      "id": "upload",
+      "lane": "storage_lane",
+      "col": 4,
+      "type": "cloud",
+      "label": "Bucket chapters",
+      "sublabel": "{uid}/{ts}.{ext}",
+      "width": 170
+    },
+    {
+      "id": "covers",
+      "lane": "storage_lane",
+      "col": 5,
+      "type": "cloud",
+      "label": "Bucket covers",
+      "sublabel": "portadas",
+      "width": 150
+    },
+    {
+      "id": "db_scan",
+      "lane": "db_lane",
+      "col": 4,
+      "type": "database",
+      "label": "books · tooks · chapters",
+      "sublabel": "created_by = auth.uid()",
+      "width": 220
+    },
+    {
+      "id": "login_admin",
+      "lane": "admin_lane",
+      "col": 0,
+      "type": "frontend",
+      "label": "LoginScreen",
+      "sublabel": "auth · is_admin()",
+      "width": 170
+    },
+    {
+      "id": "admin_dash",
+      "lane": "admin_lane",
+      "col": 1,
+      "type": "frontend",
+      "label": "AdminDash",
+      "sublabel": "tabs de gestión",
+      "width": 170
+    },
+    {
+      "id": "usuarios",
+      "lane": "admin_lane",
+      "col": 2,
+      "type": "frontend",
+      "label": "Usuarios",
+      "sublabel": "roles · suspender",
+      "width": 150
+    },
+    {
+      "id": "generos",
+      "lane": "admin_lane",
+      "col": 3,
+      "type": "frontend",
+      "label": "Géneros",
+      "sublabel": "catalog",
+      "width": 130
+    },
+    {
+      "id": "etiquetas",
+      "lane": "admin_lane",
+      "col": 4,
+      "type": "frontend",
+      "label": "Etiquetas",
+      "sublabel": "label rules",
+      "width": 130
+    },
+    {
+      "id": "analytics",
+      "lane": "admin_lane",
+      "col": 5,
+      "type": "frontend",
+      "label": "Analytics",
+      "sublabel": "book_views",
+      "width": 150
+    },
+    {
+      "id": "db_admin",
+      "lane": "db_lane",
+      "col": 5,
+      "type": "database",
+      "label": "todas las tablas",
+      "sublabel": "is_admin() bypass",
+      "width": 200
+    },
+    {
+      "id": "suspended",
+      "lane": "sus_lane",
+      "col": 0,
+      "type": "security",
+      "label": "Suspended",
+      "sublabel": "sesión revocada · RLS deny",
+      "width": 200
+    },
+    {
+      "id": "login_sus",
+      "lane": "sus_lane",
+      "col": 1,
+      "type": "frontend",
+      "label": "LoginScreen",
+      "sublabel": "debe re-loguear",
+      "width": 170
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-user-login",
+      "from": "login_user",
+      "to": "main_user",
+      "label": "entra · is_user()",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-user-main-fav",
+      "from": "main_user",
+      "to": "favoritos",
+      "label": "lee visibles",
+      "role": "main"
+    },
+    {
+      "id": "e-user-main-rec",
+      "from": "main_user",
+      "to": "recientes",
+      "label": "marca leído",
+      "role": "main"
+    },
+    {
+      "id": "e-user-fav-db",
+      "from": "favoritos",
+      "to": "db_user",
+      "label": "SELECT is_visible = true",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-user-perfil",
+      "from": "favoritos",
+      "to": "perfil_user",
+      "label": "edita",
+      "role": "main"
+    },
+    {
+      "id": "e-scan-login",
+      "from": "login_scan",
+      "to": "scan_main",
+      "label": "entra · is_scan()",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-scan-main-tooks",
+      "from": "scan_main",
+      "to": "tooks",
+      "label": "CRUD propios",
+      "role": "main"
+    },
+    {
+      "id": "e-scan-tooks-cap",
+      "from": "tooks",
+      "to": "capitulos",
+      "label": "edita",
+      "role": "main"
+    },
+    {
+      "id": "e-scan-cap-upload",
+      "from": "capitulos",
+      "to": "upload",
+      "label": "sube",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-scan-covers",
+      "from": "scan_main",
+      "to": "covers",
+      "label": "portada",
+      "role": "main"
+    },
+    {
+      "id": "e-scan-db",
+      "from": "tooks",
+      "to": "db_scan",
+      "label": "created_by = auth.uid()",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-admin-login",
+      "from": "login_admin",
+      "to": "admin_dash",
+      "label": "entra · is_admin()",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-admin-users",
+      "from": "admin_dash",
+      "to": "usuarios",
+      "label": "gestiona roles",
+      "role": "main"
+    },
+    {
+      "id": "e-admin-gen",
+      "from": "admin_dash",
+      "to": "generos",
+      "label": "CRUD",
+      "role": "main"
+    },
+    {
+      "id": "e-admin-et",
+      "from": "admin_dash",
+      "to": "etiquetas",
+      "label": "reglas",
+      "role": "main"
+    },
+    {
+      "id": "e-admin-ana",
+      "from": "admin_dash",
+      "to": "analytics",
+      "label": "metricas",
+      "role": "main"
+    },
+    {
+      "id": "e-admin-db",
+      "from": "usuarios",
+      "to": "db_admin",
+      "label": "is_admin() bypass",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-sus",
+      "from": "suspended",
+      "to": "login_sus",
+      "label": "sin acceso",
+      "role": "main",
+      "variant": "security"
+    }
+  ]
+}

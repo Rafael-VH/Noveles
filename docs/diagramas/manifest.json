@@ -1,6 +1,6 @@
 {
   "generado_por": "tools/build-diagrams.mjs",
-  "total": 5,
+  "total": 6,
   "diagramas": [
     {
       "slug": "architecture",
@@ -42,6 +42,28 @@
       "actualizado": "2026-09-22",
       "archivo": "diagramas/ciclo-de-vida/index.html",
       "especificacion": "diagramas/ciclo-de-vida/ciclo-de-vida.json"
+    },
+    {
+      "slug": "roles-interaccion",
+      "titulo": "Interacción por rol en Noveles",
+      "tipo": "workflow",
+      "tipoTexto": "Proceso",
+      "descripcion": "Qué ve y qué hace cada rol sobre la misma plataforma: el contraste RLS es visible por lane (is_visible=true para user, created_by=auth.uid() para scan, is_admin() para admin) y el acceso suspendido cae en LoginScreen.",
+      "etiquetas": [
+        "roles",
+        "suspension",
+        "admin",
+        "rls",
+        "flutter",
+        "supabase"
+      ],
+      "destacado": false,
+      "nodos": 22,
+      "relaciones": 18,
+      "capitulos": 4,
+      "actualizado": "2026-09-22",
+      "archivo": "diagramas/roles-interaccion/index.html",
+      "especificacion": "diagramas/roles-interaccion/roles-interaccion.json"
     },
     {
       "slug": "secuencia-clave",
