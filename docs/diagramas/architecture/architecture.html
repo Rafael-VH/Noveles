@@ -733,7 +733,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
        jumps between a laptop and a tall monitor. */
     .container {
       width: 100%;
-      max-width: var(--archify-reader-width, 1440px);
+      max-width: min(var(--archify-reader-width, 1440px), 100%);
       margin: 0 auto;
     }
     @media (min-width: 768px) and (max-height: 920px) {
@@ -1026,6 +1026,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     svg {
       width: 100%;
       min-width: min(900px, 100%);
+      max-width: 100%;
       display: block;
       transform-origin: 0 0;
       transition: transform 0.18s ease;
@@ -8039,7 +8040,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
           link.className = 'semantic-passport-source';
           if (source.href) {
             link.href = source.href;
-            link.target = '_blank';
+            link.target = '_self';
             link.rel = 'noopener noreferrer';
             link.referrerPolicy = 'no-referrer';
             link.setAttribute('aria-label', viewerText('viewer.passport.source.open', { path: source.path, revision: repository.shortRevision }));
@@ -11133,7 +11134,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       var frame = 0;
       var settleFrame = 0;
       var lastWidth = 0;
-      var WIDE_RATIO = 1.55;
+      var WIDE_RATIO = 1.2;
       var MIN_DESKTOP_WIDTH = 1024;
       var MIN_READER_WIDTH = 960;
       var MAX_READER_WIDTH = 1920;
@@ -11200,10 +11201,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
             document.documentElement.scrollHeight,
             document.body.scrollHeight
           ) - window.innerHeight;
-          if (overflow > 1 && lastWidth > minWidth) {
-            applyWidth(Math.max(minWidth, lastWidth - overflow * ratio - 4));
-            html.setAttribute('data-reader-overflow', 'reduced');
-          } else if (overflow > 1) {
+          if (overflow > 1) {
             html.setAttribute('data-reader-overflow', 'authored');
           } else {
             html.removeAttribute('data-reader-overflow');
@@ -11223,7 +11221,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         var fixedHeight = chrome.bodyY + chrome.diagramY + SAFE_BOTTOM_GAP +
           outerHeight(header) + outerHeight(guided) + outerHeight(cards);
         var availableSvgHeight = Math.max(1, window.innerHeight - fixedHeight);
-        var desiredWidth = availableSvgHeight * ratio + chrome.diagramX;
+        var desiredWidth = viewportCap;
         var width = Math.max(minWidth, Math.min(maxWidth, desiredWidth));
         applyWidth(width);
         settleOverflow(minWidth);
