@@ -42,3 +42,43 @@ jobs:
             exit 1
           fi
           echo "El dashboard está al día."
+
+  frescura:
+    name: Frescura de los diagramas
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Auditar (drift)
+        run: node tools/diagram-drift.mjs . --json > drift.json
+
+      - name: Publicar el informe
+        if: always()
+        run: |
+          node -e "
+            const d = require('./drift.json');
+            console.log('HEAD ' + d.head + ' · ' + d.diagramas.length + ' diagrama(s)');
+            d.diagramas.forEach((x) => console.log('  [' + x.estado + '] ' + x.slug + ' — ' + x.nota));
+          "
+
+      - name: Fallar si algún diagrama quedó roto
+        run: |
+          node -e "
+            const d = require('./drift.json');
+            const rotos = d.diagramas.filter((x) => x.estado === 'roto');
+            if (rotos.length) {
+              console.error('Diagramas con evidencia rota: ' + rotos.map((x) => x.slug).join(', '));
+              process.exit(1);
+            }
+            console.log('Ningún diagrama roto.');
+          "
