@@ -36,6 +36,17 @@ const ETIQUETA_TIPO = {
   lifecycle: 'Ciclo de vida',
 };
 
+// Cada tipo de diagrama usa nombres distintos para sus elementos; mapeamos
+// "nodos" y "relaciones" al array real de la spec (en lugar de asumir
+// components/connections, que solo existe en architecture).
+const CAMPOS_POR_TIPO = {
+  architecture: { nodos: 'components', relaciones: 'connections' },
+  workflow: { nodos: 'nodes', relaciones: 'edges' },
+  sequence: { nodos: 'participants', relaciones: 'messages' },
+  dataflow: { nodos: 'nodes', relaciones: 'flows' },
+  lifecycle: { nodos: 'states', relaciones: 'transitions' },
+};
+
 const INYECTOR_POR_DEFECTO = path.join(
   homedir(),
   '.agents',
@@ -152,6 +163,7 @@ function recolectar() {
     const extra = existsSync(extraAbs) ? leerJson(extraAbs, errores) ?? {} : {};
 
     const htmlRel = aPosix(path.relative(repoRoot, htmlAbs));
+    const campos = CAMPOS_POR_TIPO[tipo] || { nodos: 'components', relaciones: 'connections' };
 
     diagramas.push({
       slug,
@@ -161,8 +173,8 @@ function recolectar() {
       descripcion: typeof extra.descripcion === 'string' ? extra.descripcion : '',
       etiquetas: normalizarEtiquetas(extra.etiquetas),
       destacado: extra.destacado === true,
-      nodos: Array.isArray(spec.components) ? spec.components.length : 0,
-      relaciones: Array.isArray(spec.connections) ? spec.connections.length : 0,
+      nodos: Array.isArray(spec[campos.nodos]) ? spec[campos.nodos].length : 0,
+      relaciones: Array.isArray(spec[campos.relaciones]) ? spec[campos.relaciones].length : 0,
       capitulos: Array.isArray(spec.meta?.views) ? spec.meta.views.length : 0,
       actualizado: fechaDeActualizacion(htmlRel, htmlAbs),
       // Los enlaces apuntan a la copia publicada (con el botón), no al artefacto.

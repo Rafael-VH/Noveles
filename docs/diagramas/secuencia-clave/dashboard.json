@@ -1,0 +1,4 @@
+{
+  "descripcion": "Login con email y password y selecci�n de pantalla seg�n rol (admin / scan / user): credenciales � sesi�n en Supabase Auth � carga o creaci�n de profiles � ruteo; incluye expiraci�n de token v�a stream con logout autom�tico.",
+  "etiquetas": ["auth", "login", "roles", "flutter", "supabase"]
+}

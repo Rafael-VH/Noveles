@@ -1,0 +1,4 @@
+{
+  "descripcion": "Ingesta de contenido cap�tulos: archivo seleccionado � sube a Storage (chapters) � INSERT en chapters con RLS is_scan() � el lector lo recupera; con portadas aparte, reintento ante fallo y timeout de 10s.",
+  "etiquetas": ["ingesta", "storage", "chapters", "flutter", "supabase"]
+}
