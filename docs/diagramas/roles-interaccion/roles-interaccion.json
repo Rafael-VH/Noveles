@@ -68,6 +68,35 @@
       }
     ]
   },
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Rol user · lector",
+      "items": [
+        "Ve solo libros con is_visible = true",
+        "Favoritos, recientes, marcado de leído y perfil",
+        "Alcanza Postgres con la fila RLS de usuario"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Rol scan · ingesta",
+      "items": [
+        "CRUD de libros propios, tooks, capítulos",
+        "Upload .md/.txt al bucket chapters y portadas",
+        "Alcanza Postgres con created_by = auth.uid()"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Rol admin · gestión",
+      "items": [
+        "Usuarios (roles y suspensión), géneros, etiquetas",
+        "Analytics de book_views y contenido completo",
+        "Alcanza Postgres con is_admin()"
+      ]
+    }
+  ],
   "lanes": [
     {
       "id": "user_lane",

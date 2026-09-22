@@ -5778,7 +5778,41 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 
     <!-- Info Cards -->
     <div class="cards">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot cyan"></div>
+          <h3>Rol user · lector</h3>
+        </div>
+        <ul>
+          <li>&bull; Ve solo libros con is_visible = true</li>
+          <li>&bull; Favoritos, recientes, marcado de leído y perfil</li>
+          <li>&bull; Alcanza Postgres con la fila RLS de usuario</li>
+        </ul>
+      </div>
 
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot violet"></div>
+          <h3>Rol scan · ingesta</h3>
+        </div>
+        <ul>
+          <li>&bull; CRUD de libros propios, tooks, capítulos</li>
+          <li>&bull; Upload .md/.txt al bucket chapters y portadas</li>
+          <li>&bull; Alcanza Postgres con created_by = auth.uid()</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot amber"></div>
+          <h3>Rol admin · gestión</h3>
+        </div>
+        <ul>
+          <li>&bull; Usuarios (roles y suspensión), géneros, etiquetas</li>
+          <li>&bull; Analytics de book_views y contenido completo</li>
+          <li>&bull; Alcanza Postgres con is_admin()</li>
+        </ul>
+      </div>
     </div>
 
   </div>
