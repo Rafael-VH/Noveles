@@ -18,7 +18,7 @@ class ChapterCache {
   static Future<bool> has(String filename) async {
     try {
       final dir = await _cacheDir();
-      return File('${dir.path}/$filename').exists();
+      return await File('${dir.path}/$filename').exists();
     } catch (e) {
       return false;
     }
