@@ -50,8 +50,15 @@ opencode.json
 
 # CommandCode CLI local config
 .commandcode/
+
 # Local AI runtime state
 .atl/
+
+# FreeBuff CLI local config
+.freebuff/
+
+# Antigravity CLI local config
+.antigravitycli/
 
 # Evidencia regenerable de los diagramas (ver docs/diagramas/README.md)
 docs/diagramas/**/*.visual-check.*
