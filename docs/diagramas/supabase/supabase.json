@@ -7,6 +7,11 @@
     "locale": "en",
     "visual_preset": "classic",
     "quality_profile": "standard",
+    "repository": {
+      "url": "https://github.com/Rafael-VH/Noveles",
+      "provider": "github",
+      "revision": "98cde595b873650ea9832873a45f4ac0c1daf1f8"
+    },
     "viewBox": [
       1180,
       760
@@ -19,6 +24,12 @@
       "brand": "postgresql",
       "label": "profiles",
       "sublabel": "rol user/scan/admin · suspensión",
+      "sources": [
+        {
+          "path": "supabase/migrations/20260515161849_profiles_and_auth.sql",
+          "label": "tabla profiles"
+        }
+      ],
       "pos": [
         60,
         80
@@ -34,6 +45,12 @@
       "brand": "postgresql",
       "label": "books",
       "sublabel": "estado · visibilidad escaneada",
+      "sources": [
+        {
+          "path": "supabase/migrations/20260514220000_initial_schema.sql",
+          "label": "tabla books"
+        }
+      ],
       "pos": [
         60,
         180
@@ -49,6 +66,12 @@
       "brand": "postgresql",
       "label": "chapters",
       "sublabel": "contenido · tipo (inline/archivo)",
+      "sources": [
+        {
+          "path": "supabase/migrations/20260514220000_initial_schema.sql",
+          "label": "tabla chapters"
+        }
+      ],
       "pos": [
         60,
         280
@@ -64,6 +87,12 @@
       "brand": "postgresql",
       "label": "tooks",
       "sublabel": "sumario/lectura por capítulo",
+      "sources": [
+        {
+          "path": "supabase/migrations/20260514220000_initial_schema.sql",
+          "label": "tabla tooks"
+        }
+      ],
       "pos": [
         60,
         380
@@ -79,6 +108,16 @@
       "brand": "postgresql",
       "label": "book_views · chapter_reads",
       "sublabel": "analítica de lectura",
+      "sources": [
+        {
+          "path": "supabase/migrations/20260523000000_admin_panels.sql",
+          "label": "tabla book_views"
+        },
+        {
+          "path": "supabase/migrations/20260722191944_chapter_reads.sql",
+          "label": "tabla chapter_reads"
+        }
+      ],
       "pos": [
         60,
         480
@@ -94,6 +133,16 @@
       "brand": "postgresql",
       "label": "labels · label_rules",
       "sublabel": "auto-etiquetado",
+      "sources": [
+        {
+          "path": "supabase/migrations/20260520020000_labels.sql",
+          "label": "tabla labels"
+        },
+        {
+          "path": "supabase/migrations/20260723043750_label_rules.sql",
+          "label": "tabla label_rules"
+        }
+      ],
       "pos": [
         60,
         580
@@ -108,6 +157,12 @@
       "type": "security",
       "label": "Supabase Auth",
       "sublabel": "email/password · session JWT",
+      "sources": [
+        {
+          "path": "supabase/migrations/20260515161849_profiles_and_auth.sql",
+          "label": "auth + trigger perfil"
+        }
+      ],
       "pos": [
         420,
         120
@@ -122,6 +177,12 @@
       "type": "security",
       "label": "roles / claims",
       "sublabel": "is_admin · is_scan · is_user · is_suspended",
+      "sources": [
+        {
+          "path": "supabase/migrations/20260520000000_rename_admin_to_scan.sql",
+          "label": "funciones de rol"
+        }
+      ],
       "pos": [
         420,
         260
@@ -137,6 +198,12 @@
       "brand": "postgresql",
       "label": "funciones SQL",
       "sublabel": "top · más vistos · trends · admin (RPC)",
+      "sources": [
+        {
+          "path": "supabase/migrations/20260720223843_create_analytics_functions.sql",
+          "label": "RPC analytics"
+        }
+      ],
       "pos": [
         420,
         400
@@ -151,6 +218,12 @@
       "type": "backend",
       "label": "Edge Functions",
       "sublabel": "sync-labels · Deno · CRON/manual",
+      "sources": [
+        {
+          "path": "supabase/functions/sync-labels/index.ts",
+          "label": "edge sync-labels"
+        }
+      ],
       "pos": [
         720,
         120
@@ -165,6 +238,12 @@
       "type": "cloud",
       "label": "Storage",
       "sublabel": "buckets covers · chapters · avatars",
+      "sources": [
+        {
+          "path": "supabase/migrations/20260515200000_storage_migration.sql",
+          "label": "buckets storage"
+        }
+      ],
       "pos": [
         720,
         260
