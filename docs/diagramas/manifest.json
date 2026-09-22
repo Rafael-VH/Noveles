@@ -1,6 +1,6 @@
 {
   "generado_por": "tools/build-diagrams.mjs",
-  "total": 2,
+  "total": 3,
   "diagramas": [
     {
       "slug": "architecture",
@@ -18,7 +18,7 @@
       "nodos": 14,
       "relaciones": 14,
       "capitulos": 0,
-      "actualizado": "2026-09-21",
+      "actualizado": "2026-09-22",
       "archivo": "diagramas/architecture/index.html",
       "especificacion": "diagramas/architecture/architecture.json"
     },
@@ -38,9 +38,24 @@
       "nodos": 12,
       "relaciones": 8,
       "capitulos": 0,
-      "actualizado": "2026-09-21",
+      "actualizado": "2026-09-22",
       "archivo": "diagramas/supabase/index.html",
       "especificacion": "diagramas/supabase/supabase.json"
+    },
+    {
+      "slug": "pipeline",
+      "titulo": "Pipeline · ingesta de contenido en Noveles",
+      "tipo": "workflow",
+      "tipoTexto": "Proceso",
+      "descripcion": "",
+      "etiquetas": [],
+      "destacado": false,
+      "nodos": 0,
+      "relaciones": 0,
+      "capitulos": 3,
+      "actualizado": "2026-09-22",
+      "archivo": "diagramas/pipeline/index.html",
+      "especificacion": "diagramas/pipeline/pipeline.json"
     }
   ]
 }

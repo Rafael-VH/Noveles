@@ -1,0 +1,333 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Pipeline · ingesta de contenido en Noveles",
+    "subtitle": "Del archivo .md/.txt del panel scan al capítulo legible — Storage + Postgres",
+    "locale": "en",
+    "visual_preset": "classic",
+    "quality_profile": "standard",
+    "animation": "trace",
+    "viewBox": [
+      1144,
+      900
+    ],
+    "views": [
+      {
+        "id": "ingesta",
+        "label": "Ingesta",
+        "focus": [
+          "archivo",
+          "edit_screen",
+          "repo_upload",
+          "bucket",
+          "insert"
+        ],
+        "note": "El archivo sube a Storage y su URL pública se guarda en el capítulo."
+      },
+      {
+        "id": "lectura",
+        "label": "Lectura",
+        "focus": [
+          "insert",
+          "lector",
+          "bucket"
+        ],
+        "note": "El lector trae la fila y descarga el contenido desde el bucket, con cache previa."
+      },
+      {
+        "id": "fallos",
+        "label": "Fallos de ingesta",
+        "focus": [
+          "fallo",
+          "repo_upload",
+          "edit_screen"
+        ],
+        "note": "Validación de formato/tamaño y timeout de 10s en la pantalla."
+      }
+    ]
+  },
+  "lanes": [
+    {
+      "id": "scan",
+      "label": "Rol Scan · panel de contenido"
+    },
+    {
+      "id": "app",
+      "label": "App cliente · repository"
+    },
+    {
+      "id": "storage",
+      "label": "Supabase Storage"
+    },
+    {
+      "id": "db",
+      "label": "Postgres · chapters"
+    },
+    {
+      "id": "lector_lane",
+      "label": "Rol Lector"
+    },
+    {
+      "id": "fallos",
+      "label": "Fallos · reintento",
+      "variant": "exception"
+    }
+  ],
+  "phases": [
+    {
+      "id": "ingesta_ph",
+      "label": "Ingesta",
+      "fromCol": 0,
+      "toCol": 1,
+      "variant": "emphasis"
+    },
+    {
+      "id": "persistencia_ph",
+      "label": "Persistencia",
+      "fromCol": 2,
+      "toCol": 4,
+      "variant": "dashed"
+    },
+    {
+      "id": "lectura_ph",
+      "label": "Lectura",
+      "fromCol": 5,
+      "toCol": 5,
+      "variant": "default"
+    }
+  ],
+  "groups": [
+    {
+      "id": "storage_zone",
+      "label": "Storage buckets",
+      "lane": "storage",
+      "fromCol": 3,
+      "toCol": 4,
+      "variant": "emphasis"
+    }
+  ],
+  "mainPath": [
+    "archivo",
+    "edit_screen",
+    "repo_upload",
+    "bucket",
+    "insert",
+    "lector"
+  ],
+  "semanticChecks": {
+    "allowedRoots": [
+      "archivo"
+    ],
+    "allowedTerminals": [
+      "lector",
+      "cover_bucket"
+    ],
+    "requiredEdges": [
+      {
+        "from": "archivo",
+        "to": "edit_screen"
+      },
+      {
+        "from": "edit_screen",
+        "to": "repo_upload"
+      },
+      {
+        "from": "repo_upload",
+        "to": "bucket"
+      },
+      {
+        "from": "bucket",
+        "to": "insert"
+      },
+      {
+        "from": "insert",
+        "to": "lector"
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "id": "archivo",
+      "lane": "scan",
+      "col": 0,
+      "type": "external",
+      "label": "Archivo .md/.txt",
+      "sublabel": "file picker",
+      "width": 120
+    },
+    {
+      "id": "edit_screen",
+      "lane": "scan",
+      "col": 1,
+      "type": "frontend",
+      "label": "ScanChapterEditScreen",
+      "sublabel": "UploadChapterFile · timeout 10s",
+      "width": 150
+    },
+    {
+      "id": "repo_upload",
+      "lane": "app",
+      "col": 2,
+      "type": "backend",
+      "label": "ChapterRepository.uploadContent()",
+      "sublabel": "valida .txt/.html · 10MB",
+      "width": 250
+    },
+    {
+      "id": "bucket",
+      "lane": "storage",
+      "col": 3,
+      "type": "cloud",
+      "label": "Storage · chapters",
+      "sublabel": "{userId}/{timestamp}.{ext}",
+      "width": 150
+    },
+    {
+      "id": "cover_bucket",
+      "lane": "storage",
+      "col": 4,
+      "type": "cloud",
+      "label": "Storage · covers",
+      "sublabel": "portadas de libro/took",
+      "width": 150
+    },
+    {
+      "id": "insert",
+      "lane": "db",
+      "col": 4,
+      "type": "database",
+      "label": "chapters",
+      "sublabel": "INSERT · RLS is_scan()",
+      "width": 210
+    },
+    {
+      "id": "lector",
+      "lane": "lector_lane",
+      "col": 5,
+      "type": "frontend",
+      "label": "Lector · GetChapterContent",
+      "sublabel": "cache → downloadContent",
+      "width": 190
+    },
+    {
+      "id": "fallo",
+      "lane": "fallos",
+      "col": 3,
+      "type": "security",
+      "label": "Fallos de ingesta",
+      "sublabel": "formato · 10MB · timeout 10s",
+      "width": 145
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-pick",
+      "from": "archivo",
+      "to": "edit_screen",
+      "label": "selecciona",
+      "role": "main",
+      "labelDy": 50
+    },
+    {
+      "id": "e-upload",
+      "from": "edit_screen",
+      "to": "repo_upload",
+      "label": "UploadChapterFile",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-subir",
+      "from": "repo_upload",
+      "to": "bucket",
+      "label": "sube",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-url",
+      "from": "bucket",
+      "to": "insert",
+      "label": "URL pública → content",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-fetch",
+      "from": "insert",
+      "to": "lector",
+      "label": "fetch",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-cover",
+      "from": "edit_screen",
+      "to": "cover_bucket",
+      "label": "portada",
+      "role": "branch",
+      "variant": "dashed"
+    },
+    {
+      "id": "e-download",
+      "from": "lector",
+      "to": "bucket",
+      "label": "descarga (cache miss)",
+      "role": "branch",
+      "variant": "dashed"
+    },
+    {
+      "id": "e-fallo-formato",
+      "from": "repo_upload",
+      "to": "fallo",
+      "label": "ext · 10MB",
+      "role": "error",
+      "variant": "security",
+      "labelDy": 14
+    },
+    {
+      "id": "e-fallo-timeout",
+      "from": "edit_screen",
+      "to": "fallo",
+      "label": "timeout 10s",
+      "role": "error",
+      "variant": "security",
+      "labelSegment": 0
+    },
+    {
+      "id": "e-reintento",
+      "from": "fallo",
+      "to": "edit_screen",
+      "label": "reintenta",
+      "role": "return",
+      "variant": "dashed"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Un solo camino",
+      "items": [
+        "Archivo → Storage → DB → lector, en horizontal",
+        "La URL pública se guarda como content del capítulo"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Fallos acotados",
+      "items": [
+        "Solo .txt/.html y 10MB en uploadContent()",
+        "Timeout de 10s del Completer en la pantalla"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Rama lateral",
+      "items": [
+        "Las portadas (covers) viven fuera del camino principal",
+        "El lector cachea antes de descargar"
+      ]
+    }
+  ]
+}
