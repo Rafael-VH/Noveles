@@ -1,6 +1,6 @@
 {
   "generado_por": "tools/build-diagrams.mjs",
-  "total": 3,
+  "total": 4,
   "diagramas": [
     {
       "slug": "architecture",
@@ -21,6 +21,21 @@
       "actualizado": "2026-09-22",
       "archivo": "diagramas/architecture/index.html",
       "especificacion": "diagramas/architecture/architecture.json"
+    },
+    {
+      "slug": "secuencia-clave",
+      "titulo": "Login y ruteo por rol",
+      "tipo": "sequence",
+      "tipoTexto": "Secuencia",
+      "descripcion": "",
+      "etiquetas": [],
+      "destacado": false,
+      "nodos": 0,
+      "relaciones": 0,
+      "capitulos": 4,
+      "actualizado": "2026-09-22",
+      "archivo": "diagramas/secuencia-clave/index.html",
+      "especificacion": "diagramas/secuencia-clave/secuencia-clave.json"
     },
     {
       "slug": "supabase",

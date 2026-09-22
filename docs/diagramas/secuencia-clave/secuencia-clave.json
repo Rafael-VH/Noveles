@@ -1,0 +1,500 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Login y ruteo por rol",
+    "subtitle": "Credenciales → sesión → profiles → pantalla según rol · expiración de token vía stream",
+    "output": "docs/diagramas/secuencia-clave/secuencia-clave.html",
+    "viewBox": [
+      1500,
+      1160
+    ],
+    "column_fit": "spread",
+    "animation": "trace",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "credenciales",
+        "label": "Credenciales → sesión",
+        "focus": [
+          "user",
+          "login",
+          "bloc",
+          "usecases",
+          "repo",
+          "authgw",
+          "supabase"
+        ],
+        "note": "Sigue el email+password desde la pantalla hasta Supabase Auth y la sesión que vuelve."
+      },
+      {
+        "id": "profiles",
+        "label": "Carga / creación de profiles",
+        "focus": [
+          "repo",
+          "datagw",
+          "profiles"
+        ],
+        "note": "El perfil se lee de Postgres; si no existe se crea con rol user y se verifica."
+      },
+      {
+        "id": "routing",
+        "label": "Selección de pantalla por rol",
+        "focus": [
+          "usecases",
+          "bloc",
+          "app",
+          "user"
+        ],
+        "note": "AuthAuthenticated llega al router, que elige la home según isAdmin / isScan / isUser."
+      },
+      {
+        "id": "expiracion",
+        "label": "Expiración de token",
+        "focus": [
+          "supabase",
+          "authgw",
+          "repo",
+          "bloc",
+          "app",
+          "user"
+        ],
+        "note": "El stream avisa signedOut y el logout automático vuelve a LoginScreen."
+      }
+    ]
+  },
+  "participants": [
+    {
+      "id": "user",
+      "type": "external",
+      "label": "Usuario"
+    },
+    {
+      "id": "login",
+      "type": "frontend",
+      "label": "LoginScreen"
+    },
+    {
+      "id": "bloc",
+      "type": "frontend",
+      "label": "AuthBloc",
+      "sublabel": "sesión + stream"
+    },
+    {
+      "id": "usecases",
+      "type": "backend",
+      "label": "Use cases",
+      "sublabel": "Login · Auth · Logout"
+    },
+    {
+      "id": "repo",
+      "type": "backend",
+      "label": "AuthRepository",
+      "sublabel": "AuthRepositoryImpl"
+    },
+    {
+      "id": "authgw",
+      "type": "cloud",
+      "label": "AuthGateway",
+      "sublabel": "SupabaseAuthGateway"
+    },
+    {
+      "id": "supabase",
+      "type": "security",
+      "label": "Supabase Auth",
+      "sublabel": "sesión / token"
+    },
+    {
+      "id": "datagw",
+      "type": "cloud",
+      "label": "DataGateway",
+      "sublabel": "SupabaseDataGateway"
+    },
+    {
+      "id": "profiles",
+      "type": "database",
+      "label": "profiles",
+      "sublabel": "Postgres · RLS"
+    },
+    {
+      "id": "app",
+      "type": "frontend",
+      "label": "App",
+      "sublabel": "router por rol"
+    }
+  ],
+  "segments": [
+    {
+      "from": 145,
+      "to": 355,
+      "label": "Credenciales → sesión"
+    },
+    {
+      "from": 360,
+      "to": 560,
+      "label": "Carga / creación de profiles"
+    },
+    {
+      "from": 565,
+      "to": 690,
+      "label": "Routing por rol"
+    },
+    {
+      "from": 695,
+      "to": 1025,
+      "label": "Expiración → logout"
+    }
+  ],
+  "messages": [
+    {
+      "id": "ingresar",
+      "from": "user",
+      "to": "login",
+      "y": 160,
+      "label": "email + password",
+      "variant": "default"
+    },
+    {
+      "id": "login-requested",
+      "from": "login",
+      "to": "bloc",
+      "y": 185,
+      "label": "LoginRequested(email, password)",
+      "variant": "emphasis"
+    },
+    {
+      "id": "login-uc",
+      "from": "bloc",
+      "to": "usecases",
+      "y": 210,
+      "label": "login(email, password)",
+      "variant": "emphasis"
+    },
+    {
+      "id": "login-repo",
+      "from": "usecases",
+      "to": "repo",
+      "y": 235,
+      "label": "login()",
+      "variant": "emphasis"
+    },
+    {
+      "id": "sign-in",
+      "from": "repo",
+      "to": "authgw",
+      "y": 260,
+      "label": "signIn(email, password)",
+      "variant": "security"
+    },
+    {
+      "id": "token-request",
+      "from": "authgw",
+      "to": "supabase",
+      "y": 285,
+      "label": "POST /auth/v1/token",
+      "variant": "security"
+    },
+    {
+      "id": "session-return",
+      "from": "supabase",
+      "to": "authgw",
+      "y": 316,
+      "label": "session + identity",
+      "variant": "return"
+    },
+    {
+      "id": "identity-return",
+      "from": "authgw",
+      "to": "repo",
+      "y": 345,
+      "label": "AuthIdentity(id, email)",
+      "variant": "return"
+    },
+    {
+      "id": "select-profile",
+      "from": "repo",
+      "to": "datagw",
+      "y": 373,
+      "label": "select('*').eq('id', userId)",
+      "variant": "default"
+    },
+    {
+      "id": "query-profiles",
+      "from": "datagw",
+      "to": "profiles",
+      "y": 402,
+      "label": "SELECT profiles",
+      "variant": "emphasis"
+    },
+    {
+      "id": "row-or-null",
+      "from": "profiles",
+      "to": "datagw",
+      "y": 432,
+      "label": "row | null",
+      "variant": "return"
+    },
+    {
+      "id": "maybe-row",
+      "from": "datagw",
+      "to": "repo",
+      "y": 460,
+      "label": "maybeRow()",
+      "variant": "return"
+    },
+    {
+      "id": "insert-create",
+      "from": "repo",
+      "to": "datagw",
+      "y": 488,
+      "label": "si null → insert({ role: user })",
+      "variant": "dashed"
+    },
+    {
+      "id": "insert-profiles",
+      "from": "datagw",
+      "to": "profiles",
+      "y": 516,
+      "label": "INSERT + verify",
+      "variant": "dashed"
+    },
+    {
+      "id": "profile-row",
+      "from": "datagw",
+      "to": "repo",
+      "y": 544,
+      "label": "profile row",
+      "variant": "return"
+    },
+    {
+      "id": "ok-user",
+      "from": "repo",
+      "to": "usecases",
+      "y": 572,
+      "label": "Ok(UserEntity)",
+      "variant": "return"
+    },
+    {
+      "id": "ok-or-err",
+      "from": "usecases",
+      "to": "bloc",
+      "y": 600,
+      "label": "Ok(user) | Err(msg)",
+      "variant": "return"
+    },
+    {
+      "id": "authenticated",
+      "from": "bloc",
+      "to": "app",
+      "y": 628,
+      "label": "AuthAuthenticated(user)",
+      "variant": "emphasis"
+    },
+    {
+      "id": "home-for",
+      "from": "app",
+      "to": "user",
+      "y": 656,
+      "label": "_homeFor · isScan → ScanMainScreen",
+      "variant": "default",
+      "note": "isAdmin → AdminDash · isUser → Main · else → Login"
+    },
+    {
+      "id": "auth-error",
+      "from": "bloc",
+      "to": "login",
+      "y": 688,
+      "label": "AuthError → SnackBar",
+      "variant": "dashed"
+    },
+    {
+      "id": "token-expired",
+      "from": "supabase",
+      "to": "authgw",
+      "y": 705,
+      "label": "token expira → signedOut",
+      "variant": "dashed"
+    },
+    {
+      "id": "stream-event",
+      "from": "authgw",
+      "to": "repo",
+      "y": 733,
+      "label": "stateChanges → AuthEvent.signedOut",
+      "variant": "return"
+    },
+    {
+      "id": "signed-out",
+      "from": "repo",
+      "to": "bloc",
+      "y": 761,
+      "label": "signedOut (no manual)",
+      "variant": "return"
+    },
+    {
+      "id": "logout-requested",
+      "from": "bloc",
+      "to": "usecases",
+      "y": 789,
+      "label": "LogoutRequested → logout()",
+      "variant": "emphasis"
+    },
+    {
+      "id": "sign-out",
+      "from": "usecases",
+      "to": "repo",
+      "y": 817,
+      "label": "signOut()",
+      "variant": "emphasis"
+    },
+    {
+      "id": "sign-out-gw",
+      "from": "repo",
+      "to": "authgw",
+      "y": 845,
+      "label": "signOut()",
+      "variant": "security"
+    },
+    {
+      "id": "revoke",
+      "from": "authgw",
+      "to": "supabase",
+      "y": 873,
+      "label": "revoke session",
+      "variant": "default"
+    },
+    {
+      "id": "revoke-ok",
+      "from": "supabase",
+      "to": "authgw",
+      "y": 901,
+      "label": "ok",
+      "variant": "return"
+    },
+    {
+      "id": "signout-ok",
+      "from": "authgw",
+      "to": "repo",
+      "y": 929,
+      "label": "Ok(())",
+      "variant": "return"
+    },
+    {
+      "id": "logout-ok",
+      "from": "repo",
+      "to": "usecases",
+      "y": 957,
+      "label": "Ok(())",
+      "variant": "return"
+    },
+    {
+      "id": "done",
+      "from": "usecases",
+      "to": "bloc",
+      "y": 985,
+      "label": "Ok(())",
+      "variant": "return"
+    },
+    {
+      "id": "unauthenticated",
+      "from": "bloc",
+      "to": "app",
+      "y": 1013,
+      "label": "AuthUnauthenticated",
+      "variant": "dashed"
+    },
+    {
+      "id": "back-to-login",
+      "from": "app",
+      "to": "user",
+      "y": 1041,
+      "label": "LoginScreen",
+      "variant": "return"
+    }
+  ],
+  "activations": [
+    {
+      "participant": "login",
+      "from": 160,
+      "to": 688,
+      "type": "frontend"
+    },
+    {
+      "participant": "bloc",
+      "from": 185,
+      "to": 1013,
+      "type": "frontend"
+    },
+    {
+      "participant": "usecases",
+      "from": 210,
+      "to": 985,
+      "type": "backend"
+    },
+    {
+      "participant": "repo",
+      "from": 235,
+      "to": 957,
+      "type": "backend"
+    },
+    {
+      "participant": "authgw",
+      "from": 260,
+      "to": 929,
+      "type": "cloud"
+    },
+    {
+      "participant": "supabase",
+      "from": 285,
+      "to": 901,
+      "type": "security"
+    },
+    {
+      "participant": "datagw",
+      "from": 373,
+      "to": 544,
+      "type": "cloud"
+    },
+    {
+      "participant": "profiles",
+      "from": 402,
+      "to": 516,
+      "type": "database"
+    },
+    {
+      "participant": "app",
+      "from": 628,
+      "to": 1013,
+      "type": "frontend"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Happy Path",
+      "items": [
+        "Las credenciales viajan LoginScreen → AuthBloc → use cases → repositorio → gateways",
+        "Supabase devuelve session + identity y el perfil se lee de profiles",
+        "El router elige la home según el rol del usuario autenticado"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Fallos y seguridad",
+      "items": [
+        "signIn y el intercambio de sesión se colorean como interacción de seguridad",
+        "Error en use case → AuthError → SnackBar, sin sacar al usuario",
+        "authError en el stream NO es sign-out: se re-chequea la sesión"
+      ]
+    },
+    {
+      "dot": "orange",
+      "title": "Mantenimiento de sesión",
+      "items": [
+        "El stream de auth avisa signedOut cuando el token expira",
+        "La expiración dispara LogoutRequested automático",
+        "Suspended o rol unknown nunca llegan a una pantalla autenticada"
+      ]
+    }
+  ]
+}
