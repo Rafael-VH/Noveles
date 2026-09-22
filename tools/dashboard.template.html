@@ -452,8 +452,6 @@
     var titulo = document.createElement("h2");
     var enlace = document.createElement("a");
     enlace.href = diagrama.archivo;
-    enlace.target = "_blank";
-    enlace.rel = "noopener";
     enlace.textContent = diagrama.titulo;
     titulo.appendChild(enlace);
     tarjeta.appendChild(titulo);
@@ -489,8 +487,6 @@
     var abrir = document.createElement("a");
     abrir.className = "boton boton--principal";
     abrir.href = diagrama.archivo;
-    abrir.target = "_blank";
-    abrir.rel = "noopener";
     abrir.textContent = "Abrir diagrama";
     acciones.appendChild(abrir);
 
