@@ -1,0 +1,305 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "Storage: covers vs chapters y cleanup",
+    "locale": "en",
+    "visual_preset": "classic",
+    "quality_profile": "standard",
+    "animation": "trace",
+    "viewBox": [
+      1920,
+      1000
+    ],
+    "views": [
+      {
+        "id": "upload",
+        "label": "Upload por bucket",
+        "focus": [
+          "scan_edit",
+          "book_forms",
+          "upload_content",
+          "upload_image",
+          "covers_bucket",
+          "chapters_bucket"
+        ],
+        "note": "El contenido de capítulos (txt/html, 10MB) sube a chapters; las portadas (jpg/png/webp, 5MB) a covers."
+      },
+      {
+        "id": "cleanup",
+        "label": "Cleanup huérfanos",
+        "focus": [
+          "book_repo",
+          "data_gw",
+          "storage_gw",
+          "covers_bucket",
+          "chapters_bucket"
+        ],
+        "note": "deleteBook usa bookContentTree para saber qué limpiar en Storage antes del DELETE."
+      },
+      {
+        "id": "lectura",
+        "label": "Lectura con cache",
+        "focus": [
+          "chapter_repo",
+          "storage_gw",
+          "chapters_bucket"
+        ],
+        "note": "downloadContent intenta ChapterCache (disco, TTL 7d) antes de Storage."
+      }
+    ]
+  },
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Buckets separados",
+      "items": [
+        "chapters: contenido .md/.txt (10MB) · filename $userId/millis.ext",
+        "covers: portadas jpg/jpeg/png/webp (5MB) · filename $userId/millis.ext",
+        "StorageGateway: upload · download · remove · publicUrl · pathFromUrl"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Cleanup con bookContentTree",
+      "items": [
+        "deleteBook consulta 'cover, tooks(chapters(content), cover)'",
+        "Limpia covers y contenido en Storage antes del DELETE cascade",
+        "El contrato de retorno: publicUrl para capítulos, filename para portadas"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Lectura y caché",
+      "items": [
+        "downloadContent valida cache en disco (TTL 7 días) antes de Storage",
+        "ChapterCache: has / read / save / clear",
+        "RLS Storage con ownership por carpeta $userId (fixes 2026-07)"
+      ]
+    }
+  ],
+  "stages": [
+    {
+      "label": "UI · Flutter"
+    },
+    {
+      "label": "Use cases"
+    },
+    {
+      "label": "Repositories"
+    },
+    {
+      "label": "Gateways"
+    },
+    {
+      "label": "Supabase"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "scan_edit",
+      "type": "frontend",
+      "label": "ScanChapterEditScreen",
+      "sublabel": "selecciona archivo",
+      "stage": 0,
+      "row": 0,
+      "width": 150
+    },
+    {
+      "id": "book_forms",
+      "type": "frontend",
+      "label": "Formularios scan",
+      "sublabel": "portadas",
+      "stage": 0,
+      "row": 1,
+      "width": 140
+    },
+    {
+      "id": "upload_content",
+      "type": "backend",
+      "label": "UploadChapterContent",
+      "sublabel": "uploadContent(filePath)",
+      "stage": 1,
+      "row": 0,
+      "width": 160
+    },
+    {
+      "id": "upload_image",
+      "type": "backend",
+      "label": "UploadImage",
+      "sublabel": "uploadImage(filePath)",
+      "stage": 1,
+      "row": 1,
+      "width": 150
+    },
+    {
+      "id": "chapter_repo",
+      "type": "database",
+      "label": "ChapterRepository",
+      "sublabel": "uploadContent · downloadContent",
+      "stage": 2,
+      "row": 0,
+      "width": 170
+    },
+    {
+      "id": "book_repo",
+      "type": "database",
+      "label": "BookRepository",
+      "sublabel": "uploadImage · deleteBook",
+      "stage": 2,
+      "row": 1,
+      "width": 170
+    },
+    {
+      "id": "storage_gw",
+      "type": "cloud",
+      "label": "StorageGateway",
+      "sublabel": "upload · download · remove",
+      "stage": 3,
+      "row": 1,
+      "width": 170
+    },
+    {
+      "id": "data_gw",
+      "type": "cloud",
+      "label": "DataGateway",
+      "sublabel": "bookContentTree(id)",
+      "stage": 3,
+      "row": 3,
+      "width": 160
+    },
+    {
+      "id": "chapters_bucket",
+      "type": "cloud",
+      "label": "Storage chapters",
+      "sublabel": "bucket · $userId/millis.ext",
+      "stage": 4,
+      "row": 0,
+      "width": 160
+    },
+    {
+      "id": "covers_bucket",
+      "type": "cloud",
+      "label": "Storage covers",
+      "sublabel": "bucket · $userId/millis.ext",
+      "stage": 4,
+      "row": 2,
+      "width": 160
+    }
+  ],
+  "flows": [
+    {
+      "id": "f-pick-content",
+      "from": "scan_edit",
+      "to": "upload_content",
+      "label": "selecciona .md/.txt",
+      "labelAt": [
+        205,
+        200
+      ],
+      "classification": "origen",
+      "variant": "emphasis"
+    },
+    {
+      "id": "f-pick-cover",
+      "from": "book_forms",
+      "to": "upload_image",
+      "label": "selecciona portada",
+      "labelAt": [
+        205,
+        428
+      ],
+      "classification": "origen",
+      "variant": "emphasis"
+    },
+    {
+      "id": "f-content-uc",
+      "from": "upload_content",
+      "to": "chapter_repo",
+      "label": "uploadContent(path)",
+      "labelAt": [
+        420,
+        200
+      ],
+      "classification": "escritura"
+    },
+    {
+      "id": "f-image-uc",
+      "from": "upload_image",
+      "to": "book_repo",
+      "label": "uploadImage(path)",
+      "labelAt": [
+        418,
+        428
+      ],
+      "classification": "escritura"
+    },
+    {
+      "id": "f-repo-chapters",
+      "from": "chapter_repo",
+      "to": "storage_gw",
+      "label": "upload(chapters, path, file)",
+      "labelAt": [
+        640,
+        200
+      ],
+      "classification": "escritura",
+      "variant": "emphasis"
+    },
+    {
+      "id": "f-repo-covers",
+      "from": "book_repo",
+      "to": "storage_gw",
+      "label": "upload(covers) · remove(paths)",
+      "labelAt": [
+        640,
+        314
+      ],
+      "classification": "escritura",
+      "variant": "emphasis"
+    },
+    {
+      "id": "f-bucket-chapters",
+      "from": "storage_gw",
+      "to": "chapters_bucket",
+      "label": "PUT · DELETE $userId/millis.ext",
+      "labelAt": [
+        900,
+        200
+      ],
+      "classification": "escritura",
+      "variant": "emphasis"
+    },
+    {
+      "id": "f-bucket-covers",
+      "from": "storage_gw",
+      "to": "covers_bucket",
+      "label": "PUT · DELETE $userId/millis.ext",
+      "labelAt": [
+        900,
+        428
+      ],
+      "classification": "escritura",
+      "variant": "emphasis"
+    },
+    {
+      "id": "f-cleanup-tree",
+      "from": "book_repo",
+      "to": "data_gw",
+      "label": "bookContentTree(bookId)",
+      "labelAt": [
+        640,
+        542
+      ],
+      "classification": "consulta",
+      "variant": "emphasis"
+    },
+    {
+      "id": "f-tree-back",
+      "from": "data_gw",
+      "to": "book_repo",
+      "label": "covers + content URLs",
+      "classification": "cleanup"
+    }
+  ]
+}

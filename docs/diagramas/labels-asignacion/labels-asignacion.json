@@ -1,0 +1,348 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Gestión y asignación de labels en Noveles",
+    "locale": "en",
+    "visual_preset": "classic",
+    "quality_profile": "standard",
+    "animation": "trace",
+    "viewBox": [
+      1600,
+      1000
+    ],
+    "views": [
+      {
+        "id": "gestion",
+        "label": "CRUD de labels",
+        "focus": [
+          "label_mgmt",
+          "label_bloc",
+          "uc_crud",
+          "label_repo",
+          "labels_db"
+        ],
+        "note": "LabelManagementScreen → LabelBloc → use cases → LabelRepository → tabla labels (RLS is_scan() OR is_admin())."
+      },
+      {
+        "id": "asignacion",
+        "label": "Asignación a libros",
+        "focus": [
+          "label_bloc",
+          "uc_assign",
+          "label_repo",
+          "books_labels_db"
+        ],
+        "note": "AssignLabelToBook → repo.assignLabel(bookId, labelId) sobre la M:N books_labels."
+      },
+      {
+        "id": "reglas",
+        "label": "Label rules",
+        "focus": [
+          "rules_tab",
+          "rules_bloc",
+          "uc_rules",
+          "rules_repo",
+          "rules_db"
+        ],
+        "note": "Reglas automáticas por métrica (rule_type + params JSONB) en label_rules."
+      }
+    ]
+  },
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Labels manuales",
+      "items": [
+        "labels: id · name · color (default '#71A202')",
+        "books_labels M:N con PK compuesta (book_id, label_id) y FK CASCADE",
+        "RLS SELECT público · escritura solo is_scan() OR is_admin()"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Asignación y consulta",
+      "items": [
+        "AssignLabelToBook → repo.assignLabel(bookId, labelId)",
+        "RemoveLabelFromBook → repo.removeLabel(bookId, labelId)",
+        "getBookLabels(bookIds) → Map<bookId, Set<labelId>> para badges"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "label_rules y permisos",
+      "items": [
+        "label_rules: rule_type CHECK (new_release · most_read · most_popular · most_favorited)",
+        "params JSONB · políticas corregidas a is_admin() (fix 2026-07-27)",
+        "Guard '/label-management' permite admin || scan"
+      ]
+    }
+  ],
+  "lanes": [
+    {
+      "id": "ui",
+      "label": "UI · Flutter"
+    },
+    {
+      "id": "domain",
+      "label": "BLoC + Use cases"
+    },
+    {
+      "id": "data",
+      "label": "Repositories"
+    },
+    {
+      "id": "backend",
+      "label": "DataGateway · Supabase"
+    },
+    {
+      "id": "db",
+      "label": "Postgres · RLS"
+    }
+  ],
+  "mainPath": [
+    "label_mgmt",
+    "label_bloc",
+    "uc_assign",
+    "label_repo",
+    "books_labels_db"
+  ],
+  "semanticChecks": {
+    "allowedRoots": [
+      "label_mgmt",
+      "rules_tab"
+    ],
+    "allowedTerminals": [
+      "labels_db",
+      "books_labels_db",
+      "rules_db",
+      "data_gateway"
+    ],
+    "requiredEdges": [
+      {
+        "from": "label_mgmt",
+        "to": "label_bloc"
+      },
+      {
+        "from": "label_bloc",
+        "to": "uc_assign"
+      },
+      {
+        "from": "uc_assign",
+        "to": "label_repo"
+      },
+      {
+        "from": "label_repo",
+        "to": "books_labels_db"
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "id": "label_mgmt",
+      "lane": "ui",
+      "col": 0,
+      "type": "frontend",
+      "label": "LabelManagementScreen",
+      "sublabel": "gestión + asignación",
+      "width": 190
+    },
+    {
+      "id": "rules_tab",
+      "lane": "ui",
+      "col": 1,
+      "type": "frontend",
+      "label": "LabelRulesTab",
+      "sublabel": "reglas automáticas",
+      "width": 180
+    },
+    {
+      "id": "label_bloc",
+      "lane": "domain",
+      "col": 1,
+      "type": "backend",
+      "label": "LabelBloc",
+      "sublabel": "CRUD + assign",
+      "width": 170
+    },
+    {
+      "id": "rules_bloc",
+      "lane": "domain",
+      "col": 4,
+      "type": "backend",
+      "label": "LabelRulesBloc",
+      "sublabel": "reglas por métrica",
+      "width": 180
+    },
+    {
+      "id": "uc_crud",
+      "lane": "domain",
+      "col": 2,
+      "type": "backend",
+      "label": "CreateLabel · DeleteLabel",
+      "sublabel": "GetLabels · UpdateLabel",
+      "width": 190
+    },
+    {
+      "id": "uc_assign",
+      "lane": "domain",
+      "col": 3,
+      "type": "backend",
+      "label": "AssignLabelToBook",
+      "sublabel": "RemoveLabelFromBook",
+      "width": 190
+    },
+    {
+      "id": "uc_rules",
+      "lane": "domain",
+      "col": 5,
+      "type": "backend",
+      "label": "CreateRule · DeleteRule",
+      "sublabel": "GetRules · UpdateRule",
+      "width": 190
+    },
+    {
+      "id": "label_repo",
+      "lane": "data",
+      "col": 3,
+      "type": "database",
+      "label": "LabelRepository",
+      "sublabel": "impl · assignLabel(book, label)",
+      "width": 200
+    },
+    {
+      "id": "rules_repo",
+      "lane": "data",
+      "col": 5,
+      "type": "database",
+      "label": "LabelRuleRepository",
+      "sublabel": "impl · rules CRUD",
+      "width": 190
+    },
+    {
+      "id": "data_gateway",
+      "lane": "backend",
+      "col": 2,
+      "type": "cloud",
+      "label": "DataGateway",
+      "sublabel": "port · sin leak vendor",
+      "width": 180
+    },
+    {
+      "id": "labels_db",
+      "lane": "db",
+      "col": 3,
+      "type": "database",
+      "label": "labels",
+      "sublabel": "id · name · color · RLS",
+      "width": 190
+    },
+    {
+      "id": "books_labels_db",
+      "lane": "db",
+      "col": 5,
+      "type": "database",
+      "label": "books_labels",
+      "sublabel": "PK (book, label) · M:N",
+      "width": 190
+    },
+    {
+      "id": "rules_db",
+      "lane": "db",
+      "col": 4,
+      "type": "database",
+      "label": "label_rules",
+      "sublabel": "rule_type + params JSONB",
+      "width": 200
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-open",
+      "from": "label_mgmt",
+      "to": "label_bloc",
+      "label": "abre gestión",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-crud",
+      "from": "label_bloc",
+      "to": "uc_crud",
+      "label": "create · delete",
+      "role": "main"
+    },
+    {
+      "id": "e-assign",
+      "from": "label_bloc",
+      "to": "uc_assign",
+      "label": "assign · remove",
+      "role": "main"
+    },
+    {
+      "id": "e-crud-repo",
+      "from": "uc_crud",
+      "to": "label_repo",
+      "label": "createLabel · deleteLabel",
+      "role": "main"
+    },
+    {
+      "id": "e-assign-repo",
+      "from": "uc_assign",
+      "to": "label_repo",
+      "label": "assignLabel(bookId, labelId)",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-repo-labels",
+      "from": "label_repo",
+      "to": "labels_db",
+      "label": "SELECT / INSERT / UPDATE / DELETE",
+      "role": "main"
+    },
+    {
+      "id": "e-repo-books",
+      "from": "label_repo",
+      "to": "books_labels_db",
+      "label": "INSERT / DELETE · M:N",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-repo-gw",
+      "from": "label_repo",
+      "to": "data_gateway",
+      "label": "usa port",
+      "role": "main"
+    },
+    {
+      "id": "e-rules-open",
+      "from": "rules_tab",
+      "to": "rules_bloc",
+      "label": "carga · crea regla",
+      "role": "main"
+    },
+    {
+      "id": "e-rules-bloc",
+      "from": "rules_bloc",
+      "to": "uc_rules",
+      "label": "rule CRUD",
+      "role": "main"
+    },
+    {
+      "id": "e-rules-repo",
+      "from": "uc_rules",
+      "to": "rules_repo",
+      "label": "createRule · updateRule",
+      "role": "main"
+    },
+    {
+      "id": "e-rules-db",
+      "from": "rules_repo",
+      "to": "rules_db",
+      "label": "SELECT / INSERT / UPDATE / DELETE",
+      "role": "main"
+    }
+  ]
+}

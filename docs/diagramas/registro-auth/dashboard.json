@@ -1,0 +1,12 @@
+{
+  "id": "registro-auth",
+  "tipo": "sequence",
+  "titulo": "Registro y primer inicio de sesión",
+  "descripcion": "Register(email, password) hasta el primer render por rol: signUp en AuthGateway, trigger handle_new_user crea profiles con rol user, AuthBloc emite AuthAuthenticated, ListenAuthState navega vía _homeFor (admin→AdminDash, scan→ScanMain, user→Main).",
+  "etiquetas": ["auth", "registro", "profiles", "trigger", "bloc", "routing"],
+  "meta": {
+    "participantes": 10,
+    "mensajes": 22,
+    "views": 3
+  }
+}

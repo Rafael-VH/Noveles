@@ -1,6 +1,6 @@
 {
   "generado_por": "tools/build-diagrams.mjs",
-  "total": 9,
+  "total": 13,
   "diagramas": [
     {
       "slug": "architecture",
@@ -65,6 +65,94 @@
       "actualizado": "2026-09-23",
       "archivo": "diagramas/admin-users-gestion/index.html",
       "especificacion": "diagramas/admin-users-gestion/admin-users-gestion.json"
+    },
+    {
+      "slug": "labels-asignacion",
+      "titulo": "Gestión y asignación de labels en Noveles",
+      "tipo": "workflow",
+      "tipoTexto": "Proceso",
+      "descripcion": "Gestión de labels por admin y asignación sobre libros: CRUD de labels (label_rules gobierna autoasignación), LabelBloc de Flutter, repositorio con tablas labels/label_rules y books_labels (M:N) protegidas por RLS is_scan() OR is_admin(), guarda en /label-management.",
+      "etiquetas": [
+        "labels",
+        "asignacion",
+        "label_rules",
+        "rls",
+        "flutter",
+        "supabase"
+      ],
+      "destacado": false,
+      "nodos": 13,
+      "relaciones": 12,
+      "capitulos": 3,
+      "actualizado": "2026-09-23",
+      "archivo": "diagramas/labels-asignacion/index.html",
+      "especificacion": "diagramas/labels-asignacion/labels-asignacion.json"
+    },
+    {
+      "slug": "lectura-capitulo",
+      "titulo": "Lectura de capítulo y marcado como leído",
+      "tipo": "sequence",
+      "tipoTexto": "Secuencia",
+      "descripcion": "Desde ChapterBloc LoadChapterByIndex hasta las métricas: precarga de 3 capítulos (PreloadAdjacent, cache memoria), descarga con ChapterCache disco TTL 7d, MarkChapterAsRead al 80% de scroll con guard _markedChapters (INSERT chapter_reads PK user_id+chapter_id), y track_book_view con Timer 2s de BookViewTracker → tabla book_views.",
+      "etiquetas": [
+        "chapter",
+        "cache",
+        "chapter_reads",
+        "book_views",
+        "scroll",
+        "bloc"
+      ],
+      "destacado": false,
+      "nodos": 10,
+      "relaciones": 23,
+      "capitulos": 2,
+      "actualizado": "2026-09-23",
+      "archivo": "diagramas/lectura-capitulo/index.html",
+      "especificacion": "diagramas/lectura-capitulo/lectura-capitulo.json"
+    },
+    {
+      "slug": "registro-auth",
+      "titulo": "Registro de usuario en Noveles",
+      "tipo": "sequence",
+      "tipoTexto": "Secuencia",
+      "descripcion": "Register(email, password) hasta el primer render por rol: signUp en AuthGateway, trigger handle_new_user crea profiles con rol user, AuthBloc emite AuthAuthenticated, ListenAuthState navega vía _homeFor (admin→AdminDash, scan→ScanMain, user→Main).",
+      "etiquetas": [
+        "auth",
+        "registro",
+        "profiles",
+        "trigger",
+        "bloc",
+        "routing"
+      ],
+      "destacado": false,
+      "nodos": 10,
+      "relaciones": 22,
+      "capitulos": 3,
+      "actualizado": "2026-09-23",
+      "archivo": "diagramas/registro-auth/index.html",
+      "especificacion": "diagramas/registro-auth/registro-auth.json"
+    },
+    {
+      "slug": "covers-chapters-storage",
+      "titulo": "Storage: covers vs chapters y cleanup",
+      "tipo": "dataflow",
+      "tipoTexto": "Flujo de datos",
+      "descripcion": "Canales separados de Storage: capítulos (.md/.txt, 10MB) al bucket chapters, portadas (jpg/png/webp, 5MB) al bucket covers, ambos con filename $userId/millis.ext; lectura con ChapterCache en disco (TTL 7d) y cleanup huérfanos vía bookContentTree antes del DELETE cascade.",
+      "etiquetas": [
+        "storage",
+        "buckets",
+        "covers",
+        "chapters",
+        "cache",
+        "cleanup"
+      ],
+      "destacado": false,
+      "nodos": 10,
+      "relaciones": 10,
+      "capitulos": 3,
+      "actualizado": "2026-09-23",
+      "archivo": "diagramas/covers-chapters-storage/index.html",
+      "especificacion": "diagramas/covers-chapters-storage/covers-chapters-storage.json"
     },
     {
       "slug": "book-views-analytics",

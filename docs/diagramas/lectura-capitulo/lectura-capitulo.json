@@ -1,0 +1,395 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Lectura de capítulo y marcado como leído",
+    "locale": "en",
+    "visual_preset": "classic",
+    "quality_profile": "standard",
+    "animation": "trace",
+    "viewBox": [
+      1500,
+      1100
+    ],
+    "column_fit": "spread",
+    "views": [
+      {
+        "id": "carga",
+        "label": "Carga con cache",
+        "focus": [
+          "usr",
+          "chapter",
+          "bloc",
+          "usecases",
+          "repo",
+          "cache",
+          "storage",
+          "bucket"
+        ],
+        "note": "ChapterCache en disco (TTL 7 días) evita re-fetch de Storage cuando ya está."
+      },
+      {
+        "id": "leido",
+        "label": "Marcar como leído",
+        "focus": [
+          "chapter",
+          "usecases",
+          "repo",
+          "datagw",
+          "reads"
+        ],
+        "note": "Al 80% del scroll la pantalla dispara MarkChapterAsRead → INSERT en chapter_reads."
+      }
+    ]
+  },
+  "participants": [
+    {
+      "id": "usr",
+      "type": "external",
+      "label": "Usuario"
+    },
+    {
+      "id": "chapter",
+      "type": "frontend",
+      "label": "ChapterScreen",
+      "sublabel": "lectura"
+    },
+    {
+      "id": "bloc",
+      "type": "frontend",
+      "label": "ChapterBloc",
+      "sublabel": "cache en memoria"
+    },
+    {
+      "id": "usecases",
+      "type": "backend",
+      "label": "Use cases",
+      "sublabel": "GetContent · MarkAsRead"
+    },
+    {
+      "id": "repo",
+      "type": "backend",
+      "label": "ChapterRepository",
+      "sublabel": "ChapterRepositoryImpl"
+    },
+    {
+      "id": "cache",
+      "type": "database",
+      "label": "ChapterCache",
+      "sublabel": "disco · TTL 7 días"
+    },
+    {
+      "id": "storage",
+      "type": "cloud",
+      "label": "StorageGateway",
+      "sublabel": "SupabaseStorageGateway"
+    },
+    {
+      "id": "bucket",
+      "type": "cloud",
+      "label": "Storage chapters",
+      "sublabel": "bucket"
+    },
+    {
+      "id": "datagw",
+      "type": "cloud",
+      "label": "DataGateway",
+      "sublabel": "SupabaseDataGateway"
+    },
+    {
+      "id": "reads",
+      "type": "database",
+      "label": "chapter_reads",
+      "sublabel": "Postgres · RLS"
+    }
+  ],
+  "segments": [
+    {
+      "from": 145,
+      "to": 455,
+      "label": "Abrir → contenido (cache → storage)"
+    },
+    {
+      "from": 460,
+      "to": 600,
+      "label": "Render UI"
+    },
+    {
+      "from": 605,
+      "to": 815,
+      "label": "Marcar leído (80% scroll)"
+    }
+  ],
+  "messages": [
+    {
+      "id": "abrir",
+      "from": "usr",
+      "to": "chapter",
+      "y": 160,
+      "label": "abre el capítulo",
+      "variant": "default"
+    },
+    {
+      "id": "load-by-index",
+      "from": "chapter",
+      "to": "bloc",
+      "y": 185,
+      "label": "LoadChapterByIndex",
+      "variant": "emphasis"
+    },
+    {
+      "id": "get-content-uc",
+      "from": "bloc",
+      "to": "usecases",
+      "y": 210,
+      "label": "getChapterContent(contentOrPath)",
+      "variant": "emphasis"
+    },
+    {
+      "id": "get-content-repo",
+      "from": "usecases",
+      "to": "repo",
+      "y": 235,
+      "label": "getChapterContent()",
+      "variant": "emphasis"
+    },
+    {
+      "id": "cache-check",
+      "from": "repo",
+      "to": "cache",
+      "y": 260,
+      "label": "has / read(path)",
+      "variant": "default"
+    },
+    {
+      "id": "cache-miss",
+      "from": "cache",
+      "to": "repo",
+      "y": 288,
+      "label": "miss",
+      "variant": "return"
+    },
+    {
+      "id": "download",
+      "from": "repo",
+      "to": "storage",
+      "y": 316,
+      "label": "download(chapters, path)",
+      "variant": "emphasis"
+    },
+    {
+      "id": "fetch",
+      "from": "storage",
+      "to": "bucket",
+      "y": 344,
+      "label": "GET objeto",
+      "variant": "emphasis"
+    },
+    {
+      "id": "bytes",
+      "from": "bucket",
+      "to": "storage",
+      "y": 372,
+      "label": "bytes",
+      "variant": "return"
+    },
+    {
+      "id": "content",
+      "from": "storage",
+      "to": "repo",
+      "y": 400,
+      "label": "List<int>",
+      "variant": "return"
+    },
+    {
+      "id": "cache-save",
+      "from": "repo",
+      "to": "cache",
+      "y": 428,
+      "label": "save(path, bytes)",
+      "variant": "dashed"
+    },
+    {
+      "id": "content-ok",
+      "from": "repo",
+      "to": "usecases",
+      "y": 445,
+      "label": "Ok(contenido)",
+      "variant": "return"
+    },
+    {
+      "id": "bloc-state",
+      "from": "usecases",
+      "to": "bloc",
+      "y": 488,
+      "label": "Ok(content)",
+      "variant": "return"
+    },
+    {
+      "id": "render",
+      "from": "bloc",
+      "to": "chapter",
+      "y": 516,
+      "label": "estado cargado · render",
+      "variant": "return"
+    },
+    {
+      "id": "preload",
+      "from": "bloc",
+      "to": "usecases",
+      "y": 544,
+      "label": "PreloadAdjacent · siguientes",
+      "variant": "dashed",
+      "note": "precarga 3 capítulos adyacentes en paralelo (cache en memoria)"
+    },
+    {
+      "id": "preload-ok",
+      "from": "usecases",
+      "to": "bloc",
+      "y": 572,
+      "label": "carga en background",
+      "variant": "dashed"
+    },
+    {
+      "id": "scroll-80",
+      "from": "chapter",
+      "to": "usecases",
+      "y": 618,
+      "label": "80% scroll → markChapterAsRead(chapterId, userId)",
+      "variant": "emphasis"
+    },
+    {
+      "id": "mark-repo",
+      "from": "usecases",
+      "to": "repo",
+      "y": 646,
+      "label": "markChapterAsRead()",
+      "variant": "emphasis"
+    },
+    {
+      "id": "insert-read",
+      "from": "repo",
+      "to": "datagw",
+      "y": 674,
+      "label": "insert chapter_reads",
+      "variant": "emphasis"
+    },
+    {
+      "id": "insert-row",
+      "from": "datagw",
+      "to": "reads",
+      "y": 702,
+      "label": "INSERT (user_id, chapter_id, read_at)",
+      "variant": "emphasis"
+    },
+    {
+      "id": "pk-violation",
+      "from": "reads",
+      "to": "datagw",
+      "y": 732,
+      "label": "ok | PK violation → Err",
+      "variant": "return"
+    },
+    {
+      "id": "insert-ok",
+      "from": "datagw",
+      "to": "repo",
+      "y": 762,
+      "label": "ok",
+      "variant": "return"
+    },
+    {
+      "id": "mark-ok",
+      "from": "repo",
+      "to": "usecases",
+      "y": 790,
+      "label": "Ok(())",
+      "variant": "return"
+    }
+  ],
+  "activations": [
+    {
+      "participant": "chapter",
+      "from": 160,
+      "to": 618,
+      "type": "frontend"
+    },
+    {
+      "participant": "bloc",
+      "from": 185,
+      "to": 572,
+      "type": "frontend"
+    },
+    {
+      "participant": "usecases",
+      "from": 210,
+      "to": 790,
+      "type": "backend"
+    },
+    {
+      "participant": "repo",
+      "from": 235,
+      "to": 790,
+      "type": "backend"
+    },
+    {
+      "participant": "cache",
+      "from": 260,
+      "to": 428,
+      "type": "database"
+    },
+    {
+      "participant": "storage",
+      "from": 316,
+      "to": 400,
+      "type": "cloud"
+    },
+    {
+      "participant": "bucket",
+      "from": 344,
+      "to": 372,
+      "type": "cloud"
+    },
+    {
+      "participant": "datagw",
+      "from": 674,
+      "to": 762,
+      "type": "cloud"
+    },
+    {
+      "participant": "reads",
+      "from": 702,
+      "to": 732,
+      "type": "database"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Happy Path",
+      "items": [
+        "ChapterCache en disco (TTL 7 días) evita re-descargar de Storage",
+        "ChapterBloc precarga los 3 adyacentes en paralelo",
+        "Al 80% del scroll se marca leído con inserción en chapter_reads"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Fallos y duplicados",
+      "items": [
+        "chapter_reads tiene PK (user_id, chapter_id): el INSERT duplicado lanza Err",
+        "El guard _markedChapters hace idempotente el marcado dentro de la pantalla",
+        "MarkChapterAsRead no pasa por el bloc: lo dispara la pantalla directo"
+      ]
+    },
+    {
+      "dot": "orange",
+      "title": "Tracking y analytics",
+      "items": [
+        "track_book_view NO se dispara al leer: BookViewTracker usa un Timer 2s en BookScreen",
+        "chapter_reads alimenta agregados y la RPC get_user_recent_views",
+        "Recientes (UI) ≠ analytics agregados"
+      ]
+    }
+  ]
+}

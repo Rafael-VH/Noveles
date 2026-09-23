@@ -1,0 +1,393 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Registro de usuario en Noveles",
+    "locale": "en",
+    "visual_preset": "classic",
+    "quality_profile": "standard",
+    "animation": "trace",
+    "viewBox": [
+      1500,
+      1100
+    ],
+    "column_fit": "spread",
+    "views": [
+      {
+        "id": "signup",
+        "label": "SignUp → sesión",
+        "focus": [
+          "usr",
+          "register",
+          "bloc",
+          "usecases",
+          "repo",
+          "authgw",
+          "supabase"
+        ],
+        "note": "El formulario viaja RegisterScreen → AuthBloc → Register → AuthRepository → AuthGateway → Supabase Auth."
+      },
+      {
+        "id": "perfil",
+        "label": "Creación de profiles",
+        "focus": [
+          "repo",
+          "datagw",
+          "profiles"
+        ],
+        "note": "El trigger on_auth_user_created crea el perfil; el repo lo verifica y lo crea si faltó (fallback con rol user)."
+      },
+      {
+        "id": "routing",
+        "label": "Routing post-registro",
+        "focus": [
+          "bloc",
+          "app",
+          "usr"
+        ],
+        "note": "AuthAuthenticated llega al router y _homeFor elige la home según el rol."
+      }
+    ]
+  },
+  "participants": [
+    {
+      "id": "usr",
+      "type": "external",
+      "label": "Usuario"
+    },
+    {
+      "id": "register",
+      "type": "frontend",
+      "label": "RegisterScreen"
+    },
+    {
+      "id": "bloc",
+      "type": "frontend",
+      "label": "AuthBloc",
+      "sublabel": "sesión + stream"
+    },
+    {
+      "id": "usecases",
+      "type": "backend",
+      "label": "Use cases",
+      "sublabel": "Register · ListenAuthState"
+    },
+    {
+      "id": "repo",
+      "type": "backend",
+      "label": "AuthRepository",
+      "sublabel": "AuthRepositoryImpl"
+    },
+    {
+      "id": "authgw",
+      "type": "cloud",
+      "label": "AuthGateway",
+      "sublabel": "SupabaseAuthGateway"
+    },
+    {
+      "id": "supabase",
+      "type": "security",
+      "label": "Supabase Auth",
+      "sublabel": "signUp / sesión"
+    },
+    {
+      "id": "datagw",
+      "type": "cloud",
+      "label": "DataGateway",
+      "sublabel": "SupabaseDataGateway"
+    },
+    {
+      "id": "profiles",
+      "type": "database",
+      "label": "profiles",
+      "sublabel": "Postgres · RLS"
+    },
+    {
+      "id": "app",
+      "type": "frontend",
+      "label": "App",
+      "sublabel": "router por rol"
+    }
+  ],
+  "segments": [
+    {
+      "from": 145,
+      "to": 355,
+      "label": "Formulario → Supabase Auth"
+    },
+    {
+      "from": 360,
+      "to": 560,
+      "label": "Perfil (trigger + fallback)"
+    },
+    {
+      "from": 565,
+      "to": 690,
+      "label": "Routing por rol"
+    }
+  ],
+  "messages": [
+    {
+      "id": "ingresar",
+      "from": "usr",
+      "to": "register",
+      "y": 160,
+      "label": "email + password",
+      "variant": "default"
+    },
+    {
+      "id": "register-requested",
+      "from": "register",
+      "to": "bloc",
+      "y": 185,
+      "label": "RegisterRequested(email, password)",
+      "variant": "emphasis"
+    },
+    {
+      "id": "register-uc",
+      "from": "bloc",
+      "to": "usecases",
+      "y": 210,
+      "label": "register(email, password)",
+      "variant": "emphasis"
+    },
+    {
+      "id": "register-repo",
+      "from": "usecases",
+      "to": "repo",
+      "y": 235,
+      "label": "register()",
+      "variant": "emphasis"
+    },
+    {
+      "id": "sign-up",
+      "from": "repo",
+      "to": "authgw",
+      "y": 260,
+      "label": "signUp(email, password)",
+      "variant": "security"
+    },
+    {
+      "id": "token-request",
+      "from": "authgw",
+      "to": "supabase",
+      "y": 285,
+      "label": "POST /auth/v1/signup",
+      "variant": "security"
+    },
+    {
+      "id": "session-return",
+      "from": "supabase",
+      "to": "authgw",
+      "y": 318,
+      "label": "session + identity",
+      "variant": "return"
+    },
+    {
+      "id": "identity-return",
+      "from": "authgw",
+      "to": "repo",
+      "y": 345,
+      "label": "AuthIdentity(id, email)",
+      "variant": "return"
+    },
+    {
+      "id": "select-profile",
+      "from": "repo",
+      "to": "datagw",
+      "y": 373,
+      "label": "select('*').eq('id', userId)",
+      "variant": "default"
+    },
+    {
+      "id": "query-profiles",
+      "from": "datagw",
+      "to": "profiles",
+      "y": 402,
+      "label": "SELECT profiles",
+      "variant": "emphasis"
+    },
+    {
+      "id": "row-or-null",
+      "from": "profiles",
+      "to": "datagw",
+      "y": 432,
+      "label": "row | null",
+      "variant": "return"
+    },
+    {
+      "id": "maybe-row",
+      "from": "datagw",
+      "to": "repo",
+      "y": 460,
+      "label": "maybeRow()",
+      "variant": "return"
+    },
+    {
+      "id": "insert-fallback",
+      "from": "repo",
+      "to": "datagw",
+      "y": 488,
+      "label": "si null → insert({ role: user })",
+      "variant": "dashed"
+    },
+    {
+      "id": "insert-profiles",
+      "from": "datagw",
+      "to": "profiles",
+      "y": 516,
+      "label": "INSERT + verify",
+      "variant": "dashed"
+    },
+    {
+      "id": "profile-row",
+      "from": "datagw",
+      "to": "repo",
+      "y": 544,
+      "label": "profile row",
+      "variant": "return"
+    },
+    {
+      "id": "ok-user",
+      "from": "repo",
+      "to": "usecases",
+      "y": 572,
+      "label": "Ok(UserEntity)",
+      "variant": "return"
+    },
+    {
+      "id": "ok-or-err",
+      "from": "usecases",
+      "to": "bloc",
+      "y": 600,
+      "label": "Ok(user) | Err(msg)",
+      "variant": "return"
+    },
+    {
+      "id": "authenticated",
+      "from": "bloc",
+      "to": "app",
+      "y": 628,
+      "label": "AuthAuthenticated(user)",
+      "variant": "emphasis"
+    },
+    {
+      "id": "home-for",
+      "from": "app",
+      "to": "usr",
+      "y": 656,
+      "label": "_homeFor · user → MainScreen",
+      "variant": "default",
+      "note": "isAdmin → AdminDash · isScan → ScanMain"
+    },
+    {
+      "id": "auth-error",
+      "from": "bloc",
+      "to": "register",
+      "y": 688,
+      "label": "AuthError → SnackBar",
+      "variant": "dashed"
+    },
+    {
+      "id": "stream-event",
+      "from": "authgw",
+      "to": "repo",
+      "y": 712,
+      "label": "stateChanges → AuthEvent",
+      "variant": "return"
+    },
+    {
+      "id": "listen-state",
+      "from": "repo",
+      "to": "bloc",
+      "y": 740,
+      "label": "ListenAuthState · signedIn",
+      "variant": "return"
+    }
+  ],
+  "activations": [
+    {
+      "participant": "register",
+      "from": 160,
+      "to": 688,
+      "type": "frontend"
+    },
+    {
+      "participant": "bloc",
+      "from": 185,
+      "to": 740,
+      "type": "frontend"
+    },
+    {
+      "participant": "usecases",
+      "from": 210,
+      "to": 600,
+      "type": "backend"
+    },
+    {
+      "participant": "repo",
+      "from": 235,
+      "to": 740,
+      "type": "backend"
+    },
+    {
+      "participant": "authgw",
+      "from": 260,
+      "to": 712,
+      "type": "cloud"
+    },
+    {
+      "participant": "supabase",
+      "from": 285,
+      "to": 318,
+      "type": "security"
+    },
+    {
+      "participant": "datagw",
+      "from": 373,
+      "to": 544,
+      "type": "cloud"
+    },
+    {
+      "participant": "profiles",
+      "from": 402,
+      "to": 516,
+      "type": "database"
+    },
+    {
+      "participant": "app",
+      "from": 628,
+      "to": 656,
+      "type": "frontend"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Happy Path",
+      "items": [
+        "signUp crea la sesión y la identidad vuelve por el gateway",
+        "El trigger on_auth_user_created crea profiles con rol user",
+        "El repositorio verifica y, si el perfil falta, lo inserta como fallback"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Fallos",
+      "items": [
+        "register fallido → AuthError → SnackBar sin sacar al usuario",
+        "El formulario valida confirmación de password en UI",
+        "Rol absent o unknown nunca llega a una pantalla autenticada"
+      ]
+    },
+    {
+      "dot": "orange",
+      "title": "Doble vía del perfil",
+      "items": [
+        "profiles_extended agrega display_name · bio · avatar_url",
+        "add_email_to_profiles backfillea email desde auth.users",
+        "El stream de auth mantiene el estado tras el registro"
+      ]
+    }
+  ]
+}

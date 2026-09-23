@@ -1,0 +1,12 @@
+{
+  "id": "lectura-capitulo",
+  "tipo": "sequence",
+  "titulo": "Lectura de capítulo y métricas",
+  "descripcion": "Desde ChapterBloc LoadChapterByIndex hasta las métricas: precarga de 3 capítulos (PreloadAdjacent, cache memoria), descarga con ChapterCache disco TTL 7d, MarkChapterAsRead al 80% de scroll con guard _markedChapters (INSERT chapter_reads PK user_id+chapter_id), y track_book_view con Timer 2s de BookViewTracker → tabla book_views.",
+  "etiquetas": ["chapter", "cache", "chapter_reads", "book_views", "scroll", "bloc"],
+  "meta": {
+    "participantes": 10,
+    "mensajes": 23,
+    "views": 2
+  }
+}

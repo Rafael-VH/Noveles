@@ -1,0 +1,11 @@
+{
+  "id": "labels-asignacion",
+  "tipo": "workflow",
+  "titulo": "Etiquetas: gestión y asignación",
+  "descripcion": "Gestión de labels por admin y asignación sobre libros: CRUD de labels (label_rules gobierna autoasignación), LabelBloc de Flutter, repositorio con tablas labels/label_rules y books_labels (M:N) protegidas por RLS is_scan() OR is_admin(), guarda en /label-management.",
+  "etiquetas": ["labels", "asignacion", "label_rules", "rls", "flutter", "supabase"],
+  "meta": {
+    "nodos": 13,
+    "views": 3
+  }
+}

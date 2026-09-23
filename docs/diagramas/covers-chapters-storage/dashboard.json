@@ -1,0 +1,12 @@
+{
+  "id": "covers-chapters-storage",
+  "tipo": "dataflow",
+  "titulo": "Storage: covers vs chapters y cleanup",
+  "descripcion": "Canales separados de Storage: capítulos (.md/.txt, 10MB) al bucket chapters, portadas (jpg/png/webp, 5MB) al bucket covers, ambos con filename $userId/millis.ext; lectura con ChapterCache en disco (TTL 7d) y cleanup huérfanos vía bookContentTree antes del DELETE cascade.",
+  "etiquetas": ["storage", "buckets", "covers", "chapters", "cache", "cleanup"],
+  "meta": {
+    "nodos": 10,
+    "relaciones": 10,
+    "views": 3
+  }
+}
