@@ -1,0 +1,12 @@
+{
+  "id": "book-views-analytics",
+  "tipo": "dataflow",
+  "titulo": "Vistas y lecturas hacia Analytics",
+  "descripcion": "El tracking nace en el cliente (abrir libro y marcar leído insertan book_views y chapter_reads), las RPCs de analytics agregan en el servidor (overview, trend, top) y AdminAnalyticsBloc consume sin leak del vendor.",
+  "etiquetas": ["analytics", "book_views", "chapter_reads", "rpc", "flutter", "supabase"],
+  "meta": {
+    "pantallas": 2,
+    "acciones": 4,
+    "views": 3
+  }
+}

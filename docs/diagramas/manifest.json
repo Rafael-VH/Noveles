@@ -1,6 +1,6 @@
 {
   "generado_por": "tools/build-diagrams.mjs",
-  "total": 6,
+  "total": 9,
   "diagramas": [
     {
       "slug": "architecture",
@@ -21,6 +21,72 @@
       "actualizado": "2026-09-22",
       "archivo": "diagramas/architecture/index.html",
       "especificacion": "diagramas/architecture/architecture.json"
+    },
+    {
+      "slug": "favoritos-recientes",
+      "titulo": "Favoritos y vistas recientes en Noveles",
+      "tipo": "workflow",
+      "tipoTexto": "Proceso",
+      "descripcion": "El lector marca favoritos y los libros abiertos quedan en recientes: FavoriteButton dispara ToggleFavoriteUseCase sobre user_favorites (PK compuesta, RLS por auth.uid()) y BookScreen registra book_views vía trackBookView, que alimenta la sección de recientes con get_user_recent_views.",
+      "etiquetas": [
+        "favoritos",
+        "recientes",
+        "book_views",
+        "flutter",
+        "supabase",
+        "rls"
+      ],
+      "destacado": false,
+      "nodos": 14,
+      "relaciones": 16,
+      "capitulos": 2,
+      "actualizado": "2026-09-23",
+      "archivo": "diagramas/favoritos-recientes/index.html",
+      "especificacion": "diagramas/favoritos-recientes/favoritos-recientes.json"
+    },
+    {
+      "slug": "admin-users-gestion",
+      "titulo": "Gestión de usuarios en el panel admin",
+      "tipo": "workflow",
+      "tipoTexto": "Proceso",
+      "descripcion": "UsersTab carga perfiles con GetAllProfiles y AdminUsersBloc cambia roles o suspende vía UpdateUserRole: los role changes rutean por RPCs admin (sin UPDATE directo), la suspensión revoca la sesión con admin_suspend_user y el RLS RESTRICTIVE niega todo, sin escalación de privilegios.",
+      "etiquetas": [
+        "admin",
+        "usuarios",
+        "roles",
+        "suspension",
+        "rls",
+        "supabase"
+      ],
+      "destacado": false,
+      "nodos": 11,
+      "relaciones": 13,
+      "capitulos": 3,
+      "actualizado": "2026-09-23",
+      "archivo": "diagramas/admin-users-gestion/index.html",
+      "especificacion": "diagramas/admin-users-gestion/admin-users-gestion.json"
+    },
+    {
+      "slug": "book-views-analytics",
+      "titulo": "Vistas y lecturas hacia Analytics",
+      "tipo": "dataflow",
+      "tipoTexto": "Flujo de datos",
+      "descripcion": "El tracking nace en el cliente (abrir libro y marcar leído insertan book_views y chapter_reads), las RPCs de analytics agregan en el servidor (overview, trend, top) y AdminAnalyticsBloc consume sin leak del vendor.",
+      "etiquetas": [
+        "analytics",
+        "book_views",
+        "chapter_reads",
+        "rpc",
+        "flutter",
+        "supabase"
+      ],
+      "destacado": false,
+      "nodos": 9,
+      "relaciones": 8,
+      "capitulos": 3,
+      "actualizado": "2026-09-23",
+      "archivo": "diagramas/book-views-analytics/index.html",
+      "especificacion": "diagramas/book-views-analytics/book-views-analytics.json"
     },
     {
       "slug": "ciclo-de-vida",

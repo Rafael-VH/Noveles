@@ -1,0 +1,267 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "Vistas y lecturas hacia Analytics",
+    "locale": "en",
+    "visual_preset": "classic",
+    "quality_profile": "standard",
+    "animation": "trace",
+    "viewBox": [
+      1920,
+      1000
+    ],
+    "views": [
+      {
+        "id": "tracking",
+        "label": "Tracking en origen",
+        "focus": [
+          "chapter_screen",
+          "book_screen",
+          "track_uc",
+          "mark_read_uc",
+          "views_db",
+          "reads_db"
+        ],
+        "note": "El cliente genera los eventos: abrir libro inserta book_views y marcar leído inserta chapter_reads."
+      },
+      {
+        "id": "agregados",
+        "label": "Agregados por RPC",
+        "focus": [
+          "views_db",
+          "reads_db",
+          "rpcs"
+        ],
+        "note": "Las funciones de analytics agregan book_views y chapter_reads en el servidor."
+      },
+      {
+        "id": "consumo",
+        "label": "Consumo admin",
+        "focus": [
+          "rpcs",
+          "admin_bloc",
+          "analytics_tab"
+        ],
+        "note": "El AdminAnalyticsBloc consume las RPCs y pinta AnalyticsTab."
+      }
+    ]
+  },
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Origen del dato",
+      "items": [
+        "Abrir libro → INSERT book_views (track_book_view)",
+        "Marcar leído → INSERT chapter_reads (mark_chapter_as_read)",
+        "Los eventos nacen en el cliente, nunca se llenan a mano"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Agregación en servidor",
+      "items": [
+        "get_analytics_overview · overview global",
+        "get_views_trend(days_back) · serie temporal",
+        "get_top_books(limit_count) · ranking"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Consumo sin leak del vendor",
+      "items": [
+        "DataGateway.rpc() abstrae la llamada",
+        "AnalyticsRepositoryImpl mapea a entidades",
+        "AdminAnalyticsBloc expone estado a la UI"
+      ]
+    }
+  ],
+  "stages": [
+    {
+      "label": "Origen · Cliente"
+    },
+    {
+      "label": "Use cases"
+    },
+    {
+      "label": "Tablas · Postgres"
+    },
+    {
+      "label": "RPCs · Analytics"
+    },
+    {
+      "label": "Consumo · Admin"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "book_screen",
+      "type": "frontend",
+      "label": "BookScreen",
+      "sublabel": "detalle",
+      "stage": 0,
+      "row": 0,
+      "width": 150
+    },
+    {
+      "id": "chapter_screen",
+      "type": "frontend",
+      "label": "ChapterScreen",
+      "sublabel": "lectura",
+      "stage": 0,
+      "row": 2,
+      "width": 150
+    },
+    {
+      "id": "track_uc",
+      "type": "backend",
+      "label": "TrackBookView",
+      "sublabel": "trackBookView(bookId)",
+      "stage": 1,
+      "row": 0,
+      "width": 170
+    },
+    {
+      "id": "mark_read_uc",
+      "type": "backend",
+      "label": "MarkAsRead",
+      "sublabel": "markChapterAsRead",
+      "stage": 1,
+      "row": 2,
+      "width": 180
+    },
+    {
+      "id": "views_db",
+      "type": "database",
+      "label": "book_views",
+      "sublabel": "book · viewed_at · user",
+      "stage": 2,
+      "row": 0,
+      "width": 170
+    },
+    {
+      "id": "reads_db",
+      "type": "database",
+      "label": "chapter_reads",
+      "sublabel": "user · chapter · read",
+      "stage": 2,
+      "row": 2,
+      "width": 170
+    },
+    {
+      "id": "rpcs",
+      "type": "cloud",
+      "label": "RPCs analytics",
+      "sublabel": "overview · trend · top",
+      "stage": 3,
+      "row": 1,
+      "width": 190
+    },
+    {
+      "id": "admin_bloc",
+      "type": "backend",
+      "label": "AdminAnalytics",
+      "sublabel": "Bloc · GetOverview",
+      "stage": 4,
+      "row": 1,
+      "width": 170
+    },
+    {
+      "id": "analytics_tab",
+      "type": "frontend",
+      "label": "AnalyticsTab",
+      "sublabel": "UI admin",
+      "stage": 4,
+      "row": 2,
+      "width": 160
+    }
+  ],
+  "flows": [
+    {
+      "id": "f-open-track",
+      "from": "book_screen",
+      "to": "track_uc",
+      "label": "abre libro",
+      "labelAt": [
+        203,
+        200
+      ],
+      "classification": "tracking",
+      "variant": "emphasis"
+    },
+    {
+      "id": "f-read-mark",
+      "from": "chapter_screen",
+      "to": "mark_read_uc",
+      "label": "marca leído",
+      "labelAt": [
+        205,
+        428
+      ],
+      "classification": "tracking",
+      "variant": "emphasis"
+    },
+    {
+      "id": "f-track-repo",
+      "from": "track_uc",
+      "to": "views_db",
+      "label": "INSERT book_views",
+      "labelAt": [
+        423,
+        200
+      ],
+      "classification": "escritura",
+      "variant": "emphasis"
+    },
+    {
+      "id": "f-mark-repo",
+      "from": "mark_read_uc",
+      "to": "reads_db",
+      "label": "INSERT chapter_reads",
+      "labelAt": [
+        428,
+        428
+      ],
+      "classification": "escritura",
+      "variant": "emphasis"
+    },
+    {
+      "id": "f-views-rpcs",
+      "from": "views_db",
+      "to": "rpcs",
+      "label": "vistas",
+      "classification": "analytics"
+    },
+    {
+      "id": "f-reads-rpcs",
+      "from": "reads_db",
+      "to": "rpcs",
+      "label": "lecturas",
+      "classification": "analytics"
+    },
+    {
+      "id": "f-rpcs-bloc",
+      "from": "rpcs",
+      "to": "admin_bloc",
+      "label": "overview",
+      "labelAt": [
+        860,
+        314
+      ],
+      "classification": "consumo",
+      "variant": "emphasis"
+    },
+    {
+      "id": "f-bloc-tab",
+      "from": "admin_bloc",
+      "to": "analytics_tab",
+      "label": "estado · UI",
+      "labelAt": [
+        960,
+        314
+      ],
+      "classification": "presentación",
+      "variant": "emphasis"
+    }
+  ]
+}

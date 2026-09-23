@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="generator" content="archify 2.17.0-dev.1">
-  <title>Interacción por rol en Noveles Diagram</title>
+  <title>Favoritos y vistas recientes en Noveles Diagram</title>
   <script>
     // Resolve the theme before first paint so light-preference users don't
     // see a dark flash. The toolbar script below re-applies with UI state.
@@ -4974,48 +4974,6 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       svg [data-node-id], svg [data-edge-from], svg [data-detail], svg [data-detail-anchor], svg [data-legend-hit], svg { transition: none !important; }
     }
   </style>
-  <style id="archify-ui-style">
-    /* Réplica de .toolbar button del visor: usa sus tokens, así el control
-       hereda el tema claro/oscuro y los presets sin duplicar la paleta. */
-    .archify-ui-btn {
-      flex: 0 0 auto;
-      display: inline-flex;
-      align-items: center;
-      gap: .375rem;
-      min-height: 2.75rem;
-      padding: .5rem .875rem;
-      border-radius: .625rem;
-      border: 1px solid var(--toolbar-border);
-      background: var(--toolbar-bg);
-      color: var(--toolbar-text);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 4px 14px rgba(0, 0, 0, .08);
-      transition: background .15s, border-color .15s, color .15s;
-      font-family: inherit;
-      font-size: .75rem;
-      font-weight: 500;
-      line-height: 1;
-      text-decoration: none;
-      white-space: nowrap;
-      cursor: pointer;
-    }
-    .archify-ui-btn:hover {
-      background: var(--toolbar-hover);
-      border-color: color-mix(in srgb, var(--arrow) 62%, var(--toolbar-border));
-    }
-    .archify-ui-btn:focus-visible { outline: 2px solid var(--arrow-emphasis); outline-offset: 2px; }
-    .archify-ui-btn svg { width: .95rem; height: .95rem; flex: 0 0 auto; }
-
-    html[data-present="true"] .archify-ui-btn { display: none; }
-    html[data-preset="editorial"] .archify-ui-btn { border-radius: .3rem; }
-
-    @media (max-width: 360px) {
-      .archify-ui-btn span { display: none; }
-      .archify-ui-btn { padding-right: .58rem; padding-left: .58rem; }
-    }
-
-    .archify-ui-btn--flotante { position: fixed; top: 1rem; left: 1rem; z-index: 60; }
-  </style>
 </head>
 <body>
   <!-- Toolbar: theme, live visual style, trace motion, presentation stage, and export.
@@ -5122,14 +5080,13 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       <div class="header-row"
            data-preset-badge-signal-flow="SIGNAL FLOW"
            data-preset-badge-blueprint="BLUEPRINT / REV 01"
-           data-preset-badge-editorial="EDITORIAL / FIELD NOTE"><a class="archify-ui-btn no-print" data-archify-ui="archify-back-roles-interaccion" href="../../index.html" aria-label="Volver" title="Volver" lang="es"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M19 12H5m0 0 6-6m-6 6 6 6"/></svg></a>
+           data-preset-badge-editorial="EDITORIAL / FIELD NOTE">
         <div class="pulse-dot"></div>
-        <h1>Interacción por rol en Noveles</h1>
+        <h1>Favoritos y vistas recientes en Noveles</h1>
       </div>
-      <p class="subtitle">Qué ve y qué hace cada rol sobre la misma plataforma — permisos RLS diferenciados por lane</p>
     </div>
 
-    <script id="archify-guided-views-data" type="application/json">[{"id":"lectura","label":"Rol user · lector","focus":["login_user","main_user","favoritos","recientes","perfil_user","db_user"],"note":"El lector ve solo libros con is_visible = true y gestiona favoritos, recientes, marcado de leído y su perfil."},{"id":"ingesta","label":"Rol scan · ingesta","focus":["login_scan","scan_main","tooks","capitulos","upload","covers","db_scan"],"note":"El scan crea y edita contenido propio: libros, tooks, capítulos con upload al bucket y portadas."},{"id":"gestion","label":"Rol admin · gestión","focus":["login_admin","admin_dash","usuarios","generos","etiquetas","analytics","db_admin"],"note":"El admin gestiona usuarios (roles y suspensión), géneros, etiquetas y analytics de book_views."},{"id":"suspension","label":"Acceso suspendido","focus":["suspended","login_sus","login_user","login_scan","login_admin"],"note":"Un rol suspendido pierde la sesión (RESTRICTIVE RLS) y cae de nuevo en LoginScreen."}]</script>
+    <script id="archify-guided-views-data" type="application/json">[{"id":"toggle","label":"Toggle de favorito","focus":["book_screen","fav_button","fav_bloc","toggle_uc","fav_repo","fav_db"],"note":"El corazón lee si existe el favorito y hace INSERT/DELETE sobre la PK compuesta (user_id, book_id)."},{"id":"recientes","label":"Vistas recientes","focus":["book_screen","track_uc","views_db","recent_uc","recent_section"],"note":"Abrir un libro inserta book_views; la sección de recientes usa la RPC get_user_recent_views (top 6)."}]</script>
 
     <script id="archify-i18n-data" type="application/json">{"locale":"en","messages":{"viewer.kind.frontend":"Frontend","viewer.kind.backend":"Backend","viewer.kind.database":"Database","viewer.kind.cloud":"Cloud","viewer.kind.security":"Security","viewer.kind.messagebus":"Message bus","viewer.kind.external":"External","viewer.kind.neutral":"Neutral","viewer.kind.node":"Node","viewer.kind.start":"Start","viewer.kind.active":"Active","viewer.kind.waiting":"Waiting","viewer.kind.decision":"Decision","viewer.kind.success":"Success","viewer.kind.failure":"Failure","viewer.toolbar.actions":"Diagram actions","viewer.theme.toggle.title":"Toggle theme (T)","viewer.theme.toggle":"Toggle color theme","viewer.theme.dark":"Dark","viewer.theme.light":"Light","viewer.preset.choose.title":"Choose visual style (S cycles)","viewer.preset.choose":"Choose visual style","viewer.preset.style":"Style","viewer.preset.menu":"Visual style","viewer.preset.identity":"Visual identity","viewer.preset.cycles":"S cycles","viewer.preset.classic":"Classic","viewer.preset.classic.short":"Classic","viewer.preset.classic.hint":"Stable technical default","viewer.preset.flow":"Signal Flow","viewer.preset.flow.short":"Flow","viewer.preset.flow.hint":"Motion-forward presentation","viewer.preset.blueprint":"Blueprint","viewer.preset.blueprint.hint":"Engineering review","viewer.preset.editorial":"Editorial","viewer.preset.editorial.hint":"Publication and launch notes","viewer.preset.badge.signalFlow":"SIGNAL FLOW","viewer.preset.badge.blueprint":"BLUEPRINT / REV 01","viewer.preset.badge.editorial":"EDITORIAL / FIELD NOTE","viewer.preset.badge.editorialPlate":"ARCHIFY / PLATE 04","viewer.preset.current":"Visual style: {style}. Choose visual style","viewer.motion.live":"Live","viewer.motion.still":"Still","viewer.motion.pause":"Pause motion","viewer.motion.resume":"Resume motion","viewer.motion.reduced":"Motion paused by reduced-motion preference","viewer.motion.hidden":"Motion paused while this page is hidden","viewer.motion.yielding":"Pause motion; currently yielding to {owner}","viewer.motion.yielding.title":"Live preview enabled · yielding to {owner}","viewer.owner.story":"the guided story","viewer.owner.chapter":"the active chapter","viewer.owner.chapterPreview":"the chapter delta preview","viewer.owner.handoff":"the chapter handoff","viewer.owner.route":"Route Probe","viewer.owner.lens":"Semantic Lens","viewer.owner.relationship":"Relationship Preview","viewer.owner.intent":"Intent Trace","viewer.owner.focus":"semantic focus","viewer.owner.legend":"legend preview","viewer.owner.reader":"reader interaction","viewer.present.enter":"Enter presentation stage","viewer.present.enter.title":"Presentation stage (F)","viewer.present.exit":"Exit presentation stage","viewer.present.exit.title":"Exit presentation stage (F or Escape)","viewer.present.present":"Present","viewer.present.exit.label":"Exit","viewer.export.button":"Export","viewer.export.button.title":"Export diagram (E)","viewer.export.diagram":"Export diagram","viewer.export.menu":"Export","viewer.export.subtitle":"Portable, clean outputs","viewer.export.share":"Share","viewer.export.shareCard":"Share Card","viewer.export.routeShareCard":"Route Share Card","viewer.export.reachShareCard":"Reach Share Card","viewer.export.copyShareCard":"Copy Share Card","viewer.export.copyDiagram":"Copy diagram","viewer.export.clipboardPng":"PNG to clipboard","viewer.export.raster":"Raster images","viewer.export.image":"Image","viewer.export.lossless":"Lossless image","viewer.export.compact":"Compact image","viewer.export.modern":"Modern image","viewer.export.vectorMotion":"Vector and motion","viewer.export.vectorMotion.heading":"Vector \u0026 motion","viewer.export.editable":"Editable vector","viewer.export.motion6s":"6s motion","viewer.export.unsupported":"Not supported by this browser","viewer.export.clipboardUnsupported":"Clipboard image write not supported by this browser","viewer.export.clipboardUnsupported.period":"Clipboard image write not supported by this browser.","viewer.export.clipboardUnsupported.short":"Clipboard image write not supported in this browser.","viewer.export.motionUnavailable":"Motion capture unavailable in this browser","viewer.export.webmUnavailable":"WebM unavailable in this browser","viewer.export.failed":"Export failed: {message}","viewer.export.unknownVariant":"Unknown Share Card variant: {variant}","viewer.export.routeRequired":"Trace a route before exporting a Route Share Card","viewer.export.reachRequired":"Trace authored reach before exporting a Reach Share Card","viewer.export.unknown":"unknown","viewer.export.routeFailed":"Route Share Card export failed: {message}","viewer.export.reachFailed":"Reach Share Card export failed: {message}","viewer.export.copyFailed":"Copy failed: {message}","viewer.export.copiedPng":"Copied PNG to clipboard","viewer.export.copiedShare":"Copied Share Card","viewer.export.downloadedShare":"Downloaded Share Card","viewer.export.downloadedRoute":"Downloaded Route Share Card","viewer.export.downloadedReach":"Downloaded Reach Share Card","viewer.export.downloadedWebm":"Downloaded WebM","viewer.export.recording":"Recording 6 seconds of motion…","viewer.export.card.routeSummary.one":"Route: {source} → {target} · {count} directed hop","viewer.export.card.routeSummary.other":"Route: {source} → {target} · {count} directed hops","viewer.export.card.reachSummary":"Authored {direction} from {origin} · {nodes} · {links} · max {hops}","viewer.export.card.node.one":"{count} node","viewer.export.card.node.other":"{count} nodes","viewer.export.card.link.one":"{count} link","viewer.export.card.link.other":"{count} links","viewer.export.card.hop.one":"{count} hop","viewer.export.card.hop.other":"{count} hops","viewer.export.card.routeBadge":"ARCHIFY · ROUTE · {hops}","viewer.export.card.reachBadge":"ARCHIFY · {direction} REACH","viewer.export.card.defaultBadge":"ARCHIFY · {preset} · {theme}","viewer.export.direction.upstream":"Upstream","viewer.export.direction.downstream":"Downstream","viewer.export.error.canvasUnavailable":"Canvas unavailable for {label}","viewer.export.error.contextUnavailable":"2D canvas context unavailable for {label}","viewer.export.error.toBlobUnavailable":"canvas.toBlob unavailable for {label}","viewer.export.error.toBlobNull":"canvas.toBlob returned no data for {label}","viewer.export.error.variantsCombined":"Share Card variants cannot be combined","viewer.export.error.viewerState":"Share Card export could not remove temporary viewer state","viewer.export.error.routeState":"Route Card export could not preserve the resolved route safely","viewer.export.error.reachState":"Reach Card export could not preserve authored reach safely","viewer.export.error.webmRequirements":"WebM motion export requires a trace animation and browser MediaRecorder support","viewer.export.error.mediaRecorder":"MediaRecorder failed","viewer.export.error.emptyWebm":"MediaRecorder produced an empty WebM","viewer.export.error.webmBackground":"SVG background could not be loaded for WebM export","viewer.guided.region":"Guided diagram views","viewer.guided.previous":"Previous guided view","viewer.guided.previous.title":"Previous guided view ([)","viewer.guided.next":"Next guided view","viewer.guided.next.title":"Next guided view (])","viewer.guided.views":"Guided views","viewer.guided.explore":"Explore this system","viewer.guided.intro":"Step through curated paths without changing the source diagram.","viewer.guided.trail":"Story trail","viewer.guided.beat":"Beat","viewer.guided.nextBeat":"Next","viewer.guided.play":"Play guided story","viewer.guided.play.title":"Play guided story (P)","viewer.guided.pause":"Pause guided story","viewer.guided.pause.title":"Pause guided story (P)","viewer.guided.replay":"Replay guided story","viewer.guided.replay.title":"Replay guided story (P)","viewer.guided.playStory":"Play story","viewer.guided.pauseStory":"Pause","viewer.guided.replayStory":"Replay story","viewer.guided.motionUnavailable":"Story playback unavailable while motion is Still","viewer.guided.enableMotion":"Switch motion to Live to play the guided story","viewer.guided.selectBeatLink":"Select a Story Beat to copy its exact link","viewer.guided.copyMoment":"Copy moment","viewer.guided.momentCopied":"Moment link copied","viewer.guided.momentCopyFailed":"Could not copy story moment link","viewer.guided.copied":"Copied","viewer.guided.copyFailed":"Copy failed","viewer.guided.showAll":"Show all","viewer.guided.showAll.aria":"Show entire diagram","viewer.guided.chapters":"Story chapters","viewer.guided.storyTrail":"Story trail for {label}: {count} beats","viewer.guided.chapter.open":"Open chapter {index} of {total}: {label}, {count} stops","viewer.guided.chapter.current":"Current chapter {index} of {total}: {label}, {count} stops","viewer.guided.chapter.selectedNodes":"{count} selected nodes","viewer.guided.chapter.stops":"{count} stops","viewer.guided.chapter.stop.one":"{count} stop","viewer.guided.chapter.stop.other":"{count} stops","viewer.guided.chapter.current.title":"{label} — current chapter, {count} stops","viewer.guided.chapter.delta.expanded":"{stay} stay, {enter} enter, {leave} leave","viewer.guided.chapter.delta.aria":"Open chapter {index} of {total}: {label}. Chapter focus delta: {delta}","viewer.guided.chapter.delta.title":"{label} — {delta} chapter focus","viewer.guided.handoff":"{from} → {to} · via {label}","viewer.guided.share.chapter":"Chapter {index} / {total}","viewer.guided.share.initial":"Chapter 01 / 01","viewer.guided.share.default":"Guided chapter","viewer.guided.state.ready":"Ready","viewer.guided.state.playing":"Playing","viewer.guided.state.settled":"Settled","viewer.guided.state.paused":"Paused","viewer.guided.state.pinned":"Pinned","viewer.guided.state.still":"Still","viewer.guided.share.step":"Step {index} / {total} · {label}","viewer.guided.share.staticMoment":"{step} · Static moment","viewer.guided.share.complete":"{count} steps complete · {note}","viewer.guided.share.settled":"Path settled for reading.","viewer.guided.share.staticPath":"{count} steps · Static path","viewer.guided.share.ready":"{count} steps · Ready","viewer.guided.share.aria":"{state} chapter {index} of {total}: {label}. {beat}. {route}","viewer.guided.beat.start":"Beat {index} / {total} · {label} · starting point","viewer.guided.beat.forward":"Beat {index} / {total} · {from} → {to}","viewer.guided.beat.reverse":"Beat {index} / {total} · {from} → {to} · reverse authored link","viewer.guided.beat.multiple":"Beat {index} / {total} · {from} ⇄ {to} · {count} authored links","viewer.guided.beat.group":"Beat {index} / {total} · {from} · {to} · grouped · no direct link","viewer.guided.beat.aria.prefix":"Story beat {index} of {total}: {label}. ","viewer.guided.beat.aria.start":"Starting point.","viewer.guided.beat.aria.forward":"From {from} through one authored forward relationship.","viewer.guided.beat.aria.reverse":"From {from}; the authored relationship points from {to} to {from}.","viewer.guided.beat.aria.multiple":"From {from} through {count} authored relationships; shown without arbitrary motion.","viewer.guided.beat.aria.group":"Grouped from {from} with no direct authored relationship.","viewer.guided.caption.start":"Starting point","viewer.guided.caption.grouped":"Grouped transition · no direct authored link","viewer.guided.caption.more":" +{count} more","viewer.guided.caption.reverse":"Reverse authored relationship","viewer.guided.caption.relationships":"{count} authored relationships","viewer.guided.caption.relationship":"Authored relationship","viewer.guided.caption.direction":"authored direction: {from} → {to}","viewer.guided.caption.starting":"Authored starting point","viewer.guided.beatLink":"Copy link to current story moment: Beat {index} of {total}: {label}","viewer.guided.noStory":"This diagram has no authored guided story.","viewer.guide.eyebrow":"Diagram guide","viewer.guide.close":"Close diagram guide","viewer.guide.inspecting":"Inspecting compiled semantics","viewer.guide.actions":"Diagram exploration actions","viewer.guide.find":"Find any node","viewer.guide.find.hint":"Search labels, responsibilities, kinds, and stable IDs.","viewer.guide.route":"Trace a route","viewer.guide.route.aria":"Trace a directed route","viewer.guide.route.hint":"Ask how two semantic nodes connect in authored direction.","viewer.guide.map":"See the whole system","viewer.guide.map.hint":"Open Semantic Radar with a live viewport and stable nodes.","viewer.guide.lens":"Compare semantic kinds","viewer.guide.lens.hint":"Count roles, reveal their traffic, and compare direct authored links.","viewer.guide.story":"Play the guided story","viewer.guide.story.hint":"Walk the authored chapters and real relationships.","viewer.guide.present":"Enter Presentation Stage","viewer.guide.present.hint":"Give the live diagram the viewport without changing export.","viewer.guide.shortcuts":"Additional keyboard shortcuts","viewer.guide.shortcut.export":"Export","viewer.guide.shortcut.theme":"Theme","viewer.guide.shortcut.style":"Style","viewer.guide.shortcut.reset":"Reset","viewer.guide.shortcut.zoomIn":"Zoom in","viewer.guide.shortcut.zoomOut":"Zoom out","viewer.guide.shortcut.close":"Close","viewer.guide.facts":"{nodes} · {relationships} · {views}","viewer.guide.fact.node.one":"{count} semantic node","viewer.guide.fact.node.other":"{count} semantic nodes","viewer.guide.fact.relationship.one":"{count} relationship","viewer.guide.fact.relationship.other":"{count} relationships","viewer.guide.fact.view.one":"{count} guided view","viewer.guide.fact.view.other":"{count} guided views","viewer.guide.story.available.one":"Walk {count} authored chapter and its real relationships.","viewer.guide.story.available.other":"Walk {count} authored chapters and their real relationships.","viewer.guide.story.unavailable":"No authored guided story in this diagram.","viewer.guide.open":"Open diagram guide","viewer.guide.noStory":"This diagram has no authored guided story.","viewer.finder.title":"Find a node","viewer.finder.close":"Close node finder","viewer.finder.placeholder":"Search labels or IDs","viewer.finder.search":"Search diagram nodes","viewer.finder.results":"Diagram nodes","viewer.finder.empty":"No matching nodes","viewer.finder.result.focus":"Focus {label}","viewer.finder.result.routeStart":"Choose {label} as route start","viewer.finder.result.routeTarget":"Choose {label} as route destination, {links}","viewer.finder.status.empty":"No matching nodes","viewer.finder.status.count.one":"{count} matching node","viewer.finder.status.count.other":"{count} matching nodes","viewer.finder.noun.nodes":"nodes","viewer.finder.link.one":"{count} link","viewer.finder.link.other":"{count} links","viewer.finder.result.focus.one":"Focus {label}, {count} related connection","viewer.finder.result.focus.other":"Focus {label}, {count} related connections","viewer.finder.status.filtered":"{visible} of {available} {noun}","viewer.finder.status.all":"{available} {noun}","viewer.passport.eyebrow":"Semantic passport","viewer.passport.metadata":"Node metadata","viewer.passport.evidence":"Verified source evidence","viewer.passport.verified":"Verified source","viewer.passport.verificationScope":"Verified against local Git at the pinned revision. Remote access has not been checked.","viewer.passport.reach":"Authored reach","viewer.passport.reach.trace":"Trace authored reachability","viewer.passport.upstream":"Upstream","viewer.passport.downstream":"Downstream","viewer.passport.upstream.trace":"Trace upstream authored reachability","viewer.passport.downstream.trace":"Trace downstream authored reachability","viewer.passport.close":"Close semantic passport","viewer.passport.copy":"Copy link","viewer.passport.copy.focus":"Copy link to focused node","viewer.passport.relations":"Relations","viewer.passport.relations.show":"Show connected relationships","viewer.passport.relations.hide":"Hide connected relationships","viewer.passport.relations.list":"Connected relationships","viewer.passport.copyRelation":"Copy relation","viewer.passport.copyNode":"Copy node","viewer.passport.copyPinned":"Copy link to pinned relationship","viewer.passport.copySource":"Copy link to source node","viewer.passport.copy.focused.success":"Focused node link copied","viewer.passport.copy.pinned.success":"Pinned relationship link copied","viewer.passport.copy.focused.failed":"Could not copy focused node link","viewer.passport.copy.pinned.failed":"Could not copy pinned relationship link","viewer.passport.relationship.none":"No connected relationships","viewer.passport.relationship.count.one":"{count} relation","viewer.passport.relationship.count.other":"{count} relations","viewer.passport.relationship.show.one":"Show {count} connected relationship","viewer.passport.relationship.show.other":"Show {count} connected relationships","viewer.passport.relationship.summary":"{out} outgoing · {in} incoming{loops}","viewer.passport.relationship.loops":" · {count} loop","viewer.passport.relationship.explorer":"Direct relationship explorer","viewer.passport.relationship.help":"Use arrow keys to explore relationships. Press Enter or Space to pin details; Escape clears.","viewer.passport.relationship.loopsBack":"loops back","viewer.passport.relationship.connectsTo":"connects to","viewer.passport.relationship.connectsFrom":"connects from","viewer.passport.relationship.pinned":"Pinned relationship · {from} → {to} · {label}","viewer.passport.relationship.inspect":"Inspect relationship {index} of {total}: {from} to {to}, {label}. Press Enter for details.","viewer.passport.relationship.group.out":"Outgoing","viewer.passport.relationship.group.in":"Incoming","viewer.passport.relationship.group.loop":"Self loops","viewer.passport.relationship.row":"{group}: {relationship}, {neighbor}","viewer.passport.relationship.direction.out":"OUT →","viewer.passport.relationship.direction.in":"← IN","viewer.passport.relationship.direction.loop":"LOOP","viewer.passport.sourceCount.one":"{count} verified source reference","viewer.passport.sourceCount.other":"{count} verified source references","viewer.passport.sourceMarker":"SRC","viewer.passport.beacon.one":"{count} verified source; focus this node to inspect","viewer.passport.beacon.other":"{count} verified sources; focus this node to inspect","viewer.passport.repository.open":"Open verified repository revision {revision}","viewer.passport.source.open":"Open verified source {path} at revision {revision}","viewer.passport.source.openLink":"Open ↗","viewer.passport.reach.upstream.one":"Trace {count} upstream authored node","viewer.passport.reach.upstream.other":"Trace {count} upstream authored nodes","viewer.passport.reach.downstream.one":"Trace {count} downstream authored node","viewer.passport.reach.downstream.other":"Trace {count} downstream authored nodes","viewer.passport.reach.noUpstream":"No upstream authored nodes","viewer.passport.reach.noDownstream":"No downstream authored nodes","viewer.passport.reach.status":"{direction} · {nodes} nodes · {links} links · max {hops} hops","viewer.route.eyebrow":"Route probe","viewer.route.start":"Choose a start node","viewer.route.start.find":"Find start","viewer.route.start.find.aria":"Find a route start","viewer.route.copy":"Copy link","viewer.route.copy.aria":"Copy link to traced route","viewer.route.clear":"Clear","viewer.route.clear.aria":"Clear route probe","viewer.route.traced":"Traced route","viewer.route.pickTwo":"Pick two semantic nodes on the diagram","viewer.route.pickOne":"Pick a semantic node on the diagram","viewer.route.controls":"Route journey controls","viewer.route.previous":"Previous route position","viewer.route.play":"Play route journey","viewer.route.pause":"Pause route journey","viewer.route.replay":"Replay route journey","viewer.route.next":"Next route position","viewer.route.journey":"Journey","viewer.route.pause.label":"Pause","viewer.route.replay.label":"Replay","viewer.route.overview":"Overview","viewer.route.overview.aria":"Show complete route overview","viewer.route.instructions":"Choose the source, then the destination. Direction matters.","viewer.route.destination":"Choose a destination from {label}","viewer.route.destination.find":"Find target","viewer.route.destination.find.aria":"Find a reachable route destination","viewer.route.differentDestination":"Choose a different destination","viewer.route.distinct":"A route needs two distinct semantic nodes.","viewer.route.unreachable":"No directed route to {label}","viewer.route.unreachable.detail":"{target} is not reachable from {source}. Pick a highlighted destination.","viewer.route.start.instructions":"Select the source. The next step will reveal only directed destinations.","viewer.route.copy.success":"Traced route link copied","viewer.route.copy.failed":"Could not copy traced route link","viewer.route.position":"Route position {index} of {total}: {label}","viewer.route.step":"Step {index} of {total} · {phase} · {label}","viewer.route.motionRequired":"Automatic journey requires Live motion","viewer.route.trigger.clear":"Clear traced route","viewer.route.overview.status":"{nodes} · {hops} · shortest authored route","viewer.route.overview.node.one":"{count} node","viewer.route.overview.node.other":"{count} nodes","viewer.route.overview.hop.one":"{count} directed hop","viewer.route.overview.hop.other":"{count} directed hops","viewer.route.phase.playing":"Playing","viewer.route.phase.complete":"Complete","viewer.route.phase.inspecting":"Inspecting","viewer.route.destination.count.one":"{count} directed destination available. Pick a highlighted node.","viewer.route.destination.count.other":"{count} directed destinations available. Pick a highlighted node.","viewer.route.noOutgoing":"No outgoing route starts here. Clear and choose another source.","viewer.route.result.title":"{source} to {target}","viewer.route.finder.source.title":"Choose route start","viewer.route.finder.source.placeholder":"Search route sources","viewer.route.finder.source.empty":"No matching route sources","viewer.route.finder.source.results":"Nodes that can start a route","viewer.route.finder.source.noun":"route sources","viewer.route.finder.source.badge":"start","viewer.route.finder.target.title":"Destination from {label}","viewer.route.finder.target.placeholder":"Search reachable destinations","viewer.route.finder.target.empty":"No matching reachable destinations","viewer.route.finder.target.results":"Reachable route destinations","viewer.route.finder.target.noun":"reachable destinations","viewer.route.hop.one":"{count} hop","viewer.route.hop.other":"{count} hops","viewer.lens.eyebrow":"Semantic lens","viewer.lens.title":"Compare system roles","viewer.lens.close":"Close semantic lens","viewer.lens.instruction":"Choose up to two semantic kinds. One reveals its real traffic; two compare only direct authored relationships.","viewer.lens.kinds":"Semantic kinds","viewer.lens.choose":"Choose a kind to inspect its nodes and touching relationships.","viewer.lens.copy":"Copy link to semantic lens","viewer.lens.clear":"Clear semantic lens","viewer.lens.open":"Open semantic lens","viewer.lens.openActive":"Open active semantic lens","viewer.lens.legend":"Semantic legend","viewer.lens.legend.inspect.one":"Inspect {label}, {count} node","viewer.lens.legend.inspect.other":"Inspect {label}, {count} nodes","viewer.lens.kind.count.one":"{label}, {count} node","viewer.lens.kind.count.other":"{label}, {count} nodes","viewer.lens.compare.one":"{first} → {second}: {forward} · {second} → {first}: {reverse} · {count} direct relationship","viewer.lens.compare.other":"{first} → {second}: {forward} · {second} → {first}: {reverse} · {count} direct relationships","viewer.lens.single":"{nodes} · {relationships} · connected peers remain visible","viewer.lens.node.one":"{count} {label} node","viewer.lens.node.other":"{count} {label} nodes","viewer.lens.relationship.one":"{count} touching relationship","viewer.lens.relationship.other":"{count} touching relationships","viewer.radar.title":"Semantic radar","viewer.radar.building":"Building overview","viewer.radar.openFull":"Open full semantic radar","viewer.radar.open":"Open radar","viewer.radar.close":"Close semantic radar","viewer.radar.surface":"Diagram overview. Click a node to focus it, or use arrow keys to pan.","viewer.radar.click":"Click node","viewer.radar.drag":"Drag to pan","viewer.radar.space":"Semantic radar needs more MAP space.","viewer.radar.nodes":"Semantic diagram radar nodes","viewer.radar.focus":"Focus {label} from Semantic Radar","viewer.radar.status":"{count} nodes · {viewport}","viewer.radar.fullMap":"{count} nodes · full map","viewer.radar.compacted":"Radar compacted to avoid covering the Semantic Passport or MAP controls.","viewer.radar.cancelWaiting":"Cancel semantic radar waiting for more MAP space","viewer.radar.needsSpace":"Semantic radar needs more visible MAP space","viewer.radar.viewport.full":"full map","viewer.radar.viewport.width":"{percent}% width","viewer.radar.viewport.scale":"{percent}% viewport","viewer.nav.controls":"Diagram view controls","viewer.nav.route":"Trace a directed route","viewer.nav.route.title":"Trace route (R)","viewer.nav.route.short":"PATH","viewer.nav.radar":"Open semantic radar","viewer.nav.radar.title":"Semantic radar (M)","viewer.nav.radar.short":"MAP","viewer.nav.lens":"Open semantic lens","viewer.nav.lens.title":"Semantic lens (L)","viewer.nav.lens.short":"LENS","viewer.nav.find":"Find a node","viewer.nav.find.title":"Find a node (/)","viewer.nav.guide":"Open diagram guide","viewer.nav.guide.title":"Diagram guide (?)","viewer.nav.zoomOut":"Zoom out","viewer.nav.zoomOut.title":"Zoom out (-)","viewer.nav.reset":"Reset diagram view","viewer.nav.reset.title":"Reset view (0)","viewer.nav.read":"READ","viewer.nav.zoomIn":"Zoom in","viewer.nav.zoomIn.title":"Zoom in (+)","viewer.nav.camera":"{hint}. Reset diagram view","viewer.nav.camera.title":"{semantic}{hint} · reset view (0)","viewer.nav.camera.semantic":"Semantic camera active · ","viewer.nav.level.map":"MAP","viewer.nav.level.read":"READ","viewer.nav.level.full":"FULL","viewer.nav.level.auto":"AUTO","viewer.nav.detail.map":"Zoom in to reveal relationship labels and node context","viewer.nav.detail.read":"Zoom in again to reveal tags and annotations","viewer.nav.detail.full":"Full diagram detail","viewer.intent.summary":"{label}. {out} outgoing, {in} incoming{loops}. {total} connections. Press Enter for details.","viewer.intent.loops":", {count} self loop","viewer.common.copied":"Copied","viewer.common.copyFailed":"Copy failed","viewer.common.copyLink":"Copy link","viewer.common.clear":"Clear","viewer.common.close":"Close"}}</script>
     <div class="guided-views no-print" id="guided-views" hidden aria-label="Guided diagram views">
@@ -5174,9 +5131,9 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
     <!-- Main Diagram -->
     <div class="diagram-container" data-detail-level="read"
          data-preset-badge-editorial-plate="ARCHIFY / PLATE 04">
-      <svg viewBox="0 0 1620 1080" role="img" lang="en" aria-labelledby="archify-diagram-title archify-diagram-description" data-animation="trace" data-preset="classic" data-quality-profile="standard">
-        <title id="archify-diagram-title">Interacción por rol en Noveles</title>
-        <desc id="archify-diagram-description">Qué ve y qué hace cada rol sobre la misma plataforma — permisos RLS diferenciados por lane</desc>
+      <svg viewBox="0 0 1600 1000" role="img" lang="en" aria-labelledby="archify-diagram-title archify-diagram-description" data-animation="trace" data-preset="classic" data-quality-profile="standard">
+        <title id="archify-diagram-title">Favoritos y vistas recientes en Noveles</title>
+        <desc id="archify-diagram-description">A workflow diagram generated by Archify.</desc>
         <!-- Definitions -->
         <defs>
           <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
@@ -5200,24 +5157,20 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
         <rect width="100%" height="100%" fill="url(#grid)" />
 
         <!-- Swimlanes -->
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-0" x="40" y="52" width="1359" height="104" rx="10" class="c-lane" stroke-width="1"/>
-        <text x="54" y="74" class="t-dim" font-size="10" font-weight="600">01 / Rol user · lector</text>
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-0" x="40" y="52" width="1288" height="104" rx="10" class="c-lane" stroke-width="1"/>
+        <text x="54" y="74" class="t-dim" font-size="10" font-weight="600">01 / UI · Flutter</text>
 
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-1" x="40" y="176" width="1359" height="104" rx="10" class="c-lane" stroke-width="1"/>
-        <text x="54" y="198" class="t-dim" font-size="10" font-weight="600">02 / Rol scan · ingesta</text>
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-1" x="40" y="176" width="1288" height="104" rx="10" class="c-lane" stroke-width="1"/>
+        <text x="54" y="198" class="t-dim" font-size="10" font-weight="600">02 / BLoC + Use cases</text>
 
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-2" x="40" y="300" width="1359" height="104" rx="10" class="c-lane" stroke-width="1"/>
-        <text x="54" y="322" class="t-dim" font-size="10" font-weight="600">03 / Rol admin · gestión</text>
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-2" x="40" y="300" width="1288" height="104" rx="10" class="c-lane" stroke-width="1"/>
+        <text x="54" y="322" class="t-dim" font-size="10" font-weight="600">03 / Repositories</text>
 
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-3" x="40" y="424" width="1359" height="104" rx="10" class="c-lane" stroke-width="1"/>
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="exception-lane" data-composition-frame-id="lane-3-exception" x="46" y="430" width="1347" height="92" rx="8" class="c-security-group" stroke-width="1"/>
-        <text x="54" y="446" class="t-security" font-size="10" font-weight="600">EX / Rol suspended · sin acceso</text>
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-3" x="40" y="424" width="1288" height="104" rx="10" class="c-lane" stroke-width="1"/>
+        <text x="54" y="446" class="t-dim" font-size="10" font-weight="600">04 / DataGateway · Supabase</text>
 
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-4" x="40" y="548" width="1359" height="104" rx="10" class="c-lane" stroke-width="1"/>
-        <text x="54" y="570" class="t-dim" font-size="10" font-weight="600">05 / Supabase Storage</text>
-
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-5" x="40" y="672" width="1359" height="104" rx="10" class="c-lane" stroke-width="1"/>
-        <text x="54" y="694" class="t-dim" font-size="10" font-weight="600">06 / Postgres · RLS</text>
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-4" x="40" y="548" width="1288" height="104" rx="10" class="c-lane" stroke-width="1"/>
+        <text x="54" y="570" class="t-dim" font-size="10" font-weight="600">05 / Postgres · RLS</text>
 
         <!-- Phase headers -->
 
@@ -5226,412 +5179,278 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
 
 
         <!-- Edge paths -->
-        <path data-edge-from="admin_dash" data-edge-to="analytics" data-edge-label="metricas" data-edge-key="0" data-edge-id="e-admin-ana" data-composition-points="422.6,341;422.6,325;1290.8,325;1290.8,341" d="M 422.6 341 L 422.6 325 L 1290.8 325 L 1290.8 341" class="a-default" data-animate="edge" style="--step:4" stroke-width="1.4" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="usuarios" data-edge-to="db_admin" data-edge-label="is_admin() bypass" data-edge-key="1" data-edge-id="e-admin-db" data-composition-points="667.8,393;667.8,792;1290.8,792;1290.8,765" d="M 667.8 393 L 667.8 792 L 1290.8 792 L 1290.8 765" class="a-emphasis" data-animate="edge" style="--step:5" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
-        <path data-edge-from="admin_dash" data-edge-to="etiquetas" data-edge-label="reglas" data-edge-key="2" data-edge-id="e-admin-et" data-composition-points="422.6,341;422.6,325;747.7,325;747.7,409;1072.8,409;1072.8,393" d="M 422.6 341 L 422.6 325 L 747.7 325 L 747.7 409 L 1072.8 409 L 1072.8 393" class="a-default" data-animate="edge" style="--step:6" stroke-width="1.4" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="admin_dash" data-edge-to="generos" data-edge-label="CRUD" data-edge-key="3" data-edge-id="e-admin-gen" data-composition-points="422.6,341;422.6,325;849.8,325;849.8,341" d="M 422.6 341 L 422.6 325 L 849.8 325 L 849.8 341" class="a-default" data-animate="edge" style="--step:7" stroke-width="1.4" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="login_admin" data-edge-to="admin_dash" data-edge-label="entra · is_admin()" data-edge-key="4" data-edge-id="e-admin-login" data-composition-points="233,367;337.6,367" d="M 233 367 L 337.6 367" class="a-emphasis" data-animate="edge" style="--step:8" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
-        <path data-edge-from="admin_dash" data-edge-to="usuarios" data-edge-label="gestiona roles" data-edge-key="5" data-edge-id="e-admin-users" data-composition-points="422.6,393;422.6,409;667.8,409;667.8,393" d="M 422.6 393 L 422.6 409 L 667.8 409 L 667.8 393" class="a-default" data-animate="edge" style="--step:9" stroke-width="1.4" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="capitulos" data-edge-to="upload" data-edge-label="sube" data-edge-key="6" data-edge-id="e-scan-cap-upload" data-composition-points="924.8,243;956.3,243;956.3,615;987.8,615" d="M 924.8 243 L 956.3 243 L 956.3 615 L 987.8 615" class="a-emphasis" data-animate="edge" style="--step:10" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
-        <path data-edge-from="scan_main" data-edge-to="covers" data-edge-label="portada" data-edge-key="7" data-edge-id="e-scan-covers" data-composition-points="512.6,243;528.6,243;528.6,160;1381.8,160;1381.8,615;1365.8,615" d="M 512.6 243 L 528.6 243 L 528.6 160 L 1381.8 160 L 1381.8 615 L 1365.8 615" class="a-default" data-animate="edge" style="--step:11" stroke-width="1.4" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="tooks" data-edge-to="db_scan" data-edge-label="created_by = auth.uid()" data-edge-key="8" data-edge-id="e-scan-db" data-composition-points="667.8,217;667.8,201;1411,201;1411,697;1072.8,697;1072.8,713" d="M 667.8 217 L 667.8 201 L 1411 201 L 1411 697 L 1072.8 697 L 1072.8 713" class="a-emphasis" data-animate="edge" style="--step:12" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
-        <path data-edge-from="login_scan" data-edge-to="scan_main" data-edge-label="entra · is_scan()" data-edge-key="9" data-edge-id="e-scan-login" data-composition-points="233,243;332.6,243" d="M 233 243 L 332.6 243" class="a-emphasis" data-animate="edge" style="--step:12" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
-        <path data-edge-from="scan_main" data-edge-to="tooks" data-edge-label="CRUD propios" data-edge-key="10" data-edge-id="e-scan-main-tooks" data-composition-points="422.6,269;422.6,285;667.8,285;667.8,269" d="M 422.6 269 L 422.6 285 L 667.8 285 L 667.8 269" class="a-default" data-animate="edge" style="--step:12" stroke-width="1.4" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="tooks" data-edge-to="capitulos" data-edge-label="edita" data-edge-key="11" data-edge-id="e-scan-tooks-cap" data-composition-points="732.8,243;774.8,243" d="M 732.8 243 L 774.8 243" class="a-default" data-animate="edge" style="--step:12" stroke-width="1.4" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="suspended" data-edge-to="login_sus" data-edge-label="sin acceso" data-edge-key="12" data-edge-id="e-sus" data-composition-points="248,491;337.6,491" d="M 248 491 L 337.6 491" class="a-security" data-animate="edge" style="--step:12" stroke-width="1.4" marker-end="url(#arrowhead-security)"/>
-        <path data-edge-from="favoritos" data-edge-to="db_user" data-edge-label="SELECT is_visible = true" data-edge-key="13" data-edge-id="e-user-fav-db" data-composition-points="667.8,93;667.8,77;1411,77;1411,697;849.8,697;849.8,713" d="M 667.8 93 L 667.8 77 L 1411 77 L 1411 697 L 849.8 697 L 849.8 713" class="a-emphasis" data-animate="edge" style="--step:2" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
-        <path data-edge-from="login_user" data-edge-to="main_user" data-edge-label="entra · is_user()" data-edge-key="14" data-edge-id="e-user-login" data-composition-points="233,119;337.6,119" d="M 233 119 L 337.6 119" class="a-emphasis" data-animate="edge" style="--step:0" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
-        <path data-edge-from="main_user" data-edge-to="favoritos" data-edge-label="lee visibles" data-edge-key="15" data-edge-id="e-user-main-fav" data-composition-points="422.6,93;422.6,77;667.8,77;667.8,93" d="M 422.6 93 L 422.6 77 L 667.8 77 L 667.8 93" class="a-default" data-animate="edge" style="--step:1" stroke-width="1.4" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="main_user" data-edge-to="recientes" data-edge-label="marca leído" data-edge-key="16" data-edge-id="e-user-main-rec" data-composition-points="422.6,93;422.6,77;849.8,77;849.8,93" d="M 422.6 93 L 422.6 77 L 849.8 77 L 849.8 93" class="a-default" data-animate="edge" style="--step:12" stroke-width="1.4" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="favoritos" data-edge-to="perfil_user" data-edge-label="edita" data-edge-key="17" data-edge-id="e-user-perfil" data-composition-points="667.8,93;667.8,77;1072.8,77;1072.8,93" d="M 667.8 93 L 667.8 77 L 1072.8 77 L 1072.8 93" class="a-default" data-animate="edge" style="--step:12" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="fav_bloc" data-edge-to="get_fav_uc" data-edge-label="carga lista" data-edge-key="0" data-edge-id="e-bloc-favlist" data-composition-points="383.6,217;383.6,201;1016.4000000000001,201;1016.4000000000001,217" d="M 383.6 217 L 383.6 201 L 1016.4000000000001 201 L 1016.4000000000001 217" class="a-default" data-animate="edge" style="--step:6" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="fav_bloc" data-edge-to="toggle_uc" data-edge-label="toggle" data-edge-key="1" data-edge-id="e-bloc-toggle" data-composition-points="383.6,269;383.6,285;610.4000000000001,285;610.4000000000001,269" d="M 383.6 269 L 383.6 285 L 610.4000000000001 285 L 610.4000000000001 269" class="a-default" data-animate="edge" style="--step:2" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="books_repo" data-edge-to="recent_section" data-edge-label="detalle" data-edge-key="2" data-edge-id="e-books-ui" data-composition-points="1121.4,367;1340,367;1340,161;610.4000000000001,161;610.4000000000001,145" d="M 1121.4 367 L 1340 367 L 1340 161 L 610.4000000000001 161 L 610.4000000000001 145" class="a-default" data-animate="edge" style="--step:8" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="views_db" data-edge-to="recent_uc" data-edge-label="get_user_recent_views" data-edge-key="3" data-edge-id="e-db-recent" data-composition-points="1219.4,589;1219.4,573;1340,573;1340,285;1226.4,285;1226.4,269" d="M 1219.4 589 L 1219.4 573 L 1340 573 L 1340 285 L 1226.4 285 L 1226.4 269" class="a-default" data-animate="edge" style="--step:9" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="get_fav_uc" data-edge-to="fav_repo" data-edge-label="getFavorites" data-edge-key="4" data-edge-id="e-getfav-repo" data-composition-points="1016.4000000000001,269;1016.4000000000001,290;803.4000000000001,290;803.4000000000001,341" d="M 1016.4000000000001 269 L 1016.4000000000001 290 L 803.4000000000001 290 L 803.4000000000001 341" class="a-default" data-animate="edge" style="--step:10" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="fav_repo" data-edge-to="data_gateway" data-edge-label="usa port" data-edge-key="5" data-edge-id="e-gw" data-composition-points="789.4000000000001,393;789.4000000000001,491;700.4000000000001,491" d="M 789.4000000000001 393 L 789.4000000000001 491 L 700.4000000000001 491" class="a-default" data-animate="edge" style="--step:11" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="fav_repo" data-edge-to="fav_db" data-edge-label="SELECT book_id orden" data-edge-key="6" data-edge-id="e-list-db" data-composition-points="803.4000000000001,393;803.4000000000001,608;916.4000000000001,608" d="M 803.4000000000001 393 L 803.4000000000001 608 L 916.4000000000001 608" class="a-default" data-animate="edge" style="--step:4" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="get_fav_uc" data-edge-to="favorites_screen" data-edge-label="lista favoritos" data-edge-key="7" data-edge-id="e-list-ui" data-composition-points="1016.4000000000001,217;1016.4000000000001,201;1117.9,201;1117.9,161;1219.4,161;1219.4,145" d="M 1016.4000000000001 217 L 1016.4000000000001 201 L 1117.9 201 L 1117.9 161 L 1219.4 161 L 1219.4 145" class="a-default" data-animate="edge" style="--step:12" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="book_screen" data-edge-to="fav_button" data-edge-label="abre detalle" data-edge-key="8" data-edge-id="e-open" data-composition-points="218,119;293.6,119" d="M 218 119 L 293.6 119" class="a-emphasis" data-animate="edge" style="--step:0" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="book_screen" data-edge-to="track_uc" data-edge-label="track_book_view" data-edge-key="9" data-edge-id="e-open-track" data-composition-points="133,145;133,166;796.4000000000001,166;796.4000000000001,217" d="M 133 145 L 133 166 L 796.4000000000001 166 L 796.4000000000001 217" class="a-default" data-animate="edge" style="--step:12" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="recent_uc" data-edge-to="books_repo" data-edge-label="booksWithRelationsByIds" data-edge-key="10" data-edge-id="e-recent-books" data-composition-points="1219.4,269;1219.4,290;1016.4000000000001,290;1016.4000000000001,341" d="M 1219.4 269 L 1219.4 290 L 1016.4000000000001 290 L 1016.4000000000001 341" class="a-default" data-animate="edge" style="--step:12" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="recent_uc" data-edge-to="recent_section" data-edge-label="máx 6" data-edge-key="11" data-edge-id="e-recent-ui" data-composition-points="1319.4,243;1340,243;1340,77;610.4000000000001,77;610.4000000000001,93" d="M 1319.4 243 L 1340 243 L 1340 77 L 610.4000000000001 77 L 610.4000000000001 93" class="a-default" data-animate="edge" style="--step:12" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="fav_repo" data-edge-to="fav_db" data-edge-label="SELECT / INSERT / DELETE" data-edge-key="12" data-edge-id="e-repo-db" data-composition-points="803.4000000000001,393;803.4000000000001,476;1016.4000000000001,476;1016.4000000000001,589" d="M 803.4000000000001 393 L 803.4000000000001 476 L 1016.4000000000001 476 L 1016.4000000000001 589" class="a-emphasis" data-animate="edge" style="--step:4" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="fav_button" data-edge-to="fav_bloc" data-edge-label="taps corazón" data-edge-key="13" data-edge-id="e-tap" data-composition-points="383.6,145;383.6,166;282.6,166;282.6,243;298.6,243" d="M 383.6 145 L 383.6 166 L 282.6 166 L 282.6 243 L 298.6 243" class="a-default" data-animate="edge" style="--step:1" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="toggle_uc" data-edge-to="fav_repo" data-edge-label="toggleFavorite" data-edge-key="14" data-edge-id="e-toggle-repo" data-composition-points="610.4000000000001,269;610.4000000000001,367;703.4000000000001,367" d="M 610.4000000000001 269 L 610.4000000000001 367 L 703.4000000000001 367" class="a-default" data-animate="edge" style="--step:3" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="track_uc" data-edge-to="views_db" data-edge-label="INSERT book_views" data-edge-key="15" data-edge-id="e-track-db" data-composition-points="810.4000000000001,217;810.4000000000001,201;1525,201;1525,615;1314.4,615" d="M 810.4000000000001 217 L 810.4000000000001 201 L 1525 201 L 1525 615 L 1314.4 615" class="a-emphasis" data-animate="edge" style="--step:12" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
 
         <!-- Nodes -->
-        <g id="node-login_user" data-node-id="login_user" data-node-label="LoginScreen" tabindex="0" role="button" aria-label="Focus LoginScreen, auth · is_user(), Rol user · lector" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="auth · is_user()" data-node-context="Rol user · lector">
-          <title>LoginScreen · auth · is_user() · Rol user · lector</title>
-          <rect x="63" y="93" width="170" height="52" rx="6" class="c-mask"/>
-          <rect x="63" y="93" width="170" height="52" rx="6" class="c-frontend" data-animate="node" style="--step:0" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(69 99) scale(0.6875)">
+        <g id="node-book_screen" data-node-id="book_screen" data-node-label="BookScreen" tabindex="0" role="button" aria-label="Focus BookScreen, detalle de libro, UI · Flutter" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="detalle de libro" data-node-context="UI · Flutter">
+          <title>BookScreen · detalle de libro · UI · Flutter</title>
+          <rect x="48" y="93" width="170" height="52" rx="6" class="c-mask"/>
+          <rect x="48" y="93" width="170" height="52" rx="6" class="c-frontend" data-animate="node" style="--step:0" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(54 99) scale(0.6875)">
             <rect x="2" y="3" width="12" height="10" rx="2"/>
             <path d="M2 6.5h12"/>
             <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
             <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="148" y="114" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">LoginScreen</text>
-          <text data-detail="context" x="148" y="131" class="t-muted" font-size="8" text-anchor="middle">auth · is_user()</text>
+          <text data-node-label="" data-detail-anchor="" x="133" y="114" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">BookScreen</text>
+          <text data-detail="context" x="133" y="131" class="t-muted" font-size="8" text-anchor="middle">detalle de libro</text>
         </g>
 
-        <g id="node-main_user" data-node-id="main_user" data-node-label="MainScreen" tabindex="0" role="button" aria-label="Focus MainScreen, libros visibles, Rol user · lector" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="libros visibles" data-node-context="Rol user · lector">
-          <title>MainScreen · libros visibles · Rol user · lector</title>
-          <rect x="337.6" y="93" width="170" height="52" rx="6" class="c-mask"/>
-          <rect x="337.6" y="93" width="170" height="52" rx="6" class="c-frontend" data-animate="node" style="--step:1" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(343.6 99) scale(0.6875)">
+        <g id="node-fav_button" data-node-id="fav_button" data-node-label="FavoriteButton" tabindex="0" role="button" aria-label="Focus FavoriteButton, corazón · isFavorite, UI · Flutter" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="corazón · isFavorite" data-node-context="UI · Flutter">
+          <title>FavoriteButton · corazón · isFavorite · UI · Flutter</title>
+          <rect x="293.6" y="93" width="180" height="52" rx="6" class="c-mask"/>
+          <rect x="293.6" y="93" width="180" height="52" rx="6" class="c-frontend" data-animate="node" style="--step:1" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(299.6 99) scale(0.6875)">
             <rect x="2" y="3" width="12" height="10" rx="2"/>
             <path d="M2 6.5h12"/>
             <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
             <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="422.6" y="114" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">MainScreen</text>
-          <text data-detail="context" x="422.6" y="131" class="t-muted" font-size="8" text-anchor="middle">libros visibles</text>
+          <text data-node-label="" data-detail-anchor="" x="383.6" y="114" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">FavoriteButton</text>
+          <text data-detail="context" x="383.6" y="131" class="t-muted" font-size="8" text-anchor="middle">corazón · isFavorite</text>
         </g>
 
-        <g id="node-favoritos" data-node-id="favoritos" data-node-label="Favoritos" tabindex="0" role="button" aria-label="Focus Favoritos, user_favorites, Rol user · lector" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="user_favorites" data-node-context="Rol user · lector">
-          <title>Favoritos · user_favorites · Rol user · lector</title>
-          <rect x="592.8" y="93" width="150" height="52" rx="6" class="c-mask"/>
-          <rect x="592.8" y="93" width="150" height="52" rx="6" class="c-frontend" data-animate="node" style="--step:2" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(598.8 99) scale(0.6875)">
+        <g id="node-recent_section" data-node-id="recent_section" data-node-label="Sección Recientes" tabindex="0" role="button" aria-label="Focus Sección Recientes, MainScreen · top 6, UI · Flutter" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="MainScreen · top 6" data-node-context="UI · Flutter">
+          <title>Sección Recientes · MainScreen · top 6 · UI · Flutter</title>
+          <rect x="515.4000000000001" y="93" width="190" height="52" rx="6" class="c-mask"/>
+          <rect x="515.4000000000001" y="93" width="190" height="52" rx="6" class="c-frontend" data-animate="node" style="--step:8" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(521.4000000000001 99) scale(0.6875)">
             <rect x="2" y="3" width="12" height="10" rx="2"/>
             <path d="M2 6.5h12"/>
             <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
             <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="667.8" y="114" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Favoritos</text>
-          <text data-detail="context" x="667.8" y="131" class="t-muted" font-size="8" text-anchor="middle">user_favorites</text>
+          <text data-node-label="" data-detail-anchor="" x="610.4000000000001" y="114" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Sección Recientes</text>
+          <text data-detail="context" x="610.4000000000001" y="131" class="t-muted" font-size="8" text-anchor="middle">MainScreen · top 6</text>
         </g>
 
-        <g id="node-recientes" data-node-id="recientes" data-node-label="Recientes" tabindex="0" role="button" aria-label="Focus Recientes, chapter_reads, Rol user · lector" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="chapter_reads" data-node-context="Rol user · lector">
-          <title>Recientes · chapter_reads · Rol user · lector</title>
-          <rect x="774.8" y="93" width="150" height="52" rx="6" class="c-mask"/>
-          <rect x="774.8" y="93" width="150" height="52" rx="6" class="c-frontend" data-animate="node" style="--step:7" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(780.8 99) scale(0.6875)">
+        <g id="node-favorites_screen" data-node-id="favorites_screen" data-node-label="FavoritesScreen" tabindex="0" role="button" aria-label="Focus FavoritesScreen, lista del usuario, UI · Flutter" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="lista del usuario" data-node-context="UI · Flutter">
+          <title>FavoritesScreen · lista del usuario · UI · Flutter</title>
+          <rect x="1124.4" y="93" width="190" height="52" rx="6" class="c-mask"/>
+          <rect x="1124.4" y="93" width="190" height="52" rx="6" class="c-frontend" data-animate="node" style="--step:9" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(1130.4 99) scale(0.6875)">
             <rect x="2" y="3" width="12" height="10" rx="2"/>
             <path d="M2 6.5h12"/>
             <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
             <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="849.8" y="114" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Recientes</text>
-          <text data-detail="context" x="849.8" y="131" class="t-muted" font-size="8" text-anchor="middle">chapter_reads</text>
+          <text data-node-label="" data-detail-anchor="" x="1219.4" y="114" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">FavoritesScreen</text>
+          <text data-detail="context" x="1219.4" y="131" class="t-muted" font-size="8" text-anchor="middle">lista del usuario</text>
         </g>
 
-        <g id="node-perfil_user" data-node-id="perfil_user" data-node-label="Editar perfil" tabindex="0" role="button" aria-label="Focus Editar perfil, profile, Rol user · lector" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="profile" data-node-context="Rol user · lector">
-          <title>Editar perfil · profile · Rol user · lector</title>
-          <rect x="997.8" y="93" width="150" height="52" rx="6" class="c-mask"/>
-          <rect x="997.8" y="93" width="150" height="52" rx="6" class="c-frontend" data-animate="node" style="--step:8" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(1003.8 99) scale(0.6875)">
-            <rect x="2" y="3" width="12" height="10" rx="2"/>
-            <path d="M2 6.5h12"/>
-            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
-            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
+        <g id="node-fav_bloc" data-node-id="fav_bloc" data-node-label="FavoriteBloc" tabindex="0" role="button" aria-label="Focus FavoriteBloc, estado del toggle, BLoC + Use cases" aria-pressed="false" data-node-kind="backend" data-node-sublabel="estado del toggle" data-node-context="BLoC + Use cases">
+          <title>FavoriteBloc · estado del toggle · BLoC + Use cases</title>
+          <rect x="298.6" y="217" width="170" height="52" rx="6" class="c-mask"/>
+          <rect x="298.6" y="217" width="170" height="52" rx="6" class="c-backend" data-animate="node" style="--step:2" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(304.6 223) scale(0.6875)">
+            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="1072.8" y="114" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Editar perfil</text>
-          <text data-detail="context" x="1072.8" y="131" class="t-muted" font-size="8" text-anchor="middle">profile</text>
+          <text data-node-label="" data-detail-anchor="" x="383.6" y="238" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">FavoriteBloc</text>
+          <text data-detail="context" x="383.6" y="255" class="t-muted" font-size="8" text-anchor="middle">estado del toggle</text>
         </g>
 
-        <g id="node-login_scan" data-node-id="login_scan" data-node-label="LoginScreen" tabindex="0" role="button" aria-label="Focus LoginScreen, auth · is_scan(), Rol scan · ingesta" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="auth · is_scan()" data-node-context="Rol scan · ingesta">
-          <title>LoginScreen · auth · is_scan() · Rol scan · ingesta</title>
-          <rect x="63" y="217" width="170" height="52" rx="6" class="c-mask"/>
-          <rect x="63" y="217" width="170" height="52" rx="6" class="c-frontend" data-animate="node" style="--step:9" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(69 223) scale(0.6875)">
-            <rect x="2" y="3" width="12" height="10" rx="2"/>
-            <path d="M2 6.5h12"/>
-            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
-            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
+        <g id="node-toggle_uc" data-node-id="toggle_uc" data-node-label="ToggleFavorite" tabindex="0" role="button" aria-label="Focus ToggleFavorite, toggleFavorite(user, book), BLoC + Use cases" aria-pressed="false" data-node-kind="backend" data-node-sublabel="toggleFavorite(user, book)" data-node-context="BLoC + Use cases">
+          <title>ToggleFavorite · toggleFavorite(user, book) · BLoC + Use cases</title>
+          <rect x="515.4000000000001" y="217" width="190" height="52" rx="6" class="c-mask"/>
+          <rect x="515.4000000000001" y="217" width="190" height="52" rx="6" class="c-backend" data-animate="node" style="--step:3" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(521.4000000000001 223) scale(0.6875)">
+            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="148" y="238" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">LoginScreen</text>
-          <text data-detail="context" x="148" y="255" class="t-muted" font-size="8" text-anchor="middle">auth · is_scan()</text>
+          <text data-node-label="" data-detail-anchor="" x="610.4000000000001" y="238" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">ToggleFavorite</text>
+          <text data-detail="context" x="610.4000000000001" y="255" class="t-muted" font-size="8" text-anchor="middle">toggleFavorite(user, book)</text>
         </g>
 
-        <g id="node-scan_main" data-node-id="scan_main" data-node-label="ScanMainScreen" tabindex="0" role="button" aria-label="Focus ScanMainScreen, CRUD libros propios, Rol scan · ingesta" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="CRUD libros propios" data-node-context="Rol scan · ingesta">
-          <title>ScanMainScreen · CRUD libros propios · Rol scan · ingesta</title>
-          <rect x="332.6" y="217" width="180" height="52" rx="6" class="c-mask"/>
-          <rect x="332.6" y="217" width="180" height="52" rx="6" class="c-frontend" data-animate="node" style="--step:10" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(338.6 223) scale(0.6875)">
-            <rect x="2" y="3" width="12" height="10" rx="2"/>
-            <path d="M2 6.5h12"/>
-            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
-            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
+        <g id="node-track_uc" data-node-id="track_uc" data-node-label="TrackBookView" tabindex="0" role="button" aria-label="Focus TrackBookView, al abrir el libro, BLoC + Use cases" aria-pressed="false" data-node-kind="backend" data-node-sublabel="al abrir el libro" data-node-context="BLoC + Use cases">
+          <title>TrackBookView · al abrir el libro · BLoC + Use cases</title>
+          <rect x="713.4000000000001" y="217" width="180" height="52" rx="6" class="c-mask"/>
+          <rect x="713.4000000000001" y="217" width="180" height="52" rx="6" class="c-backend" data-animate="node" style="--step:12" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(719.4000000000001 223) scale(0.6875)">
+            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="422.6" y="238" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">ScanMainScreen</text>
-          <text data-detail="context" x="422.6" y="255" class="t-muted" font-size="8" text-anchor="middle">CRUD libros propios</text>
+          <text data-node-label="" data-detail-anchor="" x="803.4000000000001" y="238" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">TrackBookView</text>
+          <text data-detail="context" x="803.4000000000001" y="255" class="t-muted" font-size="8" text-anchor="middle">al abrir el libro</text>
         </g>
 
-        <g id="node-tooks" data-node-id="tooks" data-node-label="Tooks" tabindex="0" role="button" aria-label="Focus Tooks, own, Rol scan · ingesta" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="own" data-node-context="Rol scan · ingesta">
-          <title>Tooks · own · Rol scan · ingesta</title>
-          <rect x="602.8" y="217" width="130" height="52" rx="6" class="c-mask"/>
-          <rect x="602.8" y="217" width="130" height="52" rx="6" class="c-frontend" data-animate="node" style="--step:11" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(608.8 223) scale(0.6875)">
-            <rect x="2" y="3" width="12" height="10" rx="2"/>
-            <path d="M2 6.5h12"/>
-            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
-            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
+        <g id="node-get_fav_uc" data-node-id="get_fav_uc" data-node-label="GetFavorites" tabindex="0" role="button" aria-label="Focus GetFavorites, lista por usuario, BLoC + Use cases" aria-pressed="false" data-node-kind="backend" data-node-sublabel="lista por usuario" data-node-context="BLoC + Use cases">
+          <title>GetFavorites · lista por usuario · BLoC + Use cases</title>
+          <rect x="926.4000000000001" y="217" width="180" height="52" rx="6" class="c-mask"/>
+          <rect x="926.4000000000001" y="217" width="180" height="52" rx="6" class="c-backend" data-animate="node" style="--step:12" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(932.4000000000001 223) scale(0.6875)">
+            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="667.8" y="238" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Tooks</text>
-          <text data-detail="context" x="667.8" y="255" class="t-muted" font-size="8" text-anchor="middle">own</text>
+          <text data-node-label="" data-detail-anchor="" x="1016.4000000000001" y="238" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">GetFavorites</text>
+          <text data-detail="context" x="1016.4000000000001" y="255" class="t-muted" font-size="8" text-anchor="middle">lista por usuario</text>
         </g>
 
-        <g id="node-capitulos" data-node-id="capitulos" data-node-label="Capítulos" tabindex="0" role="button" aria-label="Focus Capítulos, upload .md/.txt, Rol scan · ingesta" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="upload .md/.txt" data-node-context="Rol scan · ingesta">
-          <title>Capítulos · upload .md/.txt · Rol scan · ingesta</title>
-          <rect x="774.8" y="217" width="150" height="52" rx="6" class="c-mask"/>
-          <rect x="774.8" y="217" width="150" height="52" rx="6" class="c-frontend" data-animate="node" style="--step:12" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(780.8 223) scale(0.6875)">
-            <rect x="2" y="3" width="12" height="10" rx="2"/>
-            <path d="M2 6.5h12"/>
-            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
-            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
+        <g id="node-recent_uc" data-node-id="recent_uc" data-node-label="GetRecentViews" tabindex="0" role="button" aria-label="Focus GetRecentViews, RPC get_user_recent_views, BLoC + Use cases" aria-pressed="false" data-node-kind="backend" data-node-sublabel="RPC get_user_recent_views" data-node-context="BLoC + Use cases">
+          <title>GetRecentViews · RPC get_user_recent_views · BLoC + Use cases</title>
+          <rect x="1119.4" y="217" width="200" height="52" rx="6" class="c-mask"/>
+          <rect x="1119.4" y="217" width="200" height="52" rx="6" class="c-backend" data-animate="node" style="--step:12" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(1125.4 223) scale(0.6875)">
+            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="849.8" y="238" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Capítulos</text>
-          <text data-detail="context" x="849.8" y="255" class="t-muted" font-size="8" text-anchor="middle">upload .md/.txt</text>
+          <text data-node-label="" data-detail-anchor="" x="1219.4" y="238" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">GetRecentViews</text>
+          <text data-detail="context" x="1219.4" y="255" class="t-muted" font-size="8" text-anchor="middle">RPC get_user_recent_views</text>
         </g>
 
-        <g id="node-login_admin" data-node-id="login_admin" data-node-label="LoginScreen" tabindex="0" role="button" aria-label="Focus LoginScreen, auth · is_admin(), Rol admin · gestión" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="auth · is_admin()" data-node-context="Rol admin · gestión">
-          <title>LoginScreen · auth · is_admin() · Rol admin · gestión</title>
-          <rect x="63" y="341" width="170" height="52" rx="6" class="c-mask"/>
-          <rect x="63" y="341" width="170" height="52" rx="6" class="c-frontend" data-animate="node" style="--step:12" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(69 347) scale(0.6875)">
-            <rect x="2" y="3" width="12" height="10" rx="2"/>
-            <path d="M2 6.5h12"/>
-            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
-            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
+        <g id="node-fav_repo" data-node-id="fav_repo" data-node-label="FavoriteRepository" tabindex="0" role="button" aria-label="Focus FavoriteRepository, impl · SELECT existencia, Repositories" aria-pressed="false" data-node-kind="database" data-node-sublabel="impl · SELECT existencia" data-node-context="Repositories">
+          <title>FavoriteRepository · impl · SELECT existencia · Repositories</title>
+          <rect x="703.4000000000001" y="341" width="200" height="52" rx="6" class="c-mask"/>
+          <rect x="703.4000000000001" y="341" width="200" height="52" rx="6" class="c-database" data-animate="node" style="--step:4" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(709.4000000000001 347) scale(0.6875)">
+            <ellipse cx="8" cy="4" rx="5" ry="2"/>
+            <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="148" y="362" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">LoginScreen</text>
-          <text data-detail="context" x="148" y="379" class="t-muted" font-size="8" text-anchor="middle">auth · is_admin()</text>
+          <text data-node-label="" data-detail-anchor="" x="803.4000000000001" y="362" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">FavoriteRepository</text>
+          <text data-detail="context" x="803.4000000000001" y="379" class="t-muted" font-size="8" text-anchor="middle">impl · SELECT existencia</text>
         </g>
 
-        <g id="node-admin_dash" data-node-id="admin_dash" data-node-label="AdminDash" tabindex="0" role="button" aria-label="Focus AdminDash, tabs de gestión, Rol admin · gestión" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="tabs de gestión" data-node-context="Rol admin · gestión">
-          <title>AdminDash · tabs de gestión · Rol admin · gestión</title>
-          <rect x="337.6" y="341" width="170" height="52" rx="6" class="c-mask"/>
-          <rect x="337.6" y="341" width="170" height="52" rx="6" class="c-frontend" data-animate="node" style="--step:12" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(343.6 347) scale(0.6875)">
-            <rect x="2" y="3" width="12" height="10" rx="2"/>
-            <path d="M2 6.5h12"/>
-            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
-            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
+        <g id="node-books_repo" data-node-id="books_repo" data-node-label="BookRepository" tabindex="0" role="button" aria-label="Focus BookRepository, booksWithRelationsByIds, Repositories" aria-pressed="false" data-node-kind="database" data-node-sublabel="booksWithRelationsByIds" data-node-context="Repositories">
+          <title>BookRepository · booksWithRelationsByIds · Repositories</title>
+          <rect x="911.4000000000001" y="341" width="210" height="52" rx="6" class="c-mask"/>
+          <rect x="911.4000000000001" y="341" width="210" height="52" rx="6" class="c-database" data-animate="node" style="--step:12" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(917.4000000000001 347) scale(0.6875)">
+            <ellipse cx="8" cy="4" rx="5" ry="2"/>
+            <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="422.6" y="362" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">AdminDash</text>
-          <text data-detail="context" x="422.6" y="379" class="t-muted" font-size="8" text-anchor="middle">tabs de gestión</text>
+          <text data-node-label="" data-detail-anchor="" x="1016.4000000000001" y="362" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">BookRepository</text>
+          <text data-detail="context" x="1016.4000000000001" y="379" class="t-muted" font-size="8" text-anchor="middle">booksWithRelationsByIds</text>
         </g>
 
-        <g id="node-usuarios" data-node-id="usuarios" data-node-label="Usuarios" tabindex="0" role="button" aria-label="Focus Usuarios, roles · suspender, Rol admin · gestión" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="roles · suspender" data-node-context="Rol admin · gestión">
-          <title>Usuarios · roles · suspender · Rol admin · gestión</title>
-          <rect x="592.8" y="341" width="150" height="52" rx="6" class="c-mask"/>
-          <rect x="592.8" y="341" width="150" height="52" rx="6" class="c-frontend" data-animate="node" style="--step:12" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(598.8 347) scale(0.6875)">
-            <rect x="2" y="3" width="12" height="10" rx="2"/>
-            <path d="M2 6.5h12"/>
-            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
-            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
-          </g>
-          <text data-node-label="" data-detail-anchor="" x="667.8" y="362" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Usuarios</text>
-          <text data-detail="context" x="667.8" y="379" class="t-muted" font-size="8" text-anchor="middle">roles · suspender</text>
-        </g>
-
-        <g id="node-generos" data-node-id="generos" data-node-label="Géneros" tabindex="0" role="button" aria-label="Focus Géneros, catalog, Rol admin · gestión" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="catalog" data-node-context="Rol admin · gestión">
-          <title>Géneros · catalog · Rol admin · gestión</title>
-          <rect x="784.8" y="341" width="130" height="52" rx="6" class="c-mask"/>
-          <rect x="784.8" y="341" width="130" height="52" rx="6" class="c-frontend" data-animate="node" style="--step:12" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(790.8 347) scale(0.6875)">
-            <rect x="2" y="3" width="12" height="10" rx="2"/>
-            <path d="M2 6.5h12"/>
-            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
-            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
-          </g>
-          <text data-node-label="" data-detail-anchor="" x="849.8" y="362" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Géneros</text>
-          <text data-detail="context" x="849.8" y="379" class="t-muted" font-size="8" text-anchor="middle">catalog</text>
-        </g>
-
-        <g id="node-etiquetas" data-node-id="etiquetas" data-node-label="Etiquetas" tabindex="0" role="button" aria-label="Focus Etiquetas, label rules, Rol admin · gestión" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="label rules" data-node-context="Rol admin · gestión">
-          <title>Etiquetas · label rules · Rol admin · gestión</title>
-          <rect x="1007.8" y="341" width="130" height="52" rx="6" class="c-mask"/>
-          <rect x="1007.8" y="341" width="130" height="52" rx="6" class="c-frontend" data-animate="node" style="--step:12" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(1013.8 347) scale(0.6875)">
-            <rect x="2" y="3" width="12" height="10" rx="2"/>
-            <path d="M2 6.5h12"/>
-            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
-            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
-          </g>
-          <text data-node-label="" data-detail-anchor="" x="1072.8" y="362" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Etiquetas</text>
-          <text data-detail="context" x="1072.8" y="379" class="t-muted" font-size="8" text-anchor="middle">label rules</text>
-        </g>
-
-        <g id="node-analytics" data-node-id="analytics" data-node-label="Analytics" tabindex="0" role="button" aria-label="Focus Analytics, book_views, Rol admin · gestión" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="book_views" data-node-context="Rol admin · gestión">
-          <title>Analytics · book_views · Rol admin · gestión</title>
-          <rect x="1215.8" y="341" width="150" height="52" rx="6" class="c-mask"/>
-          <rect x="1215.8" y="341" width="150" height="52" rx="6" class="c-frontend" data-animate="node" style="--step:12" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(1221.8 347) scale(0.6875)">
-            <rect x="2" y="3" width="12" height="10" rx="2"/>
-            <path d="M2 6.5h12"/>
-            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
-            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
-          </g>
-          <text data-node-label="" data-detail-anchor="" x="1290.8" y="362" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Analytics</text>
-          <text data-detail="context" x="1290.8" y="379" class="t-muted" font-size="8" text-anchor="middle">book_views</text>
-        </g>
-
-        <g id="node-suspended" data-node-id="suspended" data-node-label="Suspended" tabindex="0" role="button" aria-label="Focus Suspended, sesión revocada · RLS deny, Rol suspended · sin acceso" aria-pressed="false" data-node-kind="security" data-node-sublabel="sesión revocada · RLS deny" data-node-context="Rol suspended · sin acceso">
-          <title>Suspended · sesión revocada · RLS deny · Rol suspended · sin acceso</title>
-          <rect x="48" y="465" width="200" height="52" rx="6" class="c-mask"/>
-          <rect x="48" y="465" width="200" height="52" rx="6" class="c-security" data-animate="node" style="--step:12" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(54 471) scale(0.6875)">
-            <path d="M8 2.2 13 4v3.5c0 3.1-1.8 5.4-5 6.5-3.2-1.1-5-3.4-5-6.5V4Z"/>
-            <path d="m5.8 8 1.5 1.5 3-3"/>
-          </g>
-          <text data-node-label="" data-detail-anchor="" x="148" y="486" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Suspended</text>
-          <text data-detail="context" x="148" y="503" class="t-muted" font-size="8" text-anchor="middle">sesión revocada · RLS deny</text>
-        </g>
-
-        <g id="node-login_sus" data-node-id="login_sus" data-node-label="LoginScreen" tabindex="0" role="button" aria-label="Focus LoginScreen, debe re-loguear, Rol suspended · sin acceso" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="debe re-loguear" data-node-context="Rol suspended · sin acceso">
-          <title>LoginScreen · debe re-loguear · Rol suspended · sin acceso</title>
-          <rect x="337.6" y="465" width="170" height="52" rx="6" class="c-mask"/>
-          <rect x="337.6" y="465" width="170" height="52" rx="6" class="c-frontend" data-animate="node" style="--step:12" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(343.6 471) scale(0.6875)">
-            <rect x="2" y="3" width="12" height="10" rx="2"/>
-            <path d="M2 6.5h12"/>
-            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
-            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
-          </g>
-          <text data-node-label="" data-detail-anchor="" x="422.6" y="486" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">LoginScreen</text>
-          <text data-detail="context" x="422.6" y="503" class="t-muted" font-size="8" text-anchor="middle">debe re-loguear</text>
-        </g>
-
-        <g id="node-upload" data-node-id="upload" data-node-label="Bucket chapters" tabindex="0" role="button" aria-label="Focus Bucket chapters, {uid}/{ts}.{ext}, Supabase Storage" aria-pressed="false" data-node-kind="cloud" data-node-sublabel="{uid}/{ts}.{ext}" data-node-context="Supabase Storage">
-          <title>Bucket chapters · {uid}/{ts}.{ext} · Supabase Storage</title>
-          <rect x="987.8" y="589" width="170" height="52" rx="6" class="c-mask"/>
-          <rect x="987.8" y="589" width="170" height="52" rx="6" class="c-cloud" data-animate="node" style="--step:12" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="cloud" class="semantic-sigil s-cloud" transform="translate(993.8 595) scale(0.6875)">
+        <g id="node-data_gateway" data-node-id="data_gateway" data-node-label="DataGateway" tabindex="0" role="button" aria-label="Focus DataGateway, port · sin leak vendor, DataGateway · Supabase" aria-pressed="false" data-node-kind="cloud" data-node-sublabel="port · sin leak vendor" data-node-context="DataGateway · Supabase">
+          <title>DataGateway · port · sin leak vendor · DataGateway · Supabase</title>
+          <rect x="520.4000000000001" y="465" width="180" height="52" rx="6" class="c-mask"/>
+          <rect x="520.4000000000001" y="465" width="180" height="52" rx="6" class="c-cloud" data-animate="node" style="--step:12" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="cloud" class="semantic-sigil s-cloud" transform="translate(526.4000000000001 471) scale(0.6875)">
             <path d="M4.3 12.5h7.3a2.4 2.4 0 0 0 .2-4.8 4 4 0 0 0-7.5-1.3A3.1 3.1 0 0 0 4.3 12.5Z"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="1072.8" y="610" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Bucket chapters</text>
-          <text data-detail="context" x="1072.8" y="627" class="t-muted" font-size="8" text-anchor="middle">{uid}/{ts}.{ext}</text>
+          <text data-node-label="" data-detail-anchor="" x="610.4000000000001" y="486" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">DataGateway</text>
+          <text data-detail="context" x="610.4000000000001" y="503" class="t-muted" font-size="8" text-anchor="middle">port · sin leak vendor</text>
         </g>
 
-        <g id="node-covers" data-node-id="covers" data-node-label="Bucket covers" tabindex="0" role="button" aria-label="Focus Bucket covers, portadas, Supabase Storage" aria-pressed="false" data-node-kind="cloud" data-node-sublabel="portadas" data-node-context="Supabase Storage">
-          <title>Bucket covers · portadas · Supabase Storage</title>
-          <rect x="1215.8" y="589" width="150" height="52" rx="6" class="c-mask"/>
-          <rect x="1215.8" y="589" width="150" height="52" rx="6" class="c-cloud" data-animate="node" style="--step:12" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="cloud" class="semantic-sigil s-cloud" transform="translate(1221.8 595) scale(0.6875)">
-            <path d="M4.3 12.5h7.3a2.4 2.4 0 0 0 .2-4.8 4 4 0 0 0-7.5-1.3A3.1 3.1 0 0 0 4.3 12.5Z"/>
-          </g>
-          <text data-node-label="" data-detail-anchor="" x="1290.8" y="610" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Bucket covers</text>
-          <text data-detail="context" x="1290.8" y="627" class="t-muted" font-size="8" text-anchor="middle">portadas</text>
-        </g>
-
-        <g id="node-db_user" data-node-id="db_user" data-node-label="books · reads · favorites" tabindex="0" role="button" aria-label="Focus books · reads · favorites, is_visible = true, Postgres · RLS" aria-pressed="false" data-node-kind="database" data-node-sublabel="is_visible = true" data-node-context="Postgres · RLS">
-          <title>books · reads · favorites · is_visible = true · Postgres · RLS</title>
-          <rect x="744.8" y="713" width="210" height="52" rx="6" class="c-mask"/>
-          <rect x="744.8" y="713" width="210" height="52" rx="6" class="c-database" data-animate="node" style="--step:3" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(750.8 719) scale(0.6875)">
+        <g id="node-fav_db" data-node-id="fav_db" data-node-label="user_favorites" tabindex="0" role="button" aria-label="Focus user_favorites, PK (user_id, book_id) · RLS, Postgres · RLS" aria-pressed="false" data-node-kind="database" data-node-sublabel="PK (user_id, book_id) · RLS" data-node-context="Postgres · RLS">
+          <title>user_favorites · PK (user_id, book_id) · RLS · Postgres · RLS</title>
+          <rect x="916.4000000000001" y="589" width="200" height="52" rx="6" class="c-mask"/>
+          <rect x="916.4000000000001" y="589" width="200" height="52" rx="6" class="c-database" data-animate="node" style="--step:5" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(922.4000000000001 595) scale(0.6875)">
             <ellipse cx="8" cy="4" rx="5" ry="2"/>
             <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="849.8" y="734" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">books · reads · favorites</text>
-          <text data-detail="context" x="849.8" y="751" class="t-muted" font-size="8" text-anchor="middle">is_visible = true</text>
+          <text data-node-label="" data-detail-anchor="" x="1016.4000000000001" y="610" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">user_favorites</text>
+          <text data-detail="context" x="1016.4000000000001" y="627" class="t-muted" font-size="8" text-anchor="middle">PK (user_id, book_id) · RLS</text>
         </g>
 
-        <g id="node-db_scan" data-node-id="db_scan" data-node-label="books · tooks · chapters" tabindex="0" role="button" aria-label="Focus books · tooks · chapters, created_by = auth.uid(), Postgres · RLS" aria-pressed="false" data-node-kind="database" data-node-sublabel="created_by = auth.uid()" data-node-context="Postgres · RLS">
-          <title>books · tooks · chapters · created_by = auth.uid() · Postgres · RLS</title>
-          <rect x="962.8" y="713" width="220" height="52" rx="6" class="c-mask"/>
-          <rect x="962.8" y="713" width="220" height="52" rx="6" class="c-database" data-animate="node" style="--step:12" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(968.8 719) scale(0.6875)">
+        <g id="node-views_db" data-node-id="views_db" data-node-label="book_views" tabindex="0" role="button" aria-label="Focus book_views, INSERT · tracking, Postgres · RLS" aria-pressed="false" data-node-kind="database" data-node-sublabel="INSERT · tracking" data-node-context="Postgres · RLS">
+          <title>book_views · INSERT · tracking · Postgres · RLS</title>
+          <rect x="1124.4" y="589" width="190" height="52" rx="6" class="c-mask"/>
+          <rect x="1124.4" y="589" width="190" height="52" rx="6" class="c-database" data-animate="node" style="--step:12" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(1130.4 595) scale(0.6875)">
             <ellipse cx="8" cy="4" rx="5" ry="2"/>
             <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="1072.8" y="734" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">books · tooks · chapters</text>
-          <text data-detail="context" x="1072.8" y="751" class="t-muted" font-size="8" text-anchor="middle">created_by = auth.uid()</text>
-        </g>
-
-        <g id="node-db_admin" data-node-id="db_admin" data-node-label="todas las tablas" tabindex="0" role="button" aria-label="Focus todas las tablas, is_admin() bypass, Postgres · RLS" aria-pressed="false" data-node-kind="database" data-node-sublabel="is_admin() bypass" data-node-context="Postgres · RLS">
-          <title>todas las tablas · is_admin() bypass · Postgres · RLS</title>
-          <rect x="1190.8" y="713" width="200" height="52" rx="6" class="c-mask"/>
-          <rect x="1190.8" y="713" width="200" height="52" rx="6" class="c-database" data-animate="node" style="--step:12" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(1196.8 719) scale(0.6875)">
-            <ellipse cx="8" cy="4" rx="5" ry="2"/>
-            <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
-          </g>
-          <text data-node-label="" data-detail-anchor="" x="1290.8" y="734" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">todas las tablas</text>
-          <text data-detail="context" x="1290.8" y="751" class="t-muted" font-size="8" text-anchor="middle">is_admin() bypass</text>
+          <text data-node-label="" data-detail-anchor="" x="1219.4" y="610" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">book_views</text>
+          <text data-detail="context" x="1219.4" y="627" class="t-muted" font-size="8" text-anchor="middle">INSERT · tracking</text>
         </g>
 
         <!-- Edge labels -->
-        <g data-detail="context" data-edge-from="admin_dash" data-edge-to="analytics" data-edge-label="metricas" data-edge-key="0" data-edge-id="e-admin-ana">
-          <rect x="832.5" y="305" width="48.4" height="14" rx="3" class="c-mask"/>
-          <text x="856.7" y="315" class="t-muted" font-size="8" text-anchor="middle">metricas</text>
+        <g data-detail="context" data-edge-from="fav_bloc" data-edge-to="get_fav_uc" data-edge-label="carga lista" data-edge-key="0" data-edge-id="e-bloc-favlist">
+          <rect x="668.6" y="181" width="62.8" height="14" rx="3" class="c-mask"/>
+          <text x="700" y="191" class="t-muted" font-size="8" text-anchor="middle">carga lista</text>
         </g>
-        <g data-detail="context" data-edge-from="usuarios" data-edge-to="db_admin" data-edge-label="is_admin() bypass" data-edge-key="1" data-edge-id="e-admin-db">
-          <rect x="933.5" y="772" width="91.6" height="14" rx="3" class="c-mask"/>
-          <text x="979.3" y="782" class="t-backend" font-size="8" text-anchor="middle">is_admin() bypass</text>
+        <g data-detail="context" data-edge-from="fav_bloc" data-edge-to="toggle_uc" data-edge-label="toggle" data-edge-key="1" data-edge-id="e-bloc-toggle">
+          <rect x="477.6000000000001" y="265" width="38.8" height="14" rx="3" class="c-mask"/>
+          <text x="497.00000000000006" y="275" class="t-muted" font-size="8" text-anchor="middle">toggle</text>
         </g>
-        <g data-detail="context" data-edge-from="admin_dash" data-edge-to="etiquetas" data-edge-label="reglas" data-edge-key="2" data-edge-id="e-admin-et">
-          <rect x="565.7500000000001" y="305" width="38.8" height="14" rx="3" class="c-mask"/>
-          <text x="585.1500000000001" y="315" class="t-muted" font-size="8" text-anchor="middle">reglas</text>
+        <g data-detail="context" data-edge-from="books_repo" data-edge-to="recent_section" data-edge-label="detalle" data-edge-key="2" data-edge-id="e-books-ui">
+          <rect x="953.4000000000001" y="141" width="43.6" height="14" rx="3" class="c-mask"/>
+          <text x="975.2" y="151" class="t-muted" font-size="8" text-anchor="middle">detalle</text>
         </g>
-        <g data-detail="context" data-edge-from="admin_dash" data-edge-to="generos" data-edge-label="CRUD" data-edge-key="3" data-edge-id="e-admin-gen">
-          <rect x="621.2" y="305" width="30" height="14" rx="3" class="c-mask"/>
-          <text x="636.2" y="315" class="t-muted" font-size="8" text-anchor="middle">CRUD</text>
+        <g data-detail="context" data-edge-from="views_db" data-edge-to="recent_uc" data-edge-label="get_user_recent_views" data-edge-key="3" data-edge-id="e-db-recent">
+          <rect x="1224.3" y="553" width="110.8" height="14" rx="3" class="c-mask"/>
+          <text x="1279.7" y="563" class="t-muted" font-size="8" text-anchor="middle">get_user_recent_views</text>
         </g>
-        <g data-detail="context" data-edge-from="login_admin" data-edge-to="admin_dash" data-edge-label="entra · is_admin()" data-edge-key="4" data-edge-id="e-admin-login">
-          <rect x="237.10000000000002" y="347" width="96.39999999999999" height="14" rx="3" class="c-mask"/>
-          <text x="285.3" y="357" class="t-backend" font-size="8" text-anchor="middle">entra · is_admin()</text>
+        <g data-detail="context" data-edge-from="get_fav_uc" data-edge-to="fav_repo" data-edge-label="getFavorites" data-edge-key="4" data-edge-id="e-getfav-repo">
+          <rect x="876.1000000000001" y="270" width="67.6" height="14" rx="3" class="c-mask"/>
+          <text x="909.9000000000001" y="280" class="t-muted" font-size="8" text-anchor="middle">getFavorites</text>
         </g>
-        <g data-detail="context" data-edge-from="admin_dash" data-edge-to="usuarios" data-edge-label="gestiona roles" data-edge-key="5" data-edge-id="e-admin-users">
-          <rect x="506.6" y="389" width="77.2" height="14" rx="3" class="c-mask"/>
-          <text x="545.2" y="399" class="t-muted" font-size="8" text-anchor="middle">gestiona roles</text>
+        <g data-detail="context" data-edge-from="fav_repo" data-edge-to="data_gateway" data-edge-label="usa port" data-edge-key="5" data-edge-id="e-gw">
+          <rect x="720.7" y="471" width="48.4" height="14" rx="3" class="c-mask"/>
+          <text x="744.9000000000001" y="481" class="t-muted" font-size="8" text-anchor="middle">usa port</text>
         </g>
-        <g data-detail="context" data-edge-from="capitulos" data-edge-to="upload" data-edge-label="sube" data-edge-key="6" data-edge-id="e-scan-cap-upload">
-          <rect x="925.55" y="223" width="30" height="14" rx="3" class="c-mask"/>
-          <text x="940.55" y="233" class="t-backend" font-size="8" text-anchor="middle">sube</text>
+        <g data-detail="context" data-edge-from="fav_repo" data-edge-to="fav_db" data-edge-label="SELECT book_id orden" data-edge-key="6" data-edge-id="e-list-db">
+          <rect x="806.9000000000001" y="588" width="106" height="14" rx="3" class="c-mask"/>
+          <text x="859.9000000000001" y="598" class="t-muted" font-size="8" text-anchor="middle">SELECT book_id orden</text>
         </g>
-        <g data-detail="context" data-edge-from="scan_main" data-edge-to="covers" data-edge-label="portada" data-edge-key="7" data-edge-id="e-scan-covers">
-          <rect x="933.4000000000001" y="140" width="43.6" height="14" rx="3" class="c-mask"/>
-          <text x="955.2" y="150" class="t-muted" font-size="8" text-anchor="middle">portada</text>
+        <g data-detail="context" data-edge-from="get_fav_uc" data-edge-to="favorites_screen" data-edge-label="lista favoritos" data-edge-key="7" data-edge-id="e-list-ui">
+          <rect x="1026.15" y="181" width="82" height="14" rx="3" class="c-mask"/>
+          <text x="1067.15" y="191" class="t-muted" font-size="8" text-anchor="middle">lista favoritos</text>
         </g>
-        <g data-detail="context" data-edge-from="tooks" data-edge-to="db_scan" data-edge-label="created_by = auth.uid()" data-edge-key="8" data-edge-id="e-scan-db">
-          <rect x="979.2" y="181" width="120.39999999999999" height="14" rx="3" class="c-mask"/>
-          <text x="1039.4" y="191" class="t-backend" font-size="8" text-anchor="middle">created_by = auth.uid()</text>
+        <g data-detail="context" data-edge-from="book_screen" data-edge-to="fav_button" data-edge-label="abre detalle" data-edge-key="8" data-edge-id="e-open">
+          <rect x="222" y="99" width="67.6" height="14" rx="3" class="c-mask"/>
+          <text x="255.8" y="109" class="t-backend" font-size="8" text-anchor="middle">abre detalle</text>
         </g>
-        <g data-detail="context" data-edge-from="login_scan" data-edge-to="scan_main" data-edge-label="entra · is_scan()" data-edge-key="9" data-edge-id="e-scan-login">
-          <rect x="237" y="223" width="91.6" height="14" rx="3" class="c-mask"/>
-          <text x="282.8" y="233" class="t-backend" font-size="8" text-anchor="middle">entra · is_scan()</text>
+        <g data-detail="context" data-edge-from="book_screen" data-edge-to="track_uc" data-edge-label="track_book_view" data-edge-key="9" data-edge-id="e-open-track">
+          <rect x="423.70000000000005" y="146" width="82" height="14" rx="3" class="c-mask"/>
+          <text x="464.70000000000005" y="156" class="t-muted" font-size="8" text-anchor="middle">track_book_view</text>
         </g>
-        <g data-detail="context" data-edge-from="scan_main" data-edge-to="tooks" data-edge-label="CRUD propios" data-edge-key="10" data-edge-id="e-scan-main-tooks">
-          <rect x="511.40000000000003" y="265" width="67.6" height="14" rx="3" class="c-mask"/>
-          <text x="545.2" y="275" class="t-muted" font-size="8" text-anchor="middle">CRUD propios</text>
+        <g data-detail="context" data-edge-from="recent_uc" data-edge-to="books_repo" data-edge-label="booksWithRelationsByIds" data-edge-key="10" data-edge-id="e-recent-books">
+          <rect x="1057.7" y="270" width="120.39999999999999" height="14" rx="3" class="c-mask"/>
+          <text x="1117.9" y="280" class="t-muted" font-size="8" text-anchor="middle">booksWithRelationsByIds</text>
         </g>
-        <g data-detail="context" data-edge-from="tooks" data-edge-to="capitulos" data-edge-label="edita" data-edge-key="11" data-edge-id="e-scan-tooks-cap">
-          <rect x="736.8" y="223" width="34" height="14" rx="3" class="c-mask"/>
-          <text x="753.8" y="233" class="t-muted" font-size="8" text-anchor="middle">edita</text>
+        <g data-detail="context" data-edge-from="recent_uc" data-edge-to="recent_section" data-edge-label="máx 6" data-edge-key="11" data-edge-id="e-recent-ui">
+          <rect x="958.2" y="57" width="34" height="14" rx="3" class="c-mask"/>
+          <text x="975.2" y="67" class="t-muted" font-size="8" text-anchor="middle">máx 6</text>
         </g>
-        <g data-detail="context" data-edge-from="suspended" data-edge-to="login_sus" data-edge-label="sin acceso" data-edge-key="12" data-edge-id="e-sus">
-          <rect x="263.8" y="471" width="58" height="14" rx="3" class="c-mask"/>
-          <text x="292.8" y="481" class="t-security" font-size="8" text-anchor="middle">sin acceso</text>
+        <g data-detail="context" data-edge-from="fav_repo" data-edge-to="fav_db" data-edge-label="SELECT / INSERT / DELETE" data-edge-key="12" data-edge-id="e-repo-db">
+          <rect x="847.3000000000001" y="456" width="125.19999999999999" height="14" rx="3" class="c-mask"/>
+          <text x="909.9000000000001" y="466" class="t-backend" font-size="8" text-anchor="middle">SELECT / INSERT / DELETE</text>
         </g>
-        <g data-detail="context" data-edge-from="favoritos" data-edge-to="db_user" data-edge-label="SELECT is_visible = true" data-edge-key="13" data-edge-id="e-user-fav-db">
-          <rect x="976.8000000000001" y="57" width="125.19999999999999" height="14" rx="3" class="c-mask"/>
-          <text x="1039.4" y="67" class="t-backend" font-size="8" text-anchor="middle">SELECT is_visible = true</text>
+        <g data-detail="context" data-edge-from="fav_button" data-edge-to="fav_bloc" data-edge-label="taps corazón" data-edge-key="13" data-edge-id="e-tap">
+          <rect x="299.3" y="146" width="67.6" height="14" rx="3" class="c-mask"/>
+          <text x="333.1" y="156" class="t-muted" font-size="8" text-anchor="middle">taps corazón</text>
         </g>
-        <g data-detail="context" data-edge-from="login_user" data-edge-to="main_user" data-edge-label="entra · is_user()" data-edge-key="14" data-edge-id="e-user-login">
-          <rect x="239.5" y="99" width="91.6" height="14" rx="3" class="c-mask"/>
-          <text x="285.3" y="109" class="t-backend" font-size="8" text-anchor="middle">entra · is_user()</text>
+        <g data-detail="context" data-edge-from="toggle_uc" data-edge-to="fav_repo" data-edge-label="toggleFavorite" data-edge-key="14" data-edge-id="e-toggle-repo">
+          <rect x="618.3000000000001" y="347" width="77.2" height="14" rx="3" class="c-mask"/>
+          <text x="656.9000000000001" y="357" class="t-muted" font-size="8" text-anchor="middle">toggleFavorite</text>
         </g>
-        <g data-detail="context" data-edge-from="main_user" data-edge-to="favoritos" data-edge-label="lee visibles" data-edge-key="15" data-edge-id="e-user-main-fav">
-          <rect x="511.40000000000003" y="57" width="67.6" height="14" rx="3" class="c-mask"/>
-          <text x="545.2" y="67" class="t-muted" font-size="8" text-anchor="middle">lee visibles</text>
-        </g>
-        <g data-detail="context" data-edge-from="main_user" data-edge-to="recientes" data-edge-label="marca leído" data-edge-key="16" data-edge-id="e-user-main-rec">
-          <rect x="604.8000000000001" y="57" width="62.8" height="14" rx="3" class="c-mask"/>
-          <text x="636.2" y="67" class="t-muted" font-size="8" text-anchor="middle">marca leído</text>
-        </g>
-        <g data-detail="context" data-edge-from="favoritos" data-edge-to="perfil_user" data-edge-label="edita" data-edge-key="17" data-edge-id="e-user-perfil">
-          <rect x="853.3" y="57" width="34" height="14" rx="3" class="c-mask"/>
-          <text x="870.3" y="67" class="t-muted" font-size="8" text-anchor="middle">edita</text>
+        <g data-detail="context" data-edge-from="track_uc" data-edge-to="views_db" data-edge-label="INSERT book_views" data-edge-key="15" data-edge-id="e-track-db">
+          <rect x="1121.9" y="181" width="91.6" height="14" rx="3" class="c-mask"/>
+          <text x="1167.7" y="191" class="t-backend" font-size="8" text-anchor="middle">INSERT book_views</text>
         </g>
 
         <!-- Legend -->
         <g data-legend="" data-legend-bridge="">
-          <text x="20" y="800" class="t-primary" font-size="12" font-weight="650">Legend</text>
-          <g data-legend-semantic-kind="frontend" data-legend-kind="frontend" data-legend-label="User UI" data-legend-x="20" data-legend-baseline="820" data-legend-width="74">
-            <rect x="20" y="812" width="14" height="9" rx="2" class="c-frontend" stroke-width="1"/>
-            <text x="42" y="820" class="t-muted" font-size="7.5" font-weight="500">User UI</text>
+          <text x="20" y="676" class="t-primary" font-size="12" font-weight="650">Legend</text>
+          <g data-legend-semantic-kind="frontend" data-legend-kind="frontend" data-legend-label="User UI" data-legend-x="20" data-legend-baseline="696" data-legend-width="74">
+            <rect x="20" y="688" width="14" height="9" rx="2" class="c-frontend" stroke-width="1"/>
+            <text x="42" y="696" class="t-muted" font-size="7.5" font-weight="500">User UI</text>
           </g>
-          <g data-legend-semantic-kind="security" data-legend-kind="security" data-legend-label="Policy" data-legend-x="101" data-legend-baseline="820" data-legend-width="70">
-            <rect x="101" y="812" width="14" height="9" rx="2" class="c-security" stroke-width="1"/>
-            <text x="123" y="820" class="t-muted" font-size="7.5" font-weight="500">Policy</text>
+          <g data-legend-semantic-kind="backend" data-legend-kind="backend" data-legend-label="Agent logic" data-legend-x="101" data-legend-baseline="696" data-legend-width="91">
+            <rect x="101" y="688" width="14" height="9" rx="2" class="c-backend" stroke-width="1"/>
+            <text x="123" y="696" class="t-muted" font-size="7.5" font-weight="500">Agent logic</text>
           </g>
-          <g data-legend-semantic-kind="database" data-legend-kind="database" data-legend-label="Context / trace" data-legend-x="178" data-legend-baseline="820" data-legend-width="109">
-            <rect x="178" y="812" width="14" height="9" rx="2" class="c-database" stroke-width="1"/>
-            <text x="200" y="820" class="t-muted" font-size="7.5" font-weight="500">Context / trace</text>
+          <g data-legend-semantic-kind="database" data-legend-kind="database" data-legend-label="Context / trace" data-legend-x="199" data-legend-baseline="696" data-legend-width="109">
+            <rect x="199" y="688" width="14" height="9" rx="2" class="c-database" stroke-width="1"/>
+            <text x="221" y="696" class="t-muted" font-size="7.5" font-weight="500">Context / trace</text>
           </g>
-          <g data-legend-semantic-kind="cloud" data-legend-kind="cloud" data-legend-label="Cloud service" data-legend-x="294" data-legend-baseline="820" data-legend-width="100">
-            <rect x="294" y="812" width="14" height="9" rx="2" class="c-cloud" stroke-width="1"/>
-            <text x="316" y="820" class="t-muted" font-size="7.5" font-weight="500">Cloud service</text>
+          <g data-legend-semantic-kind="cloud" data-legend-kind="cloud" data-legend-label="Cloud service" data-legend-x="315" data-legend-baseline="696" data-legend-width="100">
+            <rect x="315" y="688" width="14" height="9" rx="2" class="c-cloud" stroke-width="1"/>
+            <text x="337" y="696" class="t-muted" font-size="7.5" font-weight="500">Cloud service</text>
           </g>
         </g>
       </svg>
@@ -5823,36 +5642,36 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       <div class="card">
         <div class="card-header">
           <div class="card-dot cyan"></div>
-          <h3>Rol user · lector</h3>
+          <h3>Favoritos por usuario</h3>
         </div>
         <ul>
-          <li>&bull; Ve solo libros con is_visible = true</li>
-          <li>&bull; Favoritos, recientes, marcado de leído y perfil</li>
-          <li>&bull; Alcanza Postgres con la fila RLS de usuario</li>
+          <li>&bull; PK compuesta (user_id, book_id) en user_favorites</li>
+          <li>&bull; Toggle consulta existencia y hace INSERT/DELETE</li>
+          <li>&bull; RLS: auth.uid() = user_id</li>
         </ul>
       </div>
 
       <div class="card">
         <div class="card-header">
           <div class="card-dot violet"></div>
-          <h3>Rol scan · ingesta</h3>
+          <h3>Vistas recientes</h3>
         </div>
         <ul>
-          <li>&bull; CRUD de libros propios, tooks, capítulos</li>
-          <li>&bull; Upload .md/.txt al bucket chapters y portadas</li>
-          <li>&bull; Alcanza Postgres con created_by = auth.uid()</li>
+          <li>&bull; track_book_view inserta book_views (book_id, viewed_at)</li>
+          <li>&bull; get_recent_views usa RPC get_user_recent_views (máx 6)</li>
+          <li>&bull; Recientes (UI) ≠ analytics agregados</li>
         </ul>
       </div>
 
       <div class="card">
         <div class="card-header">
           <div class="card-dot amber"></div>
-          <h3>Rol admin · gestión</h3>
+          <h3>Separación de capas</h3>
         </div>
         <ul>
-          <li>&bull; Usuarios (roles y suspensión), géneros, etiquetas</li>
-          <li>&bull; Analytics de book_views y contenido completo</li>
-          <li>&bull; Alcanza Postgres con is_admin()</li>
+          <li>&bull; UI → FavoriteBloc → use cases → repos</li>
+          <li>&bull; DataGateway abstrae Postgres sin leak del vendor</li>
+          <li>&bull; booksWithRelationsByIds arma el detalle de los libros</li>
         </ul>
       </div>
     </div>

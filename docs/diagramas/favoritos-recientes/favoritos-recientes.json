@@ -1,0 +1,380 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Favoritos y vistas recientes en Noveles",
+    "locale": "en",
+    "visual_preset": "classic",
+    "quality_profile": "standard",
+    "animation": "trace",
+    "viewBox": [
+      1600,
+      1000
+    ],
+    "views": [
+      {
+        "id": "toggle",
+        "label": "Toggle de favorito",
+        "focus": [
+          "book_screen",
+          "fav_button",
+          "fav_bloc",
+          "toggle_uc",
+          "fav_repo",
+          "fav_db"
+        ],
+        "note": "El corazón lee si existe el favorito y hace INSERT/DELETE sobre la PK compuesta (user_id, book_id)."
+      },
+      {
+        "id": "recientes",
+        "label": "Vistas recientes",
+        "focus": [
+          "book_screen",
+          "track_uc",
+          "views_db",
+          "recent_uc",
+          "recent_section"
+        ],
+        "note": "Abrir un libro inserta book_views; la sección de recientes usa la RPC get_user_recent_views (top 6)."
+      }
+    ]
+  },
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Favoritos por usuario",
+      "items": [
+        "PK compuesta (user_id, book_id) en user_favorites",
+        "Toggle consulta existencia y hace INSERT/DELETE",
+        "RLS: auth.uid() = user_id"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Vistas recientes",
+      "items": [
+        "track_book_view inserta book_views (book_id, viewed_at)",
+        "get_recent_views usa RPC get_user_recent_views (máx 6)",
+        "Recientes (UI) ≠ analytics agregados"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Separación de capas",
+      "items": [
+        "UI → FavoriteBloc → use cases → repos",
+        "DataGateway abstrae Postgres sin leak del vendor",
+        "booksWithRelationsByIds arma el detalle de los libros"
+      ]
+    }
+  ],
+  "lanes": [
+    {
+      "id": "ui",
+      "label": "UI · Flutter"
+    },
+    {
+      "id": "domain",
+      "label": "BLoC + Use cases"
+    },
+    {
+      "id": "data",
+      "label": "Repositories"
+    },
+    {
+      "id": "backend",
+      "label": "DataGateway · Supabase"
+    },
+    {
+      "id": "db",
+      "label": "Postgres · RLS"
+    }
+  ],
+  "mainPath": [
+    "book_screen",
+    "fav_button",
+    "fav_bloc",
+    "toggle_uc",
+    "fav_repo",
+    "fav_db"
+  ],
+  "semanticChecks": {
+    "allowedRoots": [
+      "book_screen"
+    ],
+    "allowedTerminals": [
+      "fav_db",
+      "favorites_screen",
+      "views_db",
+      "recent_section",
+      "data_gateway"
+    ],
+    "requiredEdges": [
+      {
+        "from": "book_screen",
+        "to": "fav_button"
+      },
+      {
+        "from": "fav_button",
+        "to": "fav_bloc"
+      },
+      {
+        "from": "fav_bloc",
+        "to": "toggle_uc"
+      },
+      {
+        "from": "toggle_uc",
+        "to": "fav_repo"
+      },
+      {
+        "from": "fav_repo",
+        "to": "fav_db"
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "id": "book_screen",
+      "lane": "ui",
+      "col": 0,
+      "type": "frontend",
+      "label": "BookScreen",
+      "sublabel": "detalle de libro",
+      "width": 170
+    },
+    {
+      "id": "fav_button",
+      "lane": "ui",
+      "col": 1,
+      "type": "frontend",
+      "label": "FavoriteButton",
+      "sublabel": "corazón · isFavorite",
+      "width": 180
+    },
+    {
+      "id": "recent_section",
+      "lane": "ui",
+      "col": 2,
+      "type": "frontend",
+      "label": "Sección Recientes",
+      "sublabel": "MainScreen · top 6",
+      "width": 190
+    },
+    {
+      "id": "fav_bloc",
+      "lane": "domain",
+      "col": 1,
+      "type": "backend",
+      "label": "FavoriteBloc",
+      "sublabel": "estado del toggle",
+      "width": 170
+    },
+    {
+      "id": "toggle_uc",
+      "lane": "domain",
+      "col": 2,
+      "type": "backend",
+      "label": "ToggleFavorite",
+      "sublabel": "toggleFavorite(user, book)",
+      "width": 190
+    },
+    {
+      "id": "track_uc",
+      "lane": "domain",
+      "col": 3,
+      "type": "backend",
+      "label": "TrackBookView",
+      "sublabel": "al abrir el libro",
+      "width": 180
+    },
+    {
+      "id": "get_fav_uc",
+      "lane": "domain",
+      "col": 4,
+      "type": "backend",
+      "label": "GetFavorites",
+      "sublabel": "lista por usuario",
+      "width": 180
+    },
+    {
+      "id": "recent_uc",
+      "lane": "domain",
+      "col": 5,
+      "type": "backend",
+      "label": "GetRecentViews",
+      "sublabel": "RPC get_user_recent_views",
+      "width": 200
+    },
+    {
+      "id": "fav_repo",
+      "lane": "data",
+      "col": 3,
+      "type": "database",
+      "label": "FavoriteRepository",
+      "sublabel": "impl · SELECT existencia",
+      "width": 200
+    },
+    {
+      "id": "books_repo",
+      "lane": "data",
+      "col": 4,
+      "type": "database",
+      "label": "BookRepository",
+      "sublabel": "booksWithRelationsByIds",
+      "width": 210
+    },
+    {
+      "id": "data_gateway",
+      "lane": "backend",
+      "col": 2,
+      "type": "cloud",
+      "label": "DataGateway",
+      "sublabel": "port · sin leak vendor",
+      "width": 180
+    },
+    {
+      "id": "fav_db",
+      "lane": "db",
+      "col": 4,
+      "type": "database",
+      "label": "user_favorites",
+      "sublabel": "PK (user_id, book_id) · RLS",
+      "width": 200
+    },
+    {
+      "id": "views_db",
+      "lane": "db",
+      "col": 5,
+      "type": "database",
+      "label": "book_views",
+      "sublabel": "INSERT · tracking",
+      "width": 190
+    },
+    {
+      "id": "favorites_screen",
+      "lane": "ui",
+      "col": 5,
+      "type": "frontend",
+      "label": "FavoritesScreen",
+      "sublabel": "lista del usuario",
+      "width": 190
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-open",
+      "from": "book_screen",
+      "to": "fav_button",
+      "label": "abre detalle",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-tap",
+      "from": "fav_button",
+      "to": "fav_bloc",
+      "label": "taps corazón",
+      "role": "main"
+    },
+    {
+      "id": "e-bloc-toggle",
+      "from": "fav_bloc",
+      "to": "toggle_uc",
+      "label": "toggle",
+      "role": "main"
+    },
+    {
+      "id": "e-toggle-repo",
+      "from": "toggle_uc",
+      "to": "fav_repo",
+      "label": "toggleFavorite",
+      "role": "main"
+    },
+    {
+      "id": "e-repo-db",
+      "from": "fav_repo",
+      "to": "fav_db",
+      "label": "SELECT / INSERT / DELETE",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-open-track",
+      "from": "book_screen",
+      "to": "track_uc",
+      "label": "track_book_view",
+      "role": "main"
+    },
+    {
+      "id": "e-track-db",
+      "from": "track_uc",
+      "to": "views_db",
+      "label": "INSERT book_views",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-db-recent",
+      "from": "views_db",
+      "to": "recent_uc",
+      "label": "get_user_recent_views",
+      "role": "main"
+    },
+    {
+      "id": "e-recent-ui",
+      "from": "recent_uc",
+      "to": "recent_section",
+      "label": "máx 6",
+      "role": "main"
+    },
+    {
+      "id": "e-bloc-favlist",
+      "from": "fav_bloc",
+      "to": "get_fav_uc",
+      "label": "carga lista",
+      "role": "main"
+    },
+    {
+      "id": "e-getfav-repo",
+      "from": "get_fav_uc",
+      "to": "fav_repo",
+      "label": "getFavorites",
+      "role": "main"
+    },
+    {
+      "id": "e-list-db",
+      "from": "fav_repo",
+      "to": "fav_db",
+      "label": "SELECT book_id orden",
+      "role": "main"
+    },
+    {
+      "id": "e-list-ui",
+      "from": "get_fav_uc",
+      "to": "favorites_screen",
+      "label": "lista favoritos",
+      "role": "main"
+    },
+    {
+      "id": "e-recent-books",
+      "from": "recent_uc",
+      "to": "books_repo",
+      "label": "booksWithRelationsByIds",
+      "role": "main"
+    },
+    {
+      "id": "e-books-ui",
+      "from": "books_repo",
+      "to": "recent_section",
+      "label": "detalle",
+      "role": "main"
+    },
+    {
+      "id": "e-gw",
+      "from": "fav_repo",
+      "to": "data_gateway",
+      "label": "usa port",
+      "role": "main"
+    }
+  ]
+}

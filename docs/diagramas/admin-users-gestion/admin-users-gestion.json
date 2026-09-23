@@ -1,0 +1,351 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Gestión de usuarios en el panel admin",
+    "locale": "en",
+    "visual_preset": "classic",
+    "quality_profile": "standard",
+    "animation": "trace",
+    "viewBox": [
+      1600,
+      1000
+    ],
+    "views": [
+      {
+        "id": "carga",
+        "label": "Cargar perfiles",
+        "focus": [
+          "admin_dash",
+          "users_tab",
+          "users_bloc",
+          "get_all",
+          "profiles_repo",
+          "gw",
+          "profiles_db"
+        ],
+        "note": "AdminDash abre UsersTab y AdminUsersBloc carga todos los perfiles vía GetAllProfiles."
+      },
+      {
+        "id": "rol",
+        "label": "Cambiar rol",
+        "focus": [
+          "users_tab",
+          "users_bloc",
+          "update_role",
+          "profiles_repo",
+          "rpc_role",
+          "profiles_db"
+        ],
+        "note": "UpdateUserRole rutea por RPCs admin para no escalar privilegios fuera de las funciones."
+      },
+      {
+        "id": "suspension",
+        "label": "Suspender / reactivar",
+        "focus": [
+          "users_tab",
+          "users_bloc",
+          "rpc_suspend",
+          "profiles_repo",
+          "suspended_ui"
+        ],
+        "note": "Suspender revoca la sesión vía admin_suspend_user y el RLS RESTRICTIVE niega todo."
+      }
+    ]
+  },
+  "cards": [
+    {
+      "dot": "amber",
+      "title": "Gestión admin de usuarios",
+      "items": [
+        "UsersTab lista perfiles con GetAllProfiles",
+        "Cambiar rol y suspender pasan por updateUserRole",
+        "No puedes cambiarte o suspenderte a ti mismo"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Suspensión real",
+      "items": [
+        "admin_suspend_user revoca la sesión",
+        "role = suspended activa RLS RESTRICTIVE",
+        "Enforce suspended aplica en todas las tablas"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Sin escalación de privilegios",
+      "items": [
+        "Los role changes van por RPCs admin, no UPDATE directo",
+        "Fix 20260906 blinda la escalación de roles",
+        "Reactivar vuelve a un rol activo explícito"
+      ]
+    }
+  ],
+  "lanes": [
+    {
+      "id": "ui",
+      "label": "UI · Admin"
+    },
+    {
+      "id": "bloc",
+      "label": "AdminUsersBloc"
+    },
+    {
+      "id": "domain",
+      "label": "Use cases · profiles"
+    },
+    {
+      "id": "data",
+      "label": "ProfilesRepository"
+    },
+    {
+      "id": "backend",
+      "label": "DataGateway · Supabase"
+    },
+    {
+      "id": "db",
+      "label": "Postgres · RLS"
+    }
+  ],
+  "mainPath": [
+    "admin_dash",
+    "users_tab",
+    "users_bloc",
+    "get_all",
+    "profiles_repo",
+    "profiles_db"
+  ],
+  "semanticChecks": {
+    "allowedRoots": [
+      "admin_dash"
+    ],
+    "allowedTerminals": [
+      "profiles_db",
+      "suspended_ui"
+    ],
+    "requiredEdges": [
+      {
+        "from": "admin_dash",
+        "to": "users_tab"
+      },
+      {
+        "from": "users_tab",
+        "to": "users_bloc"
+      },
+      {
+        "from": "users_bloc",
+        "to": "get_all"
+      },
+      {
+        "from": "get_all",
+        "to": "profiles_repo"
+      },
+      {
+        "from": "profiles_repo",
+        "to": "profiles_db"
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "id": "admin_dash",
+      "lane": "ui",
+      "col": 0,
+      "type": "frontend",
+      "label": "AdminDash",
+      "sublabel": "tabs de gestión",
+      "width": 170
+    },
+    {
+      "id": "users_tab",
+      "lane": "ui",
+      "col": 1,
+      "type": "frontend",
+      "label": "UsersTab",
+      "sublabel": "tab usuarios",
+      "width": 160
+    },
+    {
+      "id": "suspended_ui",
+      "lane": "ui",
+      "col": 5,
+      "type": "frontend",
+      "label": "SuspendedScreen",
+      "sublabel": "cuenta suspendida",
+      "width": 190
+    },
+    {
+      "id": "users_bloc",
+      "lane": "bloc",
+      "col": 2,
+      "type": "backend",
+      "label": "AdminUsersBloc",
+      "sublabel": "Load·Change·Suspend",
+      "width": 200
+    },
+    {
+      "id": "get_all",
+      "lane": "domain",
+      "col": 2,
+      "type": "backend",
+      "label": "GetAllProfiles",
+      "sublabel": "lista perfiles",
+      "width": 180
+    },
+    {
+      "id": "update_role",
+      "lane": "domain",
+      "col": 3,
+      "type": "backend",
+      "label": "UpdateUserRole",
+      "sublabel": "userId + rol",
+      "width": 190
+    },
+    {
+      "id": "profiles_repo",
+      "lane": "data",
+      "col": 3,
+      "type": "database",
+      "label": "ProfilesRepository",
+      "sublabel": "impl",
+      "width": 180
+    },
+    {
+      "id": "gw",
+      "lane": "backend",
+      "col": 3,
+      "type": "cloud",
+      "label": "DataGateway",
+      "sublabel": "rpc() · from()",
+      "width": 160
+    },
+    {
+      "id": "rpc_role",
+      "lane": "backend",
+      "col": 4,
+      "type": "cloud",
+      "label": "RPCs admin role",
+      "sublabel": "update role seguro",
+      "width": 190
+    },
+    {
+      "id": "rpc_suspend",
+      "lane": "backend",
+      "col": 5,
+      "type": "security",
+      "label": "admin_suspend_user",
+      "sublabel": "revoca sesión",
+      "width": 200
+    },
+    {
+      "id": "profiles_db",
+      "lane": "db",
+      "col": 5,
+      "type": "database",
+      "label": "profiles",
+      "sublabel": "role · RLS is_admin()",
+      "width": 170
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-dash-tab",
+      "from": "admin_dash",
+      "to": "users_tab",
+      "label": "abre usuarios",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-tab-bloc",
+      "from": "users_tab",
+      "to": "users_bloc",
+      "label": "LoadAdminUsers",
+      "role": "main"
+    },
+    {
+      "id": "e-bloc-getall",
+      "from": "users_bloc",
+      "to": "get_all",
+      "label": "carga perfiles",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-getall-repo",
+      "from": "get_all",
+      "to": "profiles_repo",
+      "label": "getAllProfiles",
+      "role": "main"
+    },
+    {
+      "id": "e-repo-db",
+      "from": "profiles_repo",
+      "to": "profiles_db",
+      "label": "SELECT · is_admin()",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-bloc-update",
+      "from": "users_bloc",
+      "to": "update_role",
+      "label": "ChangeUserRole",
+      "role": "main"
+    },
+    {
+      "id": "e-update-repo",
+      "from": "update_role",
+      "to": "profiles_repo",
+      "label": "rutea rol",
+      "role": "main"
+    },
+    {
+      "id": "e-repo-gw",
+      "from": "profiles_repo",
+      "to": "gw",
+      "label": "updateUserRole",
+      "role": "main"
+    },
+    {
+      "id": "e-gw-role",
+      "from": "gw",
+      "to": "rpc_role",
+      "label": "RPC role change",
+      "role": "main"
+    },
+    {
+      "id": "e-gw-suspend",
+      "from": "gw",
+      "to": "rpc_suspend",
+      "label": "role = suspended",
+      "role": "error",
+      "variant": "security"
+    },
+    {
+      "id": "e-suspend-db",
+      "from": "rpc_suspend",
+      "to": "profiles_db",
+      "label": "deny RESTRICTIVE",
+      "role": "main",
+      "variant": "security"
+    },
+    {
+      "id": "e-role-db",
+      "from": "rpc_role",
+      "to": "profiles_db",
+      "label": "UPDATE role",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-suspend-ui",
+      "from": "rpc_suspend",
+      "to": "suspended_ui",
+      "label": "sesión revocada",
+      "role": "main",
+      "variant": "security"
+    }
+  ]
+}

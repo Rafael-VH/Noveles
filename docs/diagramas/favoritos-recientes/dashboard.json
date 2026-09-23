@@ -1,0 +1,12 @@
+{
+  "id": "favoritos-recientes",
+  "tipo": "workflow",
+  "titulo": "Favoritos y vistas recientes",
+  "descripcion": "El lector marca favoritos y los libros abiertos quedan en recientes: FavoriteButton dispara ToggleFavoriteUseCase sobre user_favorites (PK compuesta, RLS por auth.uid()) y BookScreen registra book_views vía trackBookView, que alimenta la sección de recientes con get_user_recent_views.",
+  "etiquetas": ["favoritos", "recientes", "book_views", "flutter", "supabase", "rls"],
+  "meta": {
+    "pantallas": 5,
+    "acciones": 7,
+    "views": 2
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "admin-users-gestion",
+  "tipo": "workflow",
+  "titulo": "Gestión de usuarios en el panel admin",
+  "descripcion": "UsersTab carga perfiles con GetAllProfiles y AdminUsersBloc cambia roles o suspende vía UpdateUserRole: los role changes rutean por RPCs admin (sin UPDATE directo), la suspensión revoca la sesión con admin_suspend_user y el RLS RESTRICTIVE niega todo, sin escalación de privilegios.",
+  "etiquetas": ["admin", "usuarios", "roles", "suspension", "rls", "supabase"],
+  "meta": {
+    "pantallas": 3,
+    "acciones": 3,
+    "views": 3
+  }
+}
