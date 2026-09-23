@@ -57,6 +57,9 @@ opencode.json
 # FreeBuff CLI local config
 .freebuff/
 
+# PlayWright CLI
+.playwright-cli/
+
 # Antigravity CLI local config
 .antigravitycli/
 

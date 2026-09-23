@@ -269,7 +269,7 @@
       "titulo": "Login y ruteo por rol",
       "tipo": "sequence",
       "tipoTexto": "Secuencia",
-      "descripcion": "Login con email y password y selecci�n de pantalla seg�n rol (admin / scan / user): credenciales � sesi�n en Supabase Auth � carga o creaci�n de profiles � ruteo; incluye expiraci�n de token v�a stream con logout autom�tico.",
+      "descripcion": "Login con email y password y selección de pantalla según rol (admin / scan / user): credenciales → sesión en Supabase Auth → carga o creación de profiles → ruteo; incluye expiración de token vía stream con logout automático.",
       "etiquetas": [
         "auth",
         "login",
@@ -310,7 +310,7 @@
       "titulo": "Pipeline · ingesta de contenido en Noveles",
       "tipo": "workflow",
       "tipoTexto": "Proceso",
-      "descripcion": "Ingesta de contenido cap�tulos: archivo seleccionado � sube a Storage (chapters) � INSERT en chapters con RLS is_scan() � el lector lo recupera; con portadas aparte, reintento ante fallo y timeout de 10s.",
+      "descripcion": "Ingesta de contenido capítulos: archivo seleccionado → sube a Storage (chapters) → INSERT en chapters con RLS is_scan() → el lector lo recupera; con portadas aparte, reintento ante fallo y timeout de 10s.",
       "etiquetas": [
         "ingesta",
         "storage",
