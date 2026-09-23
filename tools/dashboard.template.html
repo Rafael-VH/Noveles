@@ -59,7 +59,7 @@
   header.encabezado {
     max-width: 1180px;
     margin: 0 auto;
-    padding: clamp(2rem, 6vw, 3.5rem) 0 1.5rem;
+    padding: clamp(1.25rem, 3vw, 2rem) 0 1.25rem;
     display: flex;
     flex-wrap: wrap;
     gap: 1rem 1.5rem;
@@ -80,6 +80,10 @@
   .acciones-encabezado { display: flex; gap: .5rem; flex-wrap: wrap; }
 
   main { max-width: 1180px; margin: 0 auto; }
+  @media (min-width: 1000px) {
+    main { display: grid; grid-template-columns: 260px 1fr; gap: 1.5rem; align-items: start; }
+    .contenido { display: grid; gap: 1rem; }
+  }
 
   .controles {
     display: flex;
@@ -91,10 +95,23 @@
     border-radius: var(--radio);
     box-shadow: var(--sombra);
   }
+  @media (min-width: 1000px) {
+    .controles { position: sticky; top: 1rem; }
+  }
 
   .campo { display: flex; flex-direction: column; gap: .4rem; }
 
   .campo label { font-size: .82rem; font-weight: 600; color: var(--texto-suave); }
+
+  .filtros-grupo { display: flex; flex-direction: column; gap: 1rem; }
+
+  .boton-filtros { display: none; }
+
+  @media (max-width: 999.98px) {
+    .boton-filtros { display: inline-flex; align-self: flex-start; }
+    .filtros-grupo { display: none; }
+    .filtros-grupo.abierto { display: flex; }
+  }
 
   input[type="search"] {
     width: 100%;
@@ -137,6 +154,9 @@
     display: grid;
     gap: 1rem;
     grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  }
+  @media (min-width: 1000px) {
+    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
 
   .tarjeta {
@@ -263,20 +283,26 @@
       <label for="busqueda">Buscar</label>
       <input type="search" id="busqueda" placeholder="Título, descripción, etiqueta…" autocomplete="off">
     </div>
-    <div class="filtros" id="filtros-tipo" role="group" aria-label="Filtrar por tipo"></div>
-    <div class="filtros" id="filtros-etiqueta" role="group" aria-label="Filtrar por etiqueta"></div>
+    <button class="boton boton--sutil boton-filtros" type="button" id="boton-filtros"
+      aria-expanded="false" aria-controls="filtros-grupo">Filtros</button>
+    <div class="filtros-grupo" id="filtros-grupo">
+      <div class="filtros" id="filtros-tipo" role="group" aria-label="Filtrar por tipo"></div>
+      <div class="filtros" id="filtros-etiqueta" role="group" aria-label="Filtrar por etiqueta"></div>
+    </div>
   </section>
 
-  <p class="contador" id="contador" aria-live="polite"></p>
+  <div class="contenido">
+    <p class="contador" id="contador" aria-live="polite"></p>
 
-  <ul class="grid" id="grid"></ul>
+    <ul class="grid" id="grid"></ul>
 
-  <p class="vacio" id="vacio" hidden>Ningún diagrama coincide con los filtros elegidos.</p>
+    <p class="vacio" id="vacio" hidden>Ningún diagrama coincide con los filtros elegidos.</p>
 
-  <noscript>
-    <p class="vacio">Este dashboard necesita JavaScript para listar los diagramas. La
-    especificación de cada uno sigue siendo accesible desde <code>docs/diagramas/</code>.</p>
-  </noscript>
+    <noscript>
+      <p class="vacio">Este dashboard necesita JavaScript para listar los diagramas. La
+      especificación de cada uno sigue siendo accesible desde <code>docs/diagramas/</code>.</p>
+    </noscript>
+  </div>
 </main>
 
 <footer class="pie">
@@ -301,6 +327,8 @@
   var $tipos = document.getElementById("filtros-tipo");
   var $etiquetas = document.getElementById("filtros-etiqueta");
   var $botonTema = document.getElementById("boton-tema");
+  var $botonFiltros = document.getElementById("boton-filtros");
+  var $grupoFiltros = document.getElementById("filtros-grupo");
 
   /* ---------- tema ---------- */
 
@@ -331,6 +359,11 @@
     var oscuro = document.documentElement.getAttribute("data-theme") === "dark";
     guardarTema(oscuro ? "light" : "dark");
     aplicarTema();
+  });
+
+  $botonFiltros.addEventListener("click", function () {
+    var abierto = $grupoFiltros.classList.toggle("abierto");
+    $botonFiltros.setAttribute("aria-expanded", abierto ? "true" : "false");
   });
 
   /* ---------- formato ---------- */
@@ -512,6 +545,11 @@
     $contador.textContent = visibles.length === diagramas.length
       ? plural(diagramas.length, "diagrama")
       : plural(visibles.length, "diagrama") + " de " + diagramas.length;
+
+    var activos = 0;
+    if (estado.tipo !== "todos") activos++;
+    if (estado.etiqueta) activos++;
+    $botonFiltros.textContent = activos > 0 ? "Filtros (" + activos + ")" : "Filtros";
   }
 
   $busqueda.addEventListener("input", function () {
