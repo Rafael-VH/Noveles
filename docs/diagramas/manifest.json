@@ -1,6 +1,6 @@
 {
   "generado_por": "tools/build-diagrams.mjs",
-  "total": 13,
+  "total": 15,
   "diagramas": [
     {
       "slug": "architecture",
@@ -89,6 +89,29 @@
       "especificacion": "diagramas/labels-asignacion/labels-asignacion.json"
     },
     {
+      "slug": "scan-ingesta-detallada",
+      "titulo": "Ingesta detallada del rol scan en Noveles",
+      "tipo": "workflow",
+      "tipoTexto": "Proceso",
+      "descripcion": "Jerarquía book → took → chapter con los 4 blocs orquestadores: los screens solo disparan eventos y esperan el stream con Completer (timeout 10s); contenido a bucket chapters (retorna URL) y portadas a covers (retorna filename); escritura RLS is_scan() AND created_by = auth.uid(); pitfalls: el picker permite .md pero el backend valida .txt/.html y no hay cleanup ante fallo.",
+      "etiquetas": [
+        "scan",
+        "ingesta",
+        "upload",
+        "capitulos",
+        "portadas",
+        "rls",
+        "timeout"
+      ],
+      "destacado": false,
+      "nodos": 17,
+      "relaciones": 18,
+      "capitulos": 4,
+      "actualizado": "2026-09-23",
+      "archivo": "diagramas/scan-ingesta-detallada/index.html",
+      "especificacion": "diagramas/scan-ingesta-detallada/scan-ingesta-detallada.json"
+    },
+    {
       "slug": "lectura-capitulo",
       "titulo": "Lectura de capítulo y marcado como leído",
       "tipo": "sequence",
@@ -131,6 +154,28 @@
       "actualizado": "2026-09-23",
       "archivo": "diagramas/registro-auth/index.html",
       "especificacion": "diagramas/registro-auth/registro-auth.json"
+    },
+    {
+      "slug": "rpc-analytics",
+      "titulo": "RPCs y Analytics en Noveles",
+      "tipo": "architecture",
+      "tipoTexto": "Arquitectura",
+      "descripcion": "Funciones Postgres (create/update_book_with_relations, analytics ×3, recent_views, most_viewed_public, admin suspend/reactivate, is_user) consumidas por los repos vía DataGateway.rpc(); seam único al vendor (SupabaseDataGateway) y seguridad SECURITY DEFINER + search_path='' + REVOKE FROM PUBLIC → GRANT authenticated.",
+      "etiquetas": [
+        "rpc",
+        "analytics",
+        "data_gateway",
+        "security",
+        "postgres",
+        "admin"
+      ],
+      "destacado": false,
+      "nodos": 13,
+      "relaciones": 14,
+      "capitulos": 0,
+      "actualizado": "2026-09-23",
+      "archivo": "diagramas/rpc-analytics/index.html",
+      "especificacion": "diagramas/rpc-analytics/rpc-analytics.json"
     },
     {
       "slug": "covers-chapters-storage",

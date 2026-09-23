@@ -1,0 +1,453 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "Ingesta detallada del rol scan en Noveles",
+    "locale": "en",
+    "visual_preset": "classic",
+    "quality_profile": "standard",
+    "animation": "trace",
+    "viewBox": [
+      2200,
+      1000
+    ],
+    "views": [
+      {
+        "id": "jerarquia",
+        "label": "Jerarquía book → took → chapter",
+        "focus": [
+          "hub",
+          "book_edit",
+          "took_edit",
+          "chapter_edit"
+        ],
+        "note": "Navegación encadenada con save-first: el ID nuevo se descubre por nombre/autor (ID=0 es placeholder)."
+      },
+      {
+        "id": "blocs",
+        "label": "4 blocs orquestadores",
+        "focus": [
+          "book_bloc",
+          "took_bloc",
+          "chapter_bloc",
+          "cover_bloc"
+        ],
+        "note": "Los screens solo hacen context.read<Bloc>().add(event) y esperan el stream con Completer (timeout 10s)."
+      },
+      {
+        "id": "storage",
+        "label": "Metadatos vs contenido",
+        "focus": [
+          "book_repo",
+          "chapter_repo",
+          "storage_gw",
+          "chapters_bucket",
+          "covers_bucket"
+        ],
+        "note": "Portada (covers) retorna SOLO filename; el contenido (chapters) retorna URL pública. CoverUrlService resuelve la URL después."
+      },
+      {
+        "id": "rls",
+        "label": "RLS scan",
+        "focus": [
+          "books_db",
+          "tooks_db",
+          "chapters_db",
+          "chapters_bucket",
+          "covers_bucket"
+        ],
+        "note": "Escritura con is_scan() AND created_by = auth.uid(); lectura pública. Storage por carpeta $userId."
+      }
+    ]
+  },
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Blocs como orquestadores",
+      "items": [
+        "ScanBookBloc: Load · Save · Delete · Toggle visibility",
+        "ScanTookBloc: Save · Delete · UploadTookCover",
+        "ScanChapterBloc: Save · Delete · UploadChapterFile",
+        "ScanCoverBloc: UploadScanCover (portada de libro)"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Metadatos vs contenido",
+      "items": [
+        "ChapterRepository.uploadContent → bucket chapters → URL pública",
+        "BookRepository.uploadImage → bucket covers → SOLO filename",
+        "Portada de tomo comparte UploadImage (ScanTookBloc/ScanCoverBloc)"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "RLS scan y timeout",
+      "items": [
+        "books/tooks/chapters: escritura is_scan() + created_by=auth.uid()",
+        "Lectura de tooks/chapters pública; books no-scan solo is_visible",
+        "Storage RLS por carpeta $userId · timeout 10s en pantallas (Completer)"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Pitfalls conocidos",
+      "items": [
+        "El picker permite .md pero uploadContent valida solo .txt/.html (10MB)",
+        "NO hay cleanup ante fallo: upload OK + save fallido deja huérfano en el bucket",
+        "Sin reintento automático: solo el botón 'Reintentar' de ScanMainScreen"
+      ]
+    }
+  ],
+  "lanes": [
+    {
+      "id": "ui",
+      "label": "UI · Flutter"
+    },
+    {
+      "id": "domain",
+      "label": "BLoC + Use cases"
+    },
+    {
+      "id": "data",
+      "label": "Repositories"
+    },
+    {
+      "id": "backend",
+      "label": "Gateways"
+    },
+    {
+      "id": "db",
+      "label": "Postgres · Storage"
+    }
+  ],
+  "mainPath": [
+    "hub",
+    "book_edit",
+    "took_edit",
+    "chapter_edit",
+    "chapter_bloc",
+    "chapter_repo",
+    "storage_gw",
+    "chapters_bucket"
+  ],
+  "semanticChecks": {
+    "allowedRoots": [
+      "hub"
+    ],
+    "allowedTerminals": [
+      "books_db",
+      "tooks_db",
+      "chapters_db",
+      "chapters_bucket",
+      "covers_bucket",
+      "data_gw"
+    ],
+    "requiredEdges": [
+      {
+        "from": "hub",
+        "to": "book_edit"
+      },
+      {
+        "from": "book_edit",
+        "to": "book_bloc"
+      },
+      {
+        "from": "chapter_bloc",
+        "to": "chapter_repo"
+      },
+      {
+        "from": "chapter_repo",
+        "to": "storage_gw"
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "id": "hub",
+      "lane": "ui",
+      "col": 0,
+      "type": "frontend",
+      "label": "ScanMainScreen",
+      "sublabel": "hub · lista libros",
+      "width": 160
+    },
+    {
+      "id": "book_edit",
+      "lane": "ui",
+      "col": 1,
+      "type": "frontend",
+      "label": "ScanBookEditScreen",
+      "sublabel": "crea / edita libro",
+      "width": 180
+    },
+    {
+      "id": "took_edit",
+      "lane": "ui",
+      "col": 2,
+      "type": "frontend",
+      "label": "ScanTookEditScreen",
+      "sublabel": "crea / edita tomo",
+      "width": 180
+    },
+    {
+      "id": "chapter_edit",
+      "lane": "ui",
+      "col": 3,
+      "type": "frontend",
+      "label": "ScanChapterEditScreen",
+      "sublabel": "selecciona .md/.txt",
+      "width": 190
+    },
+    {
+      "id": "book_bloc",
+      "lane": "domain",
+      "col": 1,
+      "type": "backend",
+      "label": "ScanBookBloc",
+      "sublabel": "Load · Save · Delete · Toggle",
+      "width": 180
+    },
+    {
+      "id": "took_bloc",
+      "lane": "domain",
+      "col": 2,
+      "type": "backend",
+      "label": "ScanTookBloc",
+      "sublabel": "Save · Delete · UploadTookCover",
+      "width": 190
+    },
+    {
+      "id": "chapter_bloc",
+      "lane": "domain",
+      "col": 3,
+      "type": "backend",
+      "label": "ScanChapterBloc",
+      "sublabel": "Save · Delete · UploadChapterFile",
+      "width": 200
+    },
+    {
+      "id": "cover_bloc",
+      "lane": "domain",
+      "col": 4,
+      "type": "backend",
+      "label": "ScanCoverBloc",
+      "sublabel": "UploadScanCover",
+      "width": 160
+    },
+    {
+      "id": "book_repo",
+      "lane": "data",
+      "col": 4,
+      "type": "database",
+      "label": "BookRepository",
+      "sublabel": "uploadImage → filename",
+      "width": 190
+    },
+    {
+      "id": "chapter_repo",
+      "lane": "data",
+      "col": 3,
+      "type": "database",
+      "label": "ChapterRepository",
+      "sublabel": "uploadContent → URL",
+      "width": 200
+    },
+    {
+      "id": "data_gw",
+      "lane": "backend",
+      "col": 2,
+      "type": "cloud",
+      "label": "DataGateway",
+      "sublabel": "port · sin leak vendor",
+      "width": 170
+    },
+    {
+      "id": "storage_gw",
+      "lane": "backend",
+      "col": 3,
+      "type": "cloud",
+      "label": "StorageGateway",
+      "sublabel": "upload · buckets",
+      "width": 180
+    },
+    {
+      "id": "books_db",
+      "lane": "db",
+      "col": 5,
+      "type": "database",
+      "label": "books",
+      "sublabel": "RLS is_scan + created_by",
+      "width": 190
+    },
+    {
+      "id": "tooks_db",
+      "lane": "db",
+      "col": 2,
+      "type": "database",
+      "label": "tooks",
+      "sublabel": "RLS is_scan + created_by",
+      "width": 190
+    },
+    {
+      "id": "chapters_db",
+      "lane": "db",
+      "col": 3,
+      "type": "database",
+      "label": "chapters",
+      "sublabel": "RLS is_scan + created_by",
+      "width": 190
+    },
+    {
+      "id": "chapters_bucket",
+      "lane": "db",
+      "col": 4,
+      "type": "cloud",
+      "label": "Storage chapters",
+      "sublabel": "$userId/millis.ext",
+      "width": 180
+    },
+    {
+      "id": "covers_bucket",
+      "lane": "db",
+      "col": 1,
+      "type": "cloud",
+      "label": "Storage covers",
+      "sublabel": "$userId/millis.ext",
+      "width": 180
+    }
+  ],
+  "edges": [
+    {
+      "id": "e-nav-book",
+      "from": "hub",
+      "to": "book_edit",
+      "label": "crea / edita libro",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-nav-took",
+      "from": "book_edit",
+      "to": "took_edit",
+      "label": "save-first → tomo",
+      "role": "main"
+    },
+    {
+      "id": "e-nav-chapter",
+      "from": "took_edit",
+      "to": "chapter_edit",
+      "label": "save-first → capítulo",
+      "role": "main"
+    },
+    {
+      "id": "e-save-book",
+      "from": "book_edit",
+      "to": "book_bloc",
+      "label": "SaveScanBook",
+      "role": "main"
+    },
+    {
+      "id": "e-save-took",
+      "from": "took_edit",
+      "to": "took_bloc",
+      "label": "SaveScanTook · UploadTookCover",
+      "role": "main"
+    },
+    {
+      "id": "e-save-chapter",
+      "from": "chapter_edit",
+      "to": "chapter_bloc",
+      "label": "SaveScanChapter · UploadChapterFile",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-cover-took",
+      "from": "took_bloc",
+      "to": "cover_bloc",
+      "label": "comparte UploadImage",
+      "role": "main"
+    },
+    {
+      "id": "e-book-repo",
+      "from": "book_bloc",
+      "to": "book_repo",
+      "label": "create · update · toggle",
+      "role": "main"
+    },
+    {
+      "id": "e-label-cover",
+      "from": "cover_bloc",
+      "to": "book_repo",
+      "label": "UploadScanCover",
+      "role": "main"
+    },
+    {
+      "id": "e-chapter-repo",
+      "from": "chapter_bloc",
+      "to": "chapter_repo",
+      "label": "CreateChapter · UploadChapterContent",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-repo-gw",
+      "from": "chapter_repo",
+      "to": "data_gw",
+      "label": "usa port",
+      "role": "main"
+    },
+    {
+      "id": "e-upload-chapter",
+      "from": "chapter_repo",
+      "to": "storage_gw",
+      "label": "uploadContent(path)",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-upload-cover",
+      "from": "book_repo",
+      "to": "storage_gw",
+      "label": "uploadImage(path)",
+      "role": "main"
+    },
+    {
+      "id": "e-book-db",
+      "from": "book_repo",
+      "to": "books_db",
+      "label": "INSERT / UPDATE",
+      "role": "main"
+    },
+    {
+      "id": "e-chapter-db",
+      "from": "chapter_repo",
+      "to": "chapters_db",
+      "label": "INSERT / UPDATE",
+      "role": "main"
+    },
+    {
+      "id": "e-took-db",
+      "from": "took_bloc",
+      "to": "tooks_db",
+      "label": "INSERT / UPDATE",
+      "role": "main"
+    },
+    {
+      "id": "e-st-chapters",
+      "from": "storage_gw",
+      "to": "chapters_bucket",
+      "label": "PUT · contenido",
+      "role": "main",
+      "variant": "emphasis"
+    },
+    {
+      "id": "e-st-covers",
+      "from": "storage_gw",
+      "to": "covers_bucket",
+      "label": "PUT · portada",
+      "role": "main"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "id": "rpc-analytics",
+  "tipo": "architecture",
+  "titulo": "RPCs y Analytics en Noveles",
+  "descripcion": "Funciones Postgres (create/update_book_with_relations, analytics ×3, recent_views, most_viewed_public, admin suspend/reactivate, is_user) consumidas por los repos vía DataGateway.rpc(); seam único al vendor (SupabaseDataGateway) y seguridad SECURITY DEFINER + search_path='' + REVOKE FROM PUBLIC → GRANT authenticated.",
+  "etiquetas": ["rpc", "analytics", "data_gateway", "security", "postgres", "admin"],
+  "meta": {
+    "componentes": 13,
+    "conexiones": 15,
+    "fuentes": 10
+  }
+}

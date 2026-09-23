@@ -1,0 +1,11 @@
+{
+  "id": "scan-ingesta-detallada",
+  "tipo": "workflow",
+  "titulo": "Ingesta detallada del rol scan",
+  "descripcion": "Jerarquía book → took → chapter con los 4 blocs orquestadores: los screens solo disparan eventos y esperan el stream con Completer (timeout 10s); contenido a bucket chapters (retorna URL) y portadas a covers (retorna filename); escritura RLS is_scan() AND created_by = auth.uid(); pitfalls: el picker permite .md pero el backend valida .txt/.html y no hay cleanup ante fallo.",
+  "etiquetas": ["scan", "ingesta", "upload", "capitulos", "portadas", "rls", "timeout"],
+  "meta": {
+    "nodos": 17,
+    "views": 4
+  }
+}

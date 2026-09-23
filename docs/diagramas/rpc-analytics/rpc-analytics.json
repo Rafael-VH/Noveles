@@ -1,0 +1,422 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "RPCs y Analytics en Noveles",
+    "subtitle": "Funciones Postgres (book_relations · analytics · helpers) consumidas vía DataGateway.rpc() — fuente: supabase/migrations",
+    "locale": "en",
+    "visual_preset": "classic",
+    "quality_profile": "standard",
+    "animation": "trace",
+    "repository": {
+      "url": "https://github.com/Rafael-VH/Noveles",
+      "provider": "github",
+      "revision": "4af295df9376c518e6b4e8499a17af97d0a3efbb"
+    },
+    "viewBox": [
+      1420,
+      900
+    ]
+  },
+  "components": [
+    {
+      "id": "gw_port",
+      "type": "backend",
+      "label": "DataGateway",
+      "sublabel": "rpc(function, params) · port",
+      "sources": [
+        {
+          "path": "lib/core/backend/data_gateway.dart",
+          "label": "port rpc()"
+        }
+      ],
+      "pos": [
+        360,
+        120
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "gw_adapter",
+      "type": "backend",
+      "label": "SupabaseDataGateway",
+      "sublabel": "único lugar con PostgREST",
+      "sources": [
+        {
+          "path": "lib/core/backend/supabase/supabase_data_gateway.dart",
+          "label": "adapter rpc()"
+        }
+      ],
+      "pos": [
+        600,
+        120
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "analytics_repo",
+      "type": "backend",
+      "label": "AnalyticsRepository",
+      "sublabel": "overview · trend · top books",
+      "sources": [
+        {
+          "path": "lib/features/admin/data/analytics_repository_impl.dart",
+          "label": "consumo analytics"
+        }
+      ],
+      "pos": [
+        40,
+        40
+      ],
+      "size": [
+        200,
+        64
+      ]
+    },
+    {
+      "id": "book_repo",
+      "type": "backend",
+      "label": "BookRepository",
+      "sublabel": "relations · recent views",
+      "sources": [
+        {
+          "path": "lib/features/books/data/book_repository_impl.dart",
+          "label": "consumo books"
+        }
+      ],
+      "pos": [
+        40,
+        160
+      ],
+      "size": [
+        200,
+        64
+      ]
+    },
+    {
+      "id": "profiles_repo",
+      "type": "backend",
+      "label": "ProfilesRepository",
+      "sublabel": "suspender · reactivar",
+      "sources": [
+        {
+          "path": "lib/features/profiles/data/profiles_repository_impl.dart",
+          "label": "consumo admin"
+        }
+      ],
+      "pos": [
+        40,
+        280
+      ],
+      "size": [
+        200,
+        64
+      ]
+    },
+    {
+      "id": "func_rel",
+      "type": "backend",
+      "brand": "postgresql",
+      "label": "create/update_book_with_relations",
+      "sublabel": "p_book JSONB · genres · labels",
+      "sources": [
+        {
+          "path": "supabase/migrations/20260725172716_create_book_relations_rpc.sql",
+          "label": "RPC book relations"
+        },
+        {
+          "path": "supabase/migrations/20260906004216_enforce_suspended_all_tables.sql",
+          "label": "redefinición final"
+        }
+      ],
+      "pos": [
+        850,
+        40
+      ],
+      "size": [
+        240,
+        64
+      ]
+    },
+    {
+      "id": "func_analytics",
+      "type": "backend",
+      "brand": "postgresql",
+      "label": "get_views_trend · get_top_books",
+      "sublabel": "get_analytics_overview",
+      "sources": [
+        {
+          "path": "supabase/migrations/20260720223843_create_analytics_functions.sql",
+          "label": "analytics functions"
+        },
+        {
+          "path": "supabase/migrations/20260727152112_security_hardening.sql",
+          "label": "hardening rpc"
+        }
+      ],
+      "pos": [
+        850,
+        140
+      ],
+      "size": [
+        240,
+        64
+      ]
+    },
+    {
+      "id": "func_views",
+      "type": "backend",
+      "brand": "postgresql",
+      "label": "recent_views · most_viewed_public",
+      "sublabel": "get_user_recent_views · get_most_viewed_books_public",
+      "sources": [
+        {
+          "path": "supabase/migrations/20260722191944_chapter_reads.sql",
+          "label": "recent views"
+        },
+        {
+          "path": "supabase/migrations/20260727152051_security_authz_fix.sql",
+          "label": "fix IDOR"
+        },
+        {
+          "path": "supabase/migrations/20260906004149_fix_public_most_viewed_books.sql",
+          "label": "vista pública"
+        }
+      ],
+      "pos": [
+        850,
+        240
+      ],
+      "size": [
+        240,
+        64
+      ]
+    },
+    {
+      "id": "func_admin",
+      "type": "backend",
+      "brand": "postgresql",
+      "label": "suspend · reactivate (admin)",
+      "sublabel": "admin_suspend_user · admin_reactivate_user",
+      "sources": [
+        {
+          "path": "supabase/migrations/20260906004216_enforce_suspended_all_tables.sql",
+          "label": "RPCs admin"
+        }
+      ],
+      "pos": [
+        850,
+        340
+      ],
+      "size": [
+        240,
+        64
+      ]
+    },
+    {
+      "id": "func_helper",
+      "type": "backend",
+      "brand": "postgresql",
+      "label": "is_user()",
+      "sublabel": "helper RLS · security definer",
+      "sources": [
+        {
+          "path": "supabase/migrations/20260720223717_add_is_user_helper.sql",
+          "label": "helper is_user"
+        }
+      ],
+      "pos": [
+        850,
+        440
+      ],
+      "size": [
+        240,
+        64
+      ]
+    },
+    {
+      "id": "books",
+      "type": "database",
+      "brand": "postgresql",
+      "label": "books",
+      "sublabel": "creación con relaciones",
+      "pos": [
+        1190,
+        40
+      ],
+      "size": [
+        170,
+        64
+      ]
+    },
+    {
+      "id": "book_views",
+      "type": "database",
+      "brand": "postgresql",
+      "label": "book_views · chapter_reads",
+      "sublabel": "analítica",
+      "pos": [
+        1190,
+        140
+      ],
+      "size": [
+        180,
+        64
+      ]
+    },
+    {
+      "id": "profiles",
+      "type": "database",
+      "brand": "postgresql",
+      "label": "profiles",
+      "sublabel": "rol + suspensión",
+      "pos": [
+        1190,
+        340
+      ],
+      "size": [
+        170,
+        64
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "c-analytics",
+      "from": "analytics_repo",
+      "to": "gw_port",
+      "label": "rpc overview"
+    },
+    {
+      "id": "c-book-rpc",
+      "from": "book_repo",
+      "to": "gw_port",
+      "label": "rpc relations"
+    },
+    {
+      "id": "c-profiles",
+      "from": "profiles_repo",
+      "to": "gw_port",
+      "label": "rpc admin"
+    },
+    {
+      "id": "c-adapter",
+      "from": "gw_port",
+      "to": "gw_adapter",
+      "label": "delega rpc()",
+      "variant": "emphasis"
+    },
+    {
+      "id": "c-rel",
+      "from": "gw_adapter",
+      "to": "func_rel",
+      "label": "PostgREST rpc",
+      "variant": "emphasis"
+    },
+    {
+      "id": "c-analytics-fn",
+      "from": "gw_adapter",
+      "to": "func_analytics",
+      "label": "PostgREST rpc"
+    },
+    {
+      "id": "c-views-fn",
+      "from": "gw_adapter",
+      "to": "func_views",
+      "label": "PostgREST rpc"
+    },
+    {
+      "id": "c-admin-fn",
+      "from": "gw_adapter",
+      "to": "func_admin",
+      "label": "PostgREST rpc"
+    },
+    {
+      "id": "c-helper",
+      "from": "gw_adapter",
+      "to": "func_helper",
+      "label": "helper RLS",
+      "variant": "dashed"
+    },
+    {
+      "id": "c-rel-books",
+      "from": "func_rel",
+      "to": "books",
+      "label": "crea libro + rel",
+      "variant": "emphasis"
+    },
+    {
+      "id": "c-analytics-tabla",
+      "from": "func_analytics",
+      "to": "book_views",
+      "label": "lectura agregada",
+      "variant": "dashed"
+    },
+    {
+      "id": "c-views-tabla",
+      "from": "func_views",
+      "to": "book_views",
+      "label": "recent · most viewed",
+      "variant": "dashed"
+    },
+    {
+      "id": "c-admin-profiles",
+      "from": "func_admin",
+      "to": "profiles",
+      "label": "UPDATE suspensión",
+      "variant": "emphasis"
+    },
+    {
+      "id": "c-definer",
+      "from": "func_helper",
+      "to": "profiles",
+      "label": "security definer",
+      "variant": "dashed"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Seam único al vendor",
+      "items": [
+        "DataGateway.rpc(function, params) es el port (data_gateway.dart)",
+        "SupabaseDataGateway es el único lugar que conoce PostgREST",
+        "Los repos llaman rpc('nombre', params) directo sobre el port"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Seguridad",
+      "items": [
+        "Todas las RPCs de negocio: SECURITY DEFINER + SET search_path = ''",
+        "Role check is_admin()/is_scan()/is_user() dentro de cada función",
+        "REVOKE EXECUTE FROM PUBLIC → GRANT authenticated (dashboard usa anon key pero llega como authenticated)"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Mapa de funciones",
+      "items": [
+        "book_relations: create_book_with_relations · update_book_with_relations",
+        "Analytics: get_views_trend · get_top_books · get_analytics_overview",
+        "user: get_user_recent_views · get_most_viewed_books_public · is_user()",
+        "admin: admin_suspend_user · admin_reactivate_user"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Obsolescencias",
+      "items": [
+        "get_most_viewed_books (admin-only) quedó sin grants; no se usa desde Dart",
+        "get_user_recent_views no tiene REVOKE/GRANT explícito (heredó PUBLIC)",
+        "No existe 'book_relations' ni 'ediciones_por_volumen' como funciones"
+      ]
+    }
+  ]
+}
